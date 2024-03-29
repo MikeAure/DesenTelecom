@@ -17,7 +17,6 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.io.File;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class RecvTest {
     @Resource

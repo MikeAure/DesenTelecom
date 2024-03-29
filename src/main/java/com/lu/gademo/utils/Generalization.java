@@ -1,7 +1,5 @@
 package com.lu.gademo.utils;
 
-import com.lu.gademo.utils.DSObject;
-
-public interface Dp {
+public interface Generalization {
     public DSObject service(DSObject object, Integer alg, Number...params);
 }

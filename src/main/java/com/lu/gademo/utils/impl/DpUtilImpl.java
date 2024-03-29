@@ -745,7 +745,7 @@ public class DpUtilImpl implements DpUtil {
                 milliseconds.add(0.0);
             else {
                 //java.util.Date utilDate = dateFormat.parse(data + "");
-                java.util.Date date = dateFormat.parse(data+"");
+                java.util.Date date = dateFormat.parse(data + "");
                 //Date sqlDate = new Date(utilDate.getTime());
                 milliseconds.add((double)date.getTime());
             }

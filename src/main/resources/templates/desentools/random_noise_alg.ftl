@@ -65,8 +65,8 @@
         document.getElementById("randomLaplaceToValue_submitBtn").addEventListener("click", function (){
             let textInput = $("#randomLaplaceToValue_input").val();
             let privacyLevel = document.getElementById("randomLaplaceToValue_privacyLevel").value
-            var textType = "value"
-            var algName = "randomLaplaceToValue"
+            let textType = "value"
+            let algName = "randomLaplaceToValue"
             if (textInput === "") {
                 alert("请输入文本");
                 return; // Stop further execution if the text input is empty

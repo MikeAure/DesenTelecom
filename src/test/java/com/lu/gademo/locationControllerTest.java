@@ -17,7 +17,6 @@ public class locationControllerTest {
     @Autowired
     private MockMvc mvc;
 
-
     @Test
     public void locationControllerAccuracyTest() throws Exception {
         String url = "/Location/Accuracy_reduction";

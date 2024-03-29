@@ -18,7 +18,7 @@ public class DpTest {
     public void testLaplaceMechanism()  {
         Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(2.5);
-        DSObject result = dp.dp(dsObject, 1, 20, 10);
+        DSObject result = dp.service(dsObject, 1, 20, 10);
         for (Object number : result.getList()) {
             System.out.println(number);
         }
@@ -29,7 +29,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 2, 10, 10);
+        DSObject result = dp.service(dsObject, 2, 10, 10);
         for (Object number : result.getList()) {
             System.out.println(number);
         }
@@ -40,7 +40,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 3, 10, 10);
+        DSObject result = dp.service(dsObject, 3, 10, 10);
         for (Object number : result.getList()) {
             System.out.println(number);
         }
@@ -51,7 +51,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 4, 5);
+        DSObject result = dp.service(dsObject, 4, 5);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -66,7 +66,7 @@ public class DpTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 5, 0.5);
+        DSObject result = dp.service(dsObject, 5, 0.5);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -81,7 +81,7 @@ public class DpTest {
         String path2 = Paths.get(currentPath, "audio", "0001_Laplace.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 6, 0);
+        DSObject result = dp.service(dsObject, 6, 0);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -96,7 +96,7 @@ public class DpTest {
         String path2 = Paths.get(currentPath, "desen_files", "test_graph").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        dp.dp(dsObject, 7, 0);
+        dp.service(dsObject, 7, 0);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 8, 2);
+        DSObject result = dp.service(dsObject, 8, 2);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -115,7 +115,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 9, 4);
+        DSObject result = dp.service(dsObject, 9, 4);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -126,7 +126,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 10, 4);
+        DSObject result = dp.service(dsObject, 10, 4);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -137,7 +137,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 11, 5, 6);
+        DSObject result = dp.service(dsObject, 11, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -148,7 +148,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 12, 5, 6);
+        DSObject result = dp.service(dsObject, 12, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -159,7 +159,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 13, 5, 6);
+        DSObject result = dp.service(dsObject, 13, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -170,7 +170,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 14, 5, 6);
+        DSObject result = dp.service(dsObject, 14, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -181,7 +181,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 15, 5, 6);
+        DSObject result = dp.service(dsObject, 15, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -192,7 +192,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 16, 5, 6);
+        DSObject result = dp.service(dsObject, 16, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -203,7 +203,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 17, 5, 6);
+        DSObject result = dp.service(dsObject, 17, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -213,7 +213,7 @@ public class DpTest {
     public void testRappor()  {
         Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(8.5);
-        DSObject result = dp.dp(dsObject, 18, 6);
+        DSObject result = dp.service(dsObject, 18, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -223,7 +223,7 @@ public class DpTest {
     public void testOneTimeRappor()  {
         Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(8.5);
-        DSObject result = dp.dp(dsObject, 19, 6);
+        DSObject result = dp.service(dsObject, 19, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -234,7 +234,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<String> rawData = Arrays.asList("A", "B", "C", "D", "E");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 20, 2);
+        DSObject result = dp.service(dsObject, 20, 2);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -245,7 +245,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 21, 2);
+        DSObject result = dp.service(dsObject, 21, 2);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -256,7 +256,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 22, 2);
+        DSObject result = dp.service(dsObject, 22, 2);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -267,7 +267,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 23, 2);
+        DSObject result = dp.service(dsObject, 23, 2);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -278,7 +278,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 24, 6);
+        DSObject result = dp.service(dsObject, 24, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -289,7 +289,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.dp(dsObject, 25, 6);
+        DSObject result = dp.service(dsObject, 25, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
         }

@@ -9,6 +9,8 @@ public class DSObject {
     
     Double doubleVal;
 
+    String string;
+
     List<?> list;
 
     MultipartFile file;
@@ -21,10 +23,13 @@ public class DSObject {
         this.doubleVal = doubleVal;
     }
 
+    public DSObject(String string) { this.string = string; }
 
     public DSObject(List<?> list) {
         this.list = list;
     }
+
+    public DSObject(String string, List<?> list) { this.string = string; this.list = list; }
 
     public Integer getIntVal() {
         return intVal;
@@ -32,6 +37,10 @@ public class DSObject {
 
     public Double getDoubleVal() {
         return this.doubleVal;
+    }
+
+    public String getStringVal() {
+        return this.string;
     }
 
     public List<?> getList() {
@@ -46,8 +55,9 @@ public class DSObject {
         this.doubleVal = doubleVal;
     }
 
+    public void setString(String string) { this.string = string; }
+
     public void setList(List<?> list) {
         this.list = list;
     }
-
 }

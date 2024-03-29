@@ -28,7 +28,7 @@ public interface Util {
 
     // 构建数据库并插入数据
     public void createDB(Sheet sheet, List<Integer> dataType, String tableName) throws IOException, SQLException;
-    // SM3签名
+    // SM2签名
     public String sm2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException;
     // 系统类型
     public boolean isLinux();

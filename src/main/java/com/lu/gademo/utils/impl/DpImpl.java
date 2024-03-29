@@ -3,7 +3,7 @@ package com.lu.gademo.utils.impl;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.DpUtil;
-import com.lu.gademo.utils.ExecutePython;
+import com.lu.gademo.utils.CommanExecutor;
 
 
 import java.io.File;
@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class DpImpl implements Dp {
 
-    public DSObject dp(DSObject object, Integer alg, Number...params) {
+    public DSObject service(DSObject object, Integer alg, Number...params) {
 
         if (object == null) return null;
 
@@ -95,8 +95,8 @@ public class DpImpl implements Dp {
             }
 
             /*
-                声纹特征脱敏算法
-                功能：IM-Coder1
+                IM-Coder1
+                功能：为图片添加拉普拉斯差分噪声，保持图像可用性，降低机器学习模型识别精度
                 参数：ε
                 输入：原图片文件路径，脱敏图片存放路径，隐私级别
                 输出：脱敏执行信息
@@ -473,7 +473,7 @@ public class DpImpl implements Dp {
                 String array = StringUtils.join(value, ",");
                 List<String> results = executePython(array, "noisy_hist2", path2, params[0].toString());
                 List<List<Double>> lists= new ArrayList<>();
-                for(String s : results) {
+                for (String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
                     lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList()));
@@ -488,7 +488,6 @@ public class DpImpl implements Dp {
     public List<String> executePython(String rawData, String algName, String path, String...params) {
 
         Util util = new UtilImpl();
-
         String python = util.isLinux() ? "python3" : "python";
 
         try {
@@ -502,7 +501,7 @@ public class DpImpl implements Dp {
             }
             System.out.println(command);
 
-            return ExecutePython.openExe(command.toString());
+            return CommanExecutor.openExe(command.toString());
 
         } catch (Exception e) {
             e.printStackTrace();
