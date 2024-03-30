@@ -3,20 +3,21 @@ package com.lu.gademo.utils.impl;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.DpUtil;
-import com.lu.gademo.utils.CommanExecutor;
+import com.lu.gademo.utils.CommandExecutor;
 
 
 import java.io.File;
 
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-import com.lu.gademo.utils.Util;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class DpImpl implements Dp {
 
     public DSObject service(DSObject object, Integer alg, Number...params) {
@@ -37,14 +38,21 @@ public class DpImpl implements Dp {
                 输入：单个数值、算法标识符 -> 1、隐私预算、采样次数 n
                 输出：数值一维数组 length = n
             */
+//            case 1 : {
+//               if (params.length != 2) return null;
+//               List<Object> value = new ArrayList<>();
+//               Double val = object.getDoubleVal();
+//               for (int i = 0; i < params[1].intValue(); i++) {
+//                   value.add(val);
+//               }
+//               return new DSObject(dpUtil.laplaceToValue(value, params[0].intValue()));
+//            }
+
             case 1 : {
-               if (params.length != 2) return null;
-               List<Object> value = new ArrayList<>();
-               Double val = object.getDoubleVal();
-               for (int i = 0; i < params[1].intValue(); i++) {
-                   value.add(val);
-               }
-               return new DSObject(dpUtil.laplaceToValue(value, params[0].intValue()));
+                if (params.length != 1) return null;
+//                List<Object> value = new ArrayList<>();
+                List<Object> val = new ArrayList<>(object.getList());
+                return new DSObject(dpUtil.laplaceToValue(val, params[0].intValue()));
             }
 
             /*
@@ -90,7 +98,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> result = executePython(array, "snapping", path1, params[0].toString());
+                List<String> result = CommandExecutor.executePython(array, "snapping", path1, params[0].toString());
                 return new DSObject(result);
             }
 
@@ -105,7 +113,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String path3 = Paths.get(currentPath, "image", "dpImage.py").toString();
-                List<String> results = executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path3, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path3, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -120,7 +128,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String path4 = Paths.get(currentPath, "audio", "desenAudio.py").toString();
-                List<String> results = executePython(value.get(0).toString() + " " + value.get(1).toString(), "dpAudio", path4, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "dpAudio", path4, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -136,7 +144,8 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String path5 = Paths.get(currentPath, "graph", "desenGraph.py").toString();
-                executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path5, params[0].toString());
+                System.out.println(path5);
+                CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path5, params[0].toString());
                 return null;
             }
 
@@ -151,7 +160,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "exponential", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(array, "exponential", path1, params[0].toString());
                 String s = results.get(0);
                 s = s.replace("[", "");
                 s = s.replace("]", "");
@@ -170,7 +179,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "report_noisy_max2", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(array, "report_noisy_max2", path1, params[0].toString());
                 String s = results.get(0);
                 s = s.replace("[", "");
                 s = s.replace("]", "");
@@ -189,7 +198,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "report_noisy_max4", path2, params[0].toString());
+                List<String> results = CommandExecutor.executePython(array, "report_noisy_max4", path2, params[0].toString());
                 String s = results.get(0);
                 s = s.replace("[", "");
                 s = s.replace("]", "");
@@ -208,7 +217,7 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "sparse_vector_technique1", path1, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique1", path1, params[0].toString(), params[1].toString());
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -229,7 +238,7 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "sparse_vector_technique2", path1, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique2", path1, params[0].toString(), params[1].toString());
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -250,7 +259,7 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "sparse_vector_technique3", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique3", path2, params[0].toString(), params[1].toString());
                 List<List<Double>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -271,7 +280,7 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "sparse_vector_technique4", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique4", path2, params[0].toString(), params[1].toString());
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -292,7 +301,7 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "sparse_vector_technique5", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique5", path2, params[0].toString(), params[1].toString());
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -313,7 +322,7 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "sparse_vector_technique6", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique6", path2, params[0].toString(), params[1].toString());
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -334,7 +343,7 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "sparse_vector_technique_numerical", path1, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique_numerical", path1, params[0].toString(), params[1].toString());
                 List<List<Double>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -354,7 +363,7 @@ public class DpImpl implements Dp {
             case 18 : {
                 if (params.length != 1) return null;
                 Double value = object.getDoubleVal();
-                List<String> results = executePython(value.toString(), "rappor", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.toString(), "rappor", path1, params[0].toString());
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -375,7 +384,7 @@ public class DpImpl implements Dp {
             case 19 : {
                 if (params.length != 1) return null;
                 Double value = object.getDoubleVal();
-                List<String> results = executePython(value.toString(), "onetimerappor", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.toString(), "onetimerappor", path1, params[0].toString());
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -450,7 +459,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "noisy_hist1", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(array, "noisy_hist1", path1, params[0].toString());
                 List<List<Double>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
@@ -471,7 +480,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = executePython(array, "noisy_hist2", path2, params[0].toString());
+                List<String> results = CommandExecutor.executePython(array, "noisy_hist2", path2, params[0].toString());
                 List<List<Double>> lists= new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
@@ -481,31 +490,50 @@ public class DpImpl implements Dp {
                 return new DSObject(lists);
             }
 
+            /*
+                基于差分隐私的日期加噪算法
+                功能：对日期数据添加laplace噪声
+                参数：ε
+                输入：日期数组
+                输出：日期数组
+             */
+            case 26 : {
+                if (params.length != 1) return null;
+                List<?> list = object.getList();
+                List<Object> value = new ArrayList<>(list);
+                try {
+                    return new DSObject(dpUtil.dpDate(value, params[0].intValue()));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+
             default : return null;
         }
     }
 
-    public List<String> executePython(String rawData, String algName, String path, String...params) {
-
-        Util util = new UtilImpl();
-        String python = util.isLinux() ? "python3" : "python";
-
-        try {
-            // 指定Python脚本路径
-            System.out.println(path);
-
-            // 创建参数列表
-            StringBuilder command = new StringBuilder(python + " " + path + " " + algName + " " + rawData);
-            for (String param : params) {
-                command.append(" ").append(param);
-            }
-            System.out.println(command);
-
-            return CommanExecutor.openExe(command.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    public List<String> executePython(String rawData, String algName, String path, String...params) {
+//
+//        Util util = new UtilImpl();
+//        String python = util.isLinux() ? "python3" : "python";
+//
+//        try {
+//            // 指定Python脚本路径
+//            System.out.println(path);
+//
+//            // 创建参数列表
+//            StringBuilder command = new StringBuilder(python + " " + path + " " + algName + " " + rawData);
+//            for (String param : params) {
+//                command.append(" ").append(param);
+//            }
+//            System.out.println(command);
+//
+//            return CommanExecutor.openExe(command.toString());
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 }

@@ -26,8 +26,6 @@ public class ServerMain {
         private TraceUser user;
         private UserDao userDao;
         private final Logger logger = LogManager.getLogger(DataProcessThread.class);
-
-
         public DataProcessThread(Socket socket) {
             super();
             this.socket = socket;
@@ -90,80 +88,22 @@ public class ServerMain {
     private ServerSocket listenSocket;
     private Socket acceptSocket;
     private final static int SERVER_PORT = 20006;
-//    public static TraceServer serverGui;
-
-//    public ServerMain() {
-////        new Thread(() -> {
-////            try {
-////                serverGui = new TraceServer(progress, SERVER_PORT);
-////                // serverGui.setVisible(false);
-////            } catch (UnknownHostException ex) {
-////                ex.printStackTrace();
-////            }
-////        }).start();
-//
-//        ownThread = new Thread(() -> {  // 用来开启端口监听，以及读取一张加密地图的数据
-//            try {
-//                listenSocket = new ServerSocket(SERVER_PORT);
-////						InetAddress addr = InetAddress.getByName("127.0.0.1");
-////						ss = new ServerSocket(SERVER_PORT, 50, addr);
-//                File mapFile = new File("./src/main/resources/MapData.txt");
-//                BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(mapFile.toPath()));
-//                BufferedReader bufferReader = new BufferedReader(new InputStreamReader(bis, StandardCharsets.UTF_8));
-//                StringBuilder singleMap = new StringBuilder();
-//                int data;
-//                while ((data = bufferReader.read()) != ';') {
-//                    singleMap.append((char) data);
-//                }
-//                // System.out.println("加密的地图数据：\n" + singleMap);
-////                while (serverGui == null) {
-////                    try {
-////                        Thread.sleep(1000);
-////                    } catch (InterruptedException e1) {
-////                        e1.printStackTrace();
-////                    }
-////                }
-//                // serverGui.appendLog(new StringBuffer("加密的地图数据：\n" + singleMap));
-//                while (!ownThread.isInterrupted()) {
-//                    acceptSocket = listenSocket.accept();
-//                    acceptSocket.setSoTimeout(1000 * 60 * 20);
-//                    new Thread(new DataProcessThread(acceptSocket)).start();
-//                }
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//        });
-//
-//
-//    }
 
     public void start() {
         ownThread = new Thread(() -> {  // 用来开启端口监听，以及读取一张加密地图的数据
             try {
                 listenSocket = new ServerSocket(SERVER_PORT);
-//						InetAddress addr = InetAddress.getByName("127.0.0.1");
-//						ss = new ServerSocket(SERVER_PORT, 50, addr);
+
                 InputStream mapDataStream = getClass().getClassLoader().getResourceAsStream("MapData.txt");
                 if (mapDataStream == null) {
                     throw new FileNotFoundException("MapData.txt not found");
                 }
-//                BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(mapFile.toPath()));
-//                BufferedReader bufferReader = new BufferedReader(new InputStreamReader(bis, StandardCharsets.UTF_8));
                 BufferedReader bufferReader = new BufferedReader(new InputStreamReader(mapDataStream));
                 StringBuilder singleMap = new StringBuilder();
                 int data;
                 while ((data = bufferReader.read()) != ';') {
                     singleMap.append((char) data);
                 }
-                // System.out.println("加密的地图数据：\n" + singleMap);
-//                while (serverGui == null) {
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e1) {
-//                        e1.printStackTrace();
-//                    }
-//                }
-                // serverGui.appendLog(new StringBuffer("加密的地图数据：\n" + singleMap));
                 while (!ownThread.isInterrupted()) {
                     acceptSocket = listenSocket.accept();
                     acceptSocket.setSoTimeout(1000 * 60 * 20);

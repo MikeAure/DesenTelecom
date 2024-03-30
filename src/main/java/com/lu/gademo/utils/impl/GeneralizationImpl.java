@@ -3,8 +3,9 @@ package com.lu.gademo.utils.impl;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Generalization;
 import com.lu.gademo.utils.DpUtil;
-import com.lu.gademo.utils.CommanExecutor;
+import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.Util;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -12,6 +13,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class GeneralizationImpl implements Generalization {
     public DSObject service(DSObject object, Integer alg, Number...params) {
 
@@ -120,7 +122,7 @@ public class GeneralizationImpl implements Generalization {
                     param += " " + temp[0] + " " + temp[1];
                 }
                 String cmd = path + " " + param;
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -147,7 +149,7 @@ public class GeneralizationImpl implements Generalization {
                     param += " " + temp[0] + " " + temp[1];
                 }
                 String cmd = path + " " + param;
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -162,7 +164,7 @@ public class GeneralizationImpl implements Generalization {
                 String[] s = position.split(",");
                 String param = "10 " + s[0] + " " + s[1] + " 1000";
                 String cmd = path + " " + param;
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -175,7 +177,7 @@ public class GeneralizationImpl implements Generalization {
             case 9 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "pixelate", path2, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "pixelate", path2, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -189,7 +191,7 @@ public class GeneralizationImpl implements Generalization {
             case 10 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "gaussian_blur", path2, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "gaussian_blur", path2, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -203,7 +205,7 @@ public class GeneralizationImpl implements Generalization {
             case 11 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "box_blur", path2, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "box_blur", path2, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -218,7 +220,7 @@ public class GeneralizationImpl implements Generalization {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String path3 = Paths.get(currentPath, "image", "meanValueImage.py").toString();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path3, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path3, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -232,7 +234,7 @@ public class GeneralizationImpl implements Generalization {
             case 13 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "replace_region", path2, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "replace_region", path2, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -246,7 +248,7 @@ public class GeneralizationImpl implements Generalization {
             case 14 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "pixelate_video", path4, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "pixelate_video", path4, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -260,7 +262,7 @@ public class GeneralizationImpl implements Generalization {
             case 15 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "gaussian_blur_video", path4, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "gaussian_blur_video", path4, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -274,7 +276,7 @@ public class GeneralizationImpl implements Generalization {
             case 16 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "box_blur_video", path4, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "box_blur_video", path4, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -289,7 +291,7 @@ public class GeneralizationImpl implements Generalization {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String path5 = Paths.get(currentPath, "video", "meanValueVideo.py").toString();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path5, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path5, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -303,7 +305,7 @@ public class GeneralizationImpl implements Generalization {
             case 18 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "replace_region_video", path4, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "replace_region_video", path4, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -317,7 +319,7 @@ public class GeneralizationImpl implements Generalization {
             case 19 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "floor", path6, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "floor", path6, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -330,7 +332,7 @@ public class GeneralizationImpl implements Generalization {
             */
             case 20 : {
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "spec", path6, "0");
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "spec", path6, "0");
                 return new DSObject(results);
             }
 
@@ -343,7 +345,7 @@ public class GeneralizationImpl implements Generalization {
             */
             case 21 : {
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "augmentation", path6, "0");
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "augmentation", path6, "0");
                 return new DSObject(results);
             }
 
@@ -357,7 +359,7 @@ public class GeneralizationImpl implements Generalization {
             case 22 : {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                List<String> results = CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "median", path6, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "median", path6, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -365,27 +367,4 @@ public class GeneralizationImpl implements Generalization {
         }
     }
 
-    public List<String> executePython(String rawData, String algName, String path, String...params) {
-
-        Util util = new UtilImpl();
-        String python = util.isLinux() ? "python3" : "python";
-
-        try {
-            // 指定Python脚本路径
-            System.out.println(path);
-
-            // 创建参数列表
-            StringBuilder command = new StringBuilder(python + " " + path + " " + algName + " " + rawData);
-            for (String param : params) {
-                command.append(" ").append(param);
-            }
-            System.out.println(command);
-
-            return CommanExecutor.openExe(command.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

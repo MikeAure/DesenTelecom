@@ -2,6 +2,6 @@ package com.lu.gademo.utils;
 
 import com.lu.gademo.utils.DSObject;
 
-public interface Dp {
-    public DSObject service(DSObject object, Integer alg, Number...params);
+public interface Dp extends BaseDesenAlgorithm {
+
 }

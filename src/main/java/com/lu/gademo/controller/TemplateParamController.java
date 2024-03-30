@@ -11,7 +11,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/")
-public class templateParamController {
+public class TemplateParamController {
     @Resource
     private ExcelParamServiceImpl excelParamService;
 

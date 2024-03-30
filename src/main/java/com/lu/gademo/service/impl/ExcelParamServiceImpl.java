@@ -2,13 +2,14 @@ package com.lu.gademo.service.impl;
 
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.mapper.ExcelParamDao;
+import com.lu.gademo.service.ExcelParamService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 @Service
-public class ExcelParamServiceImpl {
+public class ExcelParamServiceImpl implements ExcelParamService {
     @Resource
     private ExcelParamDao excelParamDao;
 

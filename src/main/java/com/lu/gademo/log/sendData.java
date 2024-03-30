@@ -11,6 +11,7 @@ import com.lu.gademo.entity.evidence.*;
 import com.lu.gademo.entity.ruleCheck.*;
 import com.lu.gademo.utils.Util;
 import com.lu.gademo.utils.impl.UtilImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.UTF8;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class sendData {
     // 本地存证系统ip和端口
@@ -163,12 +165,15 @@ public class sendData {
 //                    e.printStackTrace();
 //            }
 
+            BufferedReader bfReader = new BufferedReader(new FileReader("src\\main\\resources\\test_request.json"));
+            BufferedWriter bfWriter = new BufferedWriter((new FileWriter("src\\main\\resources\\test_request2.json")));
+
             byte[] evaRequestTcpPacket = tcpPacket.buildPacket();
             // 发送
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(evaRequestTcpPacket);
             outputStream.flush();
-            System.out.println("脱敏效果评测请求发送");
+            log.info("Send the desensitization request to the evaluation");
 
             // 发送原始文件
             outputStream.write(rawFileData);
@@ -179,7 +184,7 @@ public class sendData {
 //            // 存储文件数据改为存储文件地址
 //            sendEvaReq.setDesenInfoAfter(desenFileName);
 //            sendEvaReq.setDesenInfoPre(rawFileName);
-            System.out.println("选择的算法编号：" + sendEvaReq.getDesenAlg());
+            log.info("Chosen algorithm：" + sendEvaReq.getDesenAlg());
 
 
             // 效果评测请求信息存储到数据库

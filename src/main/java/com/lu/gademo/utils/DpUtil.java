@@ -1,8 +1,12 @@
 package com.lu.gademo.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.sql.Date;
 import java.text.ParseException;
 import java.util.List;
+
 
 //差分处理的算法
 public interface DpUtil {
@@ -36,13 +40,13 @@ public interface DpUtil {
     public  List<Date> dpDate(List<Object> data, Integer privacyLevel) throws ParseException;
     // 日期分组置换
     public  List<Date> date_group_replace(List<Object> data, Integer privacyLevel) throws ParseException;
-    //名字处理方式,(卢**)
+    //名称脱敏算法，名字处理方式,(卢**)
     public  List<String> nameHide(List<Object> names, Integer privacyLevel);
 
-    //电话号码或编号的处理，136****1203
+    // 编号脱敏算法，电话号码或编号的处理，136****1203
     public  List<String> numberHide(List<Object> telephones, Integer privacyLevel);
 
-    //身份号码的处理
+    // 身份号码的处理
     public  String IDCode(String ID, String zs, Date birthday,String sex);
     public  String IDCode(String ID, Date birthday,String sex);
     // 信息主键编号处理
@@ -50,10 +54,11 @@ public interface DpUtil {
 
     //文本区域的处理（eg.地址，公司名，车的类型）,商量
     public List<String> TextCode(List<Object> texts);
-    // 地址处理
+    // 地址脱敏算法，地址处理
     public List<String> addressHide(List<Object> addrs, Integer privacyLevel);
     // 地名处理
     public List<String> desenAddressName(List<Object> addrs, Integer privacyLevel, String name);
+    // 基于随机字符的字符串混淆方法 
     public List<String> passReplace(List<Object> addrs, Integer privacyLevel);
 
     // 尾部截断只保留前3位
@@ -75,7 +80,7 @@ public interface DpUtil {
     // 邮箱地址隐藏
     public  List<String> suppressEmail(List<Object> dataList);
 
-    // IP地址随机抑制
+    // IP地址随机替换
     public List<String> suppressIpRandomParts(List<Object> dataList);
 
     //IP地址全抑制

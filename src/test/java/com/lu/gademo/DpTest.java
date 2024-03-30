@@ -8,6 +8,7 @@ import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.impl.DpImpl;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -17,8 +18,8 @@ public class DpTest {
     @Test
     public void testLaplaceMechanism()  {
         Dp dp = new DpImpl();
-        DSObject dsObject = new DSObject(2.5);
-        DSObject result = dp.service(dsObject, 1, 20, 10);
+        DSObject dsObject = new DSObject(Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0));
+        DSObject result = dp.service(dsObject, 1, 1);
         for (Object number : result.getList()) {
             System.out.println(number);
         }
@@ -229,6 +230,7 @@ public class DpTest {
         }
     }
 
+    // 信工所
     @Test
     public void testDpCode()  {
         Dp dp = new DpImpl();
@@ -251,6 +253,7 @@ public class DpTest {
         }
     }
 
+    // 信工所
     @Test
     public void testRandomLaplaceToValue()  {
         Dp dp = new DpImpl();
@@ -290,6 +293,18 @@ public class DpTest {
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
         DSObject result = dp.service(dsObject, 25, 6);
+        for (Object s : result.getList()) {
+            System.out.println(s);
+        }
+    }
+
+    // 信工所
+    @Test
+    public void testDpDate() {
+        Dp dp = new DpImpl();
+        List<String> rawData = Arrays.asList("2019-03-02 10:58:53", "2019-03-02 10:58:54", "2019-03-02 10:58:55", "2019-03-02 10:58:56", "2019-03-02 10:58:57");
+        DSObject dsObject = new DSObject(rawData);
+        DSObject result = dp.service(dsObject, 26, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }

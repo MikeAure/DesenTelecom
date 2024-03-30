@@ -7,7 +7,7 @@ import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
 import com.lu.gademo.utils.RecvFiles;
 import com.mashape.unirest.http.JsonNode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 import java.util.List;
 import java.io.File;
+
 
 @SpringBootTest
 public class RecvTest {

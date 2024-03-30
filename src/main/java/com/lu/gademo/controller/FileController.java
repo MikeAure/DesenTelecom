@@ -3,7 +3,6 @@ package com.lu.gademo.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.dao.TestEntityDao;
 import com.lu.gademo.dao.effectEva.SendEvaReqDao;
-import com.lu.gademo.entity.Config;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
@@ -11,10 +10,12 @@ import com.lu.gademo.log.sendData;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.ExcelParamServiceImpl;
 import com.lu.gademo.utils.DpUtil;
+import com.lu.gademo.utils.RecvFileDesen;
 import com.lu.gademo.utils.RecvFiles;
 import com.lu.gademo.utils.impl.DpUtilImpl;
 import com.mashape.unirest.http.JsonNode;
 import com.sun.istack.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -43,17 +44,20 @@ import java.util.*;
 /**
  * 文件脱敏controller
  */
+@Slf4j
 @Controller
 @RequestMapping("/File")
 public class FileController extends BaseController {
+    // 系统id
+    private final int systemID = 0x31000000;
     @Autowired
     private SendEvaReqDao sendEvaReqDao;
     // 发送类
     @Autowired
     private sendData sendData;
-    // 系统id
-    private final int systemID = 0x31000000;
 
+    @Autowired
+    RecvFileDesen recvFileDesen;
     // param  service
     @Resource
     private ExcelParamServiceImpl excelParamService;
@@ -532,64 +536,99 @@ public class FileController extends BaseController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PostMapping(value = "fileDesen")
+//    @PostMapping(value = "fileDesen")
+//    @ResponseBody
+//    ResponseEntity<Map<String, Object>> fileDesen(@RequestPart("config") Config config,
+//                                                  @NotNull @RequestPart("file") MultipartFile file) {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        String params = config.getParams();
+//        String algName = config.getAlgName();
+//        String sheet = config.getSheet();
+//
+//        System.out.println(file.getSize());
+//        System.out.println(file.getOriginalFilename());
+//
+//        // 调用脱敏函数
+//        String fileName = file.getOriginalFilename();
+//        System.out.println(file.getOriginalFilename());
+//        // 获取文件后缀
+//        String[] names = new String[0];
+//        if (fileName != null) {
+//            names = fileName.split("\\.");
+//        }
+//        //System.out.println(Arrays.toString(names));
+//        String fileType = names[names.length - 1];
+//        System.out.println(fileType);
+//        System.out.println(sheet);
+//
+//        byte[] responseData;
+//        // 判断数据模态
+//        try {
+//            if ("xlsx".equals(fileType)) {
+//                System.out.println("excel");
+//                responseData =  fileService.dealExcel(file, params, sheet).getBody();
+//            } else if (imageType.contains(fileType)) {
+//                System.out.println("image");
+//                responseData = fileService.dealImage(file, params, algName).getBody();
+//            } else if (videoType.contains(fileType)) {
+//                System.out.println("video");
+//                responseData =  fileService.dealVideo(file, params, algName).getBody();
+//            } else if (audioType.contains(fileType)) {
+//                System.out.println("audio");
+//                responseData =  fileService.dealAudio(file, params, algName, sheet).getBody();
+//            } else if ("csv".equals(fileType)) {
+//                System.out.println("csv");
+//                responseData =  fileService.dealCsv(file, params, algName).getBody();
+//            } else {
+//                System.out.println("graph");
+//                responseData =  fileService.dealGraph(file, params).getBody();
+//            }
+//        } catch(Exception e) {
+//            response.put("message", "error");
+//            response.put("data", e.getMessage());
+//            return ResponseEntity.ok().body(response);
+//        }
+//
+//        response.put("message", "ok");
+//        response.put("data", responseData);
+//        return ResponseEntity.ok().body(response);
+//
+//
+//    }
+
+    @PostMapping(value = "recvFileDesen")
     @ResponseBody
-    ResponseEntity<Map<String, Object>> fileDesen(@RequestPart("config") Config config,
-                                                  @NotNull @RequestPart("file") MultipartFile file) {
-        Map<String, Object> response = new HashMap<>();
-
-        String params = config.getParams();
-        String algName = config.getAlgName();
-        String sheet = config.getSheet();
-
-        System.out.println(file.getSize());
-        System.out.println(file.getOriginalFilename());
-
-        // 调用脱敏函数
+    ResponseEntity<Map<String, Object>> fileDesen(@NotNull @RequestPart("file") MultipartFile file) {
         String fileName = file.getOriginalFilename();
-        System.out.println(file.getOriginalFilename());
-        // 获取文件后缀
-        String[] names = new String[0];
-        if (fileName != null) {
-            names = fileName.split("\\.");
-        }
-        //System.out.println(Arrays.toString(names));
-        String fileType = names[names.length - 1];
-        System.out.println(fileType);
-        System.out.println(sheet);
+        String fileType = fileName.split("\\.")[fileName.split("\\.").length - 1];
+        Path currentPath = Paths.get(".");
+        Path rawFilePath = Paths.get(currentPath + "/raw_files" + "/" + fileName);
+        Path desenFilePath = Paths.get(currentPath + "/desen_files" + "/desen_" + fileName);
+        List<String> officeFileTypes = Arrays.asList("xlsx", "docx", "pptx");
 
-        byte[] responseData;
-        // 判断数据模态
+        if (!officeFileTypes.contains(fileType)) {
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "error");
+            errorResponse.put("data", "File type not supported.");
+            return ResponseEntity.ok().body(errorResponse);
+        }
         try {
-            if ("xlsx".equals(fileType)) {
-                System.out.println("excel");
-                responseData =  fileService.dealExcel(file, params, sheet).getBody();
-            } else if (imageType.contains(fileType)) {
-                System.out.println("image");
-                responseData = fileService.dealImage(file, params, algName).getBody();
-            } else if (videoType.contains(fileType)) {
-                System.out.println("video");
-                responseData =  fileService.dealVideo(file, params, algName).getBody();
-            } else if (audioType.contains(fileType)) {
-                System.out.println("audio");
-                responseData =  fileService.dealAudio(file, params, algName, sheet).getBody();
-            } else if ("csv".equals(fileType)) {
-                System.out.println("csv");
-                responseData =  fileService.dealCsv(file, params, algName).getBody();
-            } else {
-                System.out.println("graph");
-                responseData =  fileService.dealGraph(file, params).getBody();
-            }
-        } catch(Exception e) {
-            response.put("message", "error");
-            response.put("data", e.getMessage());
-            return ResponseEntity.ok().body(response);
+            file.transferTo(rawFilePath.toFile());
+            recvFileDesen.desenRecvFile(rawFilePath, desenFilePath);
+            Map<String, Object> successResponse = new HashMap<>();
+            successResponse.put("message", "ok");
+            successResponse.put("data", Files.readAllBytes(desenFilePath));
+            return ResponseEntity.ok().body(successResponse);
+
+        } catch (Exception e){
+            log.error(e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "error");
+            errorResponse.put("data", e.getMessage());
+            return ResponseEntity.ok().body(errorResponse);
         }
-
-        response.put("message", "ok");
-        response.put("data", responseData);
-        return ResponseEntity.ok().body(response);
-
 
     }
 

@@ -30,7 +30,7 @@ public class ReqEvidenceSave {
     private String reqtime;
     @Basic
     @Column(name = "object_size")
-    private Integer objectSize;
+    private Long objectSize;
     @Basic
     @Column(name = "object_mode")
     private String objectMode;
@@ -94,11 +94,11 @@ public class ReqEvidenceSave {
         this.reqtime = reqTime;
     }
 
-    public Integer getObjectSize() {
+    public Long getObjectSize() {
         return objectSize;
     }
 
-    public void setObjectSize(Integer objectSize) {
+    public void setObjectSize(Long objectSize) {
         this.objectSize = objectSize;
     }
 

@@ -1,18 +1,15 @@
 package com.lu.gademo;
 
 import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import com.lu.gademo.dao.templateParam.onlineTaxi2ParamDao;
-import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
 
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@DataJpaTest
+
+@SpringBootTest
 public class UserDaoTest {
     @Autowired
     onlineTaxi2ParamDao onlineTaxi2ParamDao;

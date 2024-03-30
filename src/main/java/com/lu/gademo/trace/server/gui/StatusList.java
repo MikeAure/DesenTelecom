@@ -31,10 +31,8 @@ public class StatusList {
         int roleId = scct.getUser().getRoleId();
         if (roleId == 1) {
             consumerCount++;
-//            ServerMain.serverGui.setOnlineRc(consumerCount);
         } else if (roleId == 2) {
             driverCount++;
-//            ServerMain.serverGui.setOnlineRv(driverCount);
         }
         socketListMap.put(id, scct);
     }
@@ -43,10 +41,8 @@ public class StatusList {
         int roleId = get(id).getUser().getRoleId();
         if (roleId == 1) {
             consumerCount--;
-//            ServerMain.serverGui.setOnlineRc(consumerCount);
         } else if (roleId == 2) {
             driverCount--;
-//            ServerMain.serverGui.setOnlineRv(driverCount);
         }
         socketListMap.remove(id);
         destListMap.remove(id);
@@ -86,7 +82,6 @@ public class StatusList {
         ArrayList<ServerConClientThread> onlineCCT = new ArrayList<ServerConClientThread>();
         for (ServerConClientThread scct : socketListMap.values()) {
             if (scct.getUser().getRoleId() == 1) {
-                //System.out.println("一个乘客");
                 onlineCCT.add(scct);
             } else continue;
         }

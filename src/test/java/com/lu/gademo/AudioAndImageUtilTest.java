@@ -14,12 +14,12 @@ import java.io.File;
 import java.io.IOException;
 
 @SpringBootTest
-public class JpaTest {
+public class AudioAndImageUtilTest {
     @Test
     public void test() throws IOException {
         ImageUtil imageUtil=new ImageUtilImpl();
-        String imagePath = "C:\\Users\\admin\\Pictures\\111.png";
-        String path2 = "C:\\Users\\admin\\Desktop\\demo1\\raw_files\\1.png";
+        String imagePath = "D:\\Programming\\Desen\\image\\FaceReplace\\dataset\\image\\Honeyview_glass.jpg";
+        String path2 = "D:\\Programming\\Desen\\image\\FaceReplace\\dataset\\result\\result.jpg";
         BufferedImage originalImage = ImageIO.read(new File(imagePath));
         BufferedImage compressedImage = ImageIO.read(new File(path2));
         double entropy =imageUtil.calculateSSIM(imagePath, path2);
@@ -29,8 +29,8 @@ public class JpaTest {
     @Test
     public void test1() throws IOException {
         AudioUtil audioUtil = new AudioUtilImpl();
-        String path1 =  "C:\\Users\\admin\\Desktop\\demo1\\audio\\temp\\0001_vector.txt";
-        String path2 = "C:\\Users\\admin\\Desktop\\demo1\\audio\\temp\\0001_vector_dp.txt";
+        String path1 =  "D:\\Programming\\Desen\\audio\\temp\\0001_vector.txt";
+        String path2 = "D:\\Programming\\Desen\\audio\\temp\\0001_vector_dp.txt";
 
         System.out.println(audioUtil.cosineSimilarity(path1, path2));
         System.out.println(audioUtil.euclideanDistance(path1, path2));

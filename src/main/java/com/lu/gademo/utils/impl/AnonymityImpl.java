@@ -2,14 +2,19 @@ package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Anonymity;
-import com.lu.gademo.utils.CommanExecutor;
+import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.Util;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+@Component
 public class AnonymityImpl implements Anonymity {
     public DSObject service(DSObject object, Integer alg, Number...params) {
 
@@ -17,7 +22,8 @@ public class AnonymityImpl implements Anonymity {
         Util util = new UtilImpl();
         String currentPath = directory.getAbsolutePath();
         String locationPrivacy = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
-        String path = Paths.get(currentPath, locationPrivacy).toString();
+        String path = Objects.requireNonNull(getClass().getClassLoader().getResource("lib/local_privacy/" + locationPrivacy)).getPath();
+        System.out.println(path);
 
         switch (alg) {
 
@@ -34,7 +40,7 @@ public class AnonymityImpl implements Anonymity {
                 List<?> value = object.getList();
                 String path_k = Paths.get(currentPath, "generalization", "k_anonymity.py").toString();
                 String param = Integer.toString(k_anonymity_param[params[0].intValue()]);
-                return new DSObject(CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_k, param));
+                return new DSObject(CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_k, param));
             }
 
             /*
@@ -55,7 +61,7 @@ public class AnonymityImpl implements Anonymity {
                 String position = object.getStringVal();
                 String[] s = position.split(",");
                 String cmd = path + " 2 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString() + " " + params[2].toString();
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -75,7 +81,7 @@ public class AnonymityImpl implements Anonymity {
                 String position = object.getStringVal();
                 String[] s = position.split(",");
                 String cmd = path + " 3 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString();
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -101,7 +107,7 @@ public class AnonymityImpl implements Anonymity {
                 String[] s1 = value.get(0).toString().split(",");
                 String[] s2 = value.get(1).toString().split(",");
                 String cmd  = path + " 4 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + s1[0] + " "  + s1[1] + " " + s2[0] + " " + s2[1];
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -122,7 +128,7 @@ public class AnonymityImpl implements Anonymity {
                 String[] s = object.getStringVal().split(",");
                 String param = "9 " + s[0] + " " + s[1] + " " + params[0].toString();
                 String cmd = path + " " + param;
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -137,7 +143,7 @@ public class AnonymityImpl implements Anonymity {
                 String[] s = object.getStringVal().split(",");
                 String param = "1 " + s[0] + " " + s[1] + " " + params[0].toString();
                 String cmd = path + " " + param;
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -153,7 +159,7 @@ public class AnonymityImpl implements Anonymity {
                 List<?> value = object.getList();
                 String path_l = Paths.get(currentPath, "generalization", "l_diversity.py").toString();
                 String param = Integer.toString(l_diversity_param[params[0].intValue()]);
-                return new DSObject(CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_l, param));
+                return new DSObject(CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_l, param));
             }
 
             /*
@@ -169,7 +175,7 @@ public class AnonymityImpl implements Anonymity {
                 List<?> value = object.getList();
                 String path_t = Paths.get(currentPath, "generalization", "t_closeness.py").toString();
                 String param = Double.toString(t_closeness_param[params[0].intValue()]);
-                return new DSObject(CommanExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_t, param));
+                return new DSObject(CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_t, param));
             }
 
             /*
@@ -184,7 +190,7 @@ public class AnonymityImpl implements Anonymity {
                 String[] s = object.getStringVal().split(",");
                 String param = "8 " + s[0] + " " + s[1] + " " + params[0].toString();
                 String cmd = path + " " + param;
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             /*
@@ -208,7 +214,7 @@ public class AnonymityImpl implements Anonymity {
                     param += " " + temp[0] + " " + temp[1];
                 }
                 String cmd = path + " " + param;
-                return new DSObject(CommanExecutor.openExe(cmd));
+                return new DSObject(CommandExecutor.openExe(cmd));
             }
 
             default: return null;

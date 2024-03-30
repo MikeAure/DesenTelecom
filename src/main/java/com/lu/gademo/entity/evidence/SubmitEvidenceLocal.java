@@ -55,7 +55,7 @@ public class SubmitEvidenceLocal {
     private String desenAlg;
     @Basic
     @Column(name = "file_size")
-    private Integer fileSize;
+    private Long fileSize;
     @Basic
     @Column(name = "file_hash")
     private String fileHASH;
@@ -207,11 +207,11 @@ public class SubmitEvidenceLocal {
         this.desenAlg = desenAlg;
     }
 
-    public Integer getFileSize() {
+    public Long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(Integer fileSize) {
+    public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
     }
 

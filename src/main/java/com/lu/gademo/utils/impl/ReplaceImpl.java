@@ -1,18 +1,20 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.*;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ReplaceImpl implements Replace {
     public DSObject service(DSObject object, Integer alg, Number...params) {
 
         DpUtil dpUtil = new DpUtilImpl();
         File directory = new File("");
-        String currentPath = directory.getAbsolutePath();
+        String currentPath = Paths.get("./").normalize().toAbsolutePath().toString();
         String path1 = Paths.get(currentPath, "image", "channel_exchange.py").toString();
         String path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();
 
@@ -159,7 +161,7 @@ public class ReplaceImpl implements Replace {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "image_exchange_channel", path1));
+                return new DSObject(CommandExecutor.executePython(rawData, "image_exchange_channel", path1));
             }
 
             /*
@@ -176,7 +178,7 @@ public class ReplaceImpl implements Replace {
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
                 String[] desenParams = new String[] {"20", "50", "100"};
-                return new DSObject(CommanExecutor.executePython(rawData, "image_add_color_offset", path1, "-p " + desenParams[params[0].intValue()]));
+                return new DSObject(CommandExecutor.executePython(rawData, "image_add_color_offset", path1, "-p " + desenParams[params[0].intValue()]));
             }
 
             /*
@@ -191,7 +193,7 @@ public class ReplaceImpl implements Replace {
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString() + " " + value.get(2).toString();
                 String path2 = Paths.get(currentPath, "image", "FaceReplace", "image_inference.py").toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "", path2));
+                return new DSObject(CommandExecutor.executePython(rawData, "", path2));
             }
 
             /*
@@ -207,7 +209,7 @@ public class ReplaceImpl implements Replace {
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
                 String path3 = Paths.get(currentPath, "video", "desenVideo.py").toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "video_add_color_offset", path3, params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "video_add_color_offset", path3, params[0].toString()));
             }
 
             /*
@@ -222,7 +224,7 @@ public class ReplaceImpl implements Replace {
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString() + " " + value.get(2).toString();
                 String path4 = Paths.get(currentPath, "image", "FaceReplace", "video_inference.py").toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "", path4));
+                return new DSObject(CommandExecutor.executePython(rawData, "", path4));
             }
 
             /*
@@ -238,7 +240,7 @@ public class ReplaceImpl implements Replace {
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString() + " " + value.get(2).toString();
                 String path5 = Paths.get(currentPath, "video", "substitude_background.py").toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "video_remove_bg", path5, params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "video_remove_bg", path5, params[0].toString()));
             }
 
             /*
@@ -253,7 +255,7 @@ public class ReplaceImpl implements Replace {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "audio_reshuffle", path_audio, "0", params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "audio_reshuffle", path_audio, "0", params[0].toString()));
             }
 
             /*
@@ -268,7 +270,7 @@ public class ReplaceImpl implements Replace {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "apply_audio_effects", path_audio, params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "apply_audio_effects", path_audio, params[0].toString()));
             }
 
             /*
@@ -282,34 +284,11 @@ public class ReplaceImpl implements Replace {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommanExecutor.executePython(rawData, "replace_voice_print", path_audio, "0"));
+                return new DSObject(CommandExecutor.executePython(rawData, "replace_voice_print", path_audio, "0"));
             }
 
             default: return null;
         }
     }
 
-    public List<String> executePython(String rawData, String algName, String path, String...params) {
-
-        Util util = new UtilImpl();
-        String python = util.isLinux() ? "python3" : "python";
-
-        try {
-            // 指定Python脚本路径
-            System.out.println(path);
-
-            // 创建参数列表
-            StringBuilder command = new StringBuilder(python + " " + path + " " + algName + " " + rawData);
-            for (String param : params) {
-                command.append(" ").append(param);
-            }
-            System.out.println(command);
-
-            return CommanExecutor.openExe(command.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

@@ -379,21 +379,20 @@
 
             <div class="tabs-container">
                 <ul id = "tab-type" class="nav nav-tabs" style="left: 50%; font-size: 20px;">
-                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
+                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">失真</a>
                     </li>
-                    <li class="" ><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
+                    <li class="" ><a data-toggle="tab" href="#tab-2" aria-expanded="false">非失真</a>
                     </li>
                 </ul>
                 <div class="tab-content">
                     <div id="tab-1" class="tab-pane active" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th> 请选择音频失真脱敏算法</th></tr></thead>
+                                <thead><tr><th>请选择音频失真脱敏算法</th></tr></thead>
                                 <tbody id="table1">
                                 <tr><td><select id = "distortionaudio_algName">
                                             <option value="dpAudio" selected> 基于差分隐私的声纹特征脱敏算法 </option>
                                             <option value="add_beep" > 基于正弦波的音频替换方法 </option>
-                                            <option value="remove_audio" > 音频剪裁 </option>
                                         </select></td></tr>
                                 </tbody>
                             </table>

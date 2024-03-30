@@ -15,7 +15,7 @@ import java.util.List;
 public class ReplaceTest {
 
     @Test
-    public void testTruncation()  {
+    public void testValueHide()  {
         Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
@@ -69,6 +69,7 @@ public class ReplaceTest {
         }
     }
 
+    // 信工所
     @Test
     public void testNameHide()  {
         Replace replace = new ReplaceImpl();
@@ -80,6 +81,7 @@ public class ReplaceTest {
         }
     }
 
+    // 信工所
     @Test
     public void testNumberHide()  {
         Replace replace = new ReplaceImpl();
@@ -91,6 +93,7 @@ public class ReplaceTest {
         }
     }
 
+    // 信工所
     @Test
     public void testSuppressEmail()  {
         Replace replace = new ReplaceImpl();
@@ -190,8 +193,8 @@ public class ReplaceTest {
         Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
-        String path1 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "image", "2.png").toString();
-        String path2 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "video", "1.mp4").toString();
+        String path1 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "video", "1.mp4").toString();
+        String path2 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "image", "2.png").toString();
         String path3 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "result", "result.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2, path3);
         DSObject dsObject = new DSObject(rawData);
@@ -207,8 +210,8 @@ public class ReplaceTest {
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "video", "1.mp4").toString();
-        String path2 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "result", "result.mp4").toString();
-        String path3 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "image", "loong2.png").toString();
+        String path2 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "image", "loong2.png").toString();
+        String path3 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "result", "result.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2, path3);
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 16, 1);
@@ -226,7 +229,7 @@ public class ReplaceTest {
         String path2 = Paths.get(currentPath, "audio", "0001_reshuffle.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 17, 20);
+        DSObject result = replace.service(dsObject, 17, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }

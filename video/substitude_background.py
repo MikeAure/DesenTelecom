@@ -36,8 +36,8 @@ if __name__ == "__main__":
         print("Usage: python your_script.py algName input_file out_file background_file param")
         sys.exit(1) 
     input_file_path = sys.argv[2]
-    output_file_path = sys.argv[3]
-    background_file_path = sys.argv[4]
+    background_file_path = sys.argv[3]
+    output_file_path = sys.argv[4]
     param = int(sys.argv[5])
     params = [0.4, 0.6, 0.8][param]
     substitude_background(input_file_path, output_file_path, background_file_path, params)

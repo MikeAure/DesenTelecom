@@ -1,11 +1,14 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.DpUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.springframework.stereotype.Component;
 
+import javax.swing.tree.ExpandVetoException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.MessageDigest;
@@ -20,7 +23,21 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
+@Component
 public class DpUtilImpl implements DpUtil {
+
+    private final List<SimpleDateFormat> dataFormats = Arrays.asList(
+            new SimpleDateFormat("yyyy-MM-dd"),
+            new SimpleDateFormat("yyyyMMdd"),
+            new SimpleDateFormat("MM/dd/yyyy"),
+            new SimpleDateFormat("dd-MM-yyyy"),
+            new SimpleDateFormat("yyyy/MM/dd"),
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
+            new SimpleDateFormat("yyyyMMddHHmmss")
+
+    );
+
     @Override
     //单编码数据的处理
     public List<String> dpCode(List<Object> datas, Integer privacyLevel) {
@@ -44,7 +61,7 @@ public class DpUtilImpl implements DpUtil {
                 re_data.add(data + "");
             }
         }
-        Set uniqueSet = new HashSet(re_data);
+        Set<Object> uniqueSet = new HashSet<>(re_data);
         List<String> code1 = new ArrayList<>();
         List<Integer> count1 = new ArrayList<>();
         List<String> data2 = new ArrayList<>();
@@ -216,7 +233,7 @@ public class DpUtilImpl implements DpUtil {
                             re_data.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
-                            e.printStackTrace();
+                            log.error(e.getMessage());
                         }
                     }
                 }
@@ -345,8 +362,7 @@ public class DpUtilImpl implements DpUtil {
         return result;
     }
 
-    // 数值数据添加dp高斯噪声
-
+    // 基于高斯机制差分隐私的数值加噪算法gaussianToValue
     @Override
     public List<Double> gaussianToValue(List<Object> datas, Integer privacyLevel) {
         System.out.println(datas.size());
@@ -500,26 +516,26 @@ public class DpUtilImpl implements DpUtil {
     @Override
     public List<String> addressHide(List<Object> addrs, Integer privacyLevel){
         // 取数据
-        List<String> re_data = new ArrayList<>();
+        List<String> reData = new ArrayList<>();
         for (Object addr:addrs ) {
             if(addr == null)
-                re_data.add(null);
+                reData.add(null);
             else
-                re_data.add(addr+"");
+                reData.add(addr+"");
         }
         //privacyLevel为0，直接返回
         if(privacyLevel == 0)
-            return re_data;
+            return reData;
         List<String> newAddrs = new ArrayList<>();
         // 脱敏
-        for (int i = 0; i < re_data.size(); i++) {
-            newAddrs.add(dealAddress(re_data.get(i)));
+        for (String reDatum : reData) {
+            newAddrs.add(dealAddress(reDatum));
         }
         return newAddrs;
     }
     public String dealAddress(String addr){
         if (addr != null && !addr.isEmpty()) {
-            int length = addr.length();
+
             int indes = addr.indexOf("区");
             if (indes == -1) {
                 indes = addr.indexOf("市");
@@ -667,15 +683,34 @@ public class DpUtilImpl implements DpUtil {
     }
 
     //日期处理
+
+    private java.util.Date parseDate(Object data) {
+        for (SimpleDateFormat format : dataFormats){
+            try {
+                return format.parse(data.toString());
+            } catch (ParseException e) {
+                e.getStackTrace();
+            }
+        }
+        return null;
+    }
     @Override
     public List<Date> dpDate(List<Object> datas, Integer privacyLevel) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
         List<Date> re_data = new ArrayList<>();
+        java.util.Date utilDate;
+        // Returning null here is not a good way to handle exception,
+        // but it's a compromise that had to be made in order to unify the interface
         for (Object data : datas) {
             if (data == null)
                 re_data.add(null);
             else {
-                java.util.Date utilDate = dateFormat.parse(data + "");
+
+                utilDate = parseDate(data);
+
+                if (utilDate == null) {
+                    throw new ParseException("Parse date error : " + data, 0);
+                }
                 Date sqlDate = new Date(utilDate.getTime());
                 re_data.add(sqlDate);
             }
@@ -716,11 +751,12 @@ public class DpUtilImpl implements DpUtil {
                 String second = s3[0];
                 String msecond = s3[1].substring(0, 3);
                 //日期格式
-                SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+                SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 String d;
-                DateFormat format1 = new SimpleDateFormat("yyyy/MM/dd");
+                DateFormat format1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Date datetemp = new Date(0);
-                //根据noise干扰
+
+                    //根据noise干扰
                 if (noise >= 0) {
                     d = df.format(new Date(re_data.get(i).getTime() + Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond)));
                     datetemp = new Date(format1.parse(d).getTime());
@@ -728,13 +764,14 @@ public class DpUtilImpl implements DpUtil {
                     d = df.format(new Date(re_data.get(i).getTime() - (Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond))));
                     datetemp = new Date(format1.parse(d).getTime());
                 }
+
                 newDate.add(datetemp);
             }
         }
         return newDate;
     }
 
-    //日期匿名处理
+    //日期分组置换
     public List<Date> date_group_replace(List<Object> datas, Integer privacyLevel) throws ParseException {
         //日期格式
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -1036,6 +1073,7 @@ public class DpUtilImpl implements DpUtil {
         return result;
     }
 
+    // 基于随机高斯噪声的数值加噪算法
     @Override
     public List<Double> randomGaussianToValue(List<Object> datas, Integer privacyLevel) {
         System.out.println(datas.size());
@@ -1107,6 +1145,7 @@ public class DpUtilImpl implements DpUtil {
         return newData;
     }
 
+    // 基于随机拉普拉斯噪声的数值加噪算法
     @Override
     public List<Double> randomLaplaceToValue(List<Object> datas, Integer privacyLevel) {
         List<Double> re_data = new ArrayList<>();
@@ -1167,6 +1206,7 @@ public class DpUtilImpl implements DpUtil {
         return newData;
     }
 
+    // 基于随机均匀噪声的数值加噪算法
     @Override
     public List<Double> randomUniformToValue(List<Object> datas, Integer privacyLevel) {
         List<Double> re_data = new ArrayList<>();
@@ -1221,6 +1261,7 @@ public class DpUtilImpl implements DpUtil {
         return newData;
     }
 
+    //
     @Override
     public List<Double> valueShift(List<Object> datas, Integer privacyLevel) {
         List<Double> re_data = new ArrayList<>();

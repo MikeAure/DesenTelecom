@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
+@Component
 public class UtilImpl implements Util {
     @Override
     public String getIP() {

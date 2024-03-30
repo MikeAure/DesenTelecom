@@ -754,8 +754,8 @@
                         <option value="employment">求职招聘场景</option>
                         <option value="onlinelending">网络借贷场景</option>
                         <option value="house">房屋租售场景</option>
-                        <option value="usedCar">二手车交易场景</option>
-                        <option value="onlineshopping">问诊挂号场景</option>
+                        <option value="usedcar">二手车交易场景</option>
+                        <option value="consultation">问诊挂号场景</option>
                         <option value="travel">旅游服务类场景</option>
                         <option value="hotel">酒店服务类场景</option>
                         <option value="game">网络游戏类场景</option>
@@ -769,7 +769,7 @@
                         <option value="meeting">远程会议类场景</option>
                         <option value="webcast">网络直播类场景</option>
                         <option value="onlinemovie">在线影音类场景</option>
-                        <option value="shortmideo">短视频类场景</option>
+                        <option value="shortvideo">短视频类场景</option>
                         <option value="news">新闻资讯类场景</option>
                         <option value="sports">运动健身类场景</option>
                         <option value="browser">浏览器类场景</option>
@@ -813,7 +813,7 @@
                         <option value="onlinelending">网络借贷场景</option>
                         <option value="house">房屋租售场景</option>
                         <option value="usedcar">二手车交易场景</option>
-                        <option value="onlineshopping">问诊挂号场景</option>
+                        <option value="consultation">问诊挂号场景</option>
                         <option value="travel">旅游服务类场景</option>
                         <option value="hotel">酒店服务类场景</option>
                         <option value="game">网络游戏类场景</option>

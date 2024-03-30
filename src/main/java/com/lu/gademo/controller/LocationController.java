@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.lu.gademo.utils.CommanExecutor;
+import com.lu.gademo.utils.CommandExecutor;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -30,7 +30,7 @@ public class LocationController {
             param += " " + temp[0] + " " + temp[1];
         }
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
     @ResponseBody
     @RequestMapping(value = "/mixzone_3", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -43,7 +43,7 @@ public class LocationController {
             param += " " + temp[0] + " " + temp[1];
         }
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
     @ResponseBody
     @RequestMapping(value = "/Accuracy_reduction", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -51,7 +51,7 @@ public class LocationController {
         String[] s = rawData.split(",");
         String param = "10 " + s[0] + " " + s[1] + " 1000";
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
     @ResponseBody
     @RequestMapping(value = "/CirDummy", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -59,7 +59,7 @@ public class LocationController {
         String[] s = position.split(",");
         String param = "2 " + s[0] + " " + s[1] + " " + k + " " + s_cd + " " + rho;
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
     @ResponseBody
     @RequestMapping(value = "/GridDummy", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -67,7 +67,7 @@ public class LocationController {
         String[] s = position.split(",");
         String param = "3 " + s[0] + " " + s[1] + " " + k + " " + s_cd;
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
     @ResponseBody
     @RequestMapping(value = "/adaptiveIntervalCloakingWrapper", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -77,7 +77,7 @@ public class LocationController {
         String[] s2 = max.split(",");
         String param = "4 " + s[0] + " " + s[1] + " " + k + " " + s1[0] + " "  + s1[1] + " " + s2[0] + " " + s2[1];
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
 
     @ResponseBody
@@ -86,7 +86,7 @@ public class LocationController {
         String[] s = rawData.split(",");
         String param = "9 " + s[0] + " " + s[1] + " " + op;
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
 
     @ResponseBody
@@ -95,7 +95,7 @@ public class LocationController {
         String[] s = rawData.split(",");
         String param = "1 " + s[0] + " " + s[1] + " " + k;
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
 
     @ResponseBody
@@ -104,7 +104,7 @@ public class LocationController {
         String[] s = rawData.split(",");
         String param = "8 " + s[0] + " " + s[1] + " " + k;
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
 
     @ResponseBody
@@ -118,6 +118,6 @@ public class LocationController {
             param += " " + temp[0] + " " + temp[1];
         }
         String cmd = path + " " + param;
-        return CommanExecutor.openExe(cmd);
+        return CommandExecutor.openExe(cmd);
     }
 }

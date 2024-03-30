@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.DecimalFormat;
 
 //图片处理工具集
@@ -20,7 +21,8 @@ public class ImageUtilImpl implements ImageUtil {
 
     static {
         // 在 Windows 上设置本地库路径
-        System.load("C:\\Users\\admin\\Desktop\\demo1\\opencv_java455.dll");
+            URL url = ImageUtilImpl.class.getClassLoader().getResource("lib/opencv/opencv_java455.dll");
+            System.load(url.getPath());
     }
     // 计算PSNR的方法
     @Override

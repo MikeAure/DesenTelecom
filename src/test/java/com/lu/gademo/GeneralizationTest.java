@@ -47,6 +47,7 @@ public class GeneralizationTest {
         }
     }
 
+    // 信工所
     @Test
     public void testAddressHide()  {
         Generalization generalization = new GeneralizationImpl();
@@ -61,9 +62,9 @@ public class GeneralizationTest {
     @Test
     public void testDateGroupPlace()  {
         Generalization generalization = new GeneralizationImpl();
-        List<String> rawData = Arrays.asList("2024-3-18", "2024-2-28");
+        List<String> rawData = Arrays.asList("2024-3-18", "2024-6-1");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 5, 2);
+        DSObject result = generalization.service(dsObject, 5, 1);
         for (Object string : result.getList()) {
             System.out.println(string);
         }
