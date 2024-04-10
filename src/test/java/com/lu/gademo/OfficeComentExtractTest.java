@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.xml.namespace.QName;
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -164,29 +165,42 @@ public class OfficeComentExtractTest {
                 List<XSLFComment> comments = slide.getComments();
                 // 逐个文本框扫描分析批注位置是否在文本框内
                 for(XSLFComment comment : comments) {
-                    Point2D commentAnchor = comment.getOffset();
-                    System.out.println("Comment Offset: " + commentAnchor);
+                    // 提取commentText中的脱敏内容
                     String commentText = comment.getText();
+                    String patternString = "([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)\\s+(.*)";
+                    Pattern pattern = Pattern.compile(patternString);
+                    Matcher matcher = pattern.matcher(commentText);
+                    if (!matcher.matches()) {
+                        continue;
+                    }
+                    // 属性需求
+                    String attribute = matcher.group(2);
+                    // 脱敏内容
+                    String rawContent = matcher.group(5);
+
                     System.out.println("Comment Text: " + commentText);
+                    System.out.println("Attribute: " + attribute);
+                    System.out.println("Content: " + rawContent);
+                    // 设置privacy_level
                     int privacyLevel = 1;
-                    if (commentText.contains("独特属性")) {
+                    if (attribute.contains("独特属性")) {
                         privacyLevel = 3;
                     }
-
-                    double absoluteX = commentAnchor.getX() * slideSize.width;
-                    double absoluteY = commentAnchor.getY() * slideSize.height;
-                    System.out.println("Comment Absolute location: " + absoluteX + " " + absoluteY);
 
                     for(XSLFShape shape : slide.getShapes()) {
                         if (shape instanceof XSLFTextShape){
                             System.out.println("Anchor: " + shape.getAnchor());
+                            String shapeText = ((XSLFTextShape) shape).getText();
                             System.out.println("Shape Text: " + ((XSLFTextShape) shape).getText());
-                            if (shape.getAnchor().contains(absoluteX, absoluteY))  {
-                                String contentText = ((XSLFTextShape) shape).getText();
-                                System.out.println("Content Text: " + contentText);
-                                DSObject result = desenData(contentText, replacement, 7, privacyLevel);
-                                ((XSLFTextShape) shape).setText(result.getList().get(0).toString());
-                                System.out.println("After replacement: " + ((XSLFTextShape) shape).getText());
+                            // 匹配文本
+                            if (shapeText.contains(rawContent)) {
+                                String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
+                                String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
+                                String desenResult = desenData(rawContent, replacement, 7, privacyLevel).getList().get(0).toString();
+                                String stringBuilder = preString +
+                                        desenResult +
+                                        afterString;
+                                ((XSLFTextShape) shape).setText(stringBuilder);
                             }
                         }
                     }

@@ -160,12 +160,12 @@
                                 <thead><tr><th>请选择图像失真脱敏算法</th></tr></thead>
                                 <tbody id="table1">
                                 <tr><td><select>
-                                            <option value="meanValueImage"> 基于均值滤波器的图像像素替换方法 </option>
-                                            <option value="dpImage" selected> 基于差分隐私的图像像素替换方法 </option>
-                                            <option value="pixelate"> 基于像素化滤波器的图像像素替换方法 </option>
-                                            <option value="gaussian_blur" > 基于高斯滤波器的图像像素替换方法 </option>
-                                            <option value="box_blur"> 基于盒式滤波器的图像像素替换方法 </option>
-                                            <option value="replace_region" > 基于像素块的图像像素替换方法 </option>
+                                            <option value="meanValueImage"> 泛化-基于均值滤波器的图像加噪方法 </option>
+                                            <option value="dpImage" selected> 泛化-基于差分隐私的图像加噪方法 </option>
+                                            <option value="pixelate"> 泛化-基于像素化滤波器的图像加噪方法 </option>
+                                            <option value="gaussian_blur" > 泛化-基于高斯滤波器的图像加噪方法 </option>
+                                            <option value="box_blur"> 泛化-基于盒式滤波器的图像加噪方法 </option>
+                                            <option value="replace_region" > 泛化-基于像素块的图像区域替换方法 </option>
                                         </select></td></tr>
                                 </tbody>
                             </table>

@@ -247,9 +247,9 @@
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinevoting" style="font-size: 15px;">网上投票类场景</a>
                         </li>
 
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi2" style="font-size: 15px;">网上打车场景（接收数据）</a>
-                        </li>
+<#--                        <li>-->
+<#--                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi2" style="font-size: 15px;">网上打车场景（接收数据）</a>-->
+<#--                        </li>-->
 
                     </ul>
                 </li>
