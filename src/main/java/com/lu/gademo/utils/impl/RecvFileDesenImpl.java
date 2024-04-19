@@ -1,9 +1,6 @@
 package com.lu.gademo.utils.impl;
 
-import com.lu.gademo.utils.BaseDesenAlgorithm;
-import com.lu.gademo.utils.DSObject;
-import com.lu.gademo.utils.RecvFileDesen;
-import com.lu.gademo.utils.Replace;
+import com.lu.gademo.utils.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -20,6 +17,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTMarkupRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.namespace.QName;
 import java.awt.*;
@@ -29,6 +27,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,12 +40,22 @@ import java.util.regex.Pattern;
 @Data
 public class RecvFileDesenImpl implements RecvFileDesen {
 
-    @Autowired
-    Replace replacement;
+
+    private final Replace replacement;
+    private final Dp dp;
+    private final DpUtil dpUtil;
+    private final Util util;
+    private final Anonymity anonymity;
+    private final Generalization generalization;
 
     @Override
-    public void desenRecvFile(Path rawFilePath, Path desenFilePath) throws Exception {
-        String fileName = rawFilePath.getFileName().toString();
+    public byte[] desenRecvFile(MultipartFile file) throws Exception {
+        String time = String.valueOf(System.currentTimeMillis());
+        String fileName = time + file.getOriginalFilename();
+        Path currentPath = Paths.get("").toAbsolutePath();
+        Path rawFilePath = Paths.get(currentPath + "/raw_files" + "/" + fileName);
+        Path desenFilePath = Paths.get(currentPath + "/desen_files" + "/desen_" + fileName);
+        file.transferTo(rawFilePath.toFile());
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         switch (suffix) {
             case "xlsx": {
@@ -66,13 +75,16 @@ public class RecvFileDesenImpl implements RecvFileDesen {
             }
 
         }
+
+        return Files.readAllBytes(desenFilePath);
     }
 
-    public void extractExcel(Path rawFilePath, Path desenFilePath) throws Exception {
-
+    private void extractExcel(Path rawFilePath, Path desenFilePath) throws Exception {
+        try (
             InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
             XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
             OutputStream outputStream = Files.newOutputStream(desenFilePath);
+        ) {
 
             Sheet sheet = wb.getSheetAt(0);
 
@@ -92,16 +104,18 @@ public class RecvFileDesenImpl implements RecvFileDesen {
             }
             // 写入excel
             wb.write(outputStream);
+        }
 
     }
 
-    public void extractWord(Path rawFilePath, Path desenFilePath) throws Exception {
+    private void extractWord(Path rawFilePath, Path desenFilePath) throws Exception {
         Map<String, String> commentMap = new HashMap<>();
 
-
-                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
-                XWPFDocument document = new XWPFDocument(rawFileInputStream);
-                OutputStream outputStream = Files.newOutputStream(desenFilePath);
+        try(
+            InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
+            XWPFDocument document = new XWPFDocument(rawFileInputStream);
+            OutputStream outputStream = Files.newOutputStream(desenFilePath);
+        ){
             XmlCursor cursor = document.getDocument().getBody().newCursor();
             while (cursor.toNextToken() != XmlCursor.TokenType.NONE) {
                 if (cursor.isStart()) { // 确保光标位于元素的开始标记
@@ -132,96 +146,98 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                     }
                 }
             }
-            cursor.close();
-
+            cursor.dispose();
+            // 逐段遍历获取到的Comment内容
             for (XWPFParagraph paragraph : document.getParagraphs()) {
                 XWPFComment comment;
-                StringBuilder commentText = new StringBuilder();
-                for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartArray()) {
+
+                for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartList()) {
                     BigInteger id = anchor.getId();
 
                     if (id != null &&
                             (comment = paragraph.getDocument().getCommentByID(id.toString())) != null) {
                         System.out.println("Comment ID: " + id);
 
-                        // TODO: 根据comment内容判断脱敏等级
-                        System.out.println("Comment: " + comment.getText());
+                        // TODO: 根据comment内容判断脱敏等级及脱敏算法
+                        String commentContent = comment.getText();
+                        System.out.println("Comment: " + commentContent);
+                        // 使用正则表达式匹配中文
+                        int privacyLevel = getPrivacyLevel(commentContent);
                         String target = commentMap.get(id.toString());
                         System.out.println("Target: " + target);
-                        String desenResult  = desenData(target, replacement, 7, 1).getList().get(0).toString();
+                        String desenResult = desenData(target, replacement, 7, privacyLevel).getList().get(0).toString();
                         System.out.println("desenResult: " + desenResult);
+                        if (desenResult.equals(target)) {
+                            continue;
+                        }
                         replace(paragraph, target, desenResult);
                     }
                 }
             }
             document.write(outputStream);
+        }
 
 
     }
 
-    public void extractPowerPoint(Path rawFilePath, Path desenFilePath) throws Exception {
+    private void extractPowerPoint(Path rawFilePath, Path desenFilePath) throws Exception {
 
+            try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
-                XMLSlideShow ppt = new XMLSlideShow (rawFileInputStream);
+                XMLSlideShow  ppt = new XMLSlideShow (rawFileInputStream);
                 OutputStream outputStream = Files.newOutputStream(desenFilePath);
+            ) {
 
-            // 遍历PPT全部批注
-            for (XSLFSlide slide : ppt.getSlides()) {
-                Dimension slideSize = slide.getSlideShow().getPageSize();
-                System.out.println("Slide Width: " + slideSize.width + " Slide Height: " + slideSize.height);
-                List<XSLFComment> comments = slide.getComments();
-                // 逐个文本框扫描分析批注位置是否在文本框内
-                for(XSLFComment comment : comments) {
-                    Point2D commentAnchor = comment.getOffset();
-                    System.out.println("Comment Offset: " + commentAnchor);
-                    String commentText = comment.getText();
-                    System.out.println("Comment Text: " + commentText);
-                    int privacyLevel = 1;
-                    if (commentText.contains("独特属性")) {
-                        privacyLevel = 3;
-                    }
+                // 遍历PPT全部批注
+                for (XSLFSlide slide : ppt.getSlides()) {
+                    List<XSLFComment> comments = slide.getComments();
+                    // 逐个文本框扫描分析批注位置是否在文本框内
+                    for (XSLFComment comment : comments) {
+                        // 提取commentText中的脱敏内容
+                        String commentText = comment.getText();
+                        String patternString = "([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)\\s+(.*)";
+                        Pattern pattern = Pattern.compile(patternString);
+                        Matcher matcher = pattern.matcher(commentText);
+                        if (!matcher.matches()) {
+                            continue;
+                        }
+                        // 属性需求
+                        String attribute = matcher.group(2);
+                        // 脱敏内容
+                        String rawContent = matcher.group(5);
 
-                    double absoluteX = commentAnchor.getX() * slideSize.width;
-                    double absoluteY = commentAnchor.getY() * slideSize.height;
-                    System.out.println("Comment Absolute location: " + absoluteX + " " + absoluteY);
+//                    System.out.println("Comment Text: " + commentText);
+//                    System.out.println("Attribute: " + attribute);
+//                    System.out.println("Content: " + rawContent);
+                        // 设置privacy_level
+                        int privacyLevel = 1;
+                        if (attribute.contains("独特属性")) {
+                            privacyLevel = 3;
+                        }
 
-                    for(XSLFShape shape : slide.getShapes()) {
-                        if (shape instanceof XSLFTextShape){
-                            System.out.println("Anchor: " + shape.getAnchor());
-                            System.out.println("Shape Text: " + ((XSLFTextShape) shape).getText());
-                            if (shape.getAnchor().contains(absoluteX, absoluteY))  {
-                                String contentText = ((XSLFTextShape) shape).getText();
-                                System.out.println("Content Text: " + contentText);
-                                DSObject result = desenData(contentText, replacement, 7, privacyLevel);
-                                ((XSLFTextShape) shape).setText(result.getList().get(0).toString());
-                                System.out.println("After replacement: " + ((XSLFTextShape) shape).getText());
+                        for (XSLFShape shape : slide.getShapes()) {
+                            if (shape instanceof XSLFTextShape) {
+                                System.out.println("Anchor: " + shape.getAnchor());
+                                String shapeText = ((XSLFTextShape) shape).getText();
+                                System.out.println("Shape Text: " + ((XSLFTextShape) shape).getText());
+                                // 匹配文本
+                                if (shapeText.contains(rawContent)) {
+                                    String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
+                                    String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
+                                    // 获取脱敏结果
+                                    String desenResult = desenData(rawContent, replacement, 7, privacyLevel).getList().get(0).toString();
+                                    String stringBuilder = preString +
+                                            desenResult +
+                                            afterString;
+                                    ((XSLFTextShape) shape).setText(stringBuilder);
+                                }
                             }
                         }
                     }
                 }
-//                for (XSLFShape sh : slide.getShapes()) {
-//                    // name of the shape
-//                    String name = sh.getShapeName();
-//                    // shapes's anchor which defines the position of this shape in the slide
-//                    if (sh instanceof PlaceableShape) {
-//                        java.awt.geom.Rectangle2D anchor = ((PlaceableShape) sh).getAnchor();
-//                    }
-//                    if (sh instanceof XSLFConnectorShape) {
-//                        XSLFConnectorShape line = (XSLFConnectorShape) sh;
-//                        // work with Line
-//                    } else if (sh instanceof XSLFTextShape) {
-//                        XSLFTextShape shape = (XSLFTextShape) sh;
-//                        System.out.println(shape.getText());
-//                        // work with a shape that can hold text
-//                    } else if (sh instanceof XSLFPictureShape) {
-//                        XSLFPictureShape shape = (XSLFPictureShape) sh;
-//                        // work with Picture
-//                    }
-//                }
+
+                ppt.write(outputStream);
             }
-
-            ppt.write(outputStream);
-
     }
 
     private static Map<Integer, XWPFRun> getPosToRuns(XWPFParagraph paragraph) {
@@ -239,27 +255,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         return (map);
     }
 
-    public static <V> void replace(XWPFDocument document, Map<String, V> map) {
-        List<XWPFParagraph> paragraphs = document.getParagraphs();
-        for (XWPFParagraph paragraph : paragraphs) {
-            replace(paragraph, map);
-        }
-    }
-
-    public static <V> void replace(XWPFDocument document, String searchText, V replacement) {
-        List<XWPFParagraph> paragraphs = document.getParagraphs();
-        for (XWPFParagraph paragraph : paragraphs) {
-            replace(paragraph, searchText, replacement);
-        }
-    }
-
-    private static <V> void replace(XWPFParagraph paragraph, Map<String, V> map) {
-        for (Map.Entry<String, V> entry : map.entrySet()) {
-            replace(paragraph, entry.getKey(), entry.getValue());
-        }
-    }
-
-    public static <V> void replace(XWPFParagraph paragraph, String searchText, V replacement) {
+    private <V> void replace(XWPFParagraph paragraph, String searchText, V replacement) {
         boolean found = true;
         while (found) {
             found = false;
@@ -308,26 +304,65 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         }
     }
 
-    private static DSObject desenData(Cell cell, BaseDesenAlgorithm algorithm, int algoNum, int privacyLevel) {
+    /**
+     * 获取数据脱敏结果
+     * @param cell 电子表格单元格
+     * @param algorithm 选择的脱敏算法
+     * @param algoNum 脱敏算法编号
+     * @param privacyLevel 隐私保护级别
+     * @return 脱敏结果
+     */
+    private DSObject desenData(Cell cell, BaseDesenAlgorithm algorithm, int algoNum, int privacyLevel) {
 
         String cellContent = cell.getStringCellValue();
         // 构建脱敏算法输入数据
         DSObject rawData = new DSObject(Collections.singletonList(cellContent));
         // 使用编号脱敏算法
-        return algorithm.service(rawData, 7, privacyLevel);
+        return algorithm.service(rawData, algoNum, privacyLevel);
     }
 
-    private static DSObject desenData(String content, BaseDesenAlgorithm algorithm, int algoNum, int privacyLevel) {
+    /**
+     *
+     * @param content
+     * @param algorithm
+     * @param algoNum
+     * @param privacyLevel
+     * @return
+     */
+    private DSObject desenData(String content, BaseDesenAlgorithm algorithm, int algoNum, int privacyLevel) {
         // 构建脱敏算法输入数据
         DSObject rawData = new DSObject(Collections.singletonList(content));
         // 使用编号脱敏算法
         return algorithm.service(rawData, algoNum, privacyLevel);
     }
 
-    private static int getPrivacyLevel(Map.Entry<CellAddress, ? extends Comment> e, Pattern pattern) {
+    /**
+     * 获取电子表格中带有批注的单元格的隐私保护等级
+     * @param e Comment单元格位置
+     * @param pattern 用于匹配文本的Pattern
+     * @return 返回脱敏级别
+     */
+    private int getPrivacyLevel(Map.Entry<CellAddress, ? extends Comment> e, Pattern pattern) {
         Comment comment = e.getValue();
         // 使用正则表达式匹配中文字符串
         String commentContent = comment.getString().getString();
+        Matcher matcher = pattern.matcher(commentContent);
+        String attribute;
+        // 设置privacy_level
+        int privacyLevel = 1;
+        if (matcher.matches()) {
+            attribute = matcher.group(2);
+            if (attribute.equals("独特属性")) {
+                privacyLevel = 3;
+            }
+        }
+        return privacyLevel;
+    }
+
+    private int getPrivacyLevel(String commentContent) {
+        String patternString = "([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)";
+        Pattern pattern = Pattern.compile(patternString);
+        // 使用正则表达式匹配中文字符串
         Matcher matcher = pattern.matcher(commentContent);
         String attribute;
         // 设置privacy_level

@@ -5,8 +5,7 @@ import com.lu.gademo.dao.TestEntityDao;
 import com.lu.gademo.dao.effectEva.SendEvaReqDao;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
-import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
-import com.lu.gademo.log.sendData;
+import com.lu.gademo.log.SendData;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.ExcelParamServiceImpl;
 import com.lu.gademo.utils.DpUtil;
@@ -54,7 +53,7 @@ public class FileController extends BaseController {
     private SendEvaReqDao sendEvaReqDao;
     // 发送类
     @Autowired
-    private sendData sendData;
+    private SendData sendData;
 
     @Autowired
     RecvFileDesen recvFileDesen;
@@ -265,7 +264,7 @@ public class FileController extends BaseController {
                 double val = Double.parseDouble(textInput);
                 List<Object> value = new ArrayList<>();
                 value.add(val);
-                result = dpUtil.floor(value).get(0) + "";
+                result = dpUtil.floor(value, param).get(0) + "";
                 break;
             }
             case "suppressEmail": {
@@ -506,19 +505,6 @@ public class FileController extends BaseController {
 
     }
 
-    @GetMapping(value = "daoTest")
-    @ResponseBody
-    String daoTest() {
-        StringBuilder stringBuilder = new StringBuilder();
-        List<onlineTaxi2Param> list = onlineTaxi2ParamDao.findAll();
-        for (onlineTaxi2Param element : list){
-            stringBuilder.append(element.toString());
-            stringBuilder.append("\n");
-        }
-
-        return stringBuilder.toString();
-    }
-
     @GetMapping(value = "fileDesenRequest")
     @ResponseBody
     ResponseEntity<Map<String, Object>> fileDesenRequest() {
@@ -597,14 +583,12 @@ public class FileController extends BaseController {
 //
 //    }
 
-    @PostMapping(value = "recvFileDesen")
+    @PostMapping(value = "recvFileDesen", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    ResponseEntity<Map<String, Object>> fileDesen(@NotNull @RequestPart("file") MultipartFile file) {
+    ResponseEntity<Map<String, Object>> recvFileDesen(@NotNull @RequestPart("file") MultipartFile file) {
+
         String fileName = file.getOriginalFilename();
         String fileType = fileName.split("\\.")[fileName.split("\\.").length - 1];
-        Path currentPath = Paths.get(".");
-        Path rawFilePath = Paths.get(currentPath + "/raw_files" + "/" + fileName);
-        Path desenFilePath = Paths.get(currentPath + "/desen_files" + "/desen_" + fileName);
         List<String> officeFileTypes = Arrays.asList("xlsx", "docx", "pptx");
 
         if (!officeFileTypes.contains(fileType)) {
@@ -615,11 +599,9 @@ public class FileController extends BaseController {
             return ResponseEntity.ok().body(errorResponse);
         }
         try {
-            file.transferTo(rawFilePath.toFile());
-            recvFileDesen.desenRecvFile(rawFilePath, desenFilePath);
             Map<String, Object> successResponse = new HashMap<>();
             successResponse.put("message", "ok");
-            successResponse.put("data", Files.readAllBytes(desenFilePath));
+            successResponse.put("data", recvFileDesen.desenRecvFile(file));
             return ResponseEntity.ok().body(successResponse);
 
         } catch (Exception e){

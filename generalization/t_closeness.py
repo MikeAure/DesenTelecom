@@ -92,7 +92,7 @@ def t_closeness(data, partition, column, global_freqs):
     total_count = float(len(partition))
     d_max = None
     # 分组并统计数据出现的频数
-    group_counts = data.loc[partition].groupby(column)[column].agg('count')
+    group_counts = data.loc[partition].groupby(column, observed=False)[column].agg('count')
     for value, count in group_counts.to_dict().items():
         p = count / total_count
         # 计算两个分布的距离
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     # 计算数据集的长度
     total_count = float(len(data))
     # 分组并统计数据出现的频数
-    group_counts = data.groupby(sensitive)[sensitive].agg('count')
+    group_counts = data.groupby(sensitive, observed=False)[sensitive].agg('count')
     for value, count in group_counts.to_dict().items():
         # 计算敏感属性在整个数据集的分布
         p = count / total_count
@@ -149,5 +149,6 @@ if __name__ == "__main__":
     data_closeness.sort_values([column_x, column_y, sensitive])
 
     data_closeness.to_csv(sys.argv[2], index = False)
-    print("===============t-closeness===============")
-    print(data_closeness)
+    print("finish")
+    # print("===============t-closeness===============")
+    # print(data_closeness)

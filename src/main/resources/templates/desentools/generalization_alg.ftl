@@ -13,7 +13,7 @@
     <meta name="description" content="">
 
     <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html" />
+    <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
@@ -22,7 +22,7 @@
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 
-<body >
+<body>
 
 <!-- 全局js -->
 <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -35,9 +35,9 @@
 <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 <script type="text/javascript">
-    window.onload = function (){
+    window.onload = function () {
         // 时间取整
-        document.getElementById("floorTime_submitBtn").addEventListener("click", function (){
+        document.getElementById("floorTime_submitBtn").addEventListener("click", function () {
             let textInput = $("#floorTime_input").val();
             var privacyLevel = 1
             var textType = "address"
@@ -52,7 +52,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&textInput=' + encodeURIComponent(textInput) +
+                body: '&textInput=' + encodeURIComponent(textInput) +
                     '&textType=' + encodeURIComponent(textType) +
                     '&privacyLevel=' + encodeURIComponent(privacyLevel) +
                     '&algName=' + encodeURIComponent(algName)
@@ -64,7 +64,7 @@
                 .catch(error => console.error('Error:', error));
         })
         // 数值取整
-        document.getElementById("floor_submitBtn").addEventListener("click", function (){
+        document.getElementById("floor_submitBtn").addEventListener("click", function () {
             let textInput = $("#floor_input").val();
             var privacyLevel = 1
             var textType = "address"
@@ -79,7 +79,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&textInput=' + encodeURIComponent(textInput) +
+                body: '&textInput=' + encodeURIComponent(textInput) +
                     '&textType=' + encodeURIComponent(textType) +
                     '&privacyLevel=' + encodeURIComponent(privacyLevel) +
                     '&algName=' + encodeURIComponent(algName)
@@ -91,7 +91,7 @@
                 .catch(error => console.error('Error:', error));
         })
         // 截断
-        document.getElementById("truncation_submitBtn").addEventListener("click", function (){
+        document.getElementById("truncation_submitBtn").addEventListener("click", function () {
             let textInput = $("#truncation_input").val();
             var privacyLevel = 1
             var textType = "address"
@@ -106,7 +106,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&textInput=' + encodeURIComponent(textInput) +
+                body: '&textInput=' + encodeURIComponent(textInput) +
                     '&textType=' + encodeURIComponent(textType) +
                     '&privacyLevel=' + encodeURIComponent(privacyLevel) +
                     '&algName=' + encodeURIComponent(algName)
@@ -119,7 +119,7 @@
         })
 
         // mixzone_1
-        document.getElementById("mixzone_1_submitBtn").addEventListener("click", function (){
+        document.getElementById("mixzone_1_submitBtn").addEventListener("click", function () {
             let position = $("#mixzone_1_position").val();
             let id = $("#mixzone_1_id").val();
             let time = $("#mixzone_1_time").val();
@@ -149,7 +149,7 @@
         })
 
         //mixzone_3
-        document.getElementById("mixzone_3_submitBtn").addEventListener("click", function (){
+        document.getElementById("mixzone_3_submitBtn").addEventListener("click", function () {
             let position = $("#mixzone_3_position").val();
             let id = $("#mixzone_3_id").val();
             let time = $("#mixzone_3_time").val();
@@ -178,7 +178,7 @@
                 .catch(error => console.error('Error:', error));
         })
         //Accuracy_reduction
-        document.getElementById("Accuracy_reduction").addEventListener("click", function (){
+        document.getElementById("Accuracy_reduction").addEventListener("click", function () {
             let position = $("#Accuracy_reduction_position").val();
 
             if (position === "") {
@@ -207,14 +207,16 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading"  style="text-align: center;">
+    <div class="panel-heading" style="text-align: center;">
         <h1 class="panel-title"><b style="font-size: 2em">泛化算法</b></h1>
     </div>
 
-    <div class="panel-body" >
+    <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">1.尾部截断</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                1.尾部截断</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：尾部截断只保留前3位
@@ -227,21 +229,25 @@
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="truncation_input" class="form-control" placeholder="请输入文本" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                    <button class="btn btn-default" id="truncation_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="truncation_input" class="form-control" placeholder="请输入文本"
+                                       style="font-size: 20px">
+                                <span class="input-group-btn">
+                    <button class="btn btn-default" id="truncation_submitBtn" type="button"
+                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                         提交脱敏
                     </button>
                         </span>
                             </div>
                             <div class="text-center">
-                                <label for="truncation_output" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="truncation_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="truncation_output" rows="2" cols="50" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="truncation_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -251,10 +257,12 @@
         </div>
     </div>
     <hr>
-    <div class="panel-body" >
+    <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">2.数值取整</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                2.数值取整</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对数值取整
@@ -267,21 +275,25 @@
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="floor_input" class="form-control" placeholder="请输入文本" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                    <button class="btn btn-default" id="floor_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="floor_input" class="form-control" placeholder="请输入文本"
+                                       style="font-size: 20px">
+                                <span class="input-group-btn">
+                    <button class="btn btn-default" id="floor_submitBtn" type="button"
+                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                         提交脱敏
                     </button>
                         </span>
                             </div>
                             <div class="text-center">
-                                <label for="floor_output" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="floor_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="floor_output" rows="2" cols="50" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="floor_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -291,10 +303,12 @@
         </div>
     </div>
     <hr>
-    <div class="panel-body" >
+    <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">3.时间取整</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                3.时间取整</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对时间取整，格式为12:30:45
@@ -307,21 +321,25 @@
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="floorTime_input" class="form-control" placeholder="请输入文本" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                    <button class="btn btn-default" id="floorTime_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="floorTime_input" class="form-control" placeholder="请输入文本"
+                                       style="font-size: 20px">
+                                <span class="input-group-btn">
+                    <button class="btn btn-default" id="floorTime_submitBtn" type="button"
+                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                         提交脱敏
                     </button>
                         </span>
                             </div>
                             <div class="text-center">
-                                <label for="floorTime_output" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="floorTime_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="floorTime_output" rows="2" cols="50" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="floorTime_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -333,8 +351,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">4.mixzone_1</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                4.mixzone_1</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：根据用户不同的位置信息生成合适的假名位置信息。该算法根据用户位置判断其是否在虚拟圆的混合区域，若在混合区域，则服务器随机生成假名；若判断用户不在混合区，则直接返回用户真实位置信息。
@@ -348,32 +368,39 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
+                        <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_1_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                <input type="text" id="mixzone_1_position" class="form-control"
+                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_1_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
+                                <input type="text" id="mixzone_1_id" class="form-control" placeholder="请输入用户id"
+                                       style="font-size: 20px">
                             </div>
-                            <div class="input-group" >
-                                <input type="text" id="mixzone_1_time" class="form-control" placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
+                            <div class="input-group">
+                                <input type="text" id="mixzone_1_time" class="form-control"
+                                       placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_1_points" class="form-control" placeholder="请输入用户点集, 格式 x1,y1;x2,y2 ..." style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                        <button class="btn btn-default" id="mixzone_1_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                                <input type="text" id="mixzone_1_points" class="form-control"
+                                       placeholder="请输入用户点集, 格式 x1,y1;x2,y2 ..." style="font-size: 20px">
+                                <span class="input-group-btn">
+                                        <button class="btn btn-default" id="mixzone_1_submitBtn" type="button"
+                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
                                 </span>
                             </div>
 
                             <div class="text-center">
-                                <label for="mixzone_1_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="mixzone_1_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="mixzone_1_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="mixzone_1_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -385,8 +412,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">5.mixzone_3</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                5.mixzone_3</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：首先根据用户位置判断其是否在虚拟圆的混合区域，若在混合区域，则客户端直接从假名数据库中得到随机假名；若判断用户不在混合区，则直接返回用户真实位置信息。
@@ -400,32 +429,39 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
+                        <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                <input type="text" id="mixzone_3_position" class="form-control"
+                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
+                                <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id"
+                                       style="font-size: 20px">
                             </div>
-                            <div class="input-group" >
-                                <input type="text" id="mixzone_3_time" class="form-control" placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
+                            <div class="input-group">
+                                <input type="text" id="mixzone_3_time" class="form-control"
+                                       placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_points" class="form-control" placeholder="请输入用户点集, 格式 x1,y1;x2,y2 ..." style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                        <button class="btn btn-default" id="mixzone_3_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                                <input type="text" id="mixzone_3_points" class="form-control"
+                                       placeholder="请输入用户点集, 格式 x1,y1;x2,y2 ..." style="font-size: 20px">
+                                <span class="input-group-btn">
+                                        <button class="btn btn-default" id="mixzone_3_submitBtn" type="button"
+                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
                                 </span>
                             </div>
 
                             <div class="text-center">
-                                <label for="mixzone_3_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="mixzone_3_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="mixzone_3_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="mixzone_3_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -437,38 +473,43 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">6.Accuracy_reduction</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                6.Accuracy_reduction</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：根据用户不同的位置信息生成合适的假名位置信息。该算法根据用户位置判断其是否在虚拟圆的混合区域，若在混合区域，则服务器随机生成假名；若判断用户不在混合区，则直接返回用户真实位置信息。
+                        功能：该算法根据特定的精度需求对用户发送过来的位置信息进行模糊处理。简单地说，就是对用户的真实位置信息进行“精度消失”处理。 </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输入：用户真实位置
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输出：经度、纬度
+                        输出：处理后的位置
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
+                        <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="Accuracy_reduction_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                        <button class="btn btn-default" id="Accuracy_reduction" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                                <input type="text" id="Accuracy_reduction_position" class="form-control"
+                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                        <button class="btn btn-default" id="Accuracy_reduction" type="button"
+                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
                                 </span>
                             </div>
 
                             <div class="text-center">
-                                <label for="Accuracy_reduction_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="Accuracy_reduction_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="Accuracy_reduction_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="Accuracy_reduction_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -490,6 +531,7 @@
         color: black;
         display: flex;
     }
+
     textarea {
         font-size: 1.5em;
     }

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -42,7 +43,7 @@
 <script type="text/javascript">
     let sheet = "consultation";
     window.onload = function () {
-        document.getElementById("showTemplate").addEventListener("click",function (){
+        document.getElementById("showTemplate").addEventListener("click", function () {
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
             document.getElementById("table_list").innerHTML = ""
@@ -50,7 +51,7 @@
             document.getElementById("table_body").innerHTML = ""
             // 拼接html
             let html = "";
-            console.log("sheet:"+sheet)
+            console.log("sheet:" + sheet)
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
                 if (xhr.status === 200 && xhr.readyState === 4) {
@@ -137,11 +138,11 @@
                 }
             }
 
-            xhr.open("get", "/"+ sheet + "param/list", false);
+            xhr.open("get", "/" + sheet + "param/list", false);
             xhr.send();
             document.getElementById("table_body").innerHTML = html;
         })
-        document.getElementById("setTemplate").addEventListener("click",function (){
+        document.getElementById("setTemplate").addEventListener("click", function () {
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
             document.getElementById("table_list").innerHTML = "";
@@ -149,7 +150,7 @@
             document.getElementById("table_body").innerHTML = "";
             // 拼接html
             let html = "";
-            console.log("sheet:"+sheet)
+            console.log("sheet:" + sheet)
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
                 if (xhr.status === 200 && xhr.readyState === 4) {
@@ -229,9 +230,9 @@
 
                         //算法
                         html += "<td><select>"
-                        switch (s.dataType){
+                        switch (s.dataType) {
                             case 0:
-                                switch (s.k){
+                                switch (s.k) {
                                     case 3:
                                         html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
@@ -329,7 +330,7 @@
                                 break;
 
                             case 3:
-                                switch (s.k){
+                                switch (s.k) {
                                     case 11:
                                         html += "<option value = " + 11 + " selected>尾部截断</option>"
                                         html += "<option value = " + 13 + ">邮箱抑制算法</option>"
@@ -465,7 +466,7 @@
                                 }
                                 break;
                             case 4:
-                                switch (s.k){
+                                switch (s.k) {
                                     case 1:
                                         html += "<option value = " + 1 + " selected>基于差分隐私的日期加噪算法</option>"
                                         html += "<option value = " + 18 + ">日期分组置换</option>"
@@ -531,7 +532,7 @@
                 }
             }
 
-            xhr.open("get", "/"+ sheet + "param/list", false);
+            xhr.open("get", "/" + sheet + "param/list", false);
             xhr.send();
             document.getElementById("table_body").innerHTML = html;
 
@@ -539,7 +540,7 @@
         })
         document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function (event){
+    choose_file = function (event) {
         //读取文件
         const file = event.target.files[0]
         // 文件名，扩展名
@@ -558,15 +559,15 @@
                 var formData = new FormData();
                 formData.append("file", file);
                 formData.append("sheet", sheet);
-                formData.append("algName","distortion");
-                console.log("sheet:"+sheet)
+                formData.append("algName", "distortion");
+                console.log("sheet:" + sheet)
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
                     var tr;
-                    var dataArray = new Array();
+                    var dataArray = [];
                     var table_body = document.getElementById("table2")
                     for (var i = 0; i < table_body.rows.length; i++) {
-                        data = new Object();
+                        data = {};
                         tr = table_body.rows[i];
                         //console.log(tr);
                         data.id = tr.childNodes[0].innerHTML;
@@ -588,16 +589,16 @@
                         .then(response => response.blob())
                         .then(blob => {
                             // 脱敏前
-                            document.getElementById("preData").innerHTML="脱敏前数据"
+                            document.getElementById("preData").innerHTML = "脱敏前数据"
                             var reader = new FileReader();
                             reader.onload = function (e) {
                                 var data = new Uint8Array(e.target.result);
-                                var workbook = XLSX.read(data, { type: 'array' });
+                                var workbook = XLSX.read(data, {type: 'array'});
 
                                 var sheetName = workbook.SheetNames[0];
                                 var sheet = workbook.Sheets[sheetName];
 
-                                var jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                var jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
 
                                 var pageSize = 10;
                                 var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
@@ -669,14 +670,14 @@
                             reader.readAsArrayBuffer(file);
 
                             // 脱敏后
-                            document.getElementById("afterData").innerHTML="脱敏后数据"
+                            document.getElementById("afterData").innerHTML = "脱敏后数据"
                             const reader1 = new FileReader();
-                            reader1.onload = function(event) {
+                            reader1.onload = function (event) {
                                 const data = event.target.result;
-                                const workbook = XLSX.read(data, { type: 'binary' });
+                                const workbook = XLSX.read(data, {type: 'binary'});
                                 const sheetName = workbook.SheetNames[0];
                                 const sheet = workbook.Sheets[sheetName];
-                                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
                                 var pageSize = 10;
                                 var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
                                 var currentPage1 = 1;
@@ -756,8 +757,7 @@
                         })
                         .catch(error => console.error('Error:', error));
                 }
-            }
-            else{
+            } else {
                 alert("请提交excel文件")
             }
         }
@@ -765,7 +765,7 @@
     }
 
 </script>
-<img src="/img/consultation.jpg"  style="height: 25vh; display: block; margin: 0 auto;" alt="consultation">
+<img src="/img/consultation.jpg" style="height: 25vh; display: block; margin: 0 auto;" alt="consultation">
 <div class="row">
     <div class="col-sm-12">
         <div class="ibox float-e-margins">
@@ -774,8 +774,8 @@
                 <div class="col-sm-5 m-b-xs">
                     <button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
                     <button type="button" class="btn btn-sm btn-primary" id="setTemplate"> 设置需求模板</button>
-                    <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload"  style="display: none;">
+                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             选择文件
                         </label>
@@ -783,13 +783,13 @@
                 </div>
             </div>
             <!--文件上传信息-->
-            <div id = fileInfo>
+            <div id=fileInfo>
             </div>
-            <div id = "after">
+            <div id="after">
 
             </div>
             <div class="ibox-content">
-                <div id=table_body ></div>
+                <div id=table_body></div>
             </div>
             <div class="button1">
                 <div class="btn2">
@@ -798,13 +798,13 @@
                     <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
                 </div>
             </div>
-            <div id = "showTable">
+            <div id="showTable">
             </div>
 
         </div>
     </div>
 </div>
-<div >
+<div>
     <div>
         <span id="preData" class="center-text"></span>
     </div>
@@ -880,44 +880,52 @@
         /*text-align: center;*/
         font-size: 2em;
     }
+
     /* 设置表格样式 */
     #dataTableContainer {
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable {
         width: 100%;
         margin: 0 auto;
     }
+
     #paginationInfo {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo input {
         width: 5em;
         text-align: center;
     }
+
     /* 设置表格样式 */
     #dataTableContainer1 {
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable1 {
         width: 100%;
         margin: 0 auto;
     }
+
     #paginationInfo1 {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo1 input {
         width: 5em;
         text-align: center;
     }
 
-    #submit{
+    #submit {
         background-color: #347aa9;
         padding: 5px 20px;
         cursor: pointer;
@@ -929,21 +937,23 @@
 
     }
 
-    .btn2{
+    .btn2 {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn, #showTemplate, #setTemplate{
+    .upload-btn, #showTemplate, #setTemplate {
         background-color: #347aa9;
         color: white;
         cursor: pointer;

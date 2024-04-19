@@ -35,8 +35,11 @@ public class DpImpl implements Dp {
             /*
                 拉普拉斯机制 Laplace Mechanism
                 随机添加拉普拉斯噪声
-                输入：单个数值、算法标识符 -> 1、隐私预算、采样次数 n
-                输出：数值一维数组 length = n
+                功能：多个数值加噪
+                参数：ε、全局敏感度
+                输入：数值数值一维数组
+                输出：数值一维数组（长度为n）
+
             */
 //            case 1 : {
 //               if (params.length != 2) return null;
@@ -507,6 +510,17 @@ public class DpImpl implements Dp {
                     throw new RuntimeException(e);
                 }
 
+            }
+            /*
+                基于高斯机制差分隐私的数值加噪算法
+
+             */
+
+            case 27 : {
+                if (params.length != 1) return null;
+                List<?> list = object.getList();
+                List<Object> value = new ArrayList<>(list);
+                return new DSObject(dpUtil.gaussianToValue(value, params[0].intValue()));
             }
 
             default : return null;

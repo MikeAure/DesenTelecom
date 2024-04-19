@@ -20,7 +20,7 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(30002);
             Util util = new UtilImpl();
             //发送t_huji
-            util.myssqlDump("t_huji.sql");
+            util.mySqlDump("t_huji.sql");
 /*// 通过 Socket 发送 SQL 文件
             BufferedOutputStream outputStream = new BufferedOutputStream(remoteSocket.getOutputStream());
             FileInputStream fileInputStream = new FileInputStream("t_huji.sql");

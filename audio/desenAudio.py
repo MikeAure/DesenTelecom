@@ -252,9 +252,8 @@ if __name__ == '__main__':
     # #         "D:\\Programming\\Desen\\desen_files\\desen_1710382610951audiotest.wav", 
     # #         0.5)
 
-    # replaceVoicePrint("D:\\Programming\\Desen\\raw_files\\1710382610951audiotest.wav", 
-    #                   "D:\\Programming\\Desen\\raw_files\\1709901404551LindaSignup.wav",
-    #                   "D:\\Programming\\Desen\\desen_files\\desen_1710382610951audiotest_re.wav")
+    # replace_voice_print_fixed("D:\\Programming\\Desen\\raw_files\\17127445577770001.wav", 
+    #                   "D:\\Programming\\Desen\\desen_files\\desen_17127445577770001.wav")
 
 
 

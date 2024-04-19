@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -32,14 +33,14 @@
 
 <!-- 自定义js -->
 <script src="${ctx!}/js/content.js?v=1.0.0"></script>
-<div class="row" >
+<div class="row">
     <div class="col-sm-12">
-        <div class="ibox float-e-margins" >
-            <div class="ibox-title" >
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
                 <span>个人敏感信息按需脱敏工具集</span>
             </div>
-           <div class="ibox-content" >
-                <img src="img/img.png" width="100%" alt="" >
+            <div class="ibox-content">
+                <img src="img/img.png" width="100%" alt="">
             </div>
         </div>
 
@@ -60,20 +61,22 @@
         margin: 0;
         padding: 0;
     }
-    .ibox-title span{
+
+    .ibox-title span {
         font-size: 50px;
     }
-    .ibox-content{
+
+    .ibox-content {
         margin: 0;
         padding: 0;
         display: block;
         position: relative;
         /*display: inline-block;*/
     }
-    .ibox-content img{
+
+    .ibox-content img {
         display: block;
     }
-
 
 
 </style>

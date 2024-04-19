@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -34,9 +35,9 @@
 <script src="${ctx!}/js/content.js?v=1.0.0"></script>
 <script type="text/javascript">
     window.onload = function () {
-        document.getElementById("fileUpload").addEventListener("change",choose_file)
+        document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function(event) {
+    choose_file = function (event) {
         // 清空
         document.getElementById("pre").innerHTML = "";
         document.getElementById("after").innerHTML = "";
@@ -53,10 +54,10 @@
             const fileExtension = fileName.split('.').pop().toLowerCase();
             console.log(fileExtension)
 
-            if(videoType.includes(fileExtension)){
+            if (videoType.includes(fileExtension)) {
                 uploadVideo()
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     let after = document.getElementById("after");
                     after.innerHTML = "";
                     // 获取保护级别
@@ -69,7 +70,7 @@
                     formData.set("params", param);
 
                     let idx = $("ul .active").index();
-                    if(idx === 0) {
+                    if (idx === 0) {
                         table_body = document.getElementById("table1")
                         tr = table_body.rows[0];
                         let type1 = tr.childNodes[0].firstChild.value;
@@ -84,12 +85,12 @@
                     }
 
                     // 获取算法类型
-                    fetch('/File/desenFile',{
+                    fetch('/File/desenFile', {
                         method: 'POST',
                         body: formData
                     })
                         .then(response => response.blob())
-                        .then(data =>{
+                        .then(data => {
                             let video = document.createElement("video");
                             console.log(data)
                             video.src = URL.createObjectURL(data);
@@ -98,13 +99,12 @@
                             after.appendChild(video);
 
                         })
-                        .catch(error =>{
+                        .catch(error => {
                             console.log("Error:", error);
                         })
 
                 }
-            }
-            else {
+            } else {
                 alert("请选择视频文件");
             }
         }
@@ -132,8 +132,8 @@
             </div>
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
-                    <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload"  style="display: none;">
+                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             选择文件
                         </label>
@@ -141,38 +141,47 @@
                 </div>
             </div>
             <!--文件上传信息-->
-            <div id = fileInfo>
+            <div id=fileInfo>
             </div>
 
             <div class="showFile">
                 <!--前后文件-->
-                <div id = pre>
+                <div id=pre>
                 </div>
-                <div id = after>
+                <div id=after>
                 </div>
             </div>
 
             <div class="tabs-container">
-                <ul id = "tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
+                <ul id="tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
                     </li>
-                    <li class="" ><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
+                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
                     </li>
                 </ul>
                 <div class="tab-content">
                     <div id="tab-1" class="tab-pane active" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th> 请选择视频失真脱敏算法</th></tr></thead>
+                                <thead>
+                                <tr>
+                                    <th> 请选择视频失真脱敏算法</th>
+                                </tr>
+                                </thead>
                                 <tbody id="table1">
-                                <tr><td><select>
-                                            <option value="meanValueVideo"> 基于均值滤波器的视频帧像素替换方法 </option>
-                                            <option value="pixelate_video"> 基于像素化滤波器的视频帧像素替换方法 </option>
-                                            <option value="gaussian_blur_video"> 基于高斯滤波器的视频帧像素替换方法 </option>
-                                            <option value="box_blur_video"> 基于盒式滤波器的视频帧像素替换方法 </option>
-                                            <option value="replace_region_video"> 基于像素块的视频帧像素替换方法 </option>
+                                <tr>
+                                    <td><select>
+                                            <option value="meanValueVideo"> 基于均值滤波器的视频帧像素替换方法</option>
+                                            <option value="pixelate_video"> 基于像素化滤波器的视频帧像素替换方法
+                                            </option>
+                                            <option value="gaussian_blur_video"> 基于高斯滤波器的视频帧像素替换方法
+                                            </option>
+                                            <option value="box_blur_video"> 基于盒式滤波器的视频帧像素替换方法</option>
+                                            <option value="replace_region_video"> 基于像素块的视频帧像素替换方法
+                                            </option>
 
-                                        </select></td></tr>
+                                        </select></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -180,12 +189,18 @@
                     <div id="tab-2" class="tab-pane" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th>请选择视频非失真脱敏算法</th></tr></thead>
+                                <thead>
+                                <tr>
+                                    <th>请选择视频非失真脱敏算法</th>
+                                </tr>
+                                </thead>
                                 <tbody id="table2">
-                                <tr><td><select>
-                                            <option value="test3"> 视频非失真脱敏算法A </option>
-                                            <option value="test4" selected> 视频非失真脱敏算法B </option>
-                                        </select></td></tr>
+                                <tr>
+                                    <td><select>
+                                            <option value="test3"> 视频非失真脱敏算法A</option>
+                                            <option value="test4" selected> 视频非失真脱敏算法B</option>
+                                        </select></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -194,15 +209,21 @@
             </div>
 
             <div class="ibox-content" style="text-align: center;">
-                <div id="privacyLevel" >
+                <div id="privacyLevel">
                     <table style="margin: auto; font-size: 20px">
-                        <thead><tr><th>请选择隐私保护等级</th></tr></thead>
+                        <thead>
+                        <tr>
+                            <th>请选择隐私保护等级</th>
+                        </tr>
+                        </thead>
                         <tbody id="table3">
-                        <tr><td><select>
-                                    <option value="0"> 低程度 </option>
-                                    <option value="1" selected> 中程度 </option>
-                                    <option value="2"> 高程度 </option>
-                                </select></td></tr>
+                        <tr>
+                            <td><select>
+                                    <option value="0"> 低程度</option>
+                                    <option value="1" selected> 中程度</option>
+                                    <option value="2"> 高程度</option>
+                                </select></td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -227,10 +248,12 @@
         align-items: center;
         justify-content: center;
     }
-    .ibox-title span{
+
+    .ibox-title span {
         font-size: 50px;
     }
-    #submit{
+
+    #submit {
         background-color: #347aa9;
         padding: 5px 20px;
         cursor: pointer;
@@ -241,21 +264,24 @@
         /*margin-right: 50px;*/
 
     }
-    .btn2{
+
+    .btn2 {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn{
+    .upload-btn {
         background-color: #347aa9;
         color: white;
         cursor: pointer;
@@ -265,26 +291,32 @@
         display: inline-block;
         margin: 30px;
     }
-    #pre{
+
+    #pre {
         text-align: center;
     }
-    #pre video{
+
+    #pre video {
         display: inline-block;
         max-width: 50%;
         height: auto
     }
-    #after{
+
+    #after {
         text-align: center;
     }
-    #after video{
+
+    #after video {
         display: inline-block;
         max-width: 50%;
         height: auto
     }
-    .showFile{
+
+    .showFile {
         display: flex;
         justify-content: center;
     }
+
     .tabs-container ul {
         display: flex;
         flex-direction: row;

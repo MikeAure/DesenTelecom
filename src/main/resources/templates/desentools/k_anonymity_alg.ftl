@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -44,7 +45,7 @@
         // 提交
         document.getElementById("k_anonymity_fileUpload").addEventListener("change", choose_file)
 
-        document.getElementById("CirDummy_submitBtn").addEventListener("click", function (){
+        document.getElementById("CirDummy_submitBtn").addEventListener("click", function () {
             let position = $("#CirDummy_position").val();
             let k = $("#CirDummy_k").val();
             let s_cd = $("#CirDummy_s_cd").val();
@@ -73,7 +74,7 @@
                 .catch(error => console.error('Error:', error));
         })
 
-        document.getElementById("GridDummy_submitBtn").addEventListener("click", function (){
+        document.getElementById("GridDummy_submitBtn").addEventListener("click", function () {
             let position = $("#GridDummy_position").val();
             let k = $("#GridDummy_k").val();
             let s_cd = $("#GridDummy_s_cd").val();
@@ -100,7 +101,7 @@
                 .catch(error => console.error('Error:', error));
         })
 
-        document.getElementById("adaptiveIntervalCloakingWrapper_submitBtn").addEventListener("click", function (){
+        document.getElementById("adaptiveIntervalCloakingWrapper_submitBtn").addEventListener("click", function () {
             let position = $("#adaptiveIntervalCloakingWrapper_position").val();
             let k = $("#adaptiveIntervalCloakingWrapper_k").val();
             let min = $("#adaptiveIntervalCloakingWrapper_min").val();
@@ -129,7 +130,7 @@
                 .catch(error => console.error('Error:', error));
         })
 
-        document.getElementById("CaDSA_submitBtn").addEventListener("click", function (){
+        document.getElementById("CaDSA_submitBtn").addEventListener("click", function () {
             let op = $("#CaDSA_id").val();
             let position = $("#CaDSA_position").val();
 
@@ -154,7 +155,7 @@
                 .catch(error => console.error('Error:', error));
         })
 
-        document.getElementById("K_anonymity_position_submitBtn").addEventListener("click", function (){
+        document.getElementById("K_anonymity_position_submitBtn").addEventListener("click", function () {
             let position = $("#K_anonymity_position").val();
             let k = $("#K_anonymity_position_k").val();
 
@@ -179,7 +180,7 @@
                 .catch(error => console.error('Error:', error));
         })
     }
-    choose_file = function (event){
+    choose_file = function (event) {
         // 清空
         document.getElementById("fileInfo").innerHTML = "";
         document.getElementById("after").innerHTML = "";
@@ -203,7 +204,7 @@
                 formData.append("sheet", "k_anonymity");
                 formData.append("algName", "k_anonymity");
                 formData.append("params", document.getElementById("k_anonymity_privacyLevel").value);
-                document.getElementById("k_anonymity_submit").onclick = function (){
+                document.getElementById("k_anonymity_submit").onclick = function () {
                     fetch('/File/desenFile', {
                         method: 'POST',
                         body: formData
@@ -214,12 +215,12 @@
                             var reader = new FileReader();
                             reader.onload = function (e) {
                                 var data = new Uint8Array(e.target.result);
-                                var workbook = XLSX.read(data, { type: 'array' });
+                                var workbook = XLSX.read(data, {type: 'array'});
 
                                 var sheetName = workbook.SheetNames[0];
                                 var sheet = workbook.Sheets[sheetName];
 
-                                var jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                var jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
 
                                 var pageSize = 10;
                                 var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
@@ -231,7 +232,8 @@
 
                                     var tableContent = '<thead><tr>';
                                     var headers = ['age', 'work_class', 'fin_weight', 'education', 'edu_num', 'mar_status', 'occupation', 'relaship',
-                                        'race', 'gender', 'cap_gain', 'cap_loss', 'hours_pweek', 'country', 'income'];;
+                                        'race', 'gender', 'cap_gain', 'cap_loss', 'hours_pweek', 'country', 'income'];
+
                                     headers.forEach(function (header) {
                                         tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
                                     });
@@ -293,12 +295,12 @@
 
                             // 脱敏后
                             const reader1 = new FileReader();
-                            reader1.onload = function(event) {
+                            reader1.onload = function (event) {
                                 const data = event.target.result;
-                                const workbook = XLSX.read(data, { type: 'binary' });
+                                const workbook = XLSX.read(data, {type: 'binary'});
                                 const sheetName = workbook.SheetNames[0];
                                 const sheet = workbook.Sheets[sheetName];
-                                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
                                 var pageSize = 10;
                                 var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
                                 var currentPage1 = 1;
@@ -379,8 +381,7 @@
                         })
                         .catch(error => console.error('Error:', error));
                 }
-            }
-            else{
+            } else {
                 alert("请提交csv文件")
             }
         }
@@ -392,13 +393,15 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading"  style="text-align: center;">
+    <div class="panel-heading" style="text-align: center;">
         <h1 class="panel-title"><b style="font-size: 2em">K-匿名</b></h1>
     </div>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">1.K-匿名</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                1.K-匿名</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对csv文件进行K-匿名处理
@@ -412,8 +415,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class="<#--col-sm-5 m-b-xs d-flex--> align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="k_anonymity_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="k_anonymity_fileUpload" style="display: none;">
                                 <label for="k_anonymity_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -421,15 +424,15 @@
                         </div>
                     </div>
                     <!--文件上传信息-->
-                    <div id = "fileInfo">
+                    <div id="fileInfo">
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;">
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="k_anonymity_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -442,17 +445,57 @@
             <button type="button" class="btn btn-sm btn-primary" id="k_anonymity_submit"> 提交脱敏</button>
         </div>
 
-        <div id = "after">
+        <div id="after">
 
         </div>
 
+    </div>
+    <div class="container mt-5">
+        <div id="dataTableContainer">
+            <table id="dataTable" class="table table-bordered">
+                <!-- 这里将用 JavaScript 动态创建表格内容 -->
+            </table>
+        </div>
+        <div id="paginationContainer" class="mt-3" style="display: none;">
+            <nav>
+                <div id="paginationInfo" class="d-flex justify-content-between align-items-center">
+                    <ul class="pagination mb-0" id="pagination"></ul>
+                    <div class="form-group mb-0 text-center">
+                        <label for="pageInput">跳转至：</label>
+                        <input type="number" class="form-control" id="pageInput" min="1">
+                        <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
+                    </div>
+                    <div id="totalPages"></div>
+                </div>
+            </nav>
+        </div>
+        <div id="dataTableContainer1">
+            <table id="dataTable1" class="table table-bordered">
+                <!-- 这里将用 JavaScript 动态创建表格内容 -->
+            </table>
+        </div>
+        <div id="paginationContainer1" class="mt-3" style="display: none;">
+            <nav>
+                <div id="paginationInfo1" class="d-flex justify-content-between align-items-center">
+                    <ul class="pagination mb-0" id="pagination1"></ul>
+                    <div class="form-group mb-0 text-center">
+                        <label for="pageInput1">跳转至：</label>
+                        <input type="number" class="form-control" id="pageInput1" min="1">
+                        <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
+                    </div>
+                    <div id="totalPages1"></div>
+                </div>
+            </nav>
+        </div>
     </div>
     <hr>
 
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">2.CirDummy</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                2.CirDummy</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：基于包含用户真实位置的虚拟圆产生匿名位置。该算法首先根据匿名区域的面积来随机选取一个满足要求的圆心，
@@ -468,38 +511,45 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
+                        <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
-                          <#--  <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                            <#--  <div class="input-group" style="margin-top: 10px;">
+                                  <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                              </div>
+                              <div class="input-group" style="margin-top: 10px;">
+                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
+                              </div>-->
+                            <div class="input-group">
+                                <input type="text" id="CirDummy_position" class="form-control"
+                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
-                            </div>-->
-                            <div class="input-group" >
-                                <input type="text" id="CirDummy_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                <input type="text" id="CirDummy_k" class="form-control" placeholder="请输入匿名度k"
+                                       style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="CirDummy_k" class="form-control" placeholder="请输入匿名度k" style="font-size: 20px">
+                                <input type="text" id="CirDummy_s_cd" class="form-control" placeholder="匿名区域的面积"
+                                       style="font-size: 20px">
                             </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="CirDummy_s_cd" class="form-control" placeholder="匿名区域的面积" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" >
-                                <input type="text" id="CirDummy_rho" class="form-control" placeholder="请输入圆环内径系数" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                        <button class="btn btn-default" id="CirDummy_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                            <div class="input-group">
+                                <input type="text" id="CirDummy_rho" class="form-control"
+                                       placeholder="请输入圆环内径系数" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                        <button class="btn btn-default" id="CirDummy_submitBtn" type="button"
+                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
                                 </span>
                             </div>
 
                             <div class="text-center">
-                                <label for="CirDummy_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="CirDummy_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="CirDummy_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="CirDummy_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -512,8 +562,10 @@
 
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">3.GridDummy</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                3.GridDummy</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：基于包含用户真实位置的虚拟方格产生虚拟位置。基于覆盖用户位置的虚拟网格生成k个虚拟位置，并返回k个虚拟位置的集合。同时，生成的虚拟方格还需要满足用户预先定义的匿名区域的面积的要求。
@@ -527,9 +579,9 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
+                        <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
                             <#--  <div class="input-group" style="margin-top: 10px;">
                                   <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
@@ -537,25 +589,30 @@
                               <div class="input-group" style="margin-top: 10px;">
                                   <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
                               </div>-->
-                            <div class="input-group" >
-                                <input type="text" id="GridDummy_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                            <div class="input-group">
+                                <input type="text" id="GridDummy_position" class="form-control"
+                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="GridDummy_k" class="form-control" placeholder="请输入匿名度k" style="font-size: 20px">
+                                <input type="text" id="GridDummy_k" class="form-control" placeholder="请输入匿名度k"
+                                       style="font-size: 20px">
                             </div>
                             <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="GridDummy_s_cd" class="form-control" placeholder="匿名区域的面积" style="font-size: 20px">
-                                <button class="btn btn-default" id="GridDummy_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                                <input type="text" id="GridDummy_s_cd" class="form-control" placeholder="匿名区域的面积"
+                                       style="font-size: 20px">
+                                <button class="btn btn-default" id="GridDummy_submitBtn" type="button"
+                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                     提交脱敏
                                 </button>
                             </div>
-                            </div>
+                        </div>
 
-                            <div class="text-center">
-                                <label for="GridDummy_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="GridDummy_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
-                                </div>
+                        <div class="text-center">
+                            <label for="GridDummy_outputText"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <textarea id="GridDummy_outputText" rows="4" cols="100" readonly
+                                          style="margin-top: 10px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -563,60 +620,70 @@
             </div>
         </div>
     </div>
-    <hr>
+</div>
+<hr>
 
-    <div class="panel-body">
-        <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">4.adaptiveIntervalCloakingWrapper</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                <div>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        说明：简单理解为四分法，由坐标边界可以形成一个包含所有缓存位置信息的矩形区域，然后根据用户的真实位置以及用户设置的最小匿名度，来将矩形区域进行划分。每次将矩形区域划分为四部分，
-                        分别为第一象限、第二象限、第三象限和第四象限。首先判断用户的真实位置所在的象限，然后判断该象限中包含的缓存位置信息数量是否大于最小匿名度，若大于，则继续划分；否则，将上一次的划
-                        分结果作为最终的矩形区域，输出该区域中所包含的缓存位置信息以及真实的用户位置信息。最终为用户形成一个包含用户数量刚好大于最小匿名度、且不可再分的隐藏区域。
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度 匿名度k 矩形区域左下角和右上角坐标
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输出：坐标数组
-                    </p>
-                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+<div class="panel-body">
+    <div class="row">
+        <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            4.adaptiveIntervalCloakingWrapper</p>
+        <div <#--class="col-sm-6"-->
+                style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <div>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    说明：简单理解为四分法，由坐标边界可以形成一个包含所有缓存位置信息的矩形区域，然后根据用户的真实位置以及用户设置的最小匿名度，来将矩形区域进行划分。每次将矩形区域划分为四部分，
+                    分别为第一象限、第二象限、第三象限和第四象限。首先判断用户的真实位置所在的象限，然后判断该象限中包含的缓存位置信息数量是否大于最小匿名度，若大于，则继续划分；否则，将上一次的划
+                    分结果作为最终的矩形区域，输出该区域中所包含的缓存位置信息以及真实的用户位置信息。最终为用户形成一个包含用户数量刚好大于最小匿名度、且不可再分的隐藏区域。
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输入：经度、纬度 匿名度k 矩形区域左下角和右上角坐标
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输出：坐标数组
+                </p>
+                <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
-                </div>
-                <div class="container" >
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <!-- 新加的两个文本输入框 -->
-                            <#--  <div class="input-group" style="margin-top: 10px;">
-                                  <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                              </div>
-                              <div class="input-group" style="margin-top: 10px;">
-                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
-                              </div>-->
-                            <div class="input-group" >
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_k" class="form-control" placeholder="请输入匿名度k" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_min" class="form-control" placeholder="矩形左下角坐标" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_max" class="form-control" placeholder="矩形右上角坐标" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                        <button class="btn btn-default" id="adaptiveIntervalCloakingWrapper_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+            </div>
+            <div class="container">
+                <div class="row justify-content-center" style="display: grid; place-items: center;">
+                    <div class="col-lg-5">
+                        <!-- 新加的两个文本输入框 -->
+                        <#--  <div class="input-group" style="margin-top: 10px;">
+                              <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                          </div>
+                          <div class="input-group" style="margin-top: 10px;">
+                              <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
+                          </div>-->
+                        <div class="input-group">
+                            <input type="text" id="adaptiveIntervalCloakingWrapper_position" class="form-control"
+                                   placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                        </div>
+                        <div class="input-group" style="margin-top: 10px;">
+                            <input type="text" id="adaptiveIntervalCloakingWrapper_k" class="form-control"
+                                   placeholder="请输入匿名度k" style="font-size: 20px">
+                        </div>
+                        <div class="input-group" style="margin-top: 10px;">
+                            <input type="text" id="adaptiveIntervalCloakingWrapper_min" class="form-control"
+                                   placeholder="矩形左下角坐标" style="font-size: 20px">
+                        </div>
+                        <div class="input-group" style="margin-top: 10px;">
+                            <input type="text" id="adaptiveIntervalCloakingWrapper_max" class="form-control"
+                                   placeholder="矩形右上角坐标" style="font-size: 20px">
+                            <span class="input-group-btn">
+                                        <button class="btn btn-default" id="adaptiveIntervalCloakingWrapper_submitBtn"
+                                                type="button"
+                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
                                 </span>
-                            </div>
+                        </div>
 
-                            <div class="text-center">
-                                <label for="adaptiveIntervalCloakingWrapper_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="adaptiveIntervalCloakingWrapper_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
-                                </div>
+                        <div class="text-center">
+                            <label for="adaptiveIntervalCloakingWrapper_outputText"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <textarea id="adaptiveIntervalCloakingWrapper_outputText" rows="4" cols="100" readonly
+                                          style="margin-top: 10px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -624,51 +691,58 @@
             </div>
         </div>
     </div>
-    <hr>
+</div>
+<hr>
 
-    <div class="panel-body">
-        <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">5.CaDSA</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                <div>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        说明：该算法基于缓存选择虚拟位置。该算法首先选择4k个查询概率与虚拟位置Cr最接近的单元格，然后从中随机选出2k个单元格，由此可以为当前查询实现高熵。
-                        最后从上述2k个单元格中选出对缓存贡献最大的k-1个单元格，注意当此子集个数较多时，只随机选择S个子集。从而生成了包含k-1个单元格和1个包含真实位置的单元格的匿名位置集。
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度、算法类型（1表示CaDSA、2表示enhanced CaDSA）
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输出：经度向量、纬度向量
-                    </p>
-                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+<div class="panel-body">
+    <div class="row">
+        <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            5.CaDSA</p>
+        <div <#--class="col-sm-6"-->
+                style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <div>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    说明：该算法基于缓存选择虚拟位置。该算法首先选择4k个查询概率与虚拟位置Cr最接近的单元格，然后从中随机选出2k个单元格，由此可以为当前查询实现高熵。
+                    最后从上述2k个单元格中选出对缓存贡献最大的k-1个单元格，注意当此子集个数较多时，只随机选择S个子集。从而生成了包含k-1个单元格和1个包含真实位置的单元格的匿名位置集。
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输入：经度、纬度、算法类型（1表示CaDSA、2表示enhanced CaDSA）
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输出：经度向量、纬度向量
+                </p>
+                <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
-                </div>
-                <div class="container" >
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <!-- 新加的两个文本输入框 -->
-                            <div class="input-group" style="margin-top: 10px;">
-                                  <input type="text" id="CaDSA_id" class="form-control" placeholder="请输入算法类型" style="font-size: 20px">
-                            </div>
-                              <#--<div class="input-group" style="margin-top: 10px;">
-                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
-                              </div>-->
-                            <div class="input-group" >
-                                <input type="text" id="CaDSA_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                        <button class="btn btn-default" id="CaDSA_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+            </div>
+            <div class="container">
+                <div class="row justify-content-center" style="display: grid; place-items: center;">
+                    <div class="col-lg-5">
+                        <!-- 新加的两个文本输入框 -->
+                        <div class="input-group" style="margin-top: 10px;">
+                            <input type="text" id="CaDSA_id" class="form-control" placeholder="请输入算法类型"
+                                   style="font-size: 20px">
+                        </div>
+                        <#--<div class="input-group" style="margin-top: 10px;">
+                            <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
+                        </div>-->
+                        <div class="input-group">
+                            <input type="text" id="CaDSA_position" class="form-control"
+                                   placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                            <span class="input-group-btn">
+                                        <button class="btn btn-default" id="CaDSA_submitBtn" type="button"
+                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
                                     </span>
-                            </div>
+                        </div>
 
 
-                            <div class="text-center">
-                                <label for="CaDSA_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="CaDSA_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
-                                </div>
+                        <div class="text-center">
+                            <label for="CaDSA_outputText"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <textarea id="CaDSA_outputText" rows="4" cols="100" readonly
+                                          style="margin-top: 10px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -676,52 +750,60 @@
             </div>
         </div>
     </div>
-    <hr>
+</div>
+<hr>
 
-    <div class="panel-body">
-        <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">6.K_anonymity_position</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                <div>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        说明：从预先生成的虚拟位置库中随机选择K-1个匿名位置，与真实位置一起形成K-匿名位置集合。
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度 匿名度 k
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输出：坐标数组
-                    </p>
-                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+<div class="panel-body">
+    <div class="row">
+        <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            6.K_anonymity_position</p>
+        <div <#--class="col-sm-6"-->
+                style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <div>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    说明：从预先生成的虚拟位置库中随机选择K-1个匿名位置，与真实位置一起形成K-匿名位置集合。
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输入：经度、纬度 匿名度 k
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输出：坐标数组
+                </p>
+                <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
-                </div>
-                <div class="container" >
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <!-- 新加的两个文本输入框 -->
-                            <#--  <div class="input-group" style="margin-top: 10px;">
-                                  <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                              </div>
-                              <div class="input-group" style="margin-top: 10px;">
-                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
-                              </div>-->
-                            <div class="input-group" >
-                                <input type="text" id="K_anonymity_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="K_anonymity_position_k" class="form-control" placeholder="请输入匿名度k" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                        <button class="btn btn-default" id="K_anonymity_position_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+            </div>
+            <div class="container">
+                <div class="row justify-content-center" style="display: grid; place-items: center;">
+                    <div class="col-lg-5">
+                        <!-- 新加的两个文本输入框 -->
+                        <#--  <div class="input-group" style="margin-top: 10px;">
+                              <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                          </div>
+                          <div class="input-group" style="margin-top: 10px;">
+                              <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">
+                          </div>-->
+                        <div class="input-group">
+                            <input type="text" id="K_anonymity_position" class="form-control"
+                                   placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                        </div>
+                        <div class="input-group" style="margin-top: 10px;">
+                            <input type="text" id="K_anonymity_position_k" class="form-control"
+                                   placeholder="请输入匿名度k" style="font-size: 20px">
+                            <span class="input-group-btn">
+                                        <button class="btn btn-default" id="K_anonymity_position_submitBtn"
+                                                type="button"
+                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
                                 </span>
-                            </div>
+                        </div>
 
-                            <div class="text-center">
-                                <label for="K_anonymity_position_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="K_anonymity_position_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
-                                </div>
+                        <div class="text-center">
+                            <label for="K_anonymity_position_outputText"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <textarea id="K_anonymity_position_outputText" rows="4" cols="100" readonly
+                                          style="margin-top: 10px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -729,47 +811,10 @@
             </div>
         </div>
     </div>
-    <hr>
-
-
 </div>
-<div class="container mt-5">
-    <div id="dataTableContainer">
-        <table id="dataTable" class="table table-bordered">
-            <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-    </div>
-    <div id="paginationContainer" class="mt-3" style="display: none;">
-        <nav>
-            <div id="paginationInfo" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination mb-0" id="pagination"></ul>
-                <div class="form-group mb-0 text-center">
-                    <label for="pageInput">跳转至：</label>
-                    <input type="number" class="form-control" id="pageInput" min="1">
-                    <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
-                </div>
-                <div id="totalPages"></div>
-            </div>
-        </nav>
-    </div>
-    <div id="dataTableContainer1">
-        <table id="dataTable1" class="table table-bordered">
-            <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-    </div>
-    <div id="paginationContainer1" class="mt-3" style="display: none;">
-        <nav>
-            <div id="paginationInfo1" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination mb-0" id="pagination1"></ul>
-                <div class="form-group mb-0 text-center">
-                    <label for="pageInput1">跳转至：</label>
-                    <input type="number" class="form-control" id="pageInput1" min="1">
-                    <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
-                </div>
-                <div id="totalPages1"></div>
-            </div>
-        </nav>
-    </div>
+<hr>
+
+
 </div>
 
 
@@ -780,37 +825,45 @@
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable {
         width: max-content;
         margin: 0 auto;
     }
+
     #paginationInfo {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo input {
         width: 5em;
         text-align: center;
     }
+
     /* 设置表格样式 */
     #dataTableContainer1 {
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable1 {
         width: max-content;
         margin: 0 auto;
     }
+
     #paginationInfo1 {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo1 input {
         width: 5em;
         text-align: center;
     }
+
     /*标题*/
     .ibox-title {
         height: 200px;
@@ -823,14 +876,15 @@
     }
 
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn, #k_anonymity_submit{
+    .upload-btn, #k_anonymity_submit {
         background-color: #347aa9;
         color: white;
         cursor: pointer;

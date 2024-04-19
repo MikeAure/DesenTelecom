@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -40,11 +41,11 @@
 <script type="text/javascript">
     window.onload = function () {
         // 场景模板
-        document.getElementById("choose_template_sheet").addEventListener("change", function (){
+        document.getElementById("choose_template_sheet").addEventListener("change", function () {
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
-           /* document.getElementById("table_list").innerHTML = ""
-            document.getElementById("table_list2").innerHTML = ""*/
+            /* document.getElementById("table_list").innerHTML = ""
+             document.getElementById("table_list2").innerHTML = ""*/
             document.getElementById("table_body").innerHTML = ""
             // 重置需求模板
             document.getElementById("choose_sheet").value = "111"
@@ -52,7 +53,7 @@
             // 场景名
             let sheet = document.getElementById("choose_template_sheet").value;
             let html = "";
-            console.log("sheet:"+sheet)
+            console.log("sheet:" + sheet)
 
             let xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
@@ -69,8 +70,8 @@
                         "<th>字段缩写</th>" +
                         "<th>字段名</th>" +
                         "<th>字段类型</th>" +
-                      /*  "<th>脱敏算法</th>" +
-                        "<th>隐私保护等级</th>" +*/
+                        /*  "<th>脱敏算法</th>" +
+                          "<th>隐私保护等级</th>" +*/
                         "</tr>" +
                         "</thead>" +
                         "<tbody id=\"table2\">";
@@ -103,14 +104,14 @@
                 }
             }
 
-            xhr.open("get", "/"+ sheet + "param/list", false);
+            xhr.open("get", "/" + sheet + "param/list", false);
             xhr.send();
             document.getElementById("table_body").innerHTML = html;
         })
         //需求模板
         document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function (event){
+    choose_file = function (event) {
         // 清空
         document.getElementById("fileInfo").innerHTML = "";
 
@@ -126,7 +127,7 @@
         if (file) {
             if ("xlsx" === fileExtension) {
                 let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                "<strong>" + fileName + "文件</strong>上传成功"
+                    "<strong>" + fileName + "文件</strong>上传成功"
                 "</span>" +
                 "</div>";
                 document.getElementById("fileInfo").innerHTML = fileLoad
@@ -139,7 +140,7 @@
                 formData.set("sheet", sheet);
                 let after = document.getElementById("after");
                 let html = "";
-                console.log("sheet:"+sheet)
+                console.log("sheet:" + sheet)
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (xhr.status === 200 && xhr.readyState === 4) {
@@ -169,23 +170,23 @@
                             html += "<td>" + s.id + "</td>";
                             html += "<td>" + s.fieldName + "</td>";
                             html += "<td>" + s.columnName + "</td>";
-                           /* html += "<td>"
-                            // 字段类型
-                            switch (s.dataType) {
-                                case 0:
-                                    html += "数值型数据"
-                                    break;
-                                case 1:
-                                    html += "编码型数据"
-                                    break;
-                                case 3:
-                                    html += "文本型数据"
-                                    break;
-                                case 4:
-                                    html += "时间数据"
-                                    break;
-                            }
-                            html += "</td>"*/
+                            /* html += "<td>"
+                             // 字段类型
+                             switch (s.dataType) {
+                                 case 0:
+                                     html += "数值型数据"
+                                     break;
+                                 case 1:
+                                     html += "编码型数据"
+                                     break;
+                                 case 3:
+                                     html += "文本型数据"
+                                     break;
+                                 case 4:
+                                     html += "时间数据"
+                                     break;
+                             }
+                             html += "</td>"*/
                             html += "<td><select>"
                             /*html += "<option selected value = " + -1 + ">请选择字段数据类型</option>"*/
                             switch (s.dataType) {
@@ -219,9 +220,9 @@
 
                             //算法
                             html += "<td><select>"
-                            switch (s.dataType){
+                            switch (s.dataType) {
                                 case 0:
-                                    switch (s.k){
+                                    switch (s.k) {
                                         case 3:
                                             html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
                                             html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
@@ -319,7 +320,7 @@
                                     break;
 
                                 case 3:
-                                    switch (s.k){
+                                    switch (s.k) {
                                         case 11:
                                             html += "<option value = " + 11 + " selected>尾部截断</option>"
                                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
@@ -455,7 +456,7 @@
                                     }
                                     break;
                                 case 4:
-                                    switch (s.k){
+                                    switch (s.k) {
                                         case 1:
                                             html += "<option value = " + 1 + " selected>基于差分隐私的日期加噪算法</option>"
                                             html += "<option value = " + 18 + ">日期分组置换</option>"
@@ -519,17 +520,17 @@
                     }
                 }
 
-                xhr.open("get", "/"+ sheet + "param/list", false);
+                xhr.open("get", "/" + sheet + "param/list", false);
                 xhr.send();
                 document.getElementById("table_body").innerHTML = html;
 
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
                     let tr;
-                    let dataArray = new Array();
+                    let dataArray = [];
                     let table_body = document.getElementById("table2")
                     for (let i = 0; i < table_body.rows.length; i++) {
-                        data = new Object();
+                        data = {};
                         tr = table_body.rows[i];
                         //console.log(tr);
                         data.id = tr.childNodes[0].innerHTML;
@@ -542,7 +543,7 @@
                         //console.log(dataArray);
                     }
                     formData.set("params", JSON.stringify(dataArray));
-                    formData.set("algName","distortion");
+                    formData.set("algName", "distortion");
                     for (let [key, value] of formData) {
                         console.log("formData:" + key + " " + value);
                     }
@@ -554,16 +555,16 @@
                         .then(response => response.blob())
                         .then(blob => {
                             // 脱敏前
-                            document.getElementById("preData").innerHTML="脱敏前数据"
+                            document.getElementById("preData").innerHTML = "脱敏前数据"
                             let reader = new FileReader();
                             reader.onload = function (e) {
                                 let data = new Uint8Array(e.target.result);
-                                let workbook = XLSX.read(data, { type: 'array' });
+                                let workbook = XLSX.read(data, {type: 'array'});
 
                                 let sheetName = workbook.SheetNames[0];
                                 let sheet = workbook.Sheets[sheetName];
 
-                                let jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
 
                                 let pageSize = 10;
                                 let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
@@ -635,14 +636,14 @@
                             reader.readAsArrayBuffer(file);
 
                             // 脱敏后
-                            document.getElementById("afterData").innerHTML="脱敏后数据"
+                            document.getElementById("afterData").innerHTML = "脱敏后数据"
                             const reader1 = new FileReader();
-                            reader1.onload = function(event) {
+                            reader1.onload = function (event) {
                                 const data = event.target.result;
-                                const workbook = XLSX.read(data, { type: 'binary' });
+                                const workbook = XLSX.read(data, {type: 'binary'});
                                 const sheetName = workbook.SheetNames[0];
                                 const sheet = workbook.Sheets[sheetName];
-                                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
                                 let pageSize = 10;
                                 let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
                                 let currentPage1 = 1;
@@ -722,8 +723,7 @@
                         })
                         .catch(error => console.error('Error:', error));
                 }
-            }
-            else{
+            } else {
                 alert("请提交excel文件")
             }
         }
@@ -739,7 +739,8 @@
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
                     <label for="choose_template_sheet" style="font-size: 20px">应用场景模板选择</label>
-                    <select name="template_sheet" id="choose_template_sheet" style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
+                    <select name="template_sheet" id="choose_template_sheet"
+                            style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
                         <option value="111" selected>请选择应用场景</option>
                         <option value="map">地图导航类场景</option>
                         <option value="onlinetaxi">网络约车类场景</option>
@@ -796,8 +797,10 @@
             </div>
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
-                    <label for="choose_sheet" style="font-size: 20px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;设置需求模板</label>
-                    <select name="sheet" id="choose_sheet" style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
+                    <label for="choose_sheet"
+                           style="font-size: 20px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;设置需求模板</label>
+                    <select name="sheet" id="choose_sheet"
+                            style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
                         <option value="111" selected>请选择应用场景</option>
                         <option value="map">地图导航类场景</option>
                         <option value="onlinetaxi">网络约车类场景</option>
@@ -850,8 +853,8 @@
                         <option value="vr">虚拟现实类场景</option>
                         <option value="onlinevoting">网上投票类场景</option>
                     </select>
-                    <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload"  style="display: none;">
+                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             选择文件
                         </label>
@@ -859,19 +862,19 @@
                 </div>
             </div>
             <!--文件上传信息-->
-            <div id = "fileInfo">
+            <div id="fileInfo">
             </div>
-            <div id = "after">
+            <div id="after">
             </div>
             <div class="ibox-content">
-                <div id=table_body ></div>
+                <div id=table_body></div>
             </div>
             <div class="button1">
                 <div class="btn2">
                     <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
                 </div>
             </div>
-            <div id = "showTable">
+            <div id="showTable">
             </div>
         </div>
     </div>
@@ -928,37 +931,45 @@
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable {
         width: 100%;
         margin: 0 auto;
     }
+
     #paginationInfo {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo input {
         width: 5em;
         text-align: center;
     }
+
     /* 设置表格样式 */
     #dataTableContainer1 {
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable1 {
         width: 100%;
         margin: 0 auto;
     }
+
     #paginationInfo1 {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo1 input {
         width: 5em;
         text-align: center;
     }
+
     /*标题*/
     .ibox-title {
         height: 200px;
@@ -970,7 +981,7 @@
         justify-content: center;
     }
 
-    #submit{
+    #submit {
         background-color: #347aa9;
         padding: 5px 20px;
         cursor: pointer;
@@ -980,21 +991,24 @@
         text-align: center;
         /*margin-right: 50px;*/
     }
-    .btn2{
+
+    .btn2 {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn{
+    .upload-btn {
         background-color: #347aa9;
         color: white;
         cursor: pointer;

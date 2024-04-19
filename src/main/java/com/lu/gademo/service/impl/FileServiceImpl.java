@@ -9,14 +9,12 @@ import com.lu.gademo.entity.effectEva.SendEvaReq;
 import com.lu.gademo.entity.evidence.ReqEvidenceSave;
 import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
 import com.lu.gademo.entity.ruleCheck.SendRuleReq;
-import com.lu.gademo.log.sendData;
+import com.lu.gademo.log.SendData;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.utils.*;
 import com.lu.gademo.utils.impl.DpUtilImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +60,8 @@ public class FileServiceImpl implements FileService {
     private SendEvaReqDao sendEvaReqDao;
     // 发送类
     @Autowired
-    private sendData sendData;
+    private SendData sendData;
 
-    @Autowired
-    private DpUtil utilNew;
     // 系统id
     // param  service
     @Autowired
@@ -143,7 +139,6 @@ public class FileServiceImpl implements FileService {
         // 处理用户请求
         switch (algName) {
             case "dpImage": {
-
                 // 构造脱敏算法序号
                 desenAlg.append(44);
                 // 脱敏参数
@@ -279,8 +274,8 @@ public class FileServiceImpl implements FileService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         // 脱敏后文件字节流
-        byte[] desenFileBytes = Files.readAllBytes(Paths.get(desenFilePathString));
-        Long desenFileSize = Files.size(Paths.get(desenFilePathString));
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath);
+        Long desenFileSize = Files.size(desenFilePath);
         // 线程池
 
         ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -314,7 +309,6 @@ public class FileServiceImpl implements FileService {
         submitEvidenceLocal.setGlobalID(System.currentTimeMillis() + ran.nextInt() + "脱敏工具集");
         submitEvidenceLocal.setFileTitle(fileTitle);
         submitEvidenceLocal.setFileAbstract(fileAbstract);
-
         submitEvidenceLocal.setFileKeyword(fileKeyword);
         submitEvidenceLocal.setDesenAlg(desenAlg.toString());
         submitEvidenceLocal.setFileSize(rawFileSize);
@@ -323,7 +317,6 @@ public class FileServiceImpl implements FileService {
         submitEvidenceLocal.setDesenPerformer(desenPerformer);
         submitEvidenceLocal.setDesenCom(desenCom);
         submitEvidenceLocal.setDesenInfoPreID(rawFileHash);
-
         submitEvidenceLocal.setDesenInfoAfterID(desenFileHash);
         submitEvidenceLocal.setDesenRequirements(desenRequirements.toString());
         submitEvidenceLocal.setDesenIntention(desenIntention.toString());
@@ -336,7 +329,6 @@ public class FileServiceImpl implements FileService {
         Future<?> future_evidence = executorService.submit(() -> {
             sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
-
 
         // 效果评测系统
         SendEvaReq sendEvaReq = new SendEvaReq();
@@ -572,7 +564,10 @@ public class FileServiceImpl implements FileService {
                                     .stream()
                                     .filter(obj -> obj instanceof Double)
                                     .map(obj -> (Double) obj)
-                                    .collect(Collectors.toList());;
+                                    .collect(Collectors.toList());
+                            if (columnName.contains("年龄")) {
+                                datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                            }
                             // 写列数据
                             util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                             break;
@@ -589,6 +584,9 @@ public class FileServiceImpl implements FileService {
                             desenRequirements.append(param.getColumnName()).append("添加差分隐私高斯噪声,");
                             // 脱敏
                             datas = dpUtil.gaussianToValue(objs, param.getTmParam());
+                            if (columnName.contains("年龄")) {
+                                datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                            }
                             // 写列数据
                             util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                             break;
@@ -608,6 +606,9 @@ public class FileServiceImpl implements FileService {
                                     .filter(obj -> obj instanceof Double)
                                     .map(obj -> (Double) obj)
                                     .collect(Collectors.toList());
+                            if (columnName.contains("年龄")) {
+                                datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                            }
                             // 写列数据
                             util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                             break;
@@ -627,6 +628,9 @@ public class FileServiceImpl implements FileService {
                                     .filter(obj -> obj instanceof Double)
                                     .map(obj -> (Double) obj)
                                     .collect(Collectors.toList());
+                            if (columnName.contains("年龄")) {
+                                datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                            }
                             // 写列数据
                             util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                             break;
@@ -646,6 +650,9 @@ public class FileServiceImpl implements FileService {
                                     .filter(obj -> obj instanceof Double)
                                     .map(obj -> (Double) obj)
                                     .collect(Collectors.toList());
+                            if (columnName.contains("年龄")) {
+                                datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                            }
                             // 写列数据
                             util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                             break;
@@ -1264,6 +1271,15 @@ public class FileServiceImpl implements FileService {
                 desenAlgParam.append(Arrays.toString(paramsTemp[desenParam]));
                 desenLevel.append(desenParam + 1);
                 DSObject result = generalization.service(dsObject, 18, desenParam);
+                break;
+            }
+
+            case "video_add_color_offset" :{
+                desenAlg.append(55);
+                int[] paramsTemp = new int[] {20, 50, 100};
+                desenAlgParam.append(paramsTemp[desenParam]);
+                desenLevel.append(desenParam + 1);
+                DSObject result = replacement.service(dsObject, 14, desenParam);
                 break;
             }
 
@@ -2116,6 +2132,7 @@ public class FileServiceImpl implements FileService {
 
         // 调用脚本
         Process process = Runtime.getRuntime().exec(command);
+        // TODO: 为什么脚本执行时间过长
         process.waitFor(); // 等待Python脚本执行完毕
 
         // 脱敏结束时间
@@ -2453,8 +2470,18 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     desenRequirements.append(colName).append("添加差分隐私Laplace噪声,");
 
-                    List<Double> datas = dpUtil.laplaceToValue(objs, param);
                     desenAlg.append(3);
+                    // 脱敏
+                    DSObject rawData = new DSObject(objs);
+                    List<Double> datas = dp.service(rawData, 1, param).getList()
+                            .stream()
+                            .filter(obj -> obj instanceof Double)
+                            .map(obj -> (Double) obj)
+                            .collect(Collectors.toList());
+                    if (colName.contains("年龄")) {
+                        datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                    }
+                    // 写列数据
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
@@ -2470,6 +2497,9 @@ public class FileServiceImpl implements FileService {
                     desenRequirements.append(colName).append("添加差分隐私高斯噪声,");
 
                     List<Double> datas = dpUtil.gaussianToValue(objs, param);
+                    if (colName.contains("年龄")) {
+                        datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                    }
                     desenAlg.append(4);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
@@ -2485,6 +2515,9 @@ public class FileServiceImpl implements FileService {
                     desenRequirements.append(colName).append("添加随机均匀噪声,");
 
                     List<Double> datas = dpUtil.randomUniformToValue(objs, param);
+                    if (colName.contains("年龄")) {
+                        datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                    }
                     desenAlg.append(5);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
@@ -2499,6 +2532,9 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     desenRequirements.append(colName).append("添加随机laplace噪声,");
                     List<Double> datas = dpUtil.randomLaplaceToValue(objs, param);
+                    if (colName.contains("年龄")) {
+                        datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                    }
                     desenAlg.append(6);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
@@ -2513,6 +2549,9 @@ public class FileServiceImpl implements FileService {
                     desenRequirements.append(colName).append("添加随机高斯噪声,");
 
                     List<Double> datas = dpUtil.randomGaussianToValue(objs, param);
+                    if (colName.contains("年龄")) {
+                        datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+                    }
                     desenAlg.append(7);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
@@ -2536,7 +2575,7 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     desenRequirements.append(colName).append("数值取整,");
 
-                    List<Integer> datas = dpUtil.floor(objs);
+                    List<Integer> datas = dpUtil.floor(objs, param);
                     desenAlg.append(9);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -22,10 +23,12 @@
             align-items: center;
             justify-content: center;
         }
-        .ibox-title span{
+
+        .ibox-title span {
             font-size: 50px;
         }
-        #submit{
+
+        #submit {
             background-color: #347aa9;
             padding: 5px 20px;
             cursor: pointer;
@@ -36,21 +39,24 @@
             /*margin-right: 50px;*/
 
         }
-        .btn2{
+
+        .btn2 {
             line-height: 30px;
             text-align: center;
-            display:flex;
+            display: flex;
             justify-content: center;
         }
+
         /*选择框居中*/
-        .midtile{
+        .midtile {
             line-height: 30px;
             text-align: center;
-            display:flex;
+            display: flex;
             justify-content: center;
         }
+
         /*上传按钮*/
-        .upload-btn{
+        .upload-btn {
             background-color: #347aa9;
             color: white;
             cursor: pointer;
@@ -60,22 +66,27 @@
             display: inline-block;
             margin: 30px;
         }
-        #pre{
+
+        #pre {
             text-align: center;
         }
-        #pre img{
+
+        #pre img {
             display: inline-block;
             max-width: 50%;
             height: auto;
         }
-        #after{
+
+        #after {
             text-align: center;
         }
+
         #after img {
             display: inline-block;
             max-width: 50%;
             height: auto;
         }
+
         .tabs-container ul {
             height: 50px;
             display: flex;
@@ -92,7 +103,8 @@
     <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
     <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
     <script src="${ctx!}/js/xlsx.full.min.js"></script>
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=9017e2042639d8873323dcd7d7539611&plugin=AMap.PlaceSearch"></script>
+    <script type="text/javascript"
+            src="https://webapi.amap.com/maps?v=1.4.15&key=9017e2042639d8873323dcd7d7539611&plugin=AMap.PlaceSearch"></script>
     <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
 
     <!-- Bootstrap table -->
@@ -110,8 +122,8 @@
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
     <script type="text/javascript">
         window.onload = function () {
-            document.getElementById("fileUpload").addEventListener("change",choose_file)
-            document.getElementById("encryptGraph").addEventListener("click", function (){
+            document.getElementById("fileUpload").addEventListener("change", choose_file)
+            document.getElementById("encryptGraph").addEventListener("click", function () {
                 // 获取输入文本
                 let inputText = document.getElementById("textInput").value;
 
@@ -120,7 +132,7 @@
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body:  '&rawData=' + encodeURIComponent(inputText)
+                    body: '&rawData=' + encodeURIComponent(inputText)
 
                 })
                     .then(response => response.text())
@@ -132,7 +144,7 @@
             })
 
         }
-        choose_file = function(event) {
+        choose_file = function (event) {
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
 
@@ -156,7 +168,7 @@
 
                 /*if(graphType.includes(fileExtension)){*/
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     // 获取保护级别
                     let table_body = document.getElementById("table3")
                     let tr = table_body.rows[0];
@@ -182,7 +194,7 @@
                         formData.set("sheet", type2);
                     }
 
-                    fetch('/File/desenFile',{
+                    fetch('/File/desenFile', {
                         method: 'POST',
                         body: formData
                     })
@@ -193,7 +205,7 @@
                             let index; //轨迹序号
 
                             // 初始化map
-                            let lnglat = new AMap.LngLat(116.326936 ,40.003213);
+                            let lnglat = new AMap.LngLat(116.326936, 40.003213);
                             let map = new AMap.Map("mapid", {
                                 resizeEnable: true,  // 自适应地图容器变化
                                 center: lnglat,      // 地图中心点坐标
@@ -220,7 +232,7 @@
 
                             //绘制原轨迹
                             const reader = new FileReader();
-                            reader.onload = function(e) {
+                            reader.onload = function (e) {
                                 const content = e.target.result;
 
                                 // 将文件内容分割成行
@@ -238,19 +250,19 @@
                                 console.log(raw_points.length)
 
                                 // 保存原路径节点经纬度
-                                let raw_path=[]
+                                let raw_path = []
                                 // 遍历每个点
                                 for (let point of raw_points) {
                                     // 分割每个点的ID和属性
                                     let [poiId, attributes] = point.split(',');
 
                                     // 根据POI ID进行POI搜索
-                                    placeSearch.getDetails(poiId, function(status, result) {
+                                    placeSearch.getDetails(poiId, function (status, result) {
                                         if (status === 'complete' && result.info === 'OK') {
                                             // 获取POI的经纬度
                                             let location = result.poiList.pois[0].location;
                                             console.log(result.poiList.pois[0])
-                                            console.log(location.lng+" "+ location.lat)
+                                            console.log(location.lng + " " + location.lat)
                                             // 节点
                                             //let point_lnglat = new AMap.LngLat(location.lng, location.lat)
                                             raw_path.push([location.lng, location.lat])
@@ -288,7 +300,7 @@
                                                 infoWindow.open(map, infoWindowPosition);
                                             }
                                         } else {
-                                            console.log(`获取POI信息失败，POI ID:`+poiId);
+                                            console.log(`获取POI信息失败，POI ID:` + poiId);
                                         }
                                     });
                                 }
@@ -299,7 +311,7 @@
                             const desen_reader = new FileReader();
 
                             // 读取返回的Blob数据
-                            desen_reader.onload = function() {
+                            desen_reader.onload = function () {
                                 const content = desen_reader.result;
 
                                 // 将文件内容分割成行
@@ -315,19 +327,19 @@
                                 console.log(desen_points.length)
 
                                 // 保存原路径节点经纬度
-                                let desen_path=[]
+                                let desen_path = []
                                 // 遍历每个点
                                 for (let point of desen_points) {
                                     // 分割每个点的ID和属性
                                     let [poiId, attributes] = point.split(',');
 
                                     // 根据POI ID进行POI搜索
-                                    placeSearch.getDetails(poiId, function(status, result) {
+                                    placeSearch.getDetails(poiId, function (status, result) {
                                         if (status === 'complete' && result.info === 'OK') {
                                             // 获取POI的经纬度
                                             let location = result.poiList.pois[0].location;
                                             console.log(result.poiList.pois[0])
-                                            console.log(location.lng+" "+ location.lat)
+                                            console.log(location.lng + " " + location.lat)
                                             // 节点
                                             //let point_lnglat = new AMap.LngLat(location.lng, location.lat)
                                             desen_path.push([location.lng, location.lat])
@@ -366,7 +378,7 @@
                                                 infoWindow.open(map, infoWindowPosition);
                                             }
                                         } else {
-                                            console.log(`获取POI信息失败，POI ID:`+poiId);
+                                            console.log(`获取POI信息失败，POI ID:` + poiId);
                                         }
                                     });
                                 }
@@ -374,7 +386,6 @@
 
                             // 将Blob数据传递给FileReader
                             desen_reader.readAsText(blob);
-
 
 
                             // 创建一个下载链接
@@ -401,8 +412,8 @@
             </div>
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
-                    <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload"  style="display: none;">
+                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             选择文件
                         </label>
@@ -410,40 +421,52 @@
                 </div>
             </div>
             <!--文件上传信息-->
-            <div id = "fileInfo">
+            <div id="fileInfo">
             </div>
 
 
             <div class="tabs-container">
-                <ul id = "tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
+                <ul id="tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
                     </li>
-                    <li class="" ><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
+                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
                     </li>
                 </ul>
                 <div class="tab-content">
                     <div id="tab-1" class="tab-pane active" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th>请选择图形失真脱敏算法</th></tr></thead>
+                                <thead>
+                                <tr>
+                                    <th>请选择图形失真脱敏算法</th>
+                                </tr>
+                                </thead>
                                 <tbody id="table1">
-                                <tr><td><select>
-                                            <option value="dp" selected> 差分算法 </option>
+                                <tr>
+                                    <td><select>
+                                            <option value="dp" selected> 差分算法</option>
                                             <#-- <option value="graph2" selected> 图形失真脱敏算法B </option>-->
-                                        </select></td></tr>
+                                        </select></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="ibox-content" style="text-align: center;">
-                            <div id="privacyLevel" >
+                            <div id="privacyLevel">
                                 <table style="margin: auto; font-size: 20px">
-                                    <thead><tr><th>请选择隐私保护等级</th></tr></thead>
+                                    <thead>
+                                    <tr>
+                                        <th>请选择隐私保护等级</th>
+                                    </tr>
+                                    </thead>
                                     <tbody id="table3">
-                                    <tr><td><select>
-                                                <option value="0"> 低程度 </option>
-                                                <option value="1" selected> 中程度 </option>
-                                                <option value="2"> 高程度 </option>
-                                            </select></td></tr>
+                                    <tr>
+                                        <td><select>
+                                                <option value="0"> 低程度</option>
+                                                <option value="1" selected> 中程度</option>
+                                                <option value="2"> 高程度</option>
+                                            </select></td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -452,7 +475,7 @@
                     <div id="tab-2" class="tab-pane fade">
                         <div style="text-align: center; font-size: 20px; margin-top: 20px;">
                             <input type="text" id="textInput" placeholder="输入数值时间序列，以,分隔">
-                            <button id = "encryptGraph">提交</button>
+                            <button id="encryptGraph">提交</button>
                             <br>
                             <p>返回相似的序列ID</p>
                             <textarea id="outputText" rows="4" cols="50" readonly></textarea>

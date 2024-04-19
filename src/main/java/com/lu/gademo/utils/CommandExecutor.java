@@ -1,6 +1,7 @@
 package com.lu.gademo.utils;
 
 import com.lu.gademo.utils.impl.UtilImpl;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -9,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 public class CommandExecutor {
 
     public static List<String> openExe(String cmd) {
@@ -35,14 +37,16 @@ public class CommandExecutor {
                     return null;
                 }
             }
+            // 等待脚本执行完毕，阻塞
+            p.waitFor();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         } finally {
             if (bufferReader != null) {
                 try {
                     bufferReader.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             }
         }
@@ -63,7 +67,15 @@ public class CommandExecutor {
 
         Util util = new UtilImpl();
 //        String python = util.isLinux() ? "python3" : "python";
-        String python = util.isLinux() ? "python3" : "conda run -n torch_env python";
+        String python;
+
+        if (util.isLinux()) {
+            python = "python3";
+        } else if (util.isCondaInstalled()){
+            python = "conda run -n torch_env python";
+        } else {
+            python = "python";
+        }
 
         try {
             // 指定Python脚本路径
@@ -81,7 +93,7 @@ public class CommandExecutor {
             return CommandExecutor.openExe(command.toString(), fileParent.normalize().toFile().getAbsolutePath());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return null;
     }

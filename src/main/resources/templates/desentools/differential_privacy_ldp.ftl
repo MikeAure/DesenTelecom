@@ -13,7 +13,7 @@
     <meta name="description" content="">
 
     <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html" />
+    <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
@@ -22,7 +22,7 @@
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 
-<body >
+<body>
 
 <!-- 全局js -->
 <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -35,8 +35,8 @@
 <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 <script type="text/javascript">
-    window.onload = function (){
-        document.getElementById("rappor_submitBtn").addEventListener("click", function (){
+    window.onload = function () {
+        document.getElementById("rappor_submitBtn").addEventListener("click", function () {
             let textInput = $("#rappor_textInput").val();
             /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
             let algName = "rappor"
@@ -50,7 +50,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&rawData=' + encodeURIComponent(textInput) +
+                body: '&rawData=' + encodeURIComponent(textInput) +
                     /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                     '&samples=' + encodeURIComponent(1) +
                     '&algName=' + encodeURIComponent(algName)
@@ -61,7 +61,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         })
-        document.getElementById("onetimerappor_submitBtn").addEventListener("click", function (){
+        document.getElementById("onetimerappor_submitBtn").addEventListener("click", function () {
             let textInput = $("#onetimerappor_textInput").val();
             /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
             let algName = "onetimerappor"
@@ -75,7 +75,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&rawData=' + encodeURIComponent(textInput) +
+                body: '&rawData=' + encodeURIComponent(textInput) +
                     /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                     '&samples=' + encodeURIComponent(1) +
                     '&algName=' + encodeURIComponent(algName)
@@ -86,7 +86,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         })
-        document.getElementById("dpCode_submitBtn").addEventListener("click", function (){
+        document.getElementById("dpCode_submitBtn").addEventListener("click", function () {
             let textInput = $("#dpCode_textInput").val();
             let privacyLevel = document.getElementById("dpCode_privacyLevel").value
             var textType = "code"
@@ -101,7 +101,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&textInput=' + encodeURIComponent(textInput) +
+                body: '&textInput=' + encodeURIComponent(textInput) +
                     '&textType=' + encodeURIComponent(textType) +
                     '&privacyLevel=' + encodeURIComponent(privacyLevel) +
                     '&algName=' + encodeURIComponent(algName)
@@ -120,8 +120,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">18.Rappor</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                18.Rappor</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：基于随机响应统计用户某一特征的直方图（频次）信息
@@ -135,21 +137,25 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="rappor_textInput" class="form-control" placeholder="请输入数组，以,分隔数字" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                <button class="btn btn-default" id="rappor_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="rappor_textInput" class="form-control"
+                                       placeholder="请输入数组，以,分隔数字" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                <button class="btn btn-default" id="rappor_submitBtn" type="button"
+                                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                     提交脱敏
                                                 </button>
                                             </span>
                             </div>
                             <div class="text-center">
-                                <label for="rappor_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="rappor_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="rappor_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="rappor_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -161,8 +167,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">19.One Time Rappor</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                19.One Time Rappor</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：基于随机响应统计用户某一特征的直方图（频次）信息
@@ -176,21 +184,26 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="onetimerappor_textInput" class="form-control" placeholder="请输入数组，以,分隔数字" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                <button class="btn btn-default" id="onetimerappor_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="onetimerappor_textInput" class="form-control"
+                                       placeholder="请输入数组，以,分隔数字" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                <button class="btn btn-default" id="onetimerappor_submitBtn"
+                                                        type="button"
+                                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                     提交脱敏
                                                 </button>
                                             </span>
                             </div>
                             <div class="text-center">
-                                <label for="onetimerappor_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="onetimerappor_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="onetimerappor_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="onetimerappor_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -202,8 +215,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">20.编码型数据差分隐私脱敏算法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                20.编码型数据差分隐私脱敏算法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <#--<p style="font-size: 1.5em;">4.编码型数据差分隐私脱敏算法</p>-->
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
@@ -220,28 +235,32 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="dpCode_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="dpCode_textInput" class="form-control" placeholder="请输入文本" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                <button class="btn btn-default" id="dpCode_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="dpCode_textInput" class="form-control" placeholder="请输入文本"
+                                       style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                <button class="btn btn-default" id="dpCode_submitBtn" type="button"
+                                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                     提交脱敏
                                                 </button>
                                             </span>
                             </div>
                             <div class="text-center">
-                                <label for="dpCode_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="dpCode_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="dpCode_outputText" rows="2" cols="50" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="dpCode_outputText" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -262,26 +281,31 @@
         color: black;
         display: flex;
     }
+
     textarea {
         font-size: 1.5em;
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
-    #dpImage_pre, #dpImage_after{
+
+    #dpImage_pre, #dpImage_after {
         text-align: center;
     }
-    #dpImage_pre image, #dpImage_after image, #dpAudio_pre , #dpAudio_after  {
+
+    #dpImage_pre image, #dpImage_after image, #dpAudio_pre, #dpAudio_after {
         display: inline-block;
         max-width: 50%;
         height: auto
     }
+
     /*上传按钮*/
-    .upload-btn, #dpImage_submit, #dpAudio_submit, #dpGraph_submit{
+    .upload-btn, #dpImage_submit, #dpAudio_submit, #dpGraph_submit {
         background-color: #347aa9;
         color: white;
         cursor: pointer;
@@ -291,10 +315,12 @@
         display: inline-block;
         margin: 30px;
     }
-    .showFile{
+
+    .showFile {
         display: flex;
         justify-content: center;
     }
+
     .tabs-container ul {
         height: 60px;
         display: flex;

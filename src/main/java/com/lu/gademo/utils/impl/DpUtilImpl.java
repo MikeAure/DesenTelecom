@@ -156,8 +156,19 @@ public class DpUtilImpl implements DpUtil {
     //数值型处理
     private List<Double> NumberCode_s(List<Double> re_data, Integer privacyLevel) {
         List<Double> newData = new ArrayList<>();
+        double a, max;
+
+        max = Collections.max(re_data) ;
+        if (max<100){
+            a = 1;
+        }
+        else {
+            a = max / 50;
+        }
         //设置参数sensitivety和epsilon
-        BigDecimal sensitivety = new BigDecimal(1);
+        BigDecimal sensitivety = new BigDecimal(a);
+
+        //BigDecimal sensitivety = new BigDecimal(50);
         BigDecimal epsilon = new BigDecimal(0.1);
         if (privacyLevel == 1) {
             epsilon = new BigDecimal(10);
@@ -165,11 +176,11 @@ public class DpUtilImpl implements DpUtil {
             epsilon = new BigDecimal(1);
         }
 
+        //System.out.println("epsilon " + epsilon);
         BigDecimal beta = sensitivety.divide(epsilon, 6, RoundingMode.HALF_UP);
         double betad = beta.setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+        // System.out.println("beta " + beta);
 
-        double n_value;
-        Random r = new Random();
         //循环处理数据
         for (int i = 0; i < re_data.size(); i++) {
             LaplaceDistribution ld = new LaplaceDistribution(0, betad);
@@ -179,20 +190,10 @@ public class DpUtilImpl implements DpUtil {
             if (re_data.get(i) == null) {
                 newData.add(null);
             } else {
-                double u1 = r.nextDouble();
-                double u2 = r.nextDouble();
-                //以概率扰动
-                if (u1 <= 0.5) {
-                    n_value = -betad * (Math.log(1 - u2));
-                } else {
-                    n_value = betad * (Math.log(u2));
-                }
-                d = n_value + re_data.get(i);
+                d = noise + re_data.get(i);
                 BigDecimal b = new BigDecimal(d);
                 d = b.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
-               /* d = noise + re_data.get(i);
-                BigDecimal b = new BigDecimal(d);
-                d = b.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();*/
+
                 newData.add(d);
             }
         }
@@ -401,7 +402,18 @@ public class DpUtilImpl implements DpUtil {
 
         List<Double> newData = new ArrayList<>();
         //设置参数sensitivety和epsilon
-        double sensitivety = 1.0;
+        //double sensitivety = 0.1;
+
+        double sensitivety ;
+        double  max;
+
+        max = Collections.max(re_data) ;
+        if (max<100){
+            sensitivety = 0.1;
+        }
+        else {
+            sensitivety = max / 100;
+        }
         double epsilon = 0.1;
         if (privacyLevel == 1) {
             epsilon = 10;
@@ -516,42 +528,123 @@ public class DpUtilImpl implements DpUtil {
     @Override
     public List<String> addressHide(List<Object> addrs, Integer privacyLevel){
         // 取数据
-        List<String> reData = new ArrayList<>();
+        List<String> re_data = new ArrayList<>();
         for (Object addr:addrs ) {
             if(addr == null)
-                reData.add(null);
+                re_data.add(null);
             else
-                reData.add(addr+"");
+                re_data.add(addr+"");
         }
         //privacyLevel为0，直接返回
         if(privacyLevel == 0)
-            return reData;
+            return re_data;
         List<String> newAddrs = new ArrayList<>();
         // 脱敏
-        for (String reDatum : reData) {
-            newAddrs.add(dealAddress(reDatum));
+        for (int i = 0; i < re_data.size(); i++) {
+            newAddrs.add(dealAddress(re_data.get(i) ,privacyLevel));
         }
         return newAddrs;
     }
-    public String dealAddress(String addr){
-        if (addr != null && !addr.isEmpty()) {
 
-            int indes = addr.indexOf("区");
-            if (indes == -1) {
-                indes = addr.indexOf("市");
+    public String dealAddress(String addr, int privacyLevel){
+        if (addr != null && !addr.isEmpty()) {
+            int length = addr.length();
+            StringBuilder newAddr = new StringBuilder();
+
+            if (addr.contains("省")){
+                int index = addr.indexOf("省");
+                newAddr.append(addr.substring(0,index + 1));
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 3){
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("市");
+                newAddr.append(addr.substring(0,index + 1));
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 2){
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("市");
+                if (index == -1) {
+                    index = addr.indexOf("县");
+                }
+                if (index == -1) {
+                    index = addr.indexOf("区");
+                }
+                newAddr.append(addr.substring(0,index + 1));
+                return newAddr.toString();
             }
-            if (indes == -1) {
-                indes = addr.indexOf("州");
+            else if (addr.contains("北京") || addr.contains("上海") || addr.contains("重庆") ||addr.contains("天津")){
+                int index = addr.indexOf("市");
+                newAddr.append(addr.substring(0,index + 1));
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 3){
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("市");
+                if (index == -1) {
+                    index = addr.indexOf("县");
+                }
+                if (index == -1) {
+                    index = addr.indexOf("区");
+                }
+                newAddr.append(addr.substring(0,index + 1));
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 2){
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("道");
+                if (index == -1) {
+                    index = addr.indexOf("镇");
+                }
+                if (index == -1) {
+                    index = addr.indexOf("乡");
+                }
+                newAddr.append(addr.substring(0,index + 1));
+                return newAddr.toString();
             }
-            if (indes == -1) {
-                indes = addr.indexOf("省");
+
+            else if (addr.contains("自治区")){
+                int index = addr.indexOf("区");
+                newAddr.append(addr.substring(0,index + 1));
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 3){
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("市");
+                if (index == -1) {
+                    index = addr.indexOf("盟");
+                }
+                if (index == -1) {
+                    if (addr.contains("地区")){
+                        index = addr.indexOf("区");
+                    }
+                    else if (addr.contains("自治州")){
+                        index = addr.indexOf("州");
+                    }
+                }
+                newAddr.append(addr, 0, index + 1);
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 2){
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("市");
+                if (index == -1) {
+                    index = addr.indexOf("县");
+                }
+                if (index == -1) {
+                    index = addr.indexOf("旗");
+                }
+                if (index == -1) {
+                    index = addr.indexOf("区");
+                }
+                newAddr.append(addr.substring(0,index + 1));
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 1){
+                    return newAddr.toString();
+                }
             }
-            String newAddr = addr.substring(0, indes + 1);
-            /*StringBuffer middle = new StringBuffer();
-            for (int j = 0; j < length - indes; j++) {
-                middle.append("*");
-            }*/
-            return newAddr ;
+            return newAddr.toString() ;
         }
         return addr;
     }
@@ -906,7 +999,7 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<Integer> floor(List<Object> dataList) {
+    public List<Integer> floor(List<Object> dataList, Integer privacyLevel) {
         List<Integer> result = new ArrayList<>();
         List<Double> re_data = new ArrayList<>();
         for (Object data : dataList) {
@@ -935,12 +1028,44 @@ public class DpUtilImpl implements DpUtil {
                 }
             }
         }
-
+        double max_data = Collections.max(re_data);
         for (Object item : re_data) {
             if (item == null) {
                 result.add(null);
             } else {
-                result.add((int) Math.floor((Double) item) / 10 *10);
+                if (max_data <= 10) {
+                    result.add(10);
+                } else if (max_data <= 100) {
+                    result.add((int) Math.floor((Double) item) / 10 *10);
+                }else if (max_data <= 1000){
+                    if (privacyLevel == 1){
+                        result.add((int) Math.floor((Double) item) / 10 *10);
+                    }
+                    else {
+                        result.add((int) Math.floor((Double) item) / 100 *100);
+                    }
+                }else if (max_data <= 10000){
+                    if (privacyLevel == 1){
+                        result.add((int) Math.floor((Double) item) / 10 *10);
+                    }
+                    else if (privacyLevel == 2){
+                        result.add((int) Math.floor((Double) item) / 100 *100);
+                    }
+                    else if (privacyLevel == 3){
+                        result.add((int) Math.floor((Double) item) / 1000 *1000);
+                    }
+                } else if (max_data > 10000) {
+                    if (privacyLevel == 1){
+                        result.add((int) Math.floor((Double) item) / 100 *100);
+                    }
+                    else if (privacyLevel == 2){
+                        result.add((int) Math.floor((Double) item) / 1000 *1000);
+                    }
+                    else if (privacyLevel == 3){
+                        result.add((int) Math.floor((Double) item) / 10000 *10000);
+                    }
+                }
+                //result.add((int) Math.floor((Double) item) / 10 *10);
             }
         }
 

@@ -295,3 +295,4 @@ raw_files
 *.sublime-workspace
 *.drawio
 *.pt
+/Test Results - AlgorithmsFactoryTest.html

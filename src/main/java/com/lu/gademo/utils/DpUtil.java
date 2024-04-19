@@ -65,7 +65,7 @@ public interface DpUtil {
     public List<String> truncation(List<Object> dataList);
 
     // 数值取整
-    public List<Integer> floor(List<Object> dataList);
+    public List<Integer> floor(List<Object> dataList, Integer privacyLevel);
     // 时间取整  12:00:00
     public List<String> floorTime(List<Object> dataList);
 

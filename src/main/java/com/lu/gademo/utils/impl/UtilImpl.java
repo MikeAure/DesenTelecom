@@ -366,7 +366,7 @@ public class UtilImpl implements Util {
     }
 
     @Override
-    public void myssqlDump(String table) {
+    public void mySqlDump(String table) {
         String username = "root";
         String password = "123456QWer!!";
 
@@ -400,63 +400,80 @@ public class UtilImpl implements Util {
             e.printStackTrace();
         }
     }
+//    @Override
+//    public void excelToMysql(String tableName, String excelFilePath){
+//        String jdbcURL = "jdbc:mysql://localhost:3306/ga";
+//        String username = "root";
+//        String password = "123456QWer!!";
+//
+//
+//        try (Connection connection = DriverManager.getConnection(jdbcURL, username, password)) {
+//            // 清空数据表
+//            String truncateQuery = "TRUNCATE TABLE " + tableName;
+//            Statement truncateStatement = connection.createStatement();
+//            truncateStatement.executeUpdate(truncateQuery);
+//
+//            FileInputStream file = new FileInputStream(excelFilePath);
+//            XSSFWorkbook workbook = new XSSFWorkbook(file);
+//            XSSFSheet sheet = workbook.getSheetAt(0);
+//
+//            // 获取列数，这里第一行是列名
+//            int columnCount = sheet.getRow(0).getLastCellNum();
+//
+//            // 遍历每一行（第一行是列名，从第二行开始读取数据）
+//            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+//                Row row = sheet.getRow(i);
+//
+//                // 准备 INSERT 语句
+//                StringBuilder insertQuery = new StringBuilder("INSERT INTO " + tableName + " VALUES (");
+//                insertQuery.append(i + ",");
+//                for (int j = 0; j < columnCount; j++) {
+//                    Cell cell = row.getCell(j);
+//                    if (cell != null) {
+//                        insertQuery.append("'" + cell + "'");
+//                        // 如果不是最后一列，添加逗号分隔
+//                        if (j < columnCount - 1) {
+//                            insertQuery.append(",");
+//                        }
+//                    } else {
+//                        insertQuery.append("NULL");
+//                        // 如果不是最后一列，添加逗号分隔
+//                        if (j < columnCount - 1) {
+//                            insertQuery.append(",");
+//                        }
+//                    }
+//                }
+//                insertQuery.append(")");
+//
+//                // 执行 INSERT 语句
+//                PreparedStatement preparedStatement = connection.prepareStatement(insertQuery.toString());
+//                preparedStatement.executeUpdate();
+//            }
+//
+//            workbook.close();
+//            file.close();
+//
+//            System.out.println("数据已成功导入到 MySQL 数据库中!");
+//
+//        } catch (IOException | SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     @Override
-    public void excelToMysql(String tableName, String excelFilePath){
-        String jdbcURL = "jdbc:mysql://localhost:3306/ga";
-        String username = "root";
-        String password = "123456QWer!!";
-
-
-        try (Connection connection = DriverManager.getConnection(jdbcURL, username, password)) {
-            // 清空数据表
-            String truncateQuery = "TRUNCATE TABLE " + tableName;
-            Statement truncateStatement = connection.createStatement();
-            truncateStatement.executeUpdate(truncateQuery);
-
-            FileInputStream file = new FileInputStream(excelFilePath);
-            XSSFWorkbook workbook = new XSSFWorkbook(file);
-            XSSFSheet sheet = workbook.getSheetAt(0);
-
-            // 获取列数，这里第一行是列名
-            int columnCount = sheet.getRow(0).getLastCellNum();
-
-            // 遍历每一行（第一行是列名，从第二行开始读取数据）
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-
-                // 准备 INSERT 语句
-                StringBuilder insertQuery = new StringBuilder("INSERT INTO " + tableName + " VALUES (");
-                insertQuery.append(i + ",");
-                for (int j = 0; j < columnCount; j++) {
-                    Cell cell = row.getCell(j);
-                    if (cell != null) {
-                        insertQuery.append("'" + cell + "'");
-                        // 如果不是最后一列，添加逗号分隔
-                        if (j < columnCount - 1) {
-                            insertQuery.append(",");
-                        }
-                    } else {
-                        insertQuery.append("NULL");
-                        // 如果不是最后一列，添加逗号分隔
-                        if (j < columnCount - 1) {
-                            insertQuery.append(",");
-                        }
-                    }
-                }
-                insertQuery.append(")");
-
-                // 执行 INSERT 语句
-                PreparedStatement preparedStatement = connection.prepareStatement(insertQuery.toString());
-                preparedStatement.executeUpdate();
+    public Boolean isCondaInstalled() {
+        // 假定conda已被添加到系统变量中
+        try {
+            Process process = Runtime.getRuntime().exec("conda --version");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            if ((line = bufferedReader.readLine()) != null) {
+                return true;
             }
-
-            workbook.close();
-            file.close();
-
-            System.out.println("数据已成功导入到 MySQL 数据库中!");
-
-        } catch (IOException | SQLException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            return false;
         }
+        return false;
+
     }
 }

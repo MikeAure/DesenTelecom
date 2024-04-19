@@ -1,446 +1,448 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="renderer" content="webkit">
-        <meta name="referrer" content="no-referrer">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta name="referrer" content="no-referrer">
 
-        <title> 脱敏</title>
+    <title> 脱敏</title>
 
-        <meta name="keywords" content="">
-        <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
 
-        <!--[if lt IE 9]>
-        <meta http-equiv="refresh" content="0;ie.html" />
-        <![endif]-->
-        <link rel="shortcut icon" href="favicon.ico">
-        <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
-        <link href="${ctx!}/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
-        <link href="${ctx!}/css/animate.css" rel="stylesheet">
-        <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
-        <style>
-            .ibox-title {
-                height: 200px;
-                border-color: #edf1f2;
-                background-color: #dbeafe;
-                color: black;
-                display: flex;
-            }
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="${ctx!}/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="${ctx!}/css/animate.css" rel="stylesheet">
+    <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
+    <style>
+        .ibox-title {
+            height: 200px;
+            border-color: #edf1f2;
+            background-color: #dbeafe;
+            color: black;
+            display: flex;
+        }
 
-            textarea {
-                font-size: 1.5em;
-            }
+        textarea {
+            font-size: 1.5em;
+        }
 
-            .showFile {
-                display: flex;
-                justify-content: center;
-            }
+        .showFile {
+            display: flex;
+            justify-content: center;
+        }
 
-            /*选择框居中*/
-            .midtile {
-                line-height: 30px;
-                text-align: center;
-                display: flex;
-                justify-content: center;
-            }
+        /*选择框居中*/
+        .midtile {
+            line-height: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
 
-            /*上传按钮*/
-            .upload-btn, .submit-btn, #audio_reshuffle_submit #image_exchange_channel_submit {
-                background-color: #347aa9;
-                color: white;
-                cursor: pointer;
-                padding: 5px 20px;
-                text-align: center;
-                font-size: 20px;
-                display: inline-block;
-                margin: 30px;
-            }
+        /*上传按钮*/
+        .upload-btn, .submit-btn, #audio_reshuffle_submit #image_exchange_channel_submit {
+            background-color: #347aa9;
+            color: white;
+            cursor: pointer;
+            padding: 5px 20px;
+            text-align: center;
+            font-size: 20px;
+            display: inline-block;
+            margin: 30px;
+        }
 
-            #replace_region_after, #replace_region_pre, #audio_reshuffle_after, #audio_reshuffle_pre {
-                text-align: center;
-            }
+        #replace_region_after, #replace_region_pre, #audio_reshuffle_after, #audio_reshuffle_pre {
+            text-align: center;
+        }
 
-            image, video {
-                display: inline-block;
-                max-width: 50%;
-                height: auto
-            }
+        image, video {
+            display: inline-block;
+            max-width: 50%;
+            height: auto
+        }
 
-        </style>
-        <!-- 全局js -->
-        <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
-        <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
-        <script src="${ctx!}/js/plugins/metisMenu/jquery.metisMenu.js"></script>
-        <script src="${ctx!}/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-        <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
+    </style>
+    <!-- 全局js -->
+    <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
+    <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="${ctx!}/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="${ctx!}/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
 
-        <!-- 自定义js -->
-        <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
-        <script type="text/javascript" src="${ctx!}/js/index.js"></script>
-        <script type="text/javascript">
-            window.onload = function (){
-                // 音频重排
-                document.getElementById("audio_reshuffle_fileUpload").addEventListener("change", function (event) {
-                    // 清空
-                    document.getElementById("audio_reshuffle_pre").innerHTML = "";
-                    document.getElementById("audio_reshuffle_after").innerHTML = "";
-                    // 音频格式
-                    const audioType = ['wav', 'mp3'];
-                    //读取文件
-                    const file = event.target.files[0]
-                    // 文件名，扩展名
-                    if (file) {
-                        const fileName = file.name;
-                        const fileExtension = fileName.split('.').pop().toLowerCase();
-                        console.log(fileExtension)
+    <!-- 自定义js -->
+    <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
+    <script type="text/javascript" src="${ctx!}/js/index.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            // 音频重排
+            document.getElementById("audio_reshuffle_fileUpload").addEventListener("change", function (event) {
+                // 清空
+                document.getElementById("audio_reshuffle_pre").innerHTML = "";
+                document.getElementById("audio_reshuffle_after").innerHTML = "";
+                // 音频格式
+                const audioType = ['wav', 'mp3'];
+                //读取文件
+                const file = event.target.files[0]
+                // 文件名，扩展名
+                if (file) {
+                    const fileName = file.name;
+                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                    console.log(fileExtension)
 
-                        if (audioType.includes(fileExtension)) {
-                            let pre = document.getElementById("audio_reshuffle_pre");
-                            let reader = new FileReader();
-                            reader.onload = function (e) {
-                                var video = document.createElement("audio");
-                                video.src = e.target.result;
-                                video.controls = true;
-                                pre.appendChild(video);
-                            };
-                            reader.readAsDataURL(file);
-                            //提交脱敏参数，请求脱敏
-                            document.getElementById("audio_reshuffle_submit").onclick = function () {
-                                let after = document.getElementById("audio_reshuffle_after");
-                                after.innerHTML = "";
-                                // 获取保护级别
-                                let sheet = document.getElementById("audio_reshuffle_block_num").value;
+                    if (audioType.includes(fileExtension)) {
+                        let pre = document.getElementById("audio_reshuffle_pre");
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            var video = document.createElement("audio");
+                            video.src = e.target.result;
+                            video.controls = true;
+                            pre.appendChild(video);
+                        };
+                        reader.readAsDataURL(file);
+                        //提交脱敏参数，请求脱敏
+                        document.getElementById("audio_reshuffle_submit").onclick = function () {
+                            let after = document.getElementById("audio_reshuffle_after");
+                            after.innerHTML = "";
+                            // 获取保护级别
+                            let sheet = document.getElementById("audio_reshuffle_block_num").value;
 
-                                let formData = new FormData();
-                                formData.append("file", file);
-                                formData.append("params", "0");
-                                formData.append("algName", "audio_reshuffle");
-                                formData.append("sheet", sheet);
+                            let formData = new FormData();
+                            formData.append("file", file);
+                            formData.append("params", "0");
+                            formData.append("algName", "audio_reshuffle");
+                            formData.append("sheet", sheet);
 
-                                fetch('/File/desenFile', {
-                                    method: 'POST',
-                                    body: formData
+                            fetch('/File/desenFile', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => {
+                                    if (response.status === 200) {
+                                        return response.blob()
+                                    } else {
+                                        throw new Error("Python script executes failed")
+                                    }
                                 })
-                                    .then(response => {
-                                        if (response.status === 200) {
-                                            return response.blob()
-                                        } else {
-                                            throw new Error("Python script executes failed")
-                                        }
-                                    })
-                                    .then(blob => {
-                                        // 创建音频标签
-                                        const audioElement = document.createElement('audio');
-                                        audioElement.controls = true;
-                                        // 使用Blob URL设置音频数据
-                                        audioElement.src = URL.createObjectURL(blob);
-                                        // 添加到页面中
-                                        after.appendChild(audioElement);
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert(error);
-                                    });
-
-                            }
-                        } else {
-                            alert("请选择音频文件");
-                        }
-                    }
-                })
-                // 声纹替换
-                document.getElementById("voice_replace_src_fileupload").addEventListener("change", function (event) {
-                    // 清空
-                    document.getElementById("voice_replace_pre").innerHTML = "";
-                    document.getElementById("voice_replace_after").innerHTML = "";
-                    // 音频格式
-                    const audioType = ['wav', 'mp3'];
-                    //读取文件
-                    const file = event.target.files[0]
-                    // 文件名，扩展名
-                    if (file) {
-                        const fileName = file.name;
-                        const fileExtension = fileName.split('.').pop().toLowerCase();
-                        console.log(fileExtension)
-
-                        if (audioType.includes(fileExtension)) {
-                            let pre = document.getElementById("voice_replace_pre");
-                            let reader = new FileReader();
-                            reader.onload = function (e) {
-                                let video = document.createElement("audio");
-                                video.src = e.target.result;
-                                video.controls = true;
-                                pre.appendChild(video);
-                            };
-                            reader.readAsDataURL(file);
-                            //提交脱敏参数，请求脱敏
-                            document.getElementById("voice_replace_submit").onclick = function () {
-                                let after = document.getElementById("voice_replace_after");
-                                after.innerHTML = "";
-                                // 获取保护级别
-                                let param = "1";
-
-                                let formData = new FormData();
-                                formData.append("file", file);
-                                formData.append("params", param);
-                                formData.append("algName", "replace_voice_print");
-                                formData.append("sheet", "replace_voice_print");
-
-                                fetch('/File/desenFile', {
-                                    method: 'POST',
-                                    body: formData
+                                .then(blob => {
+                                    // 创建音频标签
+                                    const audioElement = document.createElement('audio');
+                                    audioElement.controls = true;
+                                    // 使用Blob URL设置音频数据
+                                    audioElement.src = URL.createObjectURL(blob);
+                                    // 添加到页面中
+                                    after.appendChild(audioElement);
                                 })
-                                    .then(response => {
-                                        if (response.status === 200) {
-                                            return response.blob();
-                                        } else{
-                                            throw new Error("Python script executes failed");
-                                        }
-                                    })
-                                    .then(blob => {
-                                        // 创建音频标签
-                                        const audioElement = document.createElement('audio');
-                                        audioElement.controls = true;
-                                        // 使用Blob URL设置音频数据
-                                        audioElement.src = URL.createObjectURL(blob);
-                                        // 添加到页面中
-                                        after.appendChild(audioElement);
-                                    })
-                                    .catch(error => console.error('Error:', error));
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert(error);
+                                });
 
-                            }
-                        } else {
-                            alert("请选择音频文件");
                         }
+                    } else {
+                        alert("请选择音频文件");
                     }
-                })
-                // 为音频添加效果
-                document.getElementById("apply_audio_effects_src_fileupload").addEventListener("change", function (event) {
-                    // 清空
-                    document.getElementById("apply_audio_effects_pre").innerHTML = "";
-                    document.getElementById("apply_audio_effects_after").innerHTML = "";
-                    // 音频格式
-                    const audioType = ['wav', 'mp3'];
-                    //读取文件
-                    const file = event.target.files[0]
-                    // 文件名，扩展名
-                    if (file) {
-                        const fileName = file.name;
-                        const fileExtension = fileName.split('.').pop().toLowerCase();
-                        console.log(fileExtension)
+                }
+            })
+            // 声纹替换
+            document.getElementById("voice_replace_src_fileupload").addEventListener("change", function (event) {
+                // 清空
+                document.getElementById("voice_replace_pre").innerHTML = "";
+                document.getElementById("voice_replace_after").innerHTML = "";
+                // 音频格式
+                const audioType = ['wav', 'mp3'];
+                //读取文件
+                const file = event.target.files[0]
+                // 文件名，扩展名
+                if (file) {
+                    const fileName = file.name;
+                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                    console.log(fileExtension)
 
-                        if (audioType.includes(fileExtension)) {
-                            let pre = document.getElementById("apply_audio_effects_pre");
-                            let reader = new FileReader();
-                            reader.onload = function (e) {
-                                let video = document.createElement("audio");
-                                video.src = e.target.result;
-                                video.controls = true;
-                                pre.appendChild(video);
-                            };
-                            reader.readAsDataURL(file);
-                            //提交脱敏参数，请求脱敏
-                            document.getElementById("apply_audio_effects_submit").onclick = function () {
-                                let after = document.getElementById("apply_audio_effects_after");
-                                after.innerHTML = "";
-                                // 获取保护级别
-                                let param = document.getElementById("apply_audio_effects_privacyLevel").value;
+                    if (audioType.includes(fileExtension)) {
+                        let pre = document.getElementById("voice_replace_pre");
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let video = document.createElement("audio");
+                            video.src = e.target.result;
+                            video.controls = true;
+                            pre.appendChild(video);
+                        };
+                        reader.readAsDataURL(file);
+                        //提交脱敏参数，请求脱敏
+                        document.getElementById("voice_replace_submit").onclick = function () {
+                            let after = document.getElementById("voice_replace_after");
+                            after.innerHTML = "";
+                            // 获取保护级别
+                            let param = "1";
 
-                                let formData = new FormData();
-                                formData.append("file", file);
-                                formData.append("params", param);
-                                formData.append("algName", "apply_audio_effects");
-                                formData.append("sheet", "apply_audio_effects");
+                            let formData = new FormData();
+                            formData.append("file", file);
+                            formData.append("params", param);
+                            formData.append("algName", "voice_replace");
+                            formData.append("sheet", "voice_replace");
 
-                                fetch('/File/desenFile', {
-                                    method: 'POST',
-                                    body: formData
+                            fetch('/File/desenFile', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => {
+                                    if (response.status === 200) {
+                                        return response.blob();
+                                    } else {
+                                        throw new Error("Python script executes failed");
+                                    }
                                 })
-                                    .then(response => {
-                                        if (response.status === 200) {
-                                            return response.blob();
-                                        } else{
-                                            throw new Error("Python script executes failed");
-                                        }
-                                    })
-                                    .then(blob => {
-                                        // 创建音频标签
-                                        const audioElement = document.createElement('audio');
-                                        audioElement.controls = true;
-                                        // 使用Blob URL设置音频数据
-                                        audioElement.src = URL.createObjectURL(blob);
-                                        // 添加到页面中
-                                        after.appendChild(audioElement);
-                                    })
-                                    .catch(error => console.error('Error:', error));
+                                .then(blob => {
+                                    // 创建音频标签
+                                    const audioElement = document.createElement('audio');
+                                    audioElement.controls = true;
+                                    // 使用Blob URL设置音频数据
+                                    audioElement.src = URL.createObjectURL(blob);
+                                    // 添加到页面中
+                                    after.appendChild(audioElement);
+                                })
+                                .catch(error => console.error('Error:', error));
 
-                            }
-                        } else {
-                            alert("请选择音频文件");
                         }
+                    } else {
+                        alert("请选择音频文件");
                     }
-                })
-            }
-        </script>
-    </head>
+                }
+            })
+            // 为音频添加效果
+            document.getElementById("apply_audio_effects_src_fileupload").addEventListener("change", function (event) {
+                // 清空
+                document.getElementById("apply_audio_effects_pre").innerHTML = "";
+                document.getElementById("apply_audio_effects_after").innerHTML = "";
+                // 音频格式
+                const audioType = ['wav', 'mp3'];
+                //读取文件
+                const file = event.target.files[0]
+                // 文件名，扩展名
+                if (file) {
+                    const fileName = file.name;
+                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                    console.log(fileExtension)
 
-    <body >
-        <div class="ibox-title">
+                    if (audioType.includes(fileExtension)) {
+                        let pre = document.getElementById("apply_audio_effects_pre");
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let video = document.createElement("audio");
+                            video.src = e.target.result;
+                            video.controls = true;
+                            pre.appendChild(video);
+                        };
+                        reader.readAsDataURL(file);
+                        //提交脱敏参数，请求脱敏
+                        document.getElementById("apply_audio_effects_submit").onclick = function () {
+                            let after = document.getElementById("apply_audio_effects_after");
+                            after.innerHTML = "";
+                            // 获取保护级别
+                            let param = document.getElementById("apply_audio_effects_privacyLevel").value;
+
+                            let formData = new FormData();
+                            formData.append("file", file);
+                            formData.append("params", param);
+                            formData.append("algName", "apply_audio_effects");
+                            formData.append("sheet", "apply_audio_effects");
+
+                            fetch('/File/desenFile', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => {
+                                    if (response.status === 200) {
+                                        return response.blob();
+                                    } else {
+                                        throw new Error("Python script executes failed");
+                                    }
+                                })
+                                .then(blob => {
+                                    // 创建音频标签
+                                    const audioElement = document.createElement('audio');
+                                    audioElement.controls = true;
+                                    // 使用Blob URL设置音频数据
+                                    audioElement.src = URL.createObjectURL(blob);
+                                    // 添加到页面中
+                                    after.appendChild(audioElement);
+                                })
+                                .catch(error => console.error('Error:', error));
+
+                        }
+                    } else {
+                        alert("请选择音频文件");
+                    }
+                }
+            })
+        }
+    </script>
+</head>
+
+<body>
+<div class="ibox-title">
+</div>
+
+<div class="panel panel-default">
+
+    <div class="panel-body">
+        <div class="row">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                1.声纹替换算法</p>
+            <div style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+                <#-- <p style="font-size: 1.5em;">2.基于像素块的图像像素替换方法</p>-->
+                <div>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        说明：用固定声纹替换原始音频的声纹
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输入：原音频文件路径
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输出：音频文件
+                    </p>
+                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div class="midtile">
+                        <div class="align-items-center">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="voice_replace_src_fileupload" style="display: none;">
+                                <label for="voice_replace_src_fileupload" class="upload-btn">
+                                    选择音频源文件
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-
-        <div class="panel panel-default">
-
-            <div class="panel-body">
-                <div class="row">
-                    <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                        1.声纹替换算法</p>
-                    <div style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
-                        <#-- <p style="font-size: 1.5em;">2.基于像素块的图像像素替换方法</p>-->
-                        <div>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                说明：用固定声纹替换原始音频的声纹
-                            </p>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                输入：原音频文件路径
-                            </p>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                输出：音频文件
-                            </p>
-                            <p style="font-size: 1.5em;text-align: center;">算法测试</p>
-                            <div class="midtile">
-                                <div class="align-items-center">
-                                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                        <input type="file" id="voice_replace_src_fileupload" style="display: none;">
-                                        <label for="voice_replace_src_fileupload" class="upload-btn">
-                                            选择音频源文件
-                                        </label>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="showFile">
-                    <!--前后文件-->
-                    <div id="voice_replace_pre" style="margin-right: 20px;">
-                    </div>
-                    <div id="voice_replace_after">
-                    </div>
-
-                </div>
-                <div class="btn2" style="text-align: center;">
-                    <button type="button" class="btn btn-sm btn-primary submit-btn" id="voice_replace_submit"> 提交脱敏</button>
-                </div>
+        <div class="showFile">
+            <!--前后文件-->
+            <div id="voice_replace_pre" style="margin-right: 20px;">
             </div>
-            <hr>
-            <div class="panel-body">
-                <div class="row">
-                    <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                        12.音频变形</p>
-                    <div style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
-                        <#-- <p style="font-size: 1.5em;">2.基于像素块的图像像素替换方法</p>-->
-                        <div>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                说明：对音频进行拉伸、移位和增益
-                            </p>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                输入：原音频文件路径
-                            </p>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                输出：音频文件
-                            </p>
-                            <p style="font-size: 1.5em;text-align: center;">算法测试</p>
-                            <div class="midtile">
-                                <div class="align-items-center">
-                                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                        <input type="file" id="apply_audio_effects_src_fileupload" style="display: none;">
-                                        <label for="apply_audio_effects_src_fileupload" class="upload-btn">
-                                            选择音频源文件
-                                        </label>
-                                    </form>
-                                </div>
-                            </div>
-                            <div <#--class="ibox-content"--> style="text-align: center;">
-                                <div style="margin: auto; font-size: 20px">
-                                    请选择隐私保护程度：
-                                    <select id="apply_audio_effects_privacyLevel">
-                                        <option value="0"> 低程度</option>
-                                        <option value="1" selected> 中程度</option>
-                                        <option value="2"> 高程度</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="showFile">
-                    <!--前后文件-->
-                    <div id="apply_audio_effects_pre" style="margin-right: 20px;">
-                    </div>
-                    <div id="apply_audio_effects_after">
-                    </div>
-
-                </div>
-                <div class="btn2" style="text-align: center;">
-                    <button type="button" class="btn btn-sm btn-primary submit-btn" id="apply_audio_effects_submit"> 提交脱敏</button>
-                </div>
+            <div id="voice_replace_after">
             </div>
-            <hr>
-            <div class="panel-body">
-                <div class="row">
-                    <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                        13.音频重排</p>
-                    <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                        <div>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                说明：对音频进行分块，随机重排所有分块后合并为一个音频
-                            </p>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                输入：音频文件
-                            </p>
-                            <p style="font-size: 1.5em;text-align: justify;">
-                                输出：音频对象（保存到指定音频文件路径）
-                            </p>
-                            <p style="font-size: 1.5em;text-align: center;">算法测试</p>
-                            <div class="midtile">
-                                <div class="col-sm-5 align-items-center">
-                                    <form id="uploadForm" method="post" enctype="multipart/form-data">
-                                        <input type="file" id="audio_reshuffle_fileUpload" style="display: none;">
-                                        <label for="audio_reshuffle_fileUpload" class="upload-btn">
-                                            选择文件
-                                        </label>
-                                    </form>
-                                </div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style=" font-size: 20px">
-                                    <label for="audio_reshuffle_block_num">音频分块数量:</label>
-<#--                                    <input type="text" id="audio_reshuffle_block_num">-->
-                                    <select id="audio_reshuffle_block_num">
-                                        <option value="0"> 低程度</option>
-                                        <option value="1" selected> 中程度</option>
-                                        <option value="2"> 高程度</option>
-                                    </select>
-                                </div>
-                            </div>
+
+        </div>
+        <div class="btn2" style="text-align: center;">
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="voice_replace_submit"> 提交脱敏</button>
+        </div>
+    </div>
+    <hr>
+    <div class="panel-body">
+        <div class="row">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                12.音频变形</p>
+            <div style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+                <#-- <p style="font-size: 1.5em;">2.基于像素块的图像像素替换方法</p>-->
+                <div>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        说明：对音频进行拉伸、移位和增益
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输入：原音频文件路径
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输出：音频文件
+                    </p>
+                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div class="midtile">
+                        <div class="align-items-center">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="apply_audio_effects_src_fileupload" style="display: none;">
+                                <label for="apply_audio_effects_src_fileupload" class="upload-btn">
+                                    选择音频源文件
+                                </label>
+                            </form>
                         </div>
                     </div>
-                </div>
-                <div class="showFile">
-                    <!--前后文件-->
-                    <div id=audio_reshuffle_pre style="margin-right: 20px;">
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护程度：
+                            <select id="apply_audio_effects_privacyLevel">
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
+                            </select>
+                        </div>
                     </div>
-                    <div id=audio_reshuffle_after>
-                    </div>
-                </div>
-                <div class="btn2" style="text-align: center;">
-                    <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_reshuffle_submit">提交脱敏</button>
                 </div>
             </div>
         </div>
+        <div class="showFile">
+            <!--前后文件-->
+            <div id="apply_audio_effects_pre" style="margin-right: 20px;">
+            </div>
+            <div id="apply_audio_effects_after">
+            </div>
 
-    </body>
+        </div>
+        <div class="btn2" style="text-align: center;">
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="apply_audio_effects_submit"> 提交脱敏
+            </button>
+        </div>
+    </div>
+    <hr>
+    <div class="panel-body">
+        <div class="row">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                13.音频重排</p>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                <div>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        说明：对音频进行分块，随机重排所有分块后合并为一个音频
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输入：音频文件
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输出：音频对象（保存到指定音频文件路径）
+                    </p>
+                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div class="midtile">
+                        <div class="col-sm-5 align-items-center">
+                            <form id="uploadForm" method="post" enctype="multipart/form-data">
+                                <input type="file" id="audio_reshuffle_fileUpload" style="display: none;">
+                                <label for="audio_reshuffle_fileUpload" class="upload-btn">
+                                    选择文件
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style=" font-size: 20px">
+                            <label for="audio_reshuffle_block_num">音频分块数量:</label>
+                            <#--                                    <input type="text" id="audio_reshuffle_block_num">-->
+                            <select id="audio_reshuffle_block_num">
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="showFile">
+            <!--前后文件-->
+            <div id=audio_reshuffle_pre style="margin-right: 20px;">
+            </div>
+            <div id=audio_reshuffle_after>
+            </div>
+        </div>
+        <div class="btn2" style="text-align: center;">
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_reshuffle_submit">提交脱敏
+            </button>
+        </div>
+    </div>
+</div>
+
+</body>
 
 </html>

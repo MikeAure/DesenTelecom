@@ -3,14 +3,16 @@ package com.lu.gademo.controller;
 import com.lu.gademo.utils.Util;
 import com.lu.gademo.utils.impl.UtilImpl;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
-import java.text.ParseException;
 
 /***
  * 差分隐私算法
@@ -24,13 +26,13 @@ public class DPController {
     @ResponseBody
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenValue(@RequestParam String rawData,
-                            @RequestParam String samples,
-                            @RequestParam String algName) {
+                             @RequestParam String samples,
+                             @RequestParam String algName) {
         String[] types = algName.split(",");
         algName = types[types.length - 1];
         System.out.println(algName);
         // python命令
-        String python = util.isLinux() ? "python3" : "python";
+        String python = util.isLinux() ? "python3" : "conda run -n torch_env python";
         // 当前路径
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
@@ -44,10 +46,11 @@ public class DPController {
             String[] command = {python, desenApp, algName, rawData, samples};
 
             // 创建ProcessBuilder对象
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+//            ProcessBuilder processBuilder = new ProcessBuilder(command);
 
             // 启动进程
-            Process process = processBuilder.start();
+            System.out.println(String.join(" ", command));
+            Process process = Runtime.getRuntime().exec(String.join(" ", command));
 
             // 获取进程的输出流
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -74,19 +77,20 @@ public class DPController {
         }
         return rawData;
     }
+
     @ResponseBody
     @RequestMapping(value = "/desenValue2", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenValue2(@RequestParam String rawData,
-                             @RequestParam String samples,
-                             @RequestParam String algName,
+                              @RequestParam String samples,
+                              @RequestParam String algName,
                               @RequestParam String c,
-                            @RequestParam String t){
+                              @RequestParam String t) {
 
         String[] types = algName.split(",");
         algName = types[types.length - 1];
         System.out.println(algName);
         // python命令
-        String python = util.isLinux() ? "python3" : "python";
+        String python = util.isLinux() ? "python3" : "conda run -n torch_env python";
         // 当前路径
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
@@ -94,16 +98,17 @@ public class DPController {
         try {
             // 指定Python脚本路径
             //String pythonScriptPath = "path/to/your/python/script.py";
+            String scriptPath = Paths.get(currentPath, "perturbation", "differential_privacy").toString();
             String desenApp = Paths.get(currentPath, "perturbation", "differential_privacy", "dp.py").toString();
 
             // 创建参数列表
             String[] command = {python, desenApp, algName, rawData, samples, c, t};
 
             // 创建ProcessBuilder对象
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
 
             // 启动进程
-            Process process = processBuilder.start();
+            System.out.println(String.join(" ", command));
+            Process process = Runtime.getRuntime().exec(String.join(" ", command));
 
             // 获取进程的输出流
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

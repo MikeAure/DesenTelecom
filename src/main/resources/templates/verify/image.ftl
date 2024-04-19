@@ -35,9 +35,9 @@
 <script src="${ctx!}/js/content.js?v=1.0.0"></script>
 <script type="text/javascript">
     window.onload = function () {
-        document.getElementById("fileUpload").addEventListener("change",choose_file)
+        document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function(event) {
+    choose_file = function (event) {
         // 清空
         document.getElementById("pre").innerHTML = "";
         document.getElementById("after").innerHTML = "";
@@ -53,10 +53,10 @@
             const fileExtension = fileName.split('.').pop().toLowerCase();
             console.log(fileExtension)
 
-            if(imageType.includes(fileExtension)){
+            if (imageType.includes(fileExtension)) {
                 uploadImage()
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     let after = document.getElementById("after");
                     after.innerHTML = "";
 
@@ -66,7 +66,7 @@
 
 
                     let idx = $("ul .active").index();
-                    if(idx === 0) {
+                    if (idx === 0) {
                         // 获取保护级别
                         let table_body = document.getElementById("table3")
                         let tr = table_body.rows[0];
@@ -90,12 +90,12 @@
                     formData.forEach((value, key) => {
                         console.log(key, value);
                     });
-                    fetch('/File/desenFile',{
+                    fetch('/File/desenFile', {
                         method: 'POST',
                         body: formData
                     })
                         .then(response => response.blob())
-                        .then(blob =>{
+                        .then(blob => {
                             let dealedImg = new Image();
                             dealedImg.src = URL.createObjectURL(blob);
                             after.appendChild(dealedImg);
@@ -103,8 +103,7 @@
                         })
 
                 }
-            }
-            else {
+            } else {
                 alert("请选择图像文件");
             }
         }
@@ -129,8 +128,8 @@
             </div>
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
-                    <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload"  style="display: none;">
+                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             选择文件
                         </label>
@@ -140,46 +139,58 @@
 
             <div class="showFile">
                 <!--前后文件-->
-                <div id = pre>
+                <div id=pre>
                 </div>
-                <div id = after>
+                <div id=after>
                 </div>
             </div>
 
             <div class="tabs-container">
-                <ul id = "tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
+                <ul id="tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
                     </li>
-                    <li class="" ><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
+                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
                     </li>
                 </ul>
                 <div class="tab-content">
                     <div id="tab-1" class="tab-pane active" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th>请选择图像失真脱敏算法</th></tr></thead>
+                                <thead>
+                                <tr>
+                                    <th>请选择图像失真脱敏算法</th>
+                                </tr>
+                                </thead>
                                 <tbody id="table1">
-                                <tr><td><select>
-                                            <option value="meanValueImage"> 泛化-基于均值滤波器的图像加噪方法 </option>
-                                            <option value="dpImage" selected> 泛化-基于差分隐私的图像加噪方法 </option>
-                                            <option value="pixelate"> 泛化-基于像素化滤波器的图像加噪方法 </option>
-                                            <option value="gaussian_blur" > 泛化-基于高斯滤波器的图像加噪方法 </option>
-                                            <option value="box_blur"> 泛化-基于盒式滤波器的图像加噪方法 </option>
-                                            <option value="replace_region" > 泛化-基于像素块的图像区域替换方法 </option>
-                                        </select></td></tr>
+                                <tr>
+                                    <td><select>
+                                            <option value="meanValueImage"> 泛化-基于均值滤波器的图像加噪方法</option>
+                                            <option value="dpImage" selected> 泛化-基于差分隐私的图像加噪方法</option>
+                                            <option value="pixelate"> 泛化-基于像素化滤波器的图像加噪方法</option>
+                                            <option value="gaussian_blur"> 泛化-基于高斯滤波器的图像加噪方法</option>
+                                            <option value="box_blur"> 泛化-基于盒式滤波器的图像加噪方法</option>
+                                            <option value="replace_region"> 泛化-基于像素块的图像区域替换方法</option>
+                                        </select></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="ibox-content" style="text-align: center;">
-                            <div id="privacyLevel" >
+                            <div id="privacyLevel">
                                 <table style="margin: auto; font-size: 20px">
-                                    <thead><tr><th>请选择隐私保护等级</th></tr></thead>
+                                    <thead>
+                                    <tr>
+                                        <th>请选择隐私保护等级</th>
+                                    </tr>
+                                    </thead>
                                     <tbody id="table3">
-                                    <tr><td><select>
-                                                <option value="0"> 低程度 </option>
-                                                <option value="1" selected> 中程度 </option>
-                                                <option value="2"> 高程度 </option>
-                                            </select></td></tr>
+                                    <tr>
+                                        <td><select>
+                                                <option value="0"> 低程度</option>
+                                                <option value="1" selected> 中程度</option>
+                                                <option value="2"> 高程度</option>
+                                            </select></td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -188,11 +199,17 @@
                     <div id="tab-2" class="tab-pane" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th>请选择图像非失真脱敏算法</th></tr></thead>
+                                <thead>
+                                <tr>
+                                    <th>请选择图像非失真脱敏算法</th>
+                                </tr>
+                                </thead>
                                 <tbody id="table2">
-                                <tr><td><select>
-                                            <option value="retrieval"> 相似医疗图像安全检索 </option>
-                                        </select></td></tr>
+                                <tr>
+                                    <td><select>
+                                            <option value="retrieval"> 相似医疗图像安全检索</option>
+                                        </select></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -221,10 +238,12 @@
         align-items: center;
         justify-content: center;
     }
-    .ibox-title span{
+
+    .ibox-title span {
         font-size: 50px;
     }
-    #submit{
+
+    #submit {
         background-color: #347aa9;
         padding: 5px 20px;
         cursor: pointer;
@@ -235,21 +254,24 @@
         /*margin-right: 50px;*/
 
     }
-    .btn2{
+
+    .btn2 {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn{
+    .upload-btn {
         background-color: #347aa9;
         color: white;
         cursor: pointer;
@@ -259,24 +281,28 @@
         display: inline-block;
         margin: 30px;
     }
-    #pre{
+
+    #pre {
         text-align: center;
     }
-    #pre img{
+
+    #pre img {
         display: inline-block;
         max-width: 50%;
         height: auto;
     }
-    #after{
+
+    #after {
         text-align: center;
     }
+
     #after img {
         display: inline-block;
         max-width: 50%;
         height: auto;
     }
 
-    .showFile{
+    .showFile {
         display: flex;
         justify-content: center;
         align-items: center;

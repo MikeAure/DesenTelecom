@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -43,7 +44,7 @@
     window.onload = function () {
         document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function (event){
+    choose_file = function (event) {
         // 清空
         document.getElementById("fileInfo").innerHTML = "";
         document.getElementById("table_list").innerHTML = ""
@@ -56,8 +57,9 @@
         const fileName = file.name;
         const fileExtension = fileName.split('.').pop().toLowerCase();
         if (file) {
-            if ("xlsx" === fileExtension) {var fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                "<strong>" + fileName + "文件</strong>上传成功"
+            if ("xlsx" === fileExtension) {
+                var fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                    "<strong>" + fileName + "文件</strong>上传成功"
                 "</span>" +
                 "</div>";
                 document.getElementById("fileInfo").innerHTML = fileLoad
@@ -67,7 +69,7 @@
                 formData.append("file", file);
                 formData.append("sheet", sheet);
                 let html = "";
-                console.log("sheet:"+sheet)
+                console.log("sheet:" + sheet)
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (xhr.status == 200 && xhr.readyState == 4) {
@@ -197,10 +199,10 @@
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
                     var tr;
-                    var dataArray = new Array();
+                    var dataArray = [];
                     var table_body = document.getElementById("table2")
                     for (var i = 0; i < table_body.rows.length; i++) {
-                        data = new Object();
+                        data = {};
                         tr = table_body.rows[i];
                         //console.log(tr);
                         data.id = tr.childNodes[0].innerHTML;
@@ -224,12 +226,12 @@
                             var reader = new FileReader();
                             reader.onload = function (e) {
                                 var data = new Uint8Array(e.target.result);
-                                var workbook = XLSX.read(data, { type: 'array' });
+                                var workbook = XLSX.read(data, {type: 'array'});
 
                                 var sheetName = workbook.SheetNames[0];
                                 var sheet = workbook.Sheets[sheetName];
 
-                                var jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                var jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
 
                                 var pageSize = 10;
                                 var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
@@ -302,12 +304,12 @@
 
                             // 脱敏后
                             const reader1 = new FileReader();
-                            reader1.onload = function(event) {
+                            reader1.onload = function (event) {
                                 const data = event.target.result;
-                                const workbook = XLSX.read(data, { type: 'binary' });
+                                const workbook = XLSX.read(data, {type: 'binary'});
                                 const sheetName = workbook.SheetNames[0];
                                 const sheet = workbook.Sheets[sheetName];
-                                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                                const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
                                 var pageSize = 10;
                                 var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
                                 var currentPage1 = 1;
@@ -387,8 +389,7 @@
                         })
                         .catch(error => console.error('Error:', error));
                 }
-            }
-            else{
+            } else {
                 alert("请提交excel文件")
             }
         }
@@ -404,7 +405,8 @@
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
                     <label for="choose_sheet">选择应用场景：</label>
-                    <select name="sheet" id="choose_sheet" style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
+                    <select name="sheet" id="choose_sheet"
+                            style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
                         <option value="111" selected>请选择应用场景</option>
                         <option value="map">地图导航类场景</option>
                         <option value="onlinetaxi">网络约车类场景</option>
@@ -417,8 +419,8 @@
                         <option value="transportationticket">交通票务场景</option>
                         <option value="hotel">酒店服务类场景</option>
                     </select>
-                    <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload"  style="display: none;">
+                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             选择文件
                         </label>
@@ -426,20 +428,20 @@
                 </div>
             </div>
             <!--文件上传信息-->
-            <div id = fileInfo>
+            <div id=fileInfo>
             </div>
-            <div id = "after">
+            <div id="after">
 
             </div>
             <div class="ibox-content">
-                <div id=table_body ></div>
+                <div id=table_body></div>
             </div>
             <div class="button1">
                 <div class="btn2">
                     <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
                 </div>
             </div>
-            <div id = "showTable">
+            <div id="showTable">
 
             </div>
         </div>
@@ -488,25 +490,25 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="ibox ">
-                    <div class="row row-lg">
-                        <div class="col-sm-12">
-                            <div class="example-wrap">
-                                <div class="example">
-                                    <table id="table_list"></table>
-                                </div>
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="example-wrap">
+                            <div class="example">
+                                <table id="table_list"></table>
                             </div>
-                            <div class="example-wrap">
-                                <div class="example">
-                                    <table id="table_list2"></table>
-                                </div>
-                            </div>
-
                         </div>
+                        <div class="example-wrap">
+                            <div class="example">
+                                <table id="table_list2"></table>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </body>
 <style>
     /* 设置表格样式 */
@@ -514,38 +516,46 @@
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable {
         width: max-content;
         margin: 0 auto;
     }
+
     #paginationInfo {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo input {
         width: 5em;
         text-align: center;
     }
+
     /* 设置表格样式 */
     #dataTableContainer1 {
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable1 {
         width: max-content;
         margin: 0 auto;
     }
+
     #paginationInfo1 {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo1 input {
         width: 5em;
         text-align: center;
     }
-     /*标题*/
+
+    /*标题*/
     .ibox-title {
         height: 200px;
         border-color: #edf1f2;
@@ -556,31 +566,34 @@
         justify-content: center;
     }
 
-     #submit{
-         background-color: #347aa9;
-         padding: 5px 20px;
-         cursor: pointer;
-         color: black;
-         font-size: 20px;
-         display: inline-block;
-         text-align: center;
-         /*margin-right: 50px;*/
-     }
-     .btn2{
-         line-height: 30px;
-         text-align: center;
-         display:flex;
-         justify-content: center;
-     }
-    /*选择框居中*/
-    .midtile{
+    #submit {
+        background-color: #347aa9;
+        padding: 5px 20px;
+        cursor: pointer;
+        color: black;
+        font-size: 20px;
+        display: inline-block;
+        text-align: center;
+        /*margin-right: 50px;*/
+    }
+
+    .btn2 {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
-     /*上传按钮*/
-    .upload-btn{
+
+    /*选择框居中*/
+    .midtile {
+        line-height: 30px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    /*上传按钮*/
+    .upload-btn {
         background-color: #347aa9;
         color: white;
         cursor: pointer;

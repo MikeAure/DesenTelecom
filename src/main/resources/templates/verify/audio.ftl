@@ -22,10 +22,12 @@
             align-items: center;
             justify-content: center;
         }
-        .ibox-title span{
+
+        .ibox-title span {
             font-size: 50px;
         }
-        #submit{
+
+        #submit {
             background-color: #347aa9;
             padding: 5px 20px;
             cursor: pointer;
@@ -36,21 +38,24 @@
             /*margin-right: 50px;*/
 
         }
-        .btn2{
+
+        .btn2 {
             line-height: 30px;
             text-align: center;
-            display:flex;
+            display: flex;
             justify-content: center;
         }
+
         /*选择框居中*/
-        .midtile{
+        .midtile {
             line-height: 30px;
             text-align: center;
-            display:flex;
+            display: flex;
             justify-content: center;
         }
+
         /*上传按钮*/
-        .upload-btn{
+        .upload-btn {
             background-color: #347aa9;
             color: white;
             cursor: pointer;
@@ -60,26 +65,32 @@
             display: inline-block;
             margin: 30px;
         }
-        #pre{
+
+        #pre {
             text-align: center;
         }
-        #pre video{
+
+        #pre video {
             display: inline-block;
             max-width: 50%;
             height: auto
         }
-        #after{
+
+        #after {
             text-align: center;
         }
-        #after video{
+
+        #after video {
             display: inline-block;
             max-width: 50%;
             height: auto
         }
-        .showFile{
+
+        .showFile {
             display: flex;
             justify-content: center;
         }
+
         .tabs-container ul {
             display: flex;
             flex-direction: row;
@@ -243,23 +254,22 @@
 <script src="${ctx!}/js/content.js?v=1.0.0"></script>
 <script type="text/javascript">
     window.onload = function () {
-        document.getElementById("fileUpload").addEventListener("change",choose_file)
+        document.getElementById("fileUpload").addEventListener("change", choose_file)
         // 更改算法选项
-        document.getElementById("distortionaudio_algName").addEventListener("change",function (){
+        document.getElementById("distortionaudio_algName").addEventListener("change", function () {
             // 清空after
             let after = document.getElementById("after");
             after.innerHTML = "";
 
             // 失真算法名
             let distortionaudio_algName = document.getElementById("distortionaudio_algName").value;
-            if(distortionaudio_algName === "remove_audio" || distortionaudio_algName === "add_beep") {
+            if (distortionaudio_algName === "remove_audio" || distortionaudio_algName === "add_beep") {
                 document.getElementById("privacyLevel").style.display = "none";
                 document.getElementById("audioTime").style.display = "block";
                 /* formData.append("sheet", "1");
                  formData.append("algName", distortionaudio_algName);
                  formData.append("params", document.getElementById("distortionaudio_privacyLevel").value());*/
-            }
-            else{
+            } else {
                 document.getElementById("privacyLevel").style.display = "block";
                 document.getElementById("audioTime").style.display = "none";
                 /*formData.append("sheet", document.getElementById("chixu").value());
@@ -268,7 +278,7 @@
             }
         })
     }
-    choose_file = function(event) {
+    choose_file = function (event) {
         // 清空
         document.getElementById("pre").innerHTML = "";
         document.getElementById("after").innerHTML = "";
@@ -283,10 +293,10 @@
             const fileExtension = fileName.split('.').pop().toLowerCase();
             console.log(fileExtension)
 
-            if(audioType.includes(fileExtension)){
+            if (audioType.includes(fileExtension)) {
                 uploadAudio()
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     // 清空after
                     let after = document.getElementById("after");
                     after.innerHTML = "";
@@ -297,14 +307,13 @@
 
                     let idx = $("ul .active").index();
                     console.log(idx);
-                    if(idx === 0) {
+                    if (idx === 0) {
                         let distortionaudio_algName = document.getElementById("distortionaudio_algName").value;
-                        if(distortionaudio_algName === "dpAudio"){
+                        if (distortionaudio_algName === "dpAudio") {
                             formData.set("sheet", "1");
                             formData.set("algName", distortionaudio_algName);
                             formData.set("params", document.getElementById("distortionaudio_privacyLevel").value);
-                        }
-                        else{
+                        } else {
                             document.getElementById("privacyLevel").style.display = "none";
                             document.getElementById("audioTime").style.display = "block";
                             formData.set("sheet", document.getElementById("chixu").value);
@@ -317,16 +326,16 @@
                         console.log("formData:" + key + " " + value);
                     }
                     // else {
-                        // selections = document.getElementById("distortionaudio_algName")
-                        // // tr = table_body.rows[0];
-                        // let type2 = selections.value;
-                        // console.log(type2);
-                        // formData.append("sheet", "2");
-                        // formData.append("algName", type2);
+                    // selections = document.getElementById("distortionaudio_algName")
+                    // // tr = table_body.rows[0];
+                    // let type2 = selections.value;
+                    // console.log(type2);
+                    // formData.append("sheet", "2");
+                    // formData.append("algName", type2);
                     // }
                     // 获取算法类型
                     console.log(formData)
-                    fetch('/File/desenFile',{
+                    fetch('/File/desenFile', {
                         method: 'POST',
                         body: formData
                     })
@@ -343,13 +352,12 @@
                         .catch(error => console.error('Error:', error));
 
                 }
-            }
-            else {
+            } else {
                 alert("请选择音频文件");
             }
         }
     }
-    uploadAudio = function (){
+    uploadAudio = function () {
         let input = document.getElementById("fileUpload");
         let pre = document.getElementById("pre");
         let file = input.files[0];
@@ -378,54 +386,66 @@
             </div>
 
             <div class="tabs-container">
-                <ul id = "tab-type" class="nav nav-tabs" style="left: 50%; font-size: 20px;">
+                <ul id="tab-type" class="nav nav-tabs" style="left: 50%; font-size: 20px;">
                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">失真</a>
                     </li>
-                    <li class="" ><a data-toggle="tab" href="#tab-2" aria-expanded="false">非失真</a>
+                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">非失真</a>
                     </li>
                 </ul>
                 <div class="tab-content">
                     <div id="tab-1" class="tab-pane active" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th>请选择音频失真脱敏算法</th></tr></thead>
+                                <thead>
+                                <tr>
+                                    <th>请选择音频失真脱敏算法</th>
+                                </tr>
+                                </thead>
                                 <tbody id="table1">
-                                <tr><td><select id = "distortionaudio_algName">
-                                            <option value="dpAudio" selected> 基于差分隐私的声纹特征脱敏算法 </option>
-                                            <option value="add_beep" > 基于正弦波的音频替换方法 </option>
-                                        </select></td></tr>
+                                <tr>
+                                    <td><select id="distortionaudio_algName">
+                                            <option value="dpAudio" selected> 基于差分隐私的声纹特征脱敏算法</option>
+                                            <option value="add_beep"> 基于正弦波的音频替换方法</option>
+                                        </select></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="ibox-content" id="privacyLevel" style="text-align: center; ">
-                            <div >
+                            <div>
                                 <table style="margin: auto; font-size: 20px">
-                                    <thead><tr><th>请选择隐私保护等级</th></tr></thead>
+                                    <thead>
+                                    <tr>
+                                        <th>请选择隐私保护等级</th>
+                                    </tr>
+                                    </thead>
                                     <tbody id="table3">
-                                    <tr><td><select id = "distortionaudio_privacyLevel">
-                                                <option value="0"> 低程度 </option>
-                                                <option value="1" selected> 中程度 </option>
-                                                <option value="2"> 高程度 </option>
-                                            </select></td></tr>
+                                    <tr>
+                                        <td><select id="distortionaudio_privacyLevel">
+                                                <option value="0"> 低程度</option>
+                                                <option value="1" selected> 中程度</option>
+                                                <option value="2"> 高程度</option>
+                                            </select></td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <div <#--class="ibox-content"--> id = "audioTime" style="text-align: center; display: none">
+                        <div <#--class="ibox-content"--> id="audioTime" style="text-align: center; display: none">
                             <div style=" font-size: 20px">
                                 <form>
                                     <label for="start">开始时间:</label>
-                                    <input type="text" id="start" name="input1" placeholder="单位：秒" >
+                                    <input type="text" id="start" name="input1" placeholder="单位：秒">
                                     <label for="chixu">持续时间:</label>
-                                    <input type="text" id="chixu" name="input2" placeholder="单位：秒" >
+                                    <input type="text" id="chixu" name="input2" placeholder="单位：秒">
                                 </form>
                             </div>
                         </div>
 
                         <div class="midtile">
                             <div class="col-sm-5 m-b-xs">
-                                <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                    <input type="file" id="fileUpload"  style="display: none;">
+                                <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                    <input type="file" id="fileUpload" style="display: none;">
                                     <label for="fileUpload" class="upload-btn">
                                         选择文件
                                     </label>
@@ -435,9 +455,9 @@
 
                         <div class="showFile">
                             <!--前后文件-->
-                            <div id = pre>
+                            <div id=pre>
                             </div>
-                            <div id = after>
+                            <div id=after>
                             </div>
                         </div>
 
@@ -448,13 +468,19 @@
                     <div id="tab-2" class="tab-pane" style="text-align: center;">
                         <div>
                             <table style="margin: auto; font-size: 20px">
-                                <thead><tr><th>请选择音频非失真脱敏算法</th></tr></thead>
-                                <tbody >
-                                    <tr><td>
+                                <thead>
+                                <tr>
+                                    <th>请选择音频非失真脱敏算法</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
                                         <select id="audio-nondistortion">
-                                            <option value="voice-similarity" selected> 密文声纹相似度计算 </option>
+                                            <option value="voice-similarity" selected> 密文声纹相似度计算</option>
                                         </select>
-                                    </td></tr>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -466,12 +492,15 @@
                                     <input type="text" id="registerUsername" name="username">
                                     <label for="fileUpload">选择文件:</label>
                                     <input type="text" id="registerFilePath" placeholder="文件路径" readonly>
-                                    <input type="file" id="registerFileSelector" style="display:none" onchange="document.getElementById('registerFilePath').value = this.value">
+                                    <input type="file" id="registerFileSelector" style="display:none"
+                                           onchange="document.getElementById('registerFilePath').value = this.value">
                                     <label for="registrationMessage">消息:</label>
                                     <textarea id="registrationMessage" rows="4" readonly></textarea>
                                     <div class="buttons">
                                         <button type="button" id="register-button">注册</button>
-                                        <button type="button" class="audio-match-button" onclick="document.getElementById('registerFileSelector').click();">选择文件</button>
+                                        <button type="button" class="audio-match-button"
+                                                onclick="document.getElementById('registerFileSelector').click();">选择文件
+                                        </button>
                                     </div>
 
                                 </div>
@@ -483,12 +512,15 @@
                                     <input type="text" id="loginUsername" name="loginUsername">
                                     <label for="loginFilePath">选择文件:</label>
                                     <input type="text" id="loginFilePath" placeholder="文件路径" readonly>
-                                    <input type="file" id="loginFileSelector" style="display:none" onchange="document.getElementById('loginFilePath').value = this.value">
+                                    <input type="file" id="loginFileSelector" style="display:none"
+                                           onchange="document.getElementById('loginFilePath').value = this.value">
                                     <label for="loginMessage">消息:</label>
                                     <textarea id="loginMessage" rows="4" readonly></textarea>
                                     <div class="buttons">
                                         <button type="button" id="login-button">登录</button>
-                                        <button type="button" class="audio-match-button" onclick="document.getElementById('loginFileSelector').click();">选择文件</button>
+                                        <button type="button" class="audio-match-button"
+                                                onclick="document.getElementById('loginFileSelector').click();">选择文件
+                                        </button>
                                     </div>
 
                                 </div>
@@ -503,13 +535,13 @@
 </div>
 
 <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // 初始化时禁用注册和登录按钮
         document.getElementById('register-button').disabled = true;
         document.getElementById('login-button').disabled = true;
 
         // 注册文件选择器的change事件监听器
-        document.getElementById('registerFileSelector').addEventListener('change', function() {
+        document.getElementById('registerFileSelector').addEventListener('change', function () {
             // 当文件被选择时，启用注册按钮
             if (this.files.length > 0) {
                 document.getElementById('register-button').disabled = false;
@@ -519,7 +551,7 @@
         });
 
         // 登录文件选择器的change事件监听器
-        document.getElementById('loginFileSelector').addEventListener('change', function() {
+        document.getElementById('loginFileSelector').addEventListener('change', function () {
             // 当文件被选择时，启用登录按钮
             if (this.files.length > 0) {
                 document.getElementById('login-button').disabled = false;
@@ -537,7 +569,7 @@
     let signInMessage = document.getElementById("loginMessage");
 
 
-    choose_audio_file = function(e, fileElementId, nameElementId, backendInterface) {
+    choose_audio_file = function (e, fileElementId, nameElementId, backendInterface) {
         // e.preventDefault(); // 阻止表单的默认提交行为
 
         const fileInput = document.getElementById(fileElementId);

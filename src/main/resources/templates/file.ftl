@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -34,9 +35,9 @@
 <script src="${ctx!}/js/content.js?v=1.0.0"></script>
 <script type="text/javascript">
     window.onload = function () {
-        document.getElementById("fileUpload").addEventListener("change",choose_file)
+        document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function(event) {
+    choose_file = function (event) {
         // 清空
         document.getElementById("pre").innerHTML = "";
         document.getElementById("after").innerHTML = "";
@@ -68,7 +69,7 @@
             formData.append("sheet", "media");
 
             var html = ""
-            if(imageType.includes(fileExtension)){
+            if (imageType.includes(fileExtension)) {
                 uploadImage()
                 let alg = "<div>" +
                     "<table style=\'margin: auto; font-size: 20px\'>" +
@@ -108,7 +109,7 @@
                 document.getElementById("algType").innerHTML = alg;
                 document.getElementById("privacyLevel").innerHTML = html;
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     var after = document.getElementById("after");
                     after.innerHTML = "";
                     // 获取保护级别
@@ -122,20 +123,19 @@
                     tr = table_body.rows[0];
                     var type = tr.childNodes[0].firstChild.value;
                     formData.append("sheet", type);
-                    fetch('File/desenFile',{
+                    fetch('File/desenFile', {
                         method: 'POST',
                         body: formData
                     })
                         .then(response => response.blob())
-                        .then(blob =>{
+                        .then(blob => {
                             var dealedImg = new Image();
                             dealedImg.src = URL.createObjectURL(blob);
                             after.appendChild(dealedImg);
                         })
 
                 }
-            }
-            else if (audioType.includes(fileExtension)){
+            } else if (audioType.includes(fileExtension)) {
                 uploadAudio();
                 html += "<div>" +
                     "<table style=\'margin: auto; font-size: 20px\'>" +
@@ -158,7 +158,7 @@
                 document.getElementById("table_body").innerHTML = html;
 
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     var after = document.getElementById("after");
                     after.innerHTML = "";
                     // 获取保护级别
@@ -182,8 +182,7 @@
                         })
                         .catch(error => console.error('Error:', error));
                 }
-            }
-            else if (videoType.includes(fileExtension)){
+            } else if (videoType.includes(fileExtension)) {
                 uploadVideo()
                 html += "<div>" +
                     "<table style=\'margin: auto; font-size: 20px\'>" +
@@ -206,7 +205,7 @@
                 document.getElementById("table_body").innerHTML = html;
 
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     var after = document.getElementById("after");
                     after.innerHTML = "";
                     // 获取保护级别
@@ -214,12 +213,12 @@
                     var tr = table_body.rows[0];
                     var param = tr.childNodes[0].firstChild.value;
                     formData.append("params", param);
-                    fetch('File/desenFile',{
+                    fetch('File/desenFile', {
                         method: 'POST',
                         body: formData
                     })
                         .then(response => response.blob())
-                        .then(data =>{
+                        .then(data => {
                             var video = document.createElement("video");
                             console.log(data)
                             video.src = URL.createObjectURL(data);
@@ -228,12 +227,11 @@
                             after.appendChild(video);
 
                         })
-                        .catch(error =>{
+                        .catch(error => {
                             console.log("Error:", error);
                         })
                 }
-            }
-            else{
+            } else {
                 html += "<div>" +
                     "<table style=\'margin: auto; font-size: 20px\'>" +
                     "<thead>" +
@@ -255,7 +253,7 @@
                 document.getElementById("table_body").innerHTML = html;
 
                 //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function(){
+                document.getElementById("submit").onclick = function () {
                     var after = document.getElementById("after");
                     after.innerHTML = ""
                     // 获取保护级别
@@ -308,7 +306,7 @@
         };
         reader.readAsDataURL(file);
     }
-    uploadAudio = function (){
+    uploadAudio = function () {
         var input = document.getElementById("fileUpload");
         var pre = document.getElementById("pre");
         var file = input.files[0];
@@ -330,8 +328,8 @@
             </div>
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
-                    <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload"  style="display: none;">
+                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                        <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             上传文件
                         </label>
@@ -339,23 +337,23 @@
                 </div>
             </div>
             <!--文件上传信息-->
-            <div id = fileInfo>
+            <div id=fileInfo>
             </div>
 
             <div class="showFile">
                 <!--前后文件-->
-                <div id = pre>
+                <div id=pre>
                 </div>
-                <div id = after>
+                <div id=after>
                 </div>
             </div>
 
             <div class="ibox-content">
-                <div id="algType" ></div>
+                <div id="algType"></div>
             </div>
 
             <div class="ibox-content">
-                <div id="privacyLevel" ></div>
+                <div id="privacyLevel"></div>
             </div>
 
             <div class="btn2">
@@ -380,10 +378,12 @@
         align-items: center;
         justify-content: center;
     }
-    .ibox-title span{
+
+    .ibox-title span {
         font-size: 50px;
     }
-    #submit{
+
+    #submit {
         background-color: #347aa9;
         padding: 5px 20px;
         cursor: pointer;
@@ -394,21 +394,24 @@
         /*margin-right: 50px;*/
 
     }
-    .btn2{
+
+    .btn2 {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn{
+    .upload-btn {
         background-color: #347aa9;
         color: white;
         cursor: pointer;
@@ -418,33 +421,40 @@
         display: inline-block;
         margin: 30px;
     }
-    #pre{
+
+    #pre {
         text-align: center;
     }
-    #pre img{
+
+    #pre img {
         display: inline-block;
         max-width: 50%;
         height: auto;
     }
-    #pre video{
+
+    #pre video {
         display: inline-block;
         max-width: 50%;
         height: auto
     }
-    #after{
+
+    #after {
         text-align: center;
     }
-    #after img{
+
+    #after img {
         display: inline-block;
         max-width: 50%;
         height: auto;
     }
-    #after video{
+
+    #after video {
         display: inline-block;
         max-width: 50%;
         height: auto
     }
-    .showFile{
+
+    .showFile {
         display: flex;
         justify-content: center;
     }

@@ -284,7 +284,7 @@ public class ReplaceImpl implements Replace {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommandExecutor.executePython(rawData, "replace_voice_print", path_audio, "0"));
+                return new DSObject(CommandExecutor.executePython(rawData, "voice_replace", path_audio, "0"));
             }
 
             default: return null;

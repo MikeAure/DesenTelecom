@@ -12,16 +12,12 @@ import com.lu.gademo.entity.ruleCheck.*;
 import com.lu.gademo.utils.Util;
 import com.lu.gademo.utils.impl.UtilImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.util.encoders.UTF8;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -32,7 +28,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class sendData {
+public class SendData {
     // 本地存证系统ip和端口
 //    String evidenceLocalAddress = "124.127.245.34";
     String evidenceLocalAddress = "127.0.0.1";

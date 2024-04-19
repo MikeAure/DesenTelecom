@@ -30,8 +30,8 @@ public class FileControllerTest {
         byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\test_data\\image\\test.png"));
         MockMultipartFile file = new MockMultipartFile("file", "test.png", String.valueOf(MediaType.IMAGE_PNG), imageBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "dpImage")
@@ -48,8 +48,8 @@ public class FileControllerTest {
         byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\test_data\\image\\test.png"));
         MockMultipartFile file = new MockMultipartFile("file", "test.png", String.valueOf(MediaType.IMAGE_PNG), imageBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "meanValueImage")
@@ -66,8 +66,8 @@ public class FileControllerTest {
         byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\test_data\\image\\test.png"));
         MockMultipartFile file = new MockMultipartFile("file", "test.png", String.valueOf(MediaType.IMAGE_PNG), imageBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "gaussian_blur")
@@ -84,8 +84,8 @@ public class FileControllerTest {
         byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\test_data\\image\\test.png"));
         MockMultipartFile file = new MockMultipartFile("file", "test.png", String.valueOf(MediaType.IMAGE_PNG), imageBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "pixelate")
@@ -102,8 +102,8 @@ public class FileControllerTest {
         byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\test_data\\image\\test.png"));
         MockMultipartFile file = new MockMultipartFile("file", "test.png", String.valueOf(MediaType.IMAGE_PNG), imageBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "box_blur")
@@ -120,8 +120,8 @@ public class FileControllerTest {
         byte[] imageBytes = Files.readAllBytes(Paths.get("D:\\test_data\\image\\test.png"));
         MockMultipartFile file = new MockMultipartFile("file", "test.png", String.valueOf(MediaType.IMAGE_PNG), imageBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "replace_region")
@@ -138,8 +138,8 @@ public class FileControllerTest {
         byte[] videoBytes = Files.readAllBytes(Paths.get("D:\\test_data\\video\\3.mp4"));
         MockMultipartFile file = new MockMultipartFile("file", "3.mp4", "video/mp4", videoBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "meanValueVideo")
@@ -156,8 +156,8 @@ public class FileControllerTest {
         byte[] videoBytes = Files.readAllBytes(Paths.get("D:\\test_data\\video\\3.mp4"));
         MockMultipartFile file = new MockMultipartFile("file", "3.mp4", "video/mp4", videoBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "gaussian_blur_video")
@@ -174,8 +174,8 @@ public class FileControllerTest {
         byte[] videoBytes = Files.readAllBytes(Paths.get("D:\\test_data\\video\\3.mp4"));
         MockMultipartFile file = new MockMultipartFile("file", "3.mp4", "video/mp4", videoBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "pixelate_video")
@@ -191,8 +191,8 @@ public class FileControllerTest {
         byte[] videoBytes = Files.readAllBytes(Paths.get("D:\\test_data\\video\\3.mp4"));
         MockMultipartFile file = new MockMultipartFile("file", "3.mp4", "video/mp4", videoBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "box_blur_video")
@@ -209,8 +209,8 @@ public class FileControllerTest {
         byte[] videoBytes = Files.readAllBytes(Paths.get("D:\\test_data\\video\\3.mp4"));
         MockMultipartFile file = new MockMultipartFile("file", "3.mp4", "video/mp4", videoBytes);
 
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(url) // 使用你的实际请求路径
+        // 妯℃嫙multipart/form-data璇锋眰
+        mvc.perform(multipart(url) // 浣跨敤浣犵殑瀹為檯璇锋眰璺緞
                         .file(file)
                         .param("params", "1")
                         .param("algName", "replace_region_video")

@@ -5,7 +5,6 @@ import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.Replace;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.sl.usermodel.PlaceableShape;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -14,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTMarkupRange;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.xml.namespace.QName;
 import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -79,7 +77,7 @@ public class OfficeComentExtractTest {
 
     @Test
     public void extractWordTest() {
-        Path rawFilePath = Paths.get("D:\\test_data\\sheets\\comment.docx");
+        Path rawFilePath = Paths.get("D:\\test_data\\sheets\\test.docx");
         Path desenFilePath = Paths.get("D:\\test_data\\sheets\\DealtTable\\comment_desen.docx");
 
         Map<String, String> commentMap = new HashMap<>();
@@ -90,20 +88,25 @@ public class OfficeComentExtractTest {
                 OutputStream outputStream = Files.newOutputStream(desenFilePath);)
         {
             XmlCursor cursor = document.getDocument().getBody().newCursor();
+            QName idQname = new javax.xml.namespace.QName("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "id");
             while (cursor.toNextToken() != XmlCursor.TokenType.NONE) {
-                if (cursor.isStart()) { // 确保光标位于元素的开始标记
+                // save the cursor
+                cursor.push();
+                if (cursor.isStart()) {
+                    // 确保光标位于元素的开始标记
                     QName nodeName = cursor.getName();
                     if (nodeName != null) {
                         String localName = nodeName.getLocalPart();
                         if ("commentRangeStart".equals(localName)) {
                             // 获取 commentRangeStart 的 ID
-                            String id = cursor.getAttributeText(new javax.xml.namespace.QName("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "id"));
-                            System.out.println("Comment ID: " + id);
+                            String commentStartId = cursor.getAttributeText(idQname);
+                            System.out.println("Comment ID: " + commentStartId);
                             StringBuilder stringBuilder = new StringBuilder();
                             while (cursor.toNextToken() != XmlCursor.TokenType.NONE) {
                                 if (cursor.isStart()) { // 再次检查是否为开始标记
                                     QName innerNodeName = cursor.getName();
-                                    if ("commentRangeEnd".equals(innerNodeName.getLocalPart())) { // 检查是否为结束标记，可能需要调整逻辑以识别commentRangeEnd
+                                    String commentEndId = cursor.getAttributeText(idQname);
+                                    if ("commentRangeEnd".equals(innerNodeName.getLocalPart()) && commentEndId.equals(commentStartId)) { // 检查是否为结束标记，可能需要调整逻辑以识别commentRangeEnd
                                         break;
                                     }
                                     if ("t".equals(innerNodeName.getLocalPart())) {
@@ -112,19 +115,21 @@ public class OfficeComentExtractTest {
                                 }
                             }
                             if (stringBuilder.length() > 0) {
-                                commentMap.put(id, stringBuilder.toString());
-                                System.out.println(id + "\t" + stringBuilder); // 打印收集到的文本
+                                commentMap.put(commentStartId, stringBuilder.toString());
+                                System.out.println(commentStartId + "\t" + stringBuilder); // 打印收集到的文本
                             }
+
                         }
                     }
                 }
+                cursor.pop();
             }
-            cursor.close();
+            cursor.dispose();
 
             for (XWPFParagraph paragraph : document.getParagraphs()) {
                 XWPFComment comment;
                 StringBuilder commentText = new StringBuilder();
-                for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartArray()) {
+                for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartList()) {
                     BigInteger id = anchor.getId();
 
                     if (id != null &&
@@ -134,9 +139,16 @@ public class OfficeComentExtractTest {
                         // TODO: 根据comment内容判断脱敏等级
                         System.out.println("Comment: " + comment.getText());
                         String target = commentMap.get(id.toString());
+                        if (target == null) {
+                            System.out.println("id: " + id + " target is null");
+                            continue;
+                        }
                         System.out.println("Target: " + target);
-                        String desenResult  = desenData(target, replacement, 7, 1).getList().get(0).toString();
+                        String desenResult  = desenData(target, replacement, 3, 1).getList().get(0).toString();
                         System.out.println("desenResult: " + desenResult);
+                        if (desenResult.equals(target)) {
+                            continue;
+                        }
                         replace(paragraph, target, desenResult);
                     }
                 }
@@ -196,7 +208,7 @@ public class OfficeComentExtractTest {
                             if (shapeText.contains(rawContent)) {
                                 String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
                                 String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
-                                String desenResult = desenData(rawContent, replacement, 7, privacyLevel).getList().get(0).toString();
+                                String desenResult = desenData(rawContent, replacement, 3, privacyLevel).getList().get(0).toString();
                                 String stringBuilder = preString +
                                         desenResult +
                                         afterString;
@@ -268,12 +280,13 @@ public class OfficeComentExtractTest {
     }
 
     public static <V> void replace(XWPFParagraph paragraph, String searchText, V replacement) {
-        boolean found = true;
-        while (found) {
-            found = false;
+//        boolean found = true;
+        // 将一段中所有找到的searchText全部替换
+//        while (found) {
+//            found = false;
             int pos = paragraph.getText().indexOf(searchText);
             if (pos >= 0) {
-                found = true;
+//                found = true;
                 // 每个XWPFRun的位置
                 Map<Integer, XWPFRun> posToRuns = getPosToRuns(paragraph);
                 XWPFRun run = posToRuns.get(pos);
@@ -312,8 +325,8 @@ public class OfficeComentExtractTest {
                 for (int i = lastRunNum + texts.length - 1; i > runNum + texts.length - 1; i--) {
                     paragraph.removeRun(i);
                 }
+//            }
             }
-        }
     }
 
     private static DSObject desenData(Cell cell, BaseDesenAlgorithm algorithm, int algoNum, int privacyLevel) {
@@ -322,7 +335,7 @@ public class OfficeComentExtractTest {
         // 构建脱敏算法输入数据
         DSObject rawData = new DSObject(Collections.singletonList(cellContent));
         // 使用编号脱敏算法
-        return algorithm.service(rawData, 7, privacyLevel);
+        return algorithm.service(rawData, algoNum, privacyLevel);
     }
 
     private static DSObject desenData(String content, BaseDesenAlgorithm algorithm, int algoNum, int privacyLevel) {
@@ -351,6 +364,7 @@ public class OfficeComentExtractTest {
         return privacyLevel;
     }
 
+    @Ignore
     @Test
     public void regexTest() {
 
@@ -369,6 +383,7 @@ public class OfficeComentExtractTest {
 
     }
 
+    @Ignore
     @Test
     public void readText() throws IOException {
         String filePath = "D:\\Programming\\Desen\\src\\main\\resources\\testfile.txt";

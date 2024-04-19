@@ -160,6 +160,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
+        // c:5, t:6
         DSObject result = dp.service(dsObject, 13, 5, 6);
         for (Object s : result.getList()) {
             System.out.println(s);
@@ -230,7 +231,7 @@ public class DpTest {
         }
     }
 
-    // ÐÅ¹¤Ëù
+    // ä¿¡å·¥æ‰€
     @Test
     public void testDpCode()  {
         Dp dp = new DpImpl();
@@ -253,7 +254,7 @@ public class DpTest {
         }
     }
 
-    // ÐÅ¹¤Ëù
+    // ä¿¡å·¥æ‰€
     @Test
     public void testRandomLaplaceToValue()  {
         Dp dp = new DpImpl();
@@ -298,7 +299,7 @@ public class DpTest {
         }
     }
 
-    // ÐÅ¹¤Ëù
+    // ä¿¡å·¥æ‰€
     @Test
     public void testDpDate() {
         Dp dp = new DpImpl();

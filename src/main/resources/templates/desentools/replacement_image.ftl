@@ -13,7 +13,7 @@
     <meta name="description" content="">
 
     <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html" />
+    <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
@@ -71,7 +71,7 @@
     </style>
 </head>
 
-<body >
+<body>
 
 <!-- 全局js -->
 <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -84,7 +84,7 @@
 <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 <script type="text/javascript">
-    window.onload = function (){
+    window.onload = function () {
         // 图片通道随机打乱
         document.getElementById("image_exchange_channel_fileupload").addEventListener("change", function (event) {
             // 清空
@@ -310,7 +310,7 @@
                         .then(response => {
                             if (response.status === 200) {
                                 return response.blob();
-                            } else{
+                            } else {
                                 throw new Error("Python script executes failed");
                             }
                         })
@@ -387,7 +387,9 @@
             </div>
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_exchange_channel_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_exchange_channel_submit">
+                提交脱敏
+            </button>
         </div>
     </div>
     <hr>
@@ -441,7 +443,9 @@
             </div>
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_add_color_offset_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_add_color_offset_submit">
+                提交脱敏
+            </button>
         </div>
     </div>
     <hr>

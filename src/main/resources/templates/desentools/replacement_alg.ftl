@@ -786,8 +786,8 @@
                             .then(response => {
                                 if (response.status === 200) {
                                     return response.blob();
-                                } else{
-                                   throw new Error("Python script executes failed");
+                                } else {
+                                    throw new Error("Python script executes failed");
                                 }
                             })
                             .then(blob => {
@@ -922,7 +922,7 @@
                             .then(response => {
                                 if (response.status === 200) {
                                     return response.blob();
-                                } else{
+                                } else {
                                     throw new Error("Python script executes failed");
                                 }
                             })
@@ -990,7 +990,7 @@
                                 .then(response => {
                                     if (response.status === 200) {
                                         return response.blob();
-                                    } else{
+                                    } else {
                                         throw new Error("Python script executes failed");
                                     }
                                 })
@@ -1056,7 +1056,7 @@
                                 .then(response => {
                                     if (response.status === 200) {
                                         return response.blob();
-                                    } else{
+                                    } else {
                                         throw new Error("Python script executes failed");
                                     }
                                 })
@@ -1186,113 +1186,113 @@
         </div>
     </div>
     <hr>
-<#--    <div class="panel-body">-->
-<#--        <div class="row">-->
-<#--            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">-->
-<#--                2.基于像素块的图像像素替换方法</p>-->
-<#--            <div &lt;#&ndash;class="col-sm-6"&ndash;&gt;-->
-<#--                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">-->
-<#--                &lt;#&ndash; <p style="font-size: 1.5em;">2.基于像素块的图像像素替换方法</p>&ndash;&gt;-->
-<#--                <div>-->
-<#--                    <p style="font-size: 1.5em;text-align: justify;">-->
-<#--                        说明：对图像进行马赛克处理-->
-<#--                    </p>-->
-<#--                    <p style="font-size: 1.5em;text-align: justify;">-->
-<#--                        输入：图像-->
-<#--                    </p>-->
-<#--                    <p style="font-size: 1.5em;text-align: justify;">-->
-<#--                        输出：图像-->
-<#--                    </p>-->
-<#--                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>-->
-<#--                    <div class="midtile">-->
-<#--                        <div class="&lt;#&ndash;col-sm-5 &ndash;&gt; align-items-center">-->
-<#--                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">-->
-<#--                                <input type="file" id="replace_region_fileUpload" style="display: none;">-->
-<#--                                <label for="replace_region_fileUpload" class="upload-btn">-->
-<#--                                    选择文件-->
-<#--                                </label>-->
-<#--                            </form>-->
-<#--                        </div>-->
-<#--                    </div>-->
-<#--                    <div &lt;#&ndash;class="ibox-content"&ndash;&gt; style="text-align: center;">-->
-<#--                        <div style="margin: auto; font-size: 20px">-->
-<#--                            请选择隐私保护等级-->
-<#--                            <select id="replace_region_privacyLevel">-->
-<#--                                <option value="0"> 低程度</option>-->
-<#--                                <option value="1" selected> 中程度</option>-->
-<#--                                <option value="2"> 高程度</option>-->
-<#--                            </select>-->
-<#--                        </div>-->
-<#--                    </div>-->
-<#--                </div>-->
-<#--            </div>-->
+    <#--    <div class="panel-body">-->
+    <#--        <div class="row">-->
+    <#--            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">-->
+    <#--                2.基于像素块的图像像素替换方法</p>-->
+    <#--            <div &lt;#&ndash;class="col-sm-6"&ndash;&gt;-->
+    <#--                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">-->
+    <#--                &lt;#&ndash; <p style="font-size: 1.5em;">2.基于像素块的图像像素替换方法</p>&ndash;&gt;-->
+    <#--                <div>-->
+    <#--                    <p style="font-size: 1.5em;text-align: justify;">-->
+    <#--                        说明：对图像进行马赛克处理-->
+    <#--                    </p>-->
+    <#--                    <p style="font-size: 1.5em;text-align: justify;">-->
+    <#--                        输入：图像-->
+    <#--                    </p>-->
+    <#--                    <p style="font-size: 1.5em;text-align: justify;">-->
+    <#--                        输出：图像-->
+    <#--                    </p>-->
+    <#--                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>-->
+    <#--                    <div class="midtile">-->
+    <#--                        <div class="&lt;#&ndash;col-sm-5 &ndash;&gt; align-items-center">-->
+    <#--                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">-->
+    <#--                                <input type="file" id="replace_region_fileUpload" style="display: none;">-->
+    <#--                                <label for="replace_region_fileUpload" class="upload-btn">-->
+    <#--                                    选择文件-->
+    <#--                                </label>-->
+    <#--                            </form>-->
+    <#--                        </div>-->
+    <#--                    </div>-->
+    <#--                    <div &lt;#&ndash;class="ibox-content"&ndash;&gt; style="text-align: center;">-->
+    <#--                        <div style="margin: auto; font-size: 20px">-->
+    <#--                            请选择隐私保护等级-->
+    <#--                            <select id="replace_region_privacyLevel">-->
+    <#--                                <option value="0"> 低程度</option>-->
+    <#--                                <option value="1" selected> 中程度</option>-->
+    <#--                                <option value="2"> 高程度</option>-->
+    <#--                            </select>-->
+    <#--                        </div>-->
+    <#--                    </div>-->
+    <#--                </div>-->
+    <#--            </div>-->
 
-<#--        </div>-->
-<#--        <div class="showFile">-->
-<#--            <!--前后文件&ndash;&gt;-->
-<#--            <div id="replace_region_pre" style="margin-right: 20px;">-->
-<#--            </div>-->
-<#--            <div id="replace_region_after">-->
-<#--            </div>-->
-<#--        </div>-->
-<#--        <div class="btn2" style="text-align: center;">-->
-<#--            <button type="button" class="btn btn-sm btn-primary" id="replace_region_submit"> 提交脱敏</button>-->
-<#--        </div>-->
-<#--    </div>-->
-<#--    <hr>-->
-<#--    <div class="panel-body">-->
-<#--        <div class="row">-->
-<#--            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">-->
-<#--                3.基于像素块的视频帧像素替换方法</p>-->
-<#--            <div &lt;#&ndash;class="col-sm-6"&ndash;&gt;-->
-<#--                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">-->
-<#--                &lt;#&ndash; <p style="font-size: 1.5em;">3.基于像素块的视频帧像素替换方法</p>&ndash;&gt;-->
-<#--                <div>-->
-<#--                    <p style="font-size: 1.5em;text-align: justify;">-->
-<#--                        说明：对视频进行马赛克处理-->
-<#--                    </p>-->
-<#--                    <p style="font-size: 1.5em;text-align: justify;">-->
-<#--                        输入：视频对象-->
-<#--                    </p>-->
-<#--                    <p style="font-size: 1.5em;text-align: justify;">-->
-<#--                        输出：视频对象-->
-<#--                    </p>-->
-<#--                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>-->
-<#--                    <div class="midtile">-->
-<#--                        <div class="&lt;#&ndash;col-sm-5&ndash;&gt;  align-items-center">-->
-<#--                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">-->
-<#--                                <input type="file" id="replace_region_video_fileUpload" style="display: none;">-->
-<#--                                <label for="replace_region_video_fileUpload" class="upload-btn">-->
-<#--                                    选择文件-->
-<#--                                </label>-->
-<#--                            </form>-->
-<#--                        </div>-->
-<#--                    </div>-->
-<#--                    <div &lt;#&ndash;class="ibox-content"&ndash;&gt; style="text-align: center;">-->
-<#--                        <div style="margin: auto; font-size: 20px">-->
-<#--                            请选择隐私保护等级-->
-<#--                            <select id="replace_region_video_privacyLevel">-->
-<#--                                <option value="0"> 低程度</option>-->
-<#--                                <option value="1" selected> 中程度</option>-->
-<#--                                <option value="2"> 高程度</option>-->
-<#--                            </select>-->
-<#--                        </div>-->
-<#--                    </div>-->
-<#--                </div>-->
-<#--            </div>-->
+    <#--        </div>-->
+    <#--        <div class="showFile">-->
+    <#--            <!--前后文件&ndash;&gt;-->
+    <#--            <div id="replace_region_pre" style="margin-right: 20px;">-->
+    <#--            </div>-->
+    <#--            <div id="replace_region_after">-->
+    <#--            </div>-->
+    <#--        </div>-->
+    <#--        <div class="btn2" style="text-align: center;">-->
+    <#--            <button type="button" class="btn btn-sm btn-primary" id="replace_region_submit"> 提交脱敏</button>-->
+    <#--        </div>-->
+    <#--    </div>-->
+    <#--    <hr>-->
+    <#--    <div class="panel-body">-->
+    <#--        <div class="row">-->
+    <#--            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">-->
+    <#--                3.基于像素块的视频帧像素替换方法</p>-->
+    <#--            <div &lt;#&ndash;class="col-sm-6"&ndash;&gt;-->
+    <#--                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">-->
+    <#--                &lt;#&ndash; <p style="font-size: 1.5em;">3.基于像素块的视频帧像素替换方法</p>&ndash;&gt;-->
+    <#--                <div>-->
+    <#--                    <p style="font-size: 1.5em;text-align: justify;">-->
+    <#--                        说明：对视频进行马赛克处理-->
+    <#--                    </p>-->
+    <#--                    <p style="font-size: 1.5em;text-align: justify;">-->
+    <#--                        输入：视频对象-->
+    <#--                    </p>-->
+    <#--                    <p style="font-size: 1.5em;text-align: justify;">-->
+    <#--                        输出：视频对象-->
+    <#--                    </p>-->
+    <#--                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>-->
+    <#--                    <div class="midtile">-->
+    <#--                        <div class="&lt;#&ndash;col-sm-5&ndash;&gt;  align-items-center">-->
+    <#--                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">-->
+    <#--                                <input type="file" id="replace_region_video_fileUpload" style="display: none;">-->
+    <#--                                <label for="replace_region_video_fileUpload" class="upload-btn">-->
+    <#--                                    选择文件-->
+    <#--                                </label>-->
+    <#--                            </form>-->
+    <#--                        </div>-->
+    <#--                    </div>-->
+    <#--                    <div &lt;#&ndash;class="ibox-content"&ndash;&gt; style="text-align: center;">-->
+    <#--                        <div style="margin: auto; font-size: 20px">-->
+    <#--                            请选择隐私保护等级-->
+    <#--                            <select id="replace_region_video_privacyLevel">-->
+    <#--                                <option value="0"> 低程度</option>-->
+    <#--                                <option value="1" selected> 中程度</option>-->
+    <#--                                <option value="2"> 高程度</option>-->
+    <#--                            </select>-->
+    <#--                        </div>-->
+    <#--                    </div>-->
+    <#--                </div>-->
+    <#--            </div>-->
 
-<#--        </div>-->
-<#--        <div class="showFile">-->
-<#--            <!--前后文件&ndash;&gt;-->
-<#--            <div id="replace_region_video_pre" style="margin-right: 20px;">-->
-<#--            </div>-->
-<#--            <div id="replace_region_video_after">-->
-<#--            </div>-->
-<#--        </div>-->
-<#--        <div class="btn2" style="text-align: center;">-->
-<#--            <button type="button" class="btn btn-sm btn-primary" id="replace_region_video_submit"> 提交脱敏</button>-->
-<#--        </div>-->
-<#--    </div>-->
+    <#--        </div>-->
+    <#--        <div class="showFile">-->
+    <#--            <!--前后文件&ndash;&gt;-->
+    <#--            <div id="replace_region_video_pre" style="margin-right: 20px;">-->
+    <#--            </div>-->
+    <#--            <div id="replace_region_video_after">-->
+    <#--            </div>-->
+    <#--        </div>-->
+    <#--        <div class="btn2" style="text-align: center;">-->
+    <#--            <button type="button" class="btn btn-sm btn-primary" id="replace_region_video_submit"> 提交脱敏</button>-->
+    <#--        </div>-->
+    <#--    </div>-->
     <hr>
     <div class="panel-body">
         <div class="row">
@@ -1457,16 +1457,16 @@
                             </form>
                         </div>
                     </div>
-<#--                    <div &lt;#&ndash;class="ibox-content"&ndash;&gt; style="text-align: center;">-->
-<#--                        <div style="margin: auto; font-size: 20px">-->
-<#--                            请选择隐私保护等级-->
-<#--                            <select id="replace_region_privacyLevel">-->
-<#--                                <option value="0"> 低程度</option>-->
-<#--                                <option value="1" selected> 中程度</option>-->
-<#--                                <option value="2"> 高程度</option>-->
-<#--                            </select>-->
-<#--                        </div>-->
-<#--                    </div>-->
+                    <#--                    <div &lt;#&ndash;class="ibox-content"&ndash;&gt; style="text-align: center;">-->
+                    <#--                        <div style="margin: auto; font-size: 20px">-->
+                    <#--                            请选择隐私保护等级-->
+                    <#--                            <select id="replace_region_privacyLevel">-->
+                    <#--                                <option value="0"> 低程度</option>-->
+                    <#--                                <option value="1" selected> 中程度</option>-->
+                    <#--                                <option value="2"> 高程度</option>-->
+                    <#--                            </select>-->
+                    <#--                        </div>-->
+                    <#--                    </div>-->
                 </div>
             </div>
 
@@ -1479,7 +1479,9 @@
             </div>
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_exchange_channel_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_exchange_channel_submit">
+                提交脱敏
+            </button>
         </div>
     </div>
     <hr>
@@ -1533,7 +1535,9 @@
             </div>
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_add_color_offset_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="image_add_color_offset_submit">
+                提交脱敏
+            </button>
         </div>
     </div>
     <hr>
@@ -1648,7 +1652,9 @@
             </div>
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="video_add_color_offset_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="video_add_color_offset_submit">
+                提交脱敏
+            </button>
         </div>
     </div>
     <hr>
@@ -1708,7 +1714,8 @@
             </div>
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="video_remove_bg_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="video_remove_bg_submit"> 提交脱敏
+            </button>
         </div>
     </div>
     <hr>
@@ -1759,7 +1766,8 @@
 
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="video_face_sub_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="video_face_sub_submit"> 提交脱敏
+            </button>
         </div>
     </div>
     <hr>
@@ -1859,7 +1867,8 @@
 
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="apply_audio_effects_submit"> 提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="apply_audio_effects_submit"> 提交脱敏
+            </button>
         </div>
     </div>
     <hr>
@@ -1906,7 +1915,8 @@
             </div>
         </div>
         <div class="btn2" style="text-align: center;">
-            <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_reshuffle_submit">提交脱敏</button>
+            <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_reshuffle_submit">提交脱敏
+            </button>
         </div>
     </div>
 

@@ -13,7 +13,7 @@
     <meta name="description" content="">
 
     <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html" />
+    <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
@@ -22,7 +22,7 @@
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 
-<body >
+<body>
 
 <!-- 全局js -->
 <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -35,8 +35,8 @@
 <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 <script type="text/javascript">
-    window.onload = function (){
-        document.getElementById("randomUniformToValue_submitBtn").addEventListener("click", function (){
+    window.onload = function () {
+        document.getElementById("randomUniformToValue_submitBtn").addEventListener("click", function () {
             let textInput = $("#randomUniformToValue_input").val();
             let privacyLevel = document.getElementById("randomUniformToValue_privacyLevel").value
             var textType = "value"
@@ -51,7 +51,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&textInput=' + encodeURIComponent(textInput) +
+                body: '&textInput=' + encodeURIComponent(textInput) +
                     '&textType=' + encodeURIComponent(textType) +
                     '&privacyLevel=' + encodeURIComponent(privacyLevel) +
                     '&algName=' + encodeURIComponent(algName)
@@ -62,7 +62,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         })
-        document.getElementById("randomLaplaceToValue_submitBtn").addEventListener("click", function (){
+        document.getElementById("randomLaplaceToValue_submitBtn").addEventListener("click", function () {
             let textInput = $("#randomLaplaceToValue_input").val();
             let privacyLevel = document.getElementById("randomLaplaceToValue_privacyLevel").value
             var textType = "value"
@@ -77,7 +77,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&textInput=' + encodeURIComponent(textInput) +
+                body: '&textInput=' + encodeURIComponent(textInput) +
                     '&textType=' + encodeURIComponent(textType) +
                     '&privacyLevel=' + encodeURIComponent(privacyLevel) +
                     '&algName=' + encodeURIComponent(algName)
@@ -88,7 +88,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         })
-        document.getElementById("randomGaussianToValue_submitBtn").addEventListener("click", function (){
+        document.getElementById("randomGaussianToValue_submitBtn").addEventListener("click", function () {
             let textInput = $("#randomGaussianToValue_input").val();
             let privacyLevel = document.getElementById("randomGaussianToValue_privacyLevel").value
             var textType = "value"
@@ -103,7 +103,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&textInput=' + encodeURIComponent(textInput) +
+                body: '&textInput=' + encodeURIComponent(textInput) +
                     '&textType=' + encodeURIComponent(textType) +
                     '&privacyLevel=' + encodeURIComponent(privacyLevel) +
                     '&algName=' + encodeURIComponent(algName)
@@ -115,7 +115,7 @@
                 .catch(error => console.error('Error:', error));
         })
 
-        document.getElementById("noisy_hist2_submitBtn").addEventListener("click", function (){
+        document.getElementById("noisy_hist2_submitBtn").addEventListener("click", function () {
             let textInput = $("#noisy_hist2_textInput").val();
             /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
             let algName = "noisy_hist2"
@@ -129,7 +129,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&rawData=' + encodeURIComponent(textInput) +
+                body: '&rawData=' + encodeURIComponent(textInput) +
                     /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                     '&samples=' + encodeURIComponent(1) +
                     '&algName=' + encodeURIComponent(algName)
@@ -140,7 +140,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         })
-        document.getElementById("noisy_hist1_submitBtn").addEventListener("click", function (){
+        document.getElementById("noisy_hist1_submitBtn").addEventListener("click", function () {
             let textInput = $("#noisy_hist1_textInput").val();
             /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
             let algName = "noisy_hist1"
@@ -154,7 +154,7 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:  '&rawData=' + encodeURIComponent(textInput) +
+                body: '&rawData=' + encodeURIComponent(textInput) +
                     /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                     '&samples=' + encodeURIComponent(1) +
                     '&algName=' + encodeURIComponent(algName)
@@ -171,10 +171,12 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-body" >
+    <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">21.基于随机均匀噪声的数值加噪算法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                21.基于随机均匀噪声的数值加噪算法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：向数值中加入均匀分布的随机噪声
@@ -190,28 +192,33 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="randomUniformToValue_privacyLevel">
-                                <option value="1"> 低程度 </option>
-                                <option value="2" selected> 中程度 </option>
-                                <option value="3"> 高程度 </option>
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="randomUniformToValue_input" class="form-control" placeholder="请输入文本" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                    <button class="btn btn-default" id="randomUniformToValue_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="randomUniformToValue_input" class="form-control"
+                                       placeholder="请输入文本" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" id="randomUniformToValue_submitBtn"
+                                                            type="button"
+                                                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                         提交脱敏
                                                     </button>
                                                 </span>
                             </div>
                             <div class="text-center">
-                                <label for="randomUniformToValue_output" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="randomUniformToValue_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="randomUniformToValue_output" rows="2" cols="50" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="randomUniformToValue_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -223,8 +230,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">22.基于随机高斯噪声的数值加噪算法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                22.基于随机高斯噪声的数值加噪算法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：向数值中加入高斯噪声
@@ -240,28 +249,33 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="randomGaussianToValue_privacyLevel">
-                                <option value="1"> 低程度 </option>
-                                <option value="2" selected> 中程度 </option>
-                                <option value="3"> 高程度 </option>
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="randomGaussianToValue_input" class="form-control" placeholder="请输入文本" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                    <button class="btn btn-default" id="randomGaussianToValue_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="randomGaussianToValue_input" class="form-control"
+                                       placeholder="请输入文本" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" id="randomGaussianToValue_submitBtn"
+                                                            type="button"
+                                                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                         提交脱敏
                                                     </button>
                                                 </span>
                             </div>
                             <div class="text-center">
-                                <label for="randomGaussianToValue_output" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="randomGaussianToValue_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="randomGaussianToValue_output" rows="2" cols="50" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="randomGaussianToValue_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -273,8 +287,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">23.基于随机拉普拉斯噪声的数值加噪算法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                23.基于随机拉普拉斯噪声的数值加噪算法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：向数值中加入拉普拉斯噪声
@@ -290,28 +306,33 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="randomLaplaceToValue_privacyLevel">
-                                <option value="1"> 低程度 </option>
-                                <option value="2" selected> 中程度 </option>
-                                <option value="3"> 高程度 </option>
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="randomLaplaceToValue_input" class="form-control" placeholder="请输入文本" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                    <button class="btn btn-default" id="randomLaplaceToValue_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="randomLaplaceToValue_input" class="form-control"
+                                       placeholder="请输入文本" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" id="randomLaplaceToValue_submitBtn"
+                                                            type="button"
+                                                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                         提交脱敏
                                                     </button>
                                                 </span>
                             </div>
                             <div class="text-center">
-                                <label for="randomLaplaceToValue_output" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="randomLaplaceToValue_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="randomLaplaceToValue_output" rows="2" cols="50" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="randomLaplaceToValue_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -323,8 +344,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">24.Noisy Histogram1</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                24.Noisy Histogram1</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：给直方图的每个值加噪
@@ -338,21 +361,26 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="noisy_hist1_textInput" class="form-control" placeholder="请输入，以,分隔数字" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                    <button class="btn btn-default" id="noisy_hist1_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="noisy_hist1_textInput" class="form-control"
+                                       placeholder="请输入，以,分隔数字" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" id="noisy_hist1_submitBtn"
+                                                            type="button"
+                                                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                         提交脱敏
                                                     </button>
                                                 </span>
                             </div>
                             <div class="text-center">
-                                <label for="noisy_hist1_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="noisy_hist1_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="noisy_hist1_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="noisy_hist1_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -364,8 +392,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">25.Noisy Histogram2</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                25.Noisy Histogram2</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：给直方图的每个值加噪
@@ -379,21 +409,26 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
                 </div>
-                <div class="container" >
+                <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5" >
-                            <div class="input-group" >
-                                <input type="text" id="noisy_hist2_textInput" class="form-control" placeholder="请输入，以,分隔数字" style="font-size: 20px">
-                                <span class="input-group-btn" >
-                                                    <button class="btn btn-default" id="noisy_hist2_submitBtn" type="button" style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" id="noisy_hist2_textInput" class="form-control"
+                                       placeholder="请输入，以,分隔数字" style="font-size: 20px">
+                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" id="noisy_hist2_submitBtn"
+                                                            type="button"
+                                                            style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                                         提交脱敏
                                                     </button>
                                                 </span>
                             </div>
                             <div class="text-center">
-                                <label for="noisy_hist2_outputText" style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <label for="noisy_hist2_outputText"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="noisy_hist2_outputText" rows="4" cols="100" readonly style="margin-top: 10px;"></textarea>
+                                    <textarea id="noisy_hist2_outputText" rows="4" cols="100" readonly
+                                              style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -414,26 +449,31 @@
         color: black;
         display: flex;
     }
+
     textarea {
         font-size: 1.5em;
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
-    #dpImage_pre, #dpImage_after{
+
+    #dpImage_pre, #dpImage_after {
         text-align: center;
     }
-    #dpImage_pre image, #dpImage_after image, #dpAudio_pre , #dpAudio_after  {
+
+    #dpImage_pre image, #dpImage_after image, #dpAudio_pre, #dpAudio_after {
         display: inline-block;
         max-width: 50%;
         height: auto
     }
+
     /*上传按钮*/
-    .upload-btn, #dpImage_submit, #dpAudio_submit, #dpGraph_submit{
+    .upload-btn, #dpImage_submit, #dpAudio_submit, #dpGraph_submit {
         background-color: #347aa9;
         color: white;
         cursor: pointer;
@@ -443,10 +483,12 @@
         display: inline-block;
         margin: 30px;
     }
-    .showFile{
+
+    .showFile {
         display: flex;
         justify-content: center;
     }
+
     .tabs-container ul {
         height: 60px;
         display: flex;

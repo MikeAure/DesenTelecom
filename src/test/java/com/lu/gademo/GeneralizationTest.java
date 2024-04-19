@@ -30,7 +30,7 @@ public class GeneralizationTest {
         Generalization generalization = new GeneralizationImpl();
         List<Double> rawData = Arrays.asList(12345.0, 56789.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 2);
+        DSObject result = generalization.service(dsObject, 2, 1);
         for (Object num : result.getList()) {
             System.out.println(num);
         }

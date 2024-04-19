@@ -223,7 +223,7 @@
     <script src="https://webapi.amap.com/maps?v=2.0&key=8a74dc88024b50b5b4d94a407ab49b8d"></script>
     <!-- 自定义js -->
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
-<#--    <script src="${ctx!}/js/trace.js" defer></script>-->
+    <#--    <script src="${ctx!}/js/trace.js" defer></script>-->
     <script type="text/javascript">
         window.onload = function () {
             // debugger
@@ -710,10 +710,10 @@
                             </table>
                         </div>
 
-                        <div id="nondistortion-module-container" class="tab-pane" >
-                            <div id="default-module"  style="visibility: visible"></div>
+                        <div id="nondistortion-module-container" class="tab-pane">
+                            <div id="default-module" style="visibility: visible"></div>
                             <#--                            <div id="voiceprint-module" class="tab-pane" style="visibility: hidden">Test div2</div>-->
-                            <div id="trace-module"  style="visibility: hidden">
+                            <div id="trace-module" style="visibility: hidden">
                                 <div class="map-container" id="driverMap1-container">
                                     <div class="map-title">司机1</div> <!-- 标题元素 -->
                                     <div class="map-content"> <!-- 新增的包裹容器 -->

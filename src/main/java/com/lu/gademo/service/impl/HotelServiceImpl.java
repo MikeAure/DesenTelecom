@@ -7,6 +7,7 @@ import com.lu.gademo.dao.support.IBaseDao;
 import com.lu.gademo.entity.DpHotel;
 import com.lu.gademo.entity.Hotel;
 import com.lu.gademo.entity.templateParam.HotelParam;
+import com.lu.gademo.log.SendData;
 import com.lu.gademo.service.DpHotelService;
 import com.lu.gademo.service.HotelParamService;
 import com.lu.gademo.service.HotelService;
@@ -55,7 +56,7 @@ public class HotelServiceImpl  extends BaseServiceImpl<Hotel,Integer> implements
 
     // 发送类
     @Autowired
-    private com.lu.gademo.log.sendData sendData;
+    private SendData sendData;
     // 系统id
     private int systemID = 0x31000000;
 

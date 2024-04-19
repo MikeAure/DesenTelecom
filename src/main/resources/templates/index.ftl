@@ -11,7 +11,7 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
     <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html" />
+    <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
@@ -29,12 +29,12 @@
         <div class="sidebar-collapse">
             <ul class="nav" id="side-menu">
 
-              <#--  <li>
-                    <a class="J_menuItem" href="${ctx!}/maptest" style="font-size: 20px;">
-                        <i class="fa fa-home"></i>
-                        <span class="nav-label" style="font-size: 20px;">地图测试</span>
-                    </a>
-                </li>-->
+                <#--  <li>
+                      <a class="J_menuItem" href="${ctx!}/maptest" style="font-size: 20px;">
+                          <i class="fa fa-home"></i>
+                          <span class="nav-label" style="font-size: 20px;">地图测试</span>
+                      </a>
+                  </li>-->
                 <#--脱敏算法验证-->
                 <li>
                     <a href="#" style="font-size: 20px;">
@@ -82,14 +82,16 @@
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi" style="font-size: 15px;">网络约车类</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi"
+                               style="font-size: 15px;">网络约车类</a>
                         </li>
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/communication" style="font-size: 15px;">即时通信类</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/community" style="font-size: 15px;">网络社区类</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/community"
+                               style="font-size: 15px;">网络社区类</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinepayment" style="font-size: 15px;">网络支付类</a>
@@ -99,116 +101,145 @@
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/takeaway" style="font-size: 15px;">餐饮外卖类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/takeaway"
+                               style="font-size: 15px;">餐饮外卖类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/express" style="font-size: 15px;">邮件快件寄递场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/express"
+                               style="font-size: 15px;">邮件快件寄递场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/transportationticket" style="font-size: 15px;">交通票务场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/transportationticket"
+                               style="font-size: 15px;">交通票务场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/marry" style="font-size: 15px;">婚恋相亲场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/marry"
+                               style="font-size: 15px;">婚恋相亲场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/employment" style="font-size: 15px;">求职招聘场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/employment"
+                               style="font-size: 15px;">求职招聘场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinelending" style="font-size: 15px;">网络借贷场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/house" style="font-size: 15px;">房屋租售场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/house"
+                               style="font-size: 15px;">房屋租售场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/usedcar" style="font-size: 15px;">二手车交易场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/usedcar"
+                               style="font-size: 15px;">二手车交易场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/consultation" style="font-size: 15px;">问诊挂号场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/travel" style="font-size: 15px;">旅游服务类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/travel"
+                               style="font-size: 15px;">旅游服务类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/hotel" style="font-size: 15px;">酒店服务类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/hotel"
+                               style="font-size: 15px;">酒店服务类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/game" style="font-size: 15px;">网络游戏类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/game"
+                               style="font-size: 15px;">网络游戏类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/education" style="font-size: 15px;">学习教育类场景</a>
-                        </li>
-
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/locallife" style="font-size: 15px;">本地生活类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/education"
+                               style="font-size: 15px;">学习教育类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/woman" style="font-size: 15px;">女性健康类场景</a>
-                        </li>
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/usecar" style="font-size: 15px;">用车服务类场景</a>
-                        </li>
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/investment" style="font-size: 15px;">投资理财类场景</a>
-                        </li>
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/bank" style="font-size: 15px;">手机银行类场景</a>
-                        </li>
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/mailbox" style="font-size: 15px;">邮箱云盘类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/locallife"
+                               style="font-size: 15px;">本地生活类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/meeting" style="font-size: 15px;">远程会议类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/woman"
+                               style="font-size: 15px;">女性健康类场景</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/usecar"
+                               style="font-size: 15px;">用车服务类场景</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/investment"
+                               style="font-size: 15px;">投资理财类场景</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/bank"
+                               style="font-size: 15px;">手机银行类场景</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/mailbox"
+                               style="font-size: 15px;">邮箱云盘类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/webcast" style="font-size: 15px;">网络直播类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/meeting"
+                               style="font-size: 15px;">远程会议类场景</a>
+                        </li>
+
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/webcast"
+                               style="font-size: 15px;">网络直播类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinemovie" style="font-size: 15px;">在线影音类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/shortvideo" style="font-size: 15px;">短视频类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/shortvideo"
+                               style="font-size: 15px;">短视频类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/news" style="font-size: 15px;">新闻资讯类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/news"
+                               style="font-size: 15px;">新闻资讯类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/sports" style="font-size: 15px;">运动健身类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/sports"
+                               style="font-size: 15px;">运动健身类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/browser" style="font-size: 15px;">浏览器类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/browser"
+                               style="font-size: 15px;">浏览器类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/input" style="font-size: 15px;">输入法类场景</a>
-                        </li>
-
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/security" style="font-size: 15px;">安全管理类场景</a>
-                        </li>
-
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/ebook" style="font-size: 15px;">电子图书场景</a>
-                        </li>
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/capture" style="font-size: 15px;">拍摄美化场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/input"
+                               style="font-size: 15px;">输入法类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/appstore" style="font-size: 15px;">应用商店场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/security"
+                               style="font-size: 15px;">安全管理类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/tools" style="font-size: 15px;">实用工具场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/ebook"
+                               style="font-size: 15px;">电子图书场景</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/capture"
+                               style="font-size: 15px;">拍摄美化场景</a>
+                        </li>
+
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/appstore"
+                               style="font-size: 15px;">应用商店场景</a>
+                        </li>
+
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/tools"
+                               style="font-size: 15px;">实用工具场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/performanceticket" style="font-size: 15px;">演出票务场景</a>
@@ -220,10 +251,12 @@
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/telecommunication" style="font-size: 15px;">电信业务使用类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/monitor" style="font-size: 15px;">安防监控类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/monitor"
+                               style="font-size: 15px;">安防监控类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/pay" style="font-size: 15px;">生活缴费类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/pay"
+                               style="font-size: 15px;">生活缴费类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/customerservice" style="font-size: 15px;">客服类场景</a>
@@ -232,7 +265,8 @@
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/schoolservice" style="font-size: 15px;">校园服务类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/smarthome" style="font-size: 15px;">智慧家居类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/smarthome"
+                               style="font-size: 15px;">智慧家居类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/autonomousdriving" style="font-size: 15px;">自动驾驶类场景</a>
@@ -241,15 +275,16 @@
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/telemedicine" style="font-size: 15px;">远程诊疗类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/vr" style="font-size: 15px;">虚拟现实类场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/vr"
+                               style="font-size: 15px;">虚拟现实类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinevoting" style="font-size: 15px;">网上投票类场景</a>
                         </li>
 
-<#--                        <li>-->
-<#--                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi2" style="font-size: 15px;">网上打车场景（接收数据）</a>-->
-<#--                        </li>-->
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi2" style="font-size: 15px;">网上打车场景（接收数据）</a>
+                        </li>
 
                     </ul>
                 </li>
@@ -301,25 +336,29 @@
                     </ul>-->
                     <ul class="nav nav-second-level">
                         <li class="active">
-                            <a href="#" style="font-size: 15px;" >
+                            <a href="#" style="font-size: 15px;">
                                 差分隐私
                                 <span class="fa arrow"></span>
                             </a>
                             <ul class="nav nav-third-level collapse in" aria-expanded="true" style="font-size: 13px;">
                                 <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_laplace"> 拉普拉斯 </a>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_laplace">
+                                        拉普拉斯 </a>
                                 </li>
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_exp"> 指数 </a>
                                 </li>
                                 <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_svt"> SVT 稀疏向量 </a>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_svt"> SVT
+                                        稀疏向量 </a>
                                 </li>
                                 <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_ldp"> 随机响应 </a>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_ldp">
+                                        随机响应 </a>
                                 </li>
                                 <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_random_noise"> 随机加噪 </a>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_random_noise">
+                                        随机加噪 </a>
                                 </li>
                             </ul>
                         </li>
@@ -330,10 +369,12 @@
                             </a>
                             <ul class="nav nav-third-level collapse in" aria-expanded="true" style="font-size: 13px;">
                                 <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_num_string"> 数值与字符泛化 </a>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_num_string">
+                                        数值与字符泛化 </a>
                                 </li>
                                 <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_location"> 位置数据泛化 </a>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_location">
+                                        位置数据泛化 </a>
                                 </li>
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/generalization_image"> 图像泛化 </a>
@@ -341,9 +382,9 @@
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/generalization_video"> 视频泛化 </a>
                                 </li>
-                                <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_audio"> 音频泛化 </a>
-                                </li>
+                                <#--                                <li>-->
+                                <#--                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_audio"> 音频泛化 </a>-->
+                                <#--                                </li>-->
                             </ul>
                         </li>
                         <li>
@@ -368,9 +409,10 @@
                                 数据置换
                                 <span class="fa arrow"></span>
                             </a>
-                            <ul class="nav nav-third-level collapse in", aria-expanded="true" style="font-size: 13px;">
+                            <ul class="nav nav-third-level collapse in" , aria-expanded="true" style="font-size: 13px;">
                                 <li>
-                                    <a class="J_menuItem" href="${ctx!}/desentools/replacement_num_string"> 数值与字符置换 </a>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/replacement_num_string">
+                                        数值与字符置换 </a>
                                 </li>
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/replacement_image"> 图像置换 </a>
@@ -393,7 +435,8 @@
     <!--右侧部分开始-->
     <div id="page-wrapper" class="gray-bg dashbard-1">
         <div class="row J_mainContent" id="content-main">
-            <iframe id="J_iframe" width="100%" height="100%" src="${ctx!}/home"  data-id="index_v1.html" seamless></iframe>
+            <iframe id="J_iframe" width="100%" height="100%" src="${ctx!}/home" data-id="index_v1.html"
+                    seamless></iframe>
         </div>
 
     </div>
@@ -412,7 +455,7 @@
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 </body>
 <style>
-    .navbar-static-side{
+    .navbar-static-side {
         background-color: #1f2937;
     }
 

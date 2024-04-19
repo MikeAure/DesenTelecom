@@ -60,4 +60,27 @@ public class DSObject {
     public void setList(List<?> list) {
         this.list = list;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DSObject) {
+            DSObject dsObject = (DSObject) obj;
+
+            // 比较整数和双精度值
+            boolean intsEqual = this.intVal == dsObject.intVal;
+            boolean doublesEqual = this.doubleVal == dsObject.doubleVal;
+
+            // 安全地比较字符串，处理可能的null值
+            boolean stringsEqual = (this.string == null ? dsObject.string == null : this.string.equals(dsObject.string));
+
+            // 安全地比较列表，处理可能的null值
+            boolean listsEqual = (this.list == null ? dsObject.list == null : this.list.equals(dsObject.list));
+
+            return intsEqual && doublesEqual && stringsEqual && listsEqual;
+
+        }
+        else {
+            return false;
+        }
+    }
 }

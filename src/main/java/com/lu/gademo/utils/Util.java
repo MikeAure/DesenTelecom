@@ -21,7 +21,7 @@ public interface Util {
     //SHA256哈希
     public String getSHA256Hash(String input);
     //获取时间
-    public  String getTime();
+    public String getTime();
 
     // SM3哈希
     public String getSM3Hash(byte[] input);
@@ -63,7 +63,10 @@ public interface Util {
      */
     public  String inputStreamToString(InputStream inputStream);
 
-    public  void myssqlDump(String tableName);
+    public  void mySqlDump(String tableName);
 
-    public void excelToMysql(String tableName, String excelFilePath);
+//    public void excelToMysql(String tableName, String excelFilePath);
+    
+    // 检测本机是否安装Conda
+    public Boolean isCondaInstalled();
 }

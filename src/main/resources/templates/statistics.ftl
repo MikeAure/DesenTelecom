@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -95,7 +94,7 @@
 
 <script type="text/javascript">
     // ***************************获取页面元素*******************************
-    $(function(){
+    $(function () {
         // 数据表
         var tableSelecter = $("#tableSelecter")[0]
         // 数据类型
@@ -125,7 +124,7 @@
             single_backstroke_delete: false,
             placeholder_text_multiple: "   请选择至多四个数据字段"
         })
-        $(window).resize(function() {
+        $(window).resize(function () {
             chartBody.style.height = window.innerHeight * 0.8 + "px"
         })
         chartBody.style.height = window.innerHeight * 0.8 + "px"
@@ -151,14 +150,14 @@
             "5": "散点图"
         }
         // *****************************绑定事件**********************************
-        tableSelecter.onchange = function() {
+        tableSelecter.onchange = function () {
             //每次数据表改变，重新获取所有数据
             //当数据表被选择时，重新填充数据字段选择器
             if (typeSelecter.value != -1) {
                 fillKeySelecter()
             }
         }
-        typeSelecter.onchange = function() {
+        typeSelecter.onchange = function () {
             if (tableSelecter.value == -1) {
                 typeSelecter.value = -1
                 alert("请先选择数据表！")
@@ -167,24 +166,24 @@
                 fillShowSelecter()
             }
         }
-        submitBtn.onclick = function() {
-            if(tableSelecter.value == -1){
+        submitBtn.onclick = function () {
+            if (tableSelecter.value == -1) {
                 alert('请选择数据表！')
                 return false
-            }else if(showSelecter.value == -1){
+            } else if (showSelecter.value == -1) {
                 alert('请选择展示类型！')
                 return false
-            }else if($(keySelecter).val() == null){
+            } else if ($(keySelecter).val() == null) {
                 alert('请选择数据字段！')
                 return false
-            }else{
+            } else {
                 // getQueryResult()
                 // chartTitle.innerHTML = getChartName()
                 chartDraw()
                 return false
             }
         }
-        cancelBtn.onclick = function() {
+        cancelBtn.onclick = function () {
             tableSelecter.value = -1
             typeSelecter.value = -1
             $(keySelecter).empty()
@@ -196,21 +195,21 @@
         }
         // ****************************方法实现**********************************
         // 填充数据字段
-        var fillKeySelecter = function(){
+        var fillKeySelecter = function () {
             var str = ""
             var url = tableSelecter.value + "param/statisticParam?query=" + typeSelecter.value
 
             $.ajax({
-                url:url,
-                type:'GET',
-                dataType:'json',
-                success:function(result){
-                    if(result.length == 0){
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.length == 0) {
                         alert(tableName[tableSelecter.value] + "中没有" + dataType[typeSelecter.value] + "字段，请重新选择！")
                         typeSelecter.value = -1
-                    }else{
+                    } else {
                         $(keySelecter).empty()
-                        $.each(result, function(index, el){
+                        $.each(result, function (index, el) {
                             str = "<option value=" + el.filedName + ">" + el.columnName + "</option>"
                             $(keySelecter).append(str)
                         })
@@ -220,7 +219,7 @@
             })
         }
         // 填充展示类型字段
-        var fillShowSelecter = function(){
+        var fillShowSelecter = function () {
             switch (typeSelecter.value) {
                 case '0':
                     $(showSelecter).empty()
@@ -250,7 +249,7 @@
             }
         }
         // 处理服务器返回的单意义编码数据
-        var result_process = function(result){
+        var result_process = function (result) {
             var res = []
             var res_json = {}
             var tmp_val
@@ -259,24 +258,24 @@
             var tmp_min
             var tmp_max
 
-            $.each(result, function(index, el){
+            $.each(result, function (index, el) {
                 var tmp_json = {}
                 res_json = {}
                 tmp_val = []
                 tmp_pre = []
                 tmp_post = []
 
-                $.each(el.tongMap, function(i, e){
+                $.each(el.tongMap, function (i, e) {
                     tmp_val.push(i)
                     tmp_pre.push(e.preNums)
                     tmp_post.push(e.postNums)
                 })
                 tmp_min = tmp_max = tmp_pre[0]
-                $.each(tmp_pre.concat(tmp_post), function(index, el){
-                    if(el < tmp_min){
+                $.each(tmp_pre.concat(tmp_post), function (index, el) {
+                    if (el < tmp_min) {
                         tmp_min = el
                     }
-                    if(el > tmp_max){
+                    if (el > tmp_max) {
                         tmp_max = el
                     }
                 })
@@ -293,25 +292,25 @@
             return res
         }
         // 得到查询结果
-        var getQueryResult = function(){
+        var getQueryResult = function () {
             var res = []
             // 无BUG单条数据展示代码
             // var res_tmp = []
             var url = "/" + tableSelecter.value + "//statistic"
 
-            switch(typeSelecter.value){
+            switch (typeSelecter.value) {
                 // 数值
                 case '0':
-                    $.each($(keySelecter).val(), function(index, el){
+                    $.each($(keySelecter).val(), function (index, el) {
                         url = "/" + tableSelecter.value + "//statistic"
                         // 无BUG单条数据展示代码
                         url += "/num?query1=" + el + "&query2=" + showSelecter.value
                         $.ajax({
-                            url:url,
-                            type:'GET',
+                            url: url,
+                            type: 'GET',
                             async: false,
-                            dataType:'json',
-                            success:function(result){
+                            dataType: 'json',
+                            success: function (result) {
                                 // res_tmp.push(result)
                                 // 无BUG单条数据展示代码
                                 res.push(result)
@@ -322,18 +321,18 @@
                 // 单意义
                 case '1':
                     url += "/single?query1="
-                    $.each($(keySelecter).val(), function(index, el){
+                    $.each($(keySelecter).val(), function (index, el) {
                         url += el
                         url += "+"
                     })
-                    url = url.substring(0, url.length-1)
+                    url = url.substring(0, url.length - 1)
                     url += "&query2=3"
                     $.ajax({
-                        url:url,
-                        type:'GET',
+                        url: url,
+                        type: 'GET',
                         async: false,
-                        dataType:'json',
-                        success:function(result){
+                        dataType: 'json',
+                        success: function (result) {
                             res = result_process(result)
                         }
                     })
@@ -346,29 +345,29 @@
             return res
         }
         // 生成图表数量对应的格子
-        var getGrid = function(chartNumber) {
+        var getGrid = function (chartNumber) {
             var grid = []
 
             switch (chartNumber) {
                 case 1:
-                    grid = [{ left: '7%', top: '7%', width: '86%', height: '86%' }]
+                    grid = [{left: '7%', top: '7%', width: '86%', height: '86%'}]
                     break;
                 case 2:
-                    grid = [{ left: '7%', top: '7%', width: '38%', height: '86%' },
-                        { right: '7%', top: '7%', width: '38%', height: '86%' }
+                    grid = [{left: '7%', top: '7%', width: '38%', height: '86%'},
+                        {right: '7%', top: '7%', width: '38%', height: '86%'}
                     ]
                     break;
                 case 3:
-                    grid = [{ left: '7%', top: '7%', width: '38%', height: '38%' },
-                        { left: '7%', bottom: '7%', width: '38%', height: '38%' },
-                        { right: '7%', top: '7%', width: '38%', height: '86%' }
+                    grid = [{left: '7%', top: '7%', width: '38%', height: '38%'},
+                        {left: '7%', bottom: '7%', width: '38%', height: '38%'},
+                        {right: '7%', top: '7%', width: '38%', height: '86%'}
                     ]
                     break;
                 case 4:
-                    grid = [{ left: '7%', top: '7%', width: '38%', height: '38%' },
-                        { left: '7%', bottom: '7%', width: '38%', height: '38%' },
-                        { right: '7%', top: '7%', width: '38%', height: '38%' },
-                        { right: '7%', bottom: '7%', width: '38%', height: '38%' }
+                    grid = [{left: '7%', top: '7%', width: '38%', height: '38%'},
+                        {left: '7%', bottom: '7%', width: '38%', height: '38%'},
+                        {right: '7%', top: '7%', width: '38%', height: '38%'},
+                        {right: '7%', bottom: '7%', width: '38%', height: '38%'}
                     ]
                     break;
             }
@@ -383,13 +382,13 @@
          * @param  {[type]} dataType    [数据类型，具体分为 "0": "数值类型数据", "1": "单意义编码型", "4": "时间类型数据"]
          * @return {[type]}             [数值型直接返回横坐标的filedName,其他类型返回JSON数组]
          */
-        var getXAxis = function(queryResult, dataType, showType) {
+        var getXAxis = function (queryResult, dataType, showType) {
             var xAxis = []
             // showType: // "0": "平均数", // "1": "方差", // "2": "中位数", // "3": "柱状图", // "4": "折线图", // "5": "散点图"
             // 数值类型
             if (dataType == 0) {
                 var tmp = []
-                for(i in queryResult){
+                for (i in queryResult) {
                     tmp.push(queryResult[i][0].colNname)
                 }
                 var x_tmp = {
@@ -399,9 +398,9 @@
                 xAxis.push(x_tmp)
             } else if (dataType == 1) {
                 // 散点图
-                if(showType == 5){
+                if (showType == 5) {
                     var tmp
-                    for(i in queryResult){
+                    for (i in queryResult) {
                         tmp = {}
                         tmp.gridIndex = i
                         tmp.max = Math.ceil(queryResult[i].result.max / 10) * 10
@@ -409,9 +408,9 @@
                         tmp.axisLabel = {}
                         xAxis.push(tmp)
                     }
-                }else{
+                } else {
                     var tmp
-                    for(i in queryResult){
+                    for (i in queryResult) {
                         tmp = {}
                         tmp.gridIndex = i
                         tmp.data = queryResult[i].result.val
@@ -425,22 +424,22 @@
             return xAxis
         }
         // 格式同getXAxis()
-        var getYAxis = function(queryResult, dataType, showType) {
+        var getYAxis = function (queryResult, dataType, showType) {
             var yAxis = []
 
             if (dataType == 0) {
                 yAxis.push({gridIndex: 0})
             } else if (dataType == 1) {
                 // 散点图
-                if(showType == 5){
-                    for(i in queryResult){
+                if (showType == 5) {
+                    for (i in queryResult) {
                         tmp = {}
                         tmp.gridIndex = i
                         tmp.min = Math.floor(queryResult[i].result.min / 10) * 10
                         tmp.max = Math.ceil(queryResult[i].result.max / 10) * 10
                         yAxis.push(tmp)
                     }
-                }else{
+                } else {
                     var tmp
                     for (i in queryResult) {
                         tmp = {}
@@ -466,22 +465,22 @@
          * @return {[type]}             [description]
          */
             //获取图像数据各部分的值以及图像类型（脱敏前后）
-        var getSeries = function(queryResult, dataType, showType) {
+        var getSeries = function (queryResult, dataType, showType) {
                 var series = []
                 // 数值类型
                 if (dataType == 0) {
                     var tmp_pre = []
                     var tmp_post = []
-                    $.each(queryResult, function(index, el){
+                    $.each(queryResult, function (index, el) {
                         tmp_pre.push(el[0].pre)
                         tmp_post.push(el[0].post)
                     })
                     var data_pre = []
                     var data_post = []
                     var data_tmp
-                    $.each(tmp_pre, function(index, el){
+                    $.each(tmp_pre, function (index, el) {
                         // 判断是否得0，如果都是零，则全置零
-                        if(el == 0 && tmp_post[index] == 0){
+                        if (el == 0 && tmp_post[index] == 0) {
                             data_tmp = {}
                             data_tmp.value = el
                             data_tmp.pre = el
@@ -490,7 +489,7 @@
                             data_tmp.value = el
                             data_tmp.post = tmp_post[index]
                             data_post.push(data_tmp)
-                        }else{
+                        } else {
                             data_tmp = {}
                             data_tmp.value = el
                             data_tmp.pre = el
@@ -514,7 +513,7 @@
                             },
                             color: 'black',
                             fontSize: 13,
-                            formatter: function(params) {
+                            formatter: function (params) {
                                 return params.data.pre.toFixed(2)
                             }
                         }
@@ -529,20 +528,20 @@
                             position: 'top', // 在上方显示
                             color: 'black',
                             fontSize: 13,
-                            formatter: function(params) {
+                            formatter: function (params) {
                                 return params.data.post.toFixed(2)
                             }
                         }
                     })
                 } else {
                     // 单意义编码型数据
-                    if(dataType == 1){
+                    if (dataType == 1) {
 
                         // 散点图
-                        if(showType == 5){
+                        if (showType == 5) {
                             var markLine_arr = []
 
-                            for(i in queryResult){
+                            for (i in queryResult) {
                                 var min = Math.floor(queryResult[i].result.min / 10) * 10
                                 var max = Math.ceil(queryResult[i].result.max / 10) * 10
                                 var tmp_mark_line = {
@@ -570,10 +569,10 @@
                                 markLine_arr.push(tmp_mark_line)
                             }
 
-                            for(i in queryResult){
+                            for (i in queryResult) {
                                 var group
                                 var total = []
-                                for(l in queryResult[i].result.pre){
+                                for (l in queryResult[i].result.pre) {
                                     group = []
                                     group.push(queryResult[i].result.pre[l])
                                     group.push(queryResult[i].result.post[l])
@@ -588,12 +587,12 @@
                                 tmp.markLine = markLine_arr[i]
                                 series.push(tmp)
                             }
-                        }else if(showType != 6){
+                        } else if (showType != 6) {
                             // 非饼图,即柱状图或者折线图
                             var tmp
                             var type
                             showType == 3 ? type = "bar" : type = "line"
-                            for(i in queryResult){
+                            for (i in queryResult) {
                                 tmp = {}
                                 tmp.name = 'pre'
                                 tmp.type = type
@@ -609,18 +608,18 @@
                                 tmp.yAxisIndex = i
                                 series.push(tmp)
                             }
-                        }else{
+                        } else {
                             // 饼图
                             var tmp_series = []
                             var label = {}
                             label.show = false
-                            $.each(queryResult, function(index, el){
+                            $.each(queryResult, function (index, el) {
                                 var tmp_series_json = {}
                                 var tmp_preData_arr = []
                                 var tmp_preData_json = {}
                                 var tmp_postData_arr = []
                                 var tmp_postData_json = {}
-                                $.each(el.result.val, function(i, e){
+                                $.each(el.result.val, function (i, e) {
                                     tmp_preData_json = {}
                                     tmp_preData_json.name = e
                                     tmp_preData_json.value = el.result.pre[i]
@@ -712,7 +711,7 @@
                             }
                             series = tmp_series
                         }
-                    }else{
+                    } else {
                         console.log('时间类型数据未实现')
                         return null
                     }
@@ -722,20 +721,20 @@
             }
 
         // 前后 title
-        var getTitle = function(queryResult, chartNumber, dataType, showType){
+        var getTitle = function (queryResult, chartNumber, dataType, showType) {
             var title = []
             // 数值类型
-            if(dataType == 0){
+            if (dataType == 0) {
 
                 return title
             }
             var tmp_title = []
             var tmp_json = {}
-            $.each(queryResult, function(index, el){
+            $.each(queryResult, function (index, el) {
                 tmp_title.push(el.name)
             })
             // 饼状图
-            if(showType == 6){
+            if (showType == 6) {
                 switch (chartNumber) {
                     case 1:
                         tmp_json.test = tmp_title[0]
@@ -921,7 +920,7 @@
                         title.push(tmp_json)
                         break;
                 }
-            }else{
+            } else {
                 switch (chartNumber) {
                     case 1:
                         break;
@@ -988,7 +987,7 @@
             return title
         }
         // ****************************画图*************************************
-        var chartDraw = function() {
+        var chartDraw = function () {
             var myChart = echarts.init(document.getElementById("chartBody"))
             // 动态调整画布大小
             $(window).resize(myChart.resize)
@@ -998,12 +997,12 @@
             console.log($(keySelecter).val())
             var title = getTitle(res, chartNumber, typeSelecter.value, showSelecter.value)
             var series = getSeries(res, typeSelecter.value, showSelecter.value)
-            if(showSelecter.value == 6){
+            if (showSelecter.value == 6) {
                 option = {
                     title: title,
-                    tooltip:{
+                    tooltip: {
                         trigger: 'item',
-                        formatter:function(params){
+                        formatter: function (params) {
                             var res = ""
                             var pre_value = 0
                             var tmp_change
@@ -1011,9 +1010,9 @@
                             var now_value = params.value
                             var now_index = params.seriesIndex
 
-                            if(now_index % 2 == 1){
-                                $.each(series[now_index-1].data, function(i, e){
-                                    if(e.name == now_name){
+                            if (now_index % 2 == 1) {
+                                $.each(series[now_index - 1].data, function (i, e) {
+                                    if (e.name == now_name) {
                                         pre_value = e.value
                                     }
                                 })
@@ -1025,7 +1024,7 @@
                                 res += now_value
                                 res += "<br>"
                                 res += "change:  "
-                                if(tmp_change > 0) res += '+'
+                                if (tmp_change > 0) res += '+'
                                 res += tmp_change
                                 res += "%"
                                 return res
@@ -1040,7 +1039,7 @@
                     },
                     series: series
                 }
-            }else{
+            } else {
                 var grid = getGrid(chartNumber)
                 var xAxis = getXAxis(res, typeSelecter.value, showSelecter.value)
                 var yAxis = getYAxis(res, typeSelecter.value, showSelecter.value)
@@ -1069,7 +1068,7 @@
 </script>
 </body>
 <style>
-    .btn-primary{
+    .btn-primary {
         background-color: #347aa9;
     }
 

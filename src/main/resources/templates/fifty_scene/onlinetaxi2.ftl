@@ -796,34 +796,76 @@
                     });
             });
 
-            document.getElementById("experimentBtn").addEventListener("click", function () {
-                fetch("http://10.198.37.14:30080/sourceDataController/getAllSourceData")
-                    .then(response => response.json())
-                    .then(data => console.log(data))
-                    .then(error => console.error('Error:', error));
-            });
+            // document.getElementById("experimentBtn").addEventListener("click", function () {
+            //     fetch("http://10.198.37.14:30080/sourceDataController/getAllSourceData")
+            //         .then(response => response.json())
+            //         .then(data => console.log(data))
+            //         .then(error => console.error('Error:', error));
+            // });
 
-            async function postDataWithParams(sheet, formData) {
+            document.getElementById("fileUpload").addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                const fileName = file.name
+                const fileSuffix = fileName.split(".")[1];
+                let formData = new FormData();
+                formData.set("file", file);
 
-                try {
-                    console.log(data); // 打印看看data结构是否正确
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-                return formData;
-            }
-            function saveBlobToFile(blob, fileName) {
-                // 为Blob创建临时的URL
-                const url = window.URL.createObjectURL(blob);
-                // 创建一个临时的<a>元素并设置属性
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName; // 设置下载的文件名
-                document.body.appendChild(a); // 将<a>元素添加到页面中以使其可点击
-                a.click(); // 模拟点击<a>元素，触发文件下载
-                window.URL.revokeObjectURL(url); // 下载完成后释放对象URL
-                document.body.removeChild(a); // 移除<a>元素
-            }
+                document.getElementById("experimentBtn").addEventListener("click", function () {
+                    fetch('/File/recvFileDesen', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message === 'ok') {
+                                // 如果响应消息为"ok"，处理二进制数据
+                                // 假设data.data是一个包含二进制数据的Base64编码字符串
+                                const binaryData = atob(data.data); // Base64解码
+                                const byteArray = new Uint8Array(binaryData.length);
+                                for (let i = 0; i < binaryData.length; i++) {
+                                    byteArray[i] = binaryData.charCodeAt(i);
+                                }
+
+                                // 如果响应消息为"ok"，则处理data字段
+                                let fileType;
+                                let fileExtension;
+
+                                switch (fileSuffix) {
+                                    case 'docx':
+                                        fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                                        fileExtension = '.docx';
+                                        break;
+                                    case 'xlsx':
+                                        fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                                        fileExtension = '.xlsx';
+                                        break;
+                                    case 'pptx':
+                                        fileType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+                                        fileExtension = '.pptx';
+                                        break;
+                                    default:
+                                        console.error('未知的文件类型');
+                                        return; // 或处理这种情况
+                                }
+                                const blob = new Blob([byteArray], { type: fileType });
+
+                                // 触发下载
+                                const downloadUrl = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = downloadUrl;
+                                a.download = 'desen_' + fileName; // 设置下载文件名及扩展名
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(downloadUrl);
+                            } else {
+                                // 如果消息不是"ok"，则在控制台中打印错误信息
+                                console.error(data.data);
+                            }
+                        })
+                        .catch(error => console.error('请求失败:', error)); // 处理请求失败的情况
+                })
+            })
 
             // function processData(data) {
             //     let columnNames = {}; // 存储不同attributeName下的infoContent数组

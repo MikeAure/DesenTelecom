@@ -13,7 +13,7 @@
     <meta name="description" content="">
 
     <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html" />
+    <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
@@ -22,7 +22,7 @@
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 
-<body >
+<body>
 
 <!-- 全局js -->
 <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -35,7 +35,7 @@
 <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 <script type="text/javascript">
-    window.onload = function (){
+    window.onload = function () {
 
     }
 
@@ -57,6 +57,7 @@
         color: black;
         display: flex;
     }
+
     textarea {
         font-size: 1.5em;
     }

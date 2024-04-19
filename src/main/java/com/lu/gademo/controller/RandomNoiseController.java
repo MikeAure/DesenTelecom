@@ -32,7 +32,7 @@ public class RandomNoiseController {
         System.out.println(algName);
         System.out.println(rawData);
         // python命令
-        String python = util.isLinux() ? "python3" : "python";
+        String python = util.isLinux() ? "python3" : "conda run -n torch_env python";
         // 当前路径
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
@@ -47,10 +47,11 @@ public class RandomNoiseController {
             System.out.println(Arrays.toString(command));
 
             // 创建ProcessBuilder对象
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+//            ProcessBuilder processBuilder = new ProcessBuilder(command);
 
             // 启动进程
-            Process process = processBuilder.start();
+            System.out.println(String.join(" ", command));
+            Process process = Runtime.getRuntime().exec(String.join(" ", command));
 
             // 获取进程的输出流
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -90,7 +91,7 @@ public class RandomNoiseController {
         System.out.println(algName);
         System.out.println(rawData);
         // python命令
-        String python = util.isLinux() ? "python3" : "python";
+        String python = util.isLinux() ? "python3" : "conda run -n torch_env python";
         // 当前路径
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
@@ -106,10 +107,11 @@ public class RandomNoiseController {
             System.out.println(Arrays.toString(command));
 
             // 创建ProcessBuilder对象
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
+//            ProcessBuilder processBuilder = new ProcessBuilder(command);
 
             // 启动进程
-            Process process = processBuilder.start();
+            System.out.println(String.join(" ", command));
+            Process process = Runtime.getRuntime().exec(String.join(" ", command));
 
             // 获取进程的输出流
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));

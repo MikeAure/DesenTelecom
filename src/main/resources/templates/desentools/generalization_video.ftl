@@ -13,7 +13,7 @@
     <meta name="description" content="">
 
     <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html" />
+    <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
@@ -22,7 +22,7 @@
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 
-<body >
+<body>
 
 <!-- 全局js -->
 <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -35,8 +35,8 @@
 <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 <script type="text/javascript">
-    window.onload = function (){
-        document.getElementById("pixelate_video_fileUpload").addEventListener("change",function (event){
+    window.onload = function () {
+        document.getElementById("pixelate_video_fileUpload").addEventListener("change", function (event) {
             // 清空
             document.getElementById("pixelate_video_pre").innerHTML = "";
             document.getElementById("pixelate_video_after").innerHTML = "";
@@ -51,7 +51,7 @@
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 console.log(fileExtension)
 
-                if(videoType.includes(fileExtension)){
+                if (videoType.includes(fileExtension)) {
                     var pre = document.getElementById("pixelate_video_pre");
                     var reader = new FileReader();
                     reader.onload = function (e) {
@@ -63,7 +63,7 @@
                     };
                     reader.readAsDataURL(file);
                     //提交脱敏参数，请求脱敏
-                    document.getElementById("pixelate_video_submit").onclick = function(){
+                    document.getElementById("pixelate_video_submit").onclick = function () {
                         var after = document.getElementById("pixelate_video_after");
                         after.innerHTML = "";
                         // 获取保护级别
@@ -75,7 +75,7 @@
                         formData.append("algName", "pixelate_video");
                         formData.append("sheet", "pixelate_video");
 
-                        fetch('/File/desenFile',{
+                        fetch('/File/desenFile', {
                             method: 'POST',
                             body: formData
                         })
@@ -91,13 +91,12 @@
                             .catch(error => console.error('Error:', error));
 
                     }
-                }
-                else {
+                } else {
                     alert("请选择视频文件");
                 }
             }
         })
-        document.getElementById("gaussian_blur_video_fileUpload").addEventListener("change",function (event){
+        document.getElementById("gaussian_blur_video_fileUpload").addEventListener("change", function (event) {
             // 清空
             document.getElementById("gaussian_blur_video_pre").innerHTML = "";
             document.getElementById("gaussian_blur_video_after").innerHTML = "";
@@ -112,7 +111,7 @@
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 console.log(fileExtension)
 
-                if(videoType.includes(fileExtension)){
+                if (videoType.includes(fileExtension)) {
                     var pre = document.getElementById("gaussian_blur_video_pre");
                     var reader = new FileReader();
                     reader.onload = function (e) {
@@ -124,7 +123,7 @@
                     };
                     reader.readAsDataURL(file);
                     //提交脱敏参数，请求脱敏
-                    document.getElementById("gaussian_blur_video_submit").onclick = function(){
+                    document.getElementById("gaussian_blur_video_submit").onclick = function () {
                         var after = document.getElementById("gaussian_blur_video_after");
                         after.innerHTML = "";
                         // 获取保护级别
@@ -136,7 +135,7 @@
                         formData.append("algName", "gaussian_blur_video");
                         formData.append("sheet", "gaussian_blur_video");
 
-                        fetch('/File/desenFile',{
+                        fetch('/File/desenFile', {
                             method: 'POST',
                             body: formData
                         })
@@ -152,13 +151,12 @@
                             .catch(error => console.error('Error:', error));
 
                     }
-                }
-                else {
+                } else {
                     alert("请选择视频文件");
                 }
             }
         })
-        document.getElementById("box_blur_video_fileUpload").addEventListener("change",function (event){
+        document.getElementById("box_blur_video_fileUpload").addEventListener("change", function (event) {
             // 清空
             document.getElementById("box_blur_video_pre").innerHTML = "";
             document.getElementById("box_blur_video_after").innerHTML = "";
@@ -173,7 +171,7 @@
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 console.log(fileExtension)
 
-                if(videoType.includes(fileExtension)){
+                if (videoType.includes(fileExtension)) {
                     var pre = document.getElementById("box_blur_video_pre");
                     var reader = new FileReader();
                     reader.onload = function (e) {
@@ -185,7 +183,7 @@
                     };
                     reader.readAsDataURL(file);
                     //提交脱敏参数，请求脱敏
-                    document.getElementById("box_blur_video_submit").onclick = function(){
+                    document.getElementById("box_blur_video_submit").onclick = function () {
                         var after = document.getElementById("box_blur_video_after");
                         after.innerHTML = "";
                         // 获取保护级别
@@ -197,7 +195,7 @@
                         formData.append("algName", "box_blur_video");
                         formData.append("sheet", "box_blur_video");
 
-                        fetch('/File/desenFile',{
+                        fetch('/File/desenFile', {
                             method: 'POST',
                             body: formData
                         })
@@ -213,13 +211,12 @@
                             .catch(error => console.error('Error:', error));
 
                     }
-                }
-                else {
+                } else {
                     alert("请选择视频文件");
                 }
             }
         })
-        document.getElementById("meanValueVideo_fileUpload").addEventListener("change",function (event){
+        document.getElementById("meanValueVideo_fileUpload").addEventListener("change", function (event) {
             // 清空
             document.getElementById("meanValueVideo_pre").innerHTML = "";
             document.getElementById("meanValueVideo_after").innerHTML = "";
@@ -234,7 +231,7 @@
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 console.log(fileExtension)
 
-                if(videoType.includes(fileExtension)){
+                if (videoType.includes(fileExtension)) {
                     var pre = document.getElementById("meanValueVideo_pre");
                     var reader = new FileReader();
                     reader.onload = function (e) {
@@ -246,7 +243,7 @@
                     };
                     reader.readAsDataURL(file);
                     //提交脱敏参数，请求脱敏
-                    document.getElementById("meanValueVideo_submit").onclick = function(){
+                    document.getElementById("meanValueVideo_submit").onclick = function () {
                         var after = document.getElementById("meanValueVideo_after");
                         after.innerHTML = "";
                         // 获取保护级别
@@ -258,7 +255,7 @@
                         formData.append("algName", "meanValueVideo");
                         formData.append("sheet", "meanValueVideo");
 
-                        fetch('/File/desenFile',{
+                        fetch('/File/desenFile', {
                             method: 'POST',
                             body: formData
                         })
@@ -274,13 +271,12 @@
                             .catch(error => console.error('Error:', error));
 
                     }
-                }
-                else {
+                } else {
                     alert("请选择视频文件");
                 }
             }
         })
-        document.getElementById("replace_region_video_fileUpload").addEventListener("change",function (event){
+        document.getElementById("replace_region_video_fileUpload").addEventListener("change", function (event) {
             // 清空
             document.getElementById("replace_region_video_pre").innerHTML = "";
             document.getElementById("replace_region_video_after").innerHTML = "";
@@ -295,7 +291,7 @@
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 console.log(fileExtension)
 
-                if(videoType.includes(fileExtension)){
+                if (videoType.includes(fileExtension)) {
                     var pre = document.getElementById("replace_region_video_pre");
                     var reader = new FileReader();
                     reader.onload = function (e) {
@@ -307,7 +303,7 @@
                     };
                     reader.readAsDataURL(file);
                     //提交脱敏参数，请求脱敏
-                    document.getElementById("replace_region_video_submit").onclick = function(){
+                    document.getElementById("replace_region_video_submit").onclick = function () {
                         var after = document.getElementById("replace_region_video_after");
                         after.innerHTML = "";
                         // 获取保护级别
@@ -319,7 +315,7 @@
                         formData.append("algName", "replace_region_video");
                         formData.append("sheet", "replace_region_video");
 
-                        fetch('/File/desenFile',{
+                        fetch('/File/desenFile', {
                             method: 'POST',
                             body: formData
                         })
@@ -335,8 +331,7 @@
                             .catch(error => console.error('Error:', error));
 
                     }
-                }
-                else {
+                } else {
                     alert("请选择视频文件");
                 }
             }
@@ -350,8 +345,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">14.基于像素化滤波器的视频帧像素替换方法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                14.基于像素化滤波器的视频帧像素替换方法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <#-- <p style="font-size: 1.5em;">9.基于像素化滤波器的视频帧像素替换方法</p>-->
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
@@ -366,8 +363,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class=" align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="pixelate_video_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="pixelate_video_fileUpload" style="display: none;">
                                 <label for="pixelate_video_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -378,9 +375,9 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="pixelate_video_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -390,9 +387,9 @@
         </div>
         <div class="showFile">
             <!--前后文件-->
-            <div id = "pixelate_video_pre" style="margin-right: 20px;">
+            <div id="pixelate_video_pre" style="margin-right: 20px;">
             </div>
-            <div id = "pixelate_video_after">
+            <div id="pixelate_video_after">
             </div>
         </div>
 
@@ -404,8 +401,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">15.基于高斯滤波器的视频帧像素替换方法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                15.基于高斯滤波器的视频帧像素替换方法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <#-- <p style="font-size: 1.5em;">9.基于像素化滤波器的视频帧像素替换方法</p>-->
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
@@ -420,8 +419,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class=" align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="gaussian_blur_video_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="gaussian_blur_video_fileUpload" style="display: none;">
                                 <label for="gaussian_blur_video_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -432,9 +431,9 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="gaussian_blur_video_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -444,9 +443,9 @@
         </div>
         <div class="showFile">
             <!--前后文件-->
-            <div id = "gaussian_blur_video_pre" style="margin-right: 20px;">
+            <div id="gaussian_blur_video_pre" style="margin-right: 20px;">
             </div>
-            <div id = "gaussian_blur_video_after">
+            <div id="gaussian_blur_video_after">
             </div>
         </div>
 
@@ -458,8 +457,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">16.基于盒式滤波器的视频帧像素替换方法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                16.基于盒式滤波器的视频帧像素替换方法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <#-- <p style="font-size: 1.5em;">9.基于像素化滤波器的视频帧像素替换方法</p>-->
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
@@ -474,8 +475,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class=" align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="box_blur_video_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="box_blur_video_fileUpload" style="display: none;">
                                 <label for="box_blur_video_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -486,9 +487,9 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="box_blur_video_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -498,9 +499,9 @@
         </div>
         <div class="showFile">
             <!--前后文件-->
-            <div id = "box_blur_video_pre" style="margin-right: 20px;">
+            <div id="box_blur_video_pre" style="margin-right: 20px;">
             </div>
-            <div id = "box_blur_video_after">
+            <div id="box_blur_video_after">
             </div>
         </div>
 
@@ -512,8 +513,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">17.基于均值滤波器的视频帧像素替换方法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                17.基于均值滤波器的视频帧像素替换方法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         参数：滤波核大小
@@ -527,8 +530,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class=" align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="meanValueVideo_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="meanValueVideo_fileUpload" style="display: none;">
                                 <label for="meanValueVideo_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -539,9 +542,9 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="meanValueVideo_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -551,9 +554,9 @@
         </div>
         <div class="showFile">
             <!--前后文件-->
-            <div id = "meanValueVideo_pre" style="margin-right: 20px;">
+            <div id="meanValueVideo_pre" style="margin-right: 20px;">
             </div>
-            <div id = "meanValueVideo_after">
+            <div id="meanValueVideo_after">
             </div>
         </div>
 
@@ -565,8 +568,10 @@
     <hr>
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">18.基于像素块的视频帧像素替换方法</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                18.基于像素块的视频帧像素替换方法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：将一部分像素替换颜色
@@ -580,8 +585,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class=" align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="replace_region_video_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="replace_region_video_fileUpload" style="display: none;">
                                 <label for="replace_region_video_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -592,9 +597,9 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="replace_region_video_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -604,9 +609,9 @@
         </div>
         <div class="showFile">
             <!--前后文件-->
-            <div id = "replace_region_video_pre" style="margin-right: 20px;">
+            <div id="replace_region_video_pre" style="margin-right: 20px;">
             </div>
-            <div id = "replace_region_video_after">
+            <div id="replace_region_video_after">
             </div>
         </div>
 
@@ -628,15 +633,18 @@
         color: black;
         display: flex;
     }
+
     textarea {
         font-size: 1.5em;
     }
-    .showFile{
+
+    .showFile {
         display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn,#meanValueVideo_submit, #pixelate_video_submit, #gaussian_blur_video_submit, #box_blur_video_submit, #replace_region_video_submit {
+    .upload-btn, #meanValueVideo_submit, #pixelate_video_submit, #gaussian_blur_video_submit, #box_blur_video_submit, #replace_region_video_submit {
         background-color: #347aa9;
         color: white;
         cursor: pointer;
@@ -651,20 +659,22 @@
         text-align: center;
     }
 
-    #pixelate_video_after, #pixelate_video_pre, #gaussian_blur_video_after, #gaussian_blur_video_pre, #box_blur_video_after, #box_blur_video_pre{
+    #pixelate_video_after, #pixelate_video_pre, #gaussian_blur_video_after, #gaussian_blur_video_pre, #box_blur_video_after, #box_blur_video_pre {
         text-align: center;
     }
+
     #meanValueVideo_pre, #meanValueVideo_after, #replace_region_video_pre, #replace_region_video_after,
     #pixelate_video_after, #pixelate_video_pre, #gaussian_blur_video_after, #gaussian_blur_video_pre, #box_blur_video_after, #box_blur_video_pre video {
         display: inline-block;
         max-width: 50%;
         height: auto
     }
+
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
 

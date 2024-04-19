@@ -50,9 +50,10 @@ public class GeneralizationImpl implements Generalization {
                 输出：数值列表
             */
             case 2 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.floor(value));
+                return new DSObject(dpUtil.floor(value, params[0].intValue()));
             }
 
             /*
