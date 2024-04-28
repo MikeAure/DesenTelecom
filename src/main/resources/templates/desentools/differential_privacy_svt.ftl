@@ -248,7 +248,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                11.Sparse Vector Technique1</p>
+                12.Sparse Vector Technique1</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -306,7 +306,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                12.Sparse Vector Technique2</p>
+                13.Sparse Vector Technique2</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -364,7 +364,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                13.Sparse Vector Technique3</p>
+                14.Sparse Vector Technique3</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -422,7 +422,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                14.Sparse Vector Technique4</p>
+                15.Sparse Vector Technique4</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -480,7 +480,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                15.Sparse Vector Technique5</p>
+                16.Sparse Vector Technique5</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -538,7 +538,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                16.Sparse Vector Technique6</p>
+                17.Sparse Vector Technique6</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -596,7 +596,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                17.Numerical Sparse Vector Technique</p>
+                18.Numerical Sparse Vector Technique</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>

@@ -2,8 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico">
+    <title>Home</title>
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
@@ -26,11 +25,8 @@
 
 <!-- Peity -->
 <script src="${ctx!}/js/plugins/peity/jquery.peity.min.js"></script>
-
 <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
 <script src="${ctx!}/js/multiple-select.min.js"></script>
-
-
 <!-- 自定义js -->
 <script src="${ctx!}/js/content.js?v=1.0.0"></script>
 <div class="row">
@@ -43,9 +39,7 @@
                 <img src="img/img.png" width="100%" alt="">
             </div>
         </div>
-
     </div>
-
 </div>
 </body>
 <style>

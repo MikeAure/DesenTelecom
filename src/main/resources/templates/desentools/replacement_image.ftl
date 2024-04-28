@@ -117,12 +117,11 @@
                         after.innerHTML = "";
                         // 获取保护级别
                         let param = "1";
-
                         let formData = new FormData();
-                        formData.append("file", file);
-                        formData.append("params", param);
-                        formData.append("algName", "image_exchange_channel");
-                        formData.append("sheet", "image_exchange_channel");
+                        formData.set("file", file);
+                        formData.set("params", param);
+                        formData.set("algName", "image_exchange_channel");
+                        formData.set("sheet", "image_exchange_channel");
 
                         fetch('/File/desenFile', {
                             method: 'POST',
@@ -178,10 +177,10 @@
                         let param = document.getElementById("image_add_color_offset_privacyLevel").value;
 
                         let formData = new FormData();
-                        formData.append("file", file);
-                        formData.append("params", param);
-                        formData.append("algName", "image_add_color_offset");
-                        formData.append("sheet", "image_add_color_offset");
+                        formData.set("file", file);
+                        formData.set("params", param);
+                        formData.set("algName", "image_add_color_offset");
+                        formData.set("sheet", "image_add_color_offset");
 
                         fetch('/File/desenFile', {
                             method: 'POST',
@@ -261,7 +260,9 @@
             document.getElementById("img_face_sub_after").innerHTML = "";
             // debugger
             // 清空
+            // 目标面孔
             const imgSrcFile = document.getElementById("img_face_sub_src_fileupload").files[0];
+            // 被换脸的文件
             const imgTargetFile = document.getElementById("img_face_sub_target_fileupload").files[0];
 
             // document.getElementById("video_remove_bg_img").innerHTML = "";
@@ -298,10 +299,10 @@
                     let param = "1";
 
                     let formData = new FormData();
-                    formData.append("file", imgTargetFile);
-                    formData.append("params", param);
-                    formData.append("algName", "video_remove_bg");
-                    formData.append("sheet", imgSrcFile);
+                    formData.set("file", imgTargetFile);
+                    formData.set("params", param);
+                    formData.set("algName", "image_face_sub");
+                    formData.set("sheet", imgSrcFile);
 
                     fetch('/File/replaceFace', {
                         method: 'POST',
@@ -503,7 +504,6 @@
             </div>
             <div id="img_face_sub_after">
             </div>
-
         </div>
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary submit-btn" id="img_face_sub_submit"> 提交脱敏</button>

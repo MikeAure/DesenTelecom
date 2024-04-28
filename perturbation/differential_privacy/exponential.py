@@ -11,7 +11,7 @@ class ExponentialMechanism(Mechanism):
         self.eps = eps
         self.sensitivity = sensitivity
 
-    def m(self, a: float, n_samples: int = 1):
+    def m(self, a, n_samples: int = 1):
         """返回选择该元素的概率"""
         return np.array([np.e ** (self.eps * a / (2 * self.sensitivity))] * n_samples)
 

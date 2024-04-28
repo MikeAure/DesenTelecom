@@ -34,9 +34,6 @@ if __name__ == '__main__':
 
     # 采样次数
     samples = int(sys.argv[3])
-    # algName = "exponential"
-    # data_array = np.array([1, 2, 3, 4, 5], float)
-    # samples = 5
 
     if (algName == "noisy_hist2"):
         mechanism = noisy_hist2.NoisyHist2(epsilon)
@@ -54,30 +51,30 @@ if __name__ == '__main__':
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique3.SparseVectorTechnique3(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique4"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique4.SparseVectorTechnique4(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique5"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique5.SparseVectorTechnique5(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique6"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique6.SparseVectorTechnique6(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "report_noisy_max1"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique6.SparseVectorTechnique6(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
 

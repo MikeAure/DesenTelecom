@@ -41,55 +41,55 @@ if __name__ == '__main__':
 
     if (algName == "exponential"):
         mechanism = exponential.ExponentialMechanism(epsilon, sensitivity)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "laplace"):
         mechanism = laplace.LaplaceMechanism()
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "gaussian"):
         mechanism = gaussian.GaussianMechanism()
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "noisy_hist1"):
         mechanism = noisy_hist1.NoisyHist1(epsilon, sensitivity)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "onetimerappor"):
         mechanism = onetimerappor.OneTimeRappor()
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "rappor"):
         mechanism = rappor.Rappor()
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "report_noisy_max1"):
         mechanism = report_noisy_max1.ReportNoisyMax1(epsilon)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "report_noisy_max2"):
         mechanism = report_noisy_max2.ReportNoisyMax2(epsilon)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "snapping"):
         mechanism = snapping.SnappingMechanism()
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique1"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique1.SparseVectorTechnique1(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique2"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique2.SparseVectorTechnique2(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique_numerical"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
         mechanism = sparse_vector_technique_numerical.NumericalSVT(epsilon, c, t)
-        result = mechanism.m(data_array, samples)
+        result = mechanism.m(data_array)
         print(result)

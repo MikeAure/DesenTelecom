@@ -121,7 +121,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                18.Rappor</p>
+                19.Rappor</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -168,7 +168,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                19.One Time Rappor</p>
+                20.One Time Rappor</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -216,7 +216,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                20.编码型数据差分隐私脱敏算法</p>
+                21.编码型数据差分隐私脱敏算法</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <#--<p style="font-size: 1.5em;">4.编码型数据差分隐私脱敏算法</p>-->

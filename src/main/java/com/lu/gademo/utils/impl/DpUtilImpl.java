@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -546,7 +547,7 @@ public class DpUtilImpl implements DpUtil {
         return newAddrs;
     }
 
-    public String dealAddress(String addr, int privacyLevel){
+    private String dealAddress(String addr, int privacyLevel){
         if (addr != null && !addr.isEmpty()) {
             int length = addr.length();
             StringBuilder newAddr = new StringBuilder();
@@ -882,8 +883,18 @@ public class DpUtilImpl implements DpUtil {
         }
         //判断匿名组k大小
         int k = 1 ;
-       /* if (privacyLevel == 0)
-            return re_data;*/
+       if (privacyLevel == 0) {
+           List<Date> reData = new ArrayList<>();
+           for (Object data : datas) {
+               if (data == null) {
+                   reData.add(null);
+               } else {
+                   reData.add(new Date(dateFormat.parse(data + "").getTime()));
+               }
+           }
+           return reData;
+       }
+
         //获取参数k
         if (privacyLevel == 1) {
             k = 10;
@@ -968,18 +979,12 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> truncation(List<Object> dataList) {
-        List<String> reBoxedData = new ArrayList<>();
+    public List<String> truncation(List<Object> dataList, Integer privacyLevel) {
+        List<String> reBoxedData;
 
         List<String> result = new ArrayList<>();
 
-        for (Object item : dataList) {
-            if (item == null) {
-                reBoxedData.add(null);
-            } else {
-                reBoxedData.add(item + "");
-            }
-        }
+        reBoxedData = dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
 
         for (String reBoxedDatum : reBoxedData) {
             if (reBoxedDatum == null) {
@@ -994,7 +999,7 @@ public class DpUtilImpl implements DpUtil {
 
             }
         }
-
+        if (privacyLevel == 0) return reBoxedData;
         return result;
     }
 
@@ -1028,6 +1033,9 @@ public class DpUtilImpl implements DpUtil {
                 }
             }
         }
+//        if (privacyLevel == 0) {
+//            return re_data;
+//        }
         double max_data = Collections.max(re_data);
         for (Object item : re_data) {
             if (item == null) {
@@ -1073,7 +1081,7 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> floorTime(List<Object> dataList) {
+    public List<String> floorTime(List<Object> dataList, Integer privacyLevel) {
         List<String> result = new ArrayList<>();
 
         Pattern timePattern = Pattern.compile("^(?:(?:([01]?\\d|2[0-3]):)?([0-5]?\\d):)?([0-5]?\\d)$");
@@ -1091,11 +1099,12 @@ public class DpUtilImpl implements DpUtil {
             }
         }
 
+        if (privacyLevel == 0) return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
         return result;
     }
 
     @Override
-    public List<String> value_hide(List<Object> dataList) {
+    public List<String> value_hide(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
 
         for (Object data : dataList) {
@@ -1106,11 +1115,12 @@ public class DpUtilImpl implements DpUtil {
                 result.add(tmp.replaceAll("\\d", "0"));
             }
         }
+        if (privacyLevel == 0) return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
         return result;
     }
 
     @Override
-    public List<Double> valueMapping(List<Object> dataList) {
+    public List<Double> valueMapping(List<Object> dataList, Integer privacyLevel) {
         ArrayList<Double> result = new ArrayList<>();
         List<Double> re_data = new ArrayList<>();
         //读取数据
@@ -1148,11 +1158,12 @@ public class DpUtilImpl implements DpUtil {
                 result.add((double) data * 50);
             }
         }
+        if (privacyLevel == 0) return re_data;
         return result;
     }
 
     @Override
-    public List<String> SHA512(List<Object> dataList) {
+    public List<String> SHA512(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
 
         for (Object data : dataList) {
@@ -1163,11 +1174,11 @@ public class DpUtilImpl implements DpUtil {
                 result.add(hashing("SHA-512", tmp));
             }
         }
-
+        if (privacyLevel == 0) return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
         return result;
     }
     // 哈希算法
-    public String hashing(String hashingMethod, String s) {
+    private String hashing(String hashingMethod, String s) {
         try {
             MessageDigest md = MessageDigest.getInstance(hashingMethod);
             byte[] hashBytes = md.digest(s.getBytes());
@@ -1183,7 +1194,7 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> suppressEmail(List<Object> dataList) {
+    public List<String> suppressEmail(List<Object> dataList, Integer privacyLevel) {
         String pat = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
         ArrayList<String> result = new ArrayList<>();
 
@@ -1195,6 +1206,7 @@ public class DpUtilImpl implements DpUtil {
                 result.add(tmp.replaceAll(pat, "***@***"));
             }
         }
+        if (privacyLevel == 0) return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
         return result;
     }
 
@@ -1441,7 +1453,7 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> suppressIpRandomParts(List<Object> dataList) {
+    public List<String> suppressIpRandomParts(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
         String pat = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
         String[] ip = {"$1", "$2", "$3", "$4"};
@@ -1452,7 +1464,7 @@ public class DpUtilImpl implements DpUtil {
             patTemp.set(random - 1, "*");
             result.add(getString(data, pat, patTemp));
         }
-
+        if (privacyLevel == 0) return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
         return result;
     }
     // 取字符串
@@ -1468,13 +1480,14 @@ public class DpUtilImpl implements DpUtil {
         }
     }
     @Override
-    public List<String> suppressAllIp(List<Object> dataList) {
+    public List<String> suppressAllIp(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
 
         for (Object data : dataList) {
            result.add("*.*.*.*");
         }
 
+        if (privacyLevel == 0) return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
         return result;
     }
 }

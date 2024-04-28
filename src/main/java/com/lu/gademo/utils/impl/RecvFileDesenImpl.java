@@ -99,9 +99,14 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                 Cell cell = sheet.getRow(loc.getRow()).getCell(loc.getColumn());
                 int privacyLevel = getPrivacyLevel(e, pattern);
                 // 根据Comment修改算法
-                DSObject result = desenData(cell, replacement, 7, privacyLevel);
+                DSObject result = desenData(cell, replacement, 3, privacyLevel);
+                String desenResult = result.getList().get(0).toString();
+                if (desenResult.equals(cell.getStringCellValue())) {
+                    continue;
+                }
                 cell.setCellValue(result.getList().get(0).toString());
             }
+
             // 写入excel
             wb.write(outputStream);
         }
@@ -111,26 +116,31 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     private void extractWord(Path rawFilePath, Path desenFilePath) throws Exception {
         Map<String, String> commentMap = new HashMap<>();
 
-        try(
-            InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
-            XWPFDocument document = new XWPFDocument(rawFileInputStream);
-            OutputStream outputStream = Files.newOutputStream(desenFilePath);
-        ){
+        try (
+                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
+                XWPFDocument document = new XWPFDocument(rawFileInputStream);
+                OutputStream outputStream = Files.newOutputStream(desenFilePath);)
+        {
             XmlCursor cursor = document.getDocument().getBody().newCursor();
+            QName idQname = new javax.xml.namespace.QName("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "id");
             while (cursor.toNextToken() != XmlCursor.TokenType.NONE) {
-                if (cursor.isStart()) { // 确保光标位于元素的开始标记
+                // save the cursor
+                cursor.push();
+                if (cursor.isStart()) {
+                    // 确保光标位于元素的开始标记
                     QName nodeName = cursor.getName();
                     if (nodeName != null) {
                         String localName = nodeName.getLocalPart();
                         if ("commentRangeStart".equals(localName)) {
                             // 获取 commentRangeStart 的 ID
-                            String id = cursor.getAttributeText(new javax.xml.namespace.QName("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "id"));
-                            System.out.println("Comment ID: " + id);
+                            String commentStartId = cursor.getAttributeText(idQname);
+                            System.out.println("Comment ID: " + commentStartId);
                             StringBuilder stringBuilder = new StringBuilder();
                             while (cursor.toNextToken() != XmlCursor.TokenType.NONE) {
                                 if (cursor.isStart()) { // 再次检查是否为开始标记
                                     QName innerNodeName = cursor.getName();
-                                    if ("commentRangeEnd".equals(innerNodeName.getLocalPart())) { // 检查是否为结束标记，可能需要调整逻辑以识别commentRangeEnd
+                                    String commentEndId = cursor.getAttributeText(idQname);
+                                    if ("commentRangeEnd".equals(innerNodeName.getLocalPart()) && commentEndId.equals(commentStartId)) { // 检查是否为结束标记，可能需要调整逻辑以识别commentRangeEnd
                                         break;
                                     }
                                     if ("t".equals(innerNodeName.getLocalPart())) {
@@ -139,18 +149,20 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                                 }
                             }
                             if (stringBuilder.length() > 0) {
-                                commentMap.put(id, stringBuilder.toString());
-                                System.out.println(id + "\t" + stringBuilder); // 打印收集到的文本
+                                commentMap.put(commentStartId, stringBuilder.toString());
+                                System.out.println(commentStartId + "\t" + stringBuilder); // 打印收集到的文本
                             }
+
                         }
                     }
                 }
+                cursor.pop();
             }
             cursor.dispose();
-            // 逐段遍历获取到的Comment内容
+
             for (XWPFParagraph paragraph : document.getParagraphs()) {
                 XWPFComment comment;
-
+                StringBuilder commentText = new StringBuilder();
                 for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartList()) {
                     BigInteger id = anchor.getId();
 
@@ -158,14 +170,15 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                             (comment = paragraph.getDocument().getCommentByID(id.toString())) != null) {
                         System.out.println("Comment ID: " + id);
 
-                        // TODO: 根据comment内容判断脱敏等级及脱敏算法
-                        String commentContent = comment.getText();
-                        System.out.println("Comment: " + commentContent);
-                        // 使用正则表达式匹配中文
-                        int privacyLevel = getPrivacyLevel(commentContent);
+                        // TODO: 根据comment内容判断脱敏等级
+                        System.out.println("Comment: " + comment.getText());
                         String target = commentMap.get(id.toString());
+                        if (target == null) {
+                            System.out.println("id: " + id + " target is null");
+                            continue;
+                        }
                         System.out.println("Target: " + target);
-                        String desenResult = desenData(target, replacement, 7, privacyLevel).getList().get(0).toString();
+                        String desenResult  = desenData(target, replacement, 3, 1).getList().get(0).toString();
                         System.out.println("desenResult: " + desenResult);
                         if (desenResult.equals(target)) {
                             continue;
@@ -181,63 +194,63 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     }
 
     private void extractPowerPoint(Path rawFilePath, Path desenFilePath) throws Exception {
-
-            try (
+        try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
                 XMLSlideShow  ppt = new XMLSlideShow (rawFileInputStream);
                 OutputStream outputStream = Files.newOutputStream(desenFilePath);
-            ) {
+        )
+        {
+            // 遍历PPT全部批注
+            for (XSLFSlide slide : ppt.getSlides()) {
+                Dimension slideSize = slide.getSlideShow().getPageSize();
+                System.out.println("Slide Width: " + slideSize.width + " Slide Height: " + slideSize.height);
+                List<XSLFComment> comments = slide.getComments();
+                // 逐个文本框扫描分析批注位置是否在文本框内
+                for(XSLFComment comment : comments) {
+                    // 提取commentText中的脱敏内容
+                    String commentText = comment.getText();
+                    String patternString = "([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)\\s+(.*)";
+                    Pattern pattern = Pattern.compile(patternString);
+                    Matcher matcher = pattern.matcher(commentText);
+                    if (!matcher.matches()) {
+                        continue;
+                    }
+                    // 属性需求
+                    String attribute = matcher.group(2);
+                    // 脱敏内容
+                    String rawContent = matcher.group(5);
 
-                // 遍历PPT全部批注
-                for (XSLFSlide slide : ppt.getSlides()) {
-                    List<XSLFComment> comments = slide.getComments();
-                    // 逐个文本框扫描分析批注位置是否在文本框内
-                    for (XSLFComment comment : comments) {
-                        // 提取commentText中的脱敏内容
-                        String commentText = comment.getText();
-                        String patternString = "([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)\\s+(.*)";
-                        Pattern pattern = Pattern.compile(patternString);
-                        Matcher matcher = pattern.matcher(commentText);
-                        if (!matcher.matches()) {
-                            continue;
-                        }
-                        // 属性需求
-                        String attribute = matcher.group(2);
-                        // 脱敏内容
-                        String rawContent = matcher.group(5);
+                    System.out.println("Comment Text: " + commentText);
+                    System.out.println("Attribute: " + attribute);
+                    System.out.println("Content: " + rawContent);
+                    // 设置privacy_level
+                    int privacyLevel = 1;
+                    if (attribute.contains("独特属性")) {
+                        privacyLevel = 3;
+                    }
 
-//                    System.out.println("Comment Text: " + commentText);
-//                    System.out.println("Attribute: " + attribute);
-//                    System.out.println("Content: " + rawContent);
-                        // 设置privacy_level
-                        int privacyLevel = 1;
-                        if (attribute.contains("独特属性")) {
-                            privacyLevel = 3;
-                        }
-
-                        for (XSLFShape shape : slide.getShapes()) {
-                            if (shape instanceof XSLFTextShape) {
-                                System.out.println("Anchor: " + shape.getAnchor());
-                                String shapeText = ((XSLFTextShape) shape).getText();
-                                System.out.println("Shape Text: " + ((XSLFTextShape) shape).getText());
-                                // 匹配文本
-                                if (shapeText.contains(rawContent)) {
-                                    String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
-                                    String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
-                                    // 获取脱敏结果
-                                    String desenResult = desenData(rawContent, replacement, 7, privacyLevel).getList().get(0).toString();
-                                    String stringBuilder = preString +
-                                            desenResult +
-                                            afterString;
-                                    ((XSLFTextShape) shape).setText(stringBuilder);
-                                }
+                    for(XSLFShape shape : slide.getShapes()) {
+                        if (shape instanceof XSLFTextShape){
+                            System.out.println("Anchor: " + shape.getAnchor());
+                            String shapeText = ((XSLFTextShape) shape).getText();
+                            System.out.println("Shape Text: " + ((XSLFTextShape) shape).getText());
+                            // 匹配文本
+                            if (shapeText.contains(rawContent)) {
+                                String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
+                                String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
+                                String desenResult = desenData(rawContent, replacement, 3, privacyLevel).getList().get(0).toString();
+                                String stringBuilder = preString +
+                                        desenResult +
+                                        afterString;
+                                ((XSLFTextShape) shape).setText(stringBuilder);
                             }
                         }
                     }
                 }
-
-                ppt.write(outputStream);
             }
+
+            ppt.write(outputStream);
+        }
     }
 
     private static Map<Integer, XWPFRun> getPosToRuns(XWPFParagraph paragraph) {

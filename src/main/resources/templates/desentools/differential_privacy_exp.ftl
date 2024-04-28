@@ -98,6 +98,39 @@
                     })
                     .catch((error) => console.error("Error:", error));
             });
+
+        document
+            .getElementById("exponential_submitBtn")
+            .addEventListener("click", function () {
+                let textInput = $("#exponential_textInput").val();
+                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let algName = "exponential";
+                if (textInput === "") {
+                    alert("请输入文本");
+                    return; // Stop further execution if the text input is empty
+                }
+
+                fetch("/DP/desenValue", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body:
+                        "&rawData=" +
+                        encodeURIComponent(textInput) +
+                        /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
+                        "&samples=" +
+                        encodeURIComponent(1) +
+                        "&algName=" +
+                        encodeURIComponent(algName),
+                })
+                    .then((response) => response.text())
+                    .then((data) => {
+                        document.getElementById("exponential_outputText").value =
+                            data;
+                    })
+                    .catch((error) => console.error("Error:", error));
+            });
     };
 </script>
 <div class="ibox-title"></div>
@@ -115,7 +148,97 @@
               margin: 0 auto;
             "
             >
-                9.Report Noisy Max2-Exponential
+                9.Exponential Mechanism
+            </p>
+            <div <#--class="col-sm-6" -->
+                    style="display: flex; flex-wrap: wrap; justify-content: center;
+            width: 50%; margin: 0 auto;">
+                <div>
+                    <p style="font-size: 1.5em; text-align: justify">
+                        说明：一组数值中某个数值被选中的概率
+                    </p>
+                    <p style="font-size: 1.5em; text-align: justify">
+                        输入：数值一维数组
+                    </p>
+                    <p style="font-size: 1.5em; text-align: justify">输出：数值一维数组</p>
+                    <p style="font-size: 1.5em; text-align: center">算法测试</p>
+                </div>
+                <div class="container">
+                    <div class="row justify-content-center" style="display: grid; place-items: center">
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input
+                                        type="text"
+                                        id="exponential_textInput"
+                                        class="form-control"
+                                        placeholder="请输入，以,分隔数字"
+                                        style="font-size: 20px"
+                                />
+                                <span class="input-group-btn">
+                      <button
+                              class="btn btn-default"
+                              id="exponential_submitBtn"
+                              type="button"
+                              style="
+                          font-size: 20px;
+                          height: 30px;
+                          display: flex;
+                          justify-content: center;
+                          align-items: center;
+                        "
+                      >
+                        提交脱敏
+                      </button>
+                    </span>
+                            </div>
+                            <div class="text-center">
+                                <label
+                                        for="exponential_outputText"
+                                        style="
+                        display: block;
+                        font-size: 20px;
+                        justify-content: center;
+                        align-items: center;
+                      "
+                                >
+                                    脱敏结果:</label
+                                >
+                                <div
+                                        style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                      "
+                                >
+                      <textarea
+                              id="exponential_outputText"
+                              rows="4"
+                              cols="100"
+                              readonly
+                              style="margin-top: 10px"
+                      ></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <div class="panel-body">
+        <div class="row">
+            <p
+                    style="
+              font-size: 1.5em;
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+              width: 50%;
+              margin: 0 auto;
+            "
+            >
+                10.Report Noisy Max2-Exponential
             </p>
             <div <#--class="col-sm-6" -->
                     style="display: flex; flex-wrap: wrap; justify-content: center;
@@ -205,7 +328,7 @@
               margin: 0 auto;
             "
             >
-                10.Report Noisy Max4
+                11.Report Noisy Max4
             </p>
             <div <#--class="col-sm-6" -->
                     style="display: flex; flex-wrap: wrap; justify-content: center;

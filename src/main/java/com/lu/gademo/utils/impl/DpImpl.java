@@ -148,8 +148,8 @@ public class DpImpl implements Dp {
                 List<?> value = object.getList();
                 String path5 = Paths.get(currentPath, "graph", "desenGraph.py").toString();
                 System.out.println(path5);
-                CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path5, params[0].toString());
-                return null;
+                List<String> result = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path5, params[0].toString());
+                return new DSObject(result);
             }
 
             /*
@@ -225,7 +225,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList()));
+                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -246,7 +249,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList()));
+                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -267,7 +273,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList()));
+                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -288,7 +297,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList()));
+                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -309,7 +321,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList()));
+                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -330,7 +345,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList()));
+                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -351,7 +369,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList()));
+                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -372,7 +393,10 @@ public class DpImpl implements Dp {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
                     s = s.replace(".", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList()));
+                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -388,12 +412,17 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 Double value = object.getDoubleVal();
                 List<String> results = CommandExecutor.executePython(value.toString(), "onetimerappor", path1, params[0].toString());
+                System.out.println(results);
                 List<List<Integer>> lists= new ArrayList<>();
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
                     s = s.replace(".", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList()));
+                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
+
                 }
                 return new DSObject(lists);
             }
@@ -467,7 +496,10 @@ public class DpImpl implements Dp {
                 for(String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList()));
+                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }
@@ -488,7 +520,10 @@ public class DpImpl implements Dp {
                 for (String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    lists.add(Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList()));
+                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
+                    if (!newList.isEmpty()) {
+                        lists.add(newList);
+                    }
                 }
                 return new DSObject(lists);
             }

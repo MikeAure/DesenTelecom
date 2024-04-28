@@ -19,7 +19,7 @@ public class ReplaceTest {
         Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 1);
+        DSObject result = replace.service(dsObject, 1,1);
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -41,7 +41,7 @@ public class ReplaceTest {
         Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 3);
+        DSObject result = replace.service(dsObject, 3, 0);
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -52,7 +52,7 @@ public class ReplaceTest {
         Replace replace = new ReplaceImpl();
         List<Double> rawData = Arrays.asList(123.0, 456.0, 237.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 4);
+        DSObject result = replace.service(dsObject, 4, 1);
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -99,7 +99,7 @@ public class ReplaceTest {
         Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("199@163.com", "qwertyuiop@qq.com", "217hdu1d17@gmail.com");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 8);
+        DSObject result = replace.service(dsObject, 8, 0);
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -110,7 +110,7 @@ public class ReplaceTest {
         Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 9);
+        DSObject result = replace.service(dsObject, 9, 0);
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -121,7 +121,7 @@ public class ReplaceTest {
         Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 10);
+        DSObject result = replace.service(dsObject, 10, 1);
         for (Object object : result.getList()) {
             System.out.println(object);
         }

@@ -116,7 +116,7 @@ public class DpTest {
         Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 9, 4);
+        DSObject result = dp.service(dsObject, 9, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -161,7 +161,7 @@ public class DpTest {
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
         // c:5, t:6
-        DSObject result = dp.service(dsObject, 13, 5, 6);
+        DSObject result = dp.service(dsObject, 13, 2, 5);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -215,7 +215,7 @@ public class DpTest {
     public void testRappor()  {
         Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(8.5);
-        DSObject result = dp.service(dsObject, 18, 6);
+        DSObject result = dp.service(dsObject, 18, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }

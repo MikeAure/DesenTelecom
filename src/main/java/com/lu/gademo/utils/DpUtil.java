@@ -62,29 +62,29 @@ public interface DpUtil {
     public List<String> passReplace(List<Object> addrs, Integer privacyLevel);
 
     // 尾部截断只保留前3位
-    public List<String> truncation(List<Object> dataList);
+    public List<String> truncation(List<Object> dataList, Integer privacyLevel);
 
     // 数值取整
     public List<Integer> floor(List<Object> dataList, Integer privacyLevel);
     // 时间取整  12:00:00
-    public List<String> floorTime(List<Object> dataList);
+    public List<String> floorTime(List<Object> dataList, Integer privacyLevel);
 
     // 将字符串中数字替换为0
-    public List<String> value_hide(List<Object> dataList);
+    public List<String> value_hide(List<Object> dataList, Integer privacyLevel);
     //数值映射为新值  *50
-    public  List<Double> valueMapping(List<Object> dataList);
+    public  List<Double> valueMapping(List<Object> dataList, Integer privacyLevel);
 
     //SHA512 哈希
-    public  List<String> SHA512(List<Object> dataList);
+    public  List<String> SHA512(List<Object> dataList, Integer privacyLevel);
 
     // 邮箱地址隐藏
-    public  List<String> suppressEmail(List<Object> dataList);
+    public  List<String> suppressEmail(List<Object> dataList, Integer privacyLevel);
 
     // IP地址随机替换
-    public List<String> suppressIpRandomParts(List<Object> dataList);
+    public List<String> suppressIpRandomParts(List<Object> dataList, Integer privacyLevel);
 
     //IP地址全抑制
-    public List<String> suppressAllIp(List<Object> dataList);
+    public List<String> suppressAllIp(List<Object> dataList, Integer privacyLevel);
 
 
 }

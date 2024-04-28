@@ -71,7 +71,7 @@ public class AlgorithmsFactory {
                 Arrays.asList(100, 100, 200, 200), Arrays.asList(50, 50, 300, 300), Arrays.asList(25, 25, 400, 400)), this.generalization));
         algorithmInfoMap.put("video_add_color_offset", new AlgorithmInfo("video_add_color_offset", 55, AlgorithmType.REPLACEMENT, 14, Arrays.asList(20, 50, 100), this.replacement));
         algorithmInfoMap.put("video_remove_bg", new AlgorithmInfo("video_remove_bg", 56, AlgorithmType.REPLACEMENT, 16, null, this.replacement));
-        algorithmInfoMap.put("video_face_sub_target", new AlgorithmInfo("video_face_sub_target", 57, AlgorithmType.REPLACEMENT, 15, null, this.replacement));
+        algorithmInfoMap.put("video_face_sub", new AlgorithmInfo("video_face_sub", 57, AlgorithmType.REPLACEMENT, 15, null, this.replacement));
         algorithmInfoMap.put("dpGraph", new AlgorithmInfo("dpGraph", 60, AlgorithmType.DP, 7, Arrays.asList(5.0, 1.0, 0.2), this.dp));
         algorithmInfoMap.put("dpAudio", new AlgorithmInfo("dpAudio", 71, AlgorithmType.DP, 6, Arrays.asList(5.0, 1.0, 0.2), this.dp));
         algorithmInfoMap.put("voice_replace", new AlgorithmInfo("voice_replace", 72, AlgorithmType.REPLACEMENT, 19, Arrays.asList(3.6, 2, 0.7), this.replacement));

@@ -32,6 +32,7 @@ public class CommandExecutor {
             bufferReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             bufferReaderError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             while ((line = bufferReader.readLine()) != null  || (line = bufferReaderError.readLine()) != null) {
+                log.info("Python ouput: " + line);
                 result.add(line);
                 if (line.contains("Error") || line.contains("Traceback")) {
                     return null;
@@ -79,17 +80,18 @@ public class CommandExecutor {
 
         try {
             // 指定Python脚本路径
-            System.out.println(path);
+            log.info("Python execution path: " + path);
 
             // 创建参数列表
             StringBuilder command = new StringBuilder(python + " " + path + " " + algName + " " + rawData);
             for (String param : params) {
                 command.append(" ").append(param);
             }
-            System.out.println(command);
+            log.info("Python command info: " + command);
 
             Path fileParent = Paths.get(path).getParent();
-            System.out.println(fileParent.toString());
+            // System.out.println(fileParent.toString());
+            // 设置Python working directory
             return CommandExecutor.openExe(command.toString(), fileParent.normalize().toFile().getAbsolutePath());
 
         } catch (Exception e) {

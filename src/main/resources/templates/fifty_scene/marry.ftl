@@ -234,7 +234,7 @@
                                 switch (s.k){
                                     case 3:
                                         html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -243,8 +243,8 @@
                                         html += "<option value = " + 10 + ">数值映射</option>"
                                         break;
                                     case 4:
-                                        html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + " selected>基于高斯机制差分隐私的数值加噪算法</option>"
+                                        html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -254,7 +254,7 @@
                                         break;
                                     case 5:
                                         html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + " selected>基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -264,7 +264,7 @@
                                         break;
                                     case 6:
                                         html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + " selected>基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -274,7 +274,7 @@
                                         break;
                                     case 7:
                                         html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + " selected>基于随机高斯噪声的数值加噪算法</option>"
@@ -284,7 +284,7 @@
                                         break;
                                     case 8:
                                         html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -294,7 +294,7 @@
                                         break;
                                     case 9:
                                         html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -304,7 +304,7 @@
                                         break;
                                     case 10:
                                         html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -314,7 +314,7 @@
                                         break;
                                     default:
                                         html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
@@ -322,7 +322,6 @@
                                         html += "<option value = " + 9 + ">数值取整</option>"
                                         html += "<option value = " + 10 + ">数值映射</option>"
                                         break;
-                                }
                                 break;
                             case 1:
                                 html += "<option value = " + 2 + " selected>编码型数据差分隐私脱敏算法</option>"

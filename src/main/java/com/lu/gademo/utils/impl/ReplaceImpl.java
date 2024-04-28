@@ -28,9 +28,10 @@ public class ReplaceImpl implements Replace {
                 输出：字符串列表
             */
             case 1 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.value_hide(value));
+                return new DSObject(dpUtil.value_hide(value, params[0].intValue()));
             }
 
             /*
@@ -55,9 +56,10 @@ public class ReplaceImpl implements Replace {
                 输出：字符串列表
             */
             case 3 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.SHA512(value));
+                return new DSObject(dpUtil.SHA512(value, params[0].intValue()));
             }
 
             /*
@@ -68,9 +70,10 @@ public class ReplaceImpl implements Replace {
                 输出：Double 数值列表
             */
             case 4 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.valueMapping(value));
+                return new DSObject(dpUtil.valueMapping(value, params[0].intValue()));
             }
 
             /*
@@ -122,9 +125,10 @@ public class ReplaceImpl implements Replace {
                 输出：字符串列表
             */
             case 8 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.suppressEmail(value));
+                return new DSObject(dpUtil.suppressEmail(value, params[0].intValue()));
             }
 
             /*
@@ -134,9 +138,10 @@ public class ReplaceImpl implements Replace {
                 输出：字符串列表
             */
             case 9 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.suppressAllIp(value));
+                return new DSObject(dpUtil.suppressAllIp(value, params[0].intValue()));
             }
 
             /*
@@ -146,9 +151,10 @@ public class ReplaceImpl implements Replace {
                 输出：字符串列表
             */
             case 10 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.suppressIpRandomParts(value));
+                return new DSObject(dpUtil.suppressIpRandomParts(value, params[0].intValue()));
             }
 
             /*

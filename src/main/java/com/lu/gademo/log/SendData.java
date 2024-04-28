@@ -11,8 +11,10 @@ import com.lu.gademo.entity.evidence.*;
 import com.lu.gademo.entity.ruleCheck.*;
 import com.lu.gademo.utils.Util;
 import com.lu.gademo.utils.impl.UtilImpl;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -28,35 +30,40 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Data
 public class SendData {
     // 本地存证系统ip和端口
-//    String evidenceLocalAddress = "124.127.245.34";
-    String evidenceLocalAddress = "127.0.0.1";
+    @Value("${evidence.localAddress}")
+    String evidenceLocalAddress;
+    @Value("${evidence.localPort}")
+    int evidenceLocalPort;
 
-    int evidenceLocalPort = 50004;
     // 中心存证系统ip和端口
-//    String evidenceRemoteAddress = "124.127.245.34";
-    String evidenceRemoteAddress = "127.0.0.1";
-    int evidenceRemotePort = 50005;
+    @Value("${evidence.remoteAddress}")
+    String evidenceRemoteAddress;
+    @Value("${evidence.remotePort}")
+    int evidenceRemotePort;
+
     // 合规检查系统ip和端口
-    String ruleCheckAddress = "127.0.0.1";
-    //String ruleCheckAddress = "124.127.245.34";
-    int ruleCheckPort = 30002;
+    @Value("${ruleCheck.address}")
+    String ruleCheckAddress;
+    @Value("${ruleCheck.port}")
+    int ruleCheckPort;
+
     // 脱敏效果评测系统ip和端口
-    String effectEvaAddress = "192.168.1.12";
-//    String effectEvaAddress = "127.0.0.1";
-//    String effectEvaAddress = "10.199.3.233";
-    int effectEvaPort = 10005;
+    @Value("${effectEva.address}")
+    String effectEvaAddress;
+    @Value("${effectEva.port}")
+    int effectEvaPort;
     // 拆分重构系统ip和端口
-//    String splitAddress = "127.0.0.1";
-//    int splitPort = 21445;
-//
-//    // 个人敏感信息系统封端口
-//    int indiPort = 12354;
+    // TODO
+
     // 存证系统id
-    int evidenceSystemId = 0x10000000;
+    @Value("${systemId.evidenceSystemId}")
+    int evidenceSystemId;
     // 评估系统的ID
-    int evaluationSystemId = 0x32000000;
+    @Value("${systemId.evaluationSystemId}")
+    int evaluationSystemId;
 
     // 效果评测Dao
     @Autowired
@@ -152,7 +159,7 @@ public class SendData {
             ObjectNode dataJson = objectMapper.createObjectNode();
             dataJson.set("data", data);
             //System.out.println(dataJson);
-            tcpPacket tcpPacket = new tcpPacket(objectMapper.writeValueAsString(dataJson));
+            TcpPacket tcpPacket = new TcpPacket(objectMapper.writeValueAsString(dataJson));
 
 //            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("D:\\test_request.json"), "UTF-8")) {
 //                    writer.write(objectMapper.writeValueAsString(dataJson));
@@ -312,7 +319,7 @@ public class SendData {
             data1.set("content", evaReceiptContent);
             ObjectNode dataJson1 = objectMapper.createObjectNode();
             dataJson1.set("data", data1);
-            tcpPacket tcpPacket1 = new tcpPacket(objectMapper.writeValueAsString(dataJson1));
+            TcpPacket tcpPacket1 = new TcpPacket(objectMapper.writeValueAsString(dataJson1));
             byte[] tcp1 = tcpPacket1.buildPacket();
 
 
@@ -350,7 +357,7 @@ public class SendData {
             data.set("content", content);
             ObjectNode dataJson = objectMapper.createObjectNode();
             dataJson.set("data", data);
-            tcpPacket tcpPacket = new tcpPacket(objectMapper.writeValueAsString(dataJson));
+            TcpPacket tcpPacket = new TcpPacket(objectMapper.writeValueAsString(dataJson));
             byte[] tcp = tcpPacket.buildPacket();
             // 发送
             OutputStream outputStream = socket.getOutputStream();
@@ -483,7 +490,7 @@ public class SendData {
             data1.set("content", ruleRecepitContent);
             ObjectNode dataJson1 = objectMapper.createObjectNode();
             dataJson1.set("data", data1);
-            tcpPacket tcpPacket1 = new tcpPacket(objectMapper.writeValueAsString(dataJson1));
+            TcpPacket tcpPacket1 = new TcpPacket(objectMapper.writeValueAsString(dataJson1));
             byte[] tcp1 = tcpPacket1.buildPacket();
             // 发送
             outputStream.write(tcp1);
@@ -534,7 +541,7 @@ public class SendData {
 
             // 发起请求
             Socket remoteSocket = new Socket(evidenceRemoteAddress, evidenceRemotePort);
-            tcpPacket reqEvidenceTcpPacket = new tcpPacket(objectMapper.writeValueAsString(reqEvidence), (short) 0x0001, (short) 0x0031, (short) 0x1000);
+            TcpPacket reqEvidenceTcpPacket = new TcpPacket(objectMapper.writeValueAsString(reqEvidence), (short) 0x0001, (short) 0x0031, (short) 0x1000);
             byte[] reqEvidenceTcp = reqEvidenceTcpPacket.buildPacket();
             // 发送
             OutputStream remoteOutputStream = remoteSocket.getOutputStream();
@@ -655,7 +662,7 @@ public class SendData {
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(localEvidenceJson);
             System.out.println(json);
 
-            tcpPacket localTcpPacket = new tcpPacket(objectMapper.writeValueAsString(localEvidenceJson), (short) 0x0003, (short) 0x0031, (short) 0x3110);
+            TcpPacket localTcpPacket = new TcpPacket(objectMapper.writeValueAsString(localEvidenceJson), (short) 0x0003, (short) 0x0031, (short) 0x3110);
             byte[] localTcp = localTcpPacket.buildPacket();
             // 发送
             System.out.println("向本地存证系统发送");

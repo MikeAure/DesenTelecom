@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class GeneralizationImpl implements Generalization {
@@ -38,9 +39,10 @@ public class GeneralizationImpl implements Generalization {
                 输出：字符串列表
             */
             case 1 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.truncation(value));
+                return new DSObject(dpUtil.truncation(value, params[0].intValue()));
             }
 
             /*
@@ -53,6 +55,9 @@ public class GeneralizationImpl implements Generalization {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
+                if (params[0].intValue() == 0) {
+                    return object;
+                }
                 return new DSObject(dpUtil.floor(value, params[0].intValue()));
             }
 
@@ -63,9 +68,10 @@ public class GeneralizationImpl implements Generalization {
                 输出：字符串列表
             */
             case 3 : {
+                if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.floorTime(value));
+                return new DSObject(dpUtil.floorTime(value, params[0].intValue()));
             }
 
             /*

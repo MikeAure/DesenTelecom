@@ -292,7 +292,7 @@ public class AlgorithmsFactoryTest {
         Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("199293845297", "7654321", "17789012345");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 7, 1);
+        DSObject result = replace.service(dsObject, 7, 2);
         for (Object object : result.getList()) {
             System.out.println(object);
         }

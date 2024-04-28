@@ -45,8 +45,9 @@ import java.util.stream.Collectors;
 @Service
 public class FileServiceImpl implements FileService {
     @Autowired
+    AlgorithmsFactory algorithmsFactory;
+    @Autowired
     private Dp dp;
-
     @Autowired
     private Replace replacement;
 
@@ -61,8 +62,6 @@ public class FileServiceImpl implements FileService {
     // 发送类
     @Autowired
     private SendData sendData;
-
-    // 系统id
     // param  service
     @Autowired
     private ExcelParamService excelParamService;
@@ -543,7 +542,7 @@ public class FileServiceImpl implements FileService {
                     List<Double> datas;
 
                     int algoNum = param.getK();
-
+                    AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(algoNum);
                     switch (algoNum) {
 
                         case 3:{
@@ -560,7 +559,7 @@ public class FileServiceImpl implements FileService {
                             desenRequirements.append(param.getColumnName()).append("添加差分隐私Laplace噪声,");
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
-                            datas = dp.service(rawData, 1, param.getTmParam()).getList()
+                            datas = algorithmInfo.execute(rawData, param.getTmParam()).getList()
                                     .stream()
                                     .filter(obj -> obj instanceof Double)
                                     .map(obj -> (Double) obj)
@@ -572,25 +571,26 @@ public class FileServiceImpl implements FileService {
                             util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                             break;
                         }
-                        case 4: {
-                            Map<Integer , String> map = new HashMap<>();
-                            map.put(0, "没有脱敏");
-                            map.put(1, "10,");
-                            map.put(2, "1,");
-                            map.put(3, "0.1,");
-
-                            desenAlgParam.append(map.get(param.getTmParam()));
-                            // 脱敏要求
-                            desenRequirements.append(param.getColumnName()).append("添加差分隐私高斯噪声,");
-                            // 脱敏
-                            datas = dpUtil.gaussianToValue(objs, param.getTmParam());
-                            if (columnName.contains("年龄")) {
-                                datas = datas.stream().map(Math::floor).collect(Collectors.toList());
-                            }
-                            // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, datas);
-                            break;
-                        }
+                        // deprecated
+//                        case 4: {
+//                            Map<Integer , String> map = new HashMap<>();
+//                            map.put(0, "没有脱敏");
+//                            map.put(1, "10,");
+//                            map.put(2, "1,");
+//                            map.put(3, "0.1,");
+//
+//                            desenAlgParam.append(map.get(param.getTmParam()));
+//                            // 脱敏要求
+//                            desenRequirements.append(param.getColumnName()).append("添加差分隐私高斯噪声,");
+//                            // 脱敏
+//                            datas = dpUtil.gaussianToValue(objs, param.getTmParam());
+//                            if (columnName.contains("年龄")) {
+//                                datas = datas.stream().map(Math::floor).collect(Collectors.toList());
+//                            }
+//                            // 写列数据
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+//                            break;
+//                        }
                         case 5: {
                             Map<Integer , String> map = new HashMap<>();
                             map.put(1, "2.0,");
@@ -691,7 +691,11 @@ public class FileServiceImpl implements FileService {
                                     .map(obj -> (Integer) obj)
                                     .collect(Collectors.toList());
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, list);
+                            if (param.getTmParam() == 0) {
+                                util.write2Excel(sheet, totalRowNum, columnIndex, objs);
+                            } else {
+                                util.write2Excel(sheet, totalRowNum, columnIndex, list);
+                            }
                             break;
                         }
                         case 10: {
@@ -1495,14 +1499,14 @@ public class FileServiceImpl implements FileService {
         System.out.println(desenApp);
         System.out.println(rawFilePath);
         // 调用脱敏程序处理
-        String[] p = params.split(",");
-        String desenParam = p[p.length - 1];
-        String[] q = sheet.split(",");
+        String[] paramsList = params.split(",");
+        String desenParam = paramsList[paramsList.length - 1];
+        String[] sheetList = sheet.split(",");
 //        System.out.println(q);
-        String block_num = q[q.length - 1];
-        System.out.println(block_num);
+        String blockNum = sheetList[sheetList.length - 1];
+        System.out.println(blockNum);
 
-        String command = python + " "  + desenApp + " " + algName + " " + rawFilePath + " " + desenFilePath + " " + desenParam + " " + block_num;
+        String command = python + " "  + desenApp + " " + algName + " " + rawFilePath + " " + desenFilePath + " " + desenParam + " " + blockNum;
         // 根据当前操作系统类型决定是否使用conda环境
         if(!util.isLinux()){
             String conda = "conda run -n torch_env ";
@@ -1513,29 +1517,99 @@ public class FileServiceImpl implements FileService {
         // 开始时间
         // 脱敏开始时间
         String startTime = util.getTime();
-        long starttime = System.currentTimeMillis();
+        long startTimeMillis = System.currentTimeMillis();
 
         // 调用脚本
-        Process process = Runtime.getRuntime().exec(command);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        // 捕获脚本执行失败的异常，并返回给掐断
-        while ((line = reader.readLine()) != null) {
-            System.out.println("Python Output: " + line);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.TEXT_PLAIN);
-            if (line.contains("Error")) {
-                return new ResponseEntity<>("Python script executes failed".getBytes(), HttpStatus.INTERNAL_SERVER_ERROR);
-//                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                        .headers(headers)
-//                        .body("Python script executes failed".getBytes());
-            }
+//        Process process = Runtime.getRuntime().exec(command);
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//        String line;
+//        // 捕获脚本执行失败的异常，并返回给掐断
+//        while ((line = reader.readLine()) != null) {
+//            System.out.println("Python Output: " + line);
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.TEXT_PLAIN);
+//            if (line.contains("Error")) {
+//                return new ResponseEntity<>("Python script executes failed".getBytes(), HttpStatus.INTERNAL_SERVER_ERROR);
+////                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+////                        .headers(headers)
+////                        .body("Python script executes failed".getBytes());
+//            }
+//        }
+//        process.waitFor(); // 等待Python脚本执行完毕
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+        // 脱敏算法
+        desenAlg.append(algorithmInfo.getId());
+        List<String> paths = Arrays.asList(rawFilePath, desenFilePath);
+        DSObject desenObj = new DSObject(paths);
+        if (algorithmInfo.getParams() == null) {
+            algorithmInfo.execute(desenObj);
+            // 脱敏参数
+            desenAlgParam.append("无参");
+            // 脱敏级别
+            desenLevel.append(4);
+        } else {
+            int paramIndex = Integer.getInteger(desenParam);
+            List<Object> param = algorithmInfo.getParams();
+            desenAlgParam.append(param.get(paramIndex));
+            algorithmInfo.execute(desenObj, paramIndex);
+            desenLevel.append(paramIndex);
         }
-        process.waitFor(); // 等待Python脚本执行完毕
+//        switch (algName){
+//            case "dpAudio": {
+//                // 脱敏算法
+//                desenAlg.append(71);
+//                // 脱敏参数
+//                double[] param = new double[]{5, 1, 0.2};
+//                desenAlgParam.append(param[Integer.parseInt(desenParam)]);
+//                // 脱敏级别
+//                desenLevel.append(Integer.parseInt(desenParam) + 1);
+//                break;
+//            }
+//
+//            case "remove_audio":{
+//                // 脱敏算法
+//                desenAlg.append(72);
+//                desenAlgParam.append("无参");
+//                // 脱敏级别
+//                desenLevel.append(4);
+//                break;
+//            }
+//
+//            case "voice_replace":{
+//                // 脱敏算法
+//                desenAlg.append(73);
+//                desenAlgParam.append("无参");
+//                // 脱敏级别
+//                desenLevel.append(4);
+//                break;
+//            }
+//
+//            case "apply_audio_effects":{
+//                // 脱敏算法
+//                desenAlg.append(74);
+//                // 脱敏参数
+//                double[][] param = new double[][]{{-3, 0.7, -5, 5}, {2, 0.8, -10, 10}, {5, 0.9, -20, 20}};
+//                desenAlgParam.append(Arrays.toString(param[Integer.parseInt(desenParam)]));
+//                // 脱敏级别
+//                desenLevel.append(Integer.parseInt(desenParam) + 1);
+//                break;
+//            }
+//
+//            case "audio_reshuffle":{
+//                // 脱敏算法
+//                desenAlg.append(75);
+//                // 脱敏参数
+//                double[] param = new double[]{5, 10, 15};
+//                desenAlgParam.append(param[Integer.parseInt(desenParam)]);
+//                // 脱敏级别
+//                desenLevel.append(Integer.parseInt(desenParam) + 1);
+//                break;
+//            }
+//        }
         // 结束时间
         long endtime = System.currentTimeMillis();
         // 脱敏耗时
-        long executionTime = endtime - starttime;
+        long executionTime = endtime - startTimeMillis;
         System.out.println("脱敏用时" + executionTime + "ms");
         System.out.println("Python脚本执行完毕，退出代码：");
 
@@ -1543,59 +1617,6 @@ public class FileServiceImpl implements FileService {
         String endTime = util.getTime();
         // 标志脱敏完成
         desenCom = 1;
-
-        switch (algName){
-            case "dpAudio": {
-                // 脱敏算法
-                desenAlg.append(71);
-                // 脱敏参数
-                double[] param = new double[]{5, 1, 0.2};
-                desenAlgParam.append(param[Integer.parseInt(desenParam)]);
-                // 脱敏级别
-                desenLevel.append(Integer.parseInt(desenParam) + 1);
-                break;
-            }
-
-            case "remove_audio":{
-                // 脱敏算法
-                desenAlg.append(72);
-                desenAlgParam.append("无参");
-                // 脱敏级别
-                desenLevel.append(4);
-                break;
-            }
-
-            case "voice_replace":{
-                // 脱敏算法
-                desenAlg.append(73);
-                desenAlgParam.append("无参");
-                // 脱敏级别
-                desenLevel.append(4);
-                break;
-            }
-
-            case "apply_audio_effects":{
-                // 脱敏算法
-                desenAlg.append(74);
-                // 脱敏参数
-                double[][] param = new double[][]{{-3, 0.7, -5, 5}, {2, 0.8, -10, 10}, {5, 0.9, -20, 20}};
-                desenAlgParam.append(Arrays.toString(param[Integer.parseInt(desenParam)]));
-                // 脱敏级别
-                desenLevel.append(Integer.parseInt(desenParam) + 1);
-                break;
-            }
-
-            case "audio_reshuffle":{
-                // 脱敏算法
-                desenAlg.append(75);
-                // 脱敏参数
-                double[] param = new double[]{5, 10, 15};
-                desenAlgParam.append(param[Integer.parseInt(desenParam)]);
-                // 脱敏级别
-                desenLevel.append(Integer.parseInt(desenParam) + 1);
-                break;
-            }
-        }
 
         Long desenFileSize = Files.size(Paths.get(desenFilePath));
 
@@ -2574,65 +2595,60 @@ public class FileServiceImpl implements FileService {
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("数值取整,");
-
-                    List<Integer> datas = dpUtil.floor(objs, param);
+                    if (param == 0) {
+                        util.write2Excel(sheet, lastRowNum, colIndex, objs);
+                    } else {
+                        List<Integer> datas = dpUtil.floor(objs, param);
+                        util.write2Excel(sheet, lastRowNum, colIndex, datas);
+                    }
                     desenAlg.append(9);
-                    util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
                 case "valueMapping": {
-
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("数值映射,");
 
-                    List<Double> datas = dpUtil.valueMapping(objs);
+                    List<Double> datas = dpUtil.valueMapping(objs, 1);
                     desenAlg.append(10);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
                 case "truncation": {
-
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("截断,");
 
-                    List<String> datas = dpUtil.truncation(objs);
+                    List<String> datas = dpUtil.truncation(objs, param);
                     desenAlg.append(11);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
                 case "floorTime": {
-
-                    List<String> datas = dpUtil.floorTime(objs);
+                    List<String> datas = dpUtil.floorTime(objs, param);
                     desenAlg.append(12);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
                 case "suppressEmail": {
-
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("抑制,");
-
-                    List<String> datas = dpUtil.suppressEmail(objs);
+                    List<String> datas = dpUtil.suppressEmail(objs, param);
                     desenAlg.append(13);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
                 case "addressHide": {
-
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("抑制,");
-
                     List<String> datas = dpUtil.addressHide(objs, param);
                     desenAlg.append(14);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
                 case "nameHide": {
-
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("抑制,");
@@ -2658,7 +2674,7 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     desenRequirements.append(colName).append("置换,");
                     desenAlg.append(17);
-                    List<String> datas = dpUtil.SHA512(objs);
+                    List<String> datas = dpUtil.SHA512(objs, param);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
                 }
@@ -2678,7 +2694,7 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     desenRequirements.append(colName).append("置换,");
 
-                    List<String> datas = dpUtil.value_hide(objs);
+                    List<String> datas = dpUtil.value_hide(objs, param);
                     desenAlg.append(20);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
@@ -2687,7 +2703,7 @@ public class FileServiceImpl implements FileService {
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("抑制,");
-                    List<String> datas = dpUtil.suppressAllIp(objs);
+                    List<String> datas = dpUtil.suppressAllIp(objs, param);
                     desenAlg.append(21);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
@@ -2697,7 +2713,7 @@ public class FileServiceImpl implements FileService {
                     desenAlgParam.append("无参,");
                     // 脱敏要求
                     desenRequirements.append(colName).append("抑制,");
-                    List<String> datas = dpUtil.suppressIpRandomParts(objs);
+                    List<String> datas = dpUtil.suppressIpRandomParts(objs, param);
                     desenAlg.append(22);
                     util.write2Excel(sheet, lastRowNum, colIndex, datas);
                     break;
@@ -2889,7 +2905,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏算法
         StringBuilder desenAlg = new StringBuilder();
         //List<Integer> desenAlg = new ArrayList<>();
-
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
         python = util.isLinux()? "python3" : "python";
 
         // 当前路径
@@ -2925,12 +2941,10 @@ public class FileServiceImpl implements FileService {
 
         // 脱敏程序路径
         String desenApp = currentPath + File.separator + "video" + File.separator + "substitude_background.py";
-//        System.out.println("desen app path: " + desenApp);
-//        System.out.println("raw video path: " + rawFilePath);
-//        System.out.println("bg image path: " + rawBgPath);
         // 脱敏后
         String time2 = String.valueOf(System.currentTimeMillis());
         String desenFilePath = currentPath + File.separator + "desen_files" + File.separator + "desen_" + rawFileName;
+
         String desenFileName = "desen_" + rawFileName;
         // 调用脱敏程序处理
         String desenParam = String.valueOf(params.charAt(params.length() - 1));
@@ -2950,18 +2964,19 @@ public class FileServiceImpl implements FileService {
         // 脱敏开始时间
         startTime = util.getTime();
         starttime = System.currentTimeMillis();
-        // 调用脚本
-        Process process = Runtime.getRuntime().exec(command);
-        process.waitFor(); // 等待Python脚本执行完毕
+//        // 调用脚本
+//        Process process = Runtime.getRuntime().exec(command);
+//        process.waitFor(); // 等待Python脚本执行完毕
+        // 执行脱敏算法
+        List<String> rawData = Arrays.asList(rawFilePath, rawBgPath, desenFilePath);
+        DSObject dsObject = new DSObject(rawData);
+        String resultString = algorithmInfo.execute(dsObject, Integer.valueOf(params)).getList().toString();
+        log.info(resultString);
         // 结束时间
         endtime = System.currentTimeMillis();
         // 脱敏耗时
         executionTime = endtime - starttime;
         System.out.println("脱敏用时" + executionTime + "ms");
-        System.out.println("Python脚本执行完毕，退出代码：");
-
-//        System.out.println("脱敏文件存放路径");
-//        System.out.println(desenFilePath);
 
         // 脱敏结束时间
         String endTime = util.getTime();
@@ -2971,8 +2986,13 @@ public class FileServiceImpl implements FileService {
         // 脱敏算法
         desenAlg.append(55);
         // 脱敏参数
-        int[] param = (algName.contains("color_offset"))? new int[]{5, 10, 20} : new int[]{20, 50 ,100};
-        desenAlgParam.append("无参");
+//        int[] param = algorithmInfo.getParams().toArray();
+        List<Object> algParams = algorithmInfo.getParams();
+        if (algParams == null) {
+            desenAlgParam.append("无参");
+        } else {
+            desenAlgParam.append(algParams.toString());
+        }
         // 脱敏级别
         desenLevel.append(Integer.parseInt(desenParam));
         // 脱敏前类型
@@ -2989,10 +3009,7 @@ public class FileServiceImpl implements FileService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // 脱敏后信息
-        //String desenFilePath = currentPath + File.separator + "desen_files" + File.separator + "desen_" + rawFileName;
-        //FileInputStream fileInputStream = new FileInputStream(desenFilePath);
         FileInputStream fileInputStream = new FileInputStream(rawFilePath);
-
         // 线程池
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
@@ -3140,6 +3157,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public ResponseEntity<byte[]> replaceFace(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException {
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
         // 脱敏前信息类型标识
         StringBuilder desenInfoPreIden = new StringBuilder();
         // 脱敏后信息类型标识
@@ -3232,25 +3250,31 @@ public class FileServiceImpl implements FileService {
         starttime = System.currentTimeMillis();
 
         // 调用脚本
-        Process process;
-        process = Runtime.getRuntime().exec(command, null, new File(desenAppDir));
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        // 捕获脚本执行失败的异常，并返回给掐断
-        while ((line = reader.readLine()) != null) {
-            System.out.println("Python Output: " + line);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.TEXT_PLAIN);
-            if (line.contains("Error")) {
-                return new ResponseEntity<>("Python script executes failed".getBytes(), HttpStatus.INTERNAL_SERVER_ERROR);
-//                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                        .headers(headers)
-//                        .body("Python script executes failed".getBytes());
-            }
+//        Process process;
+//        process = Runtime.getRuntime().exec(command, null, new File(desenAppDir));
+//
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//        String line;
+//        // 捕获脚本执行失败的异常，并返回给掐断
+//        while ((line = reader.readLine()) != null) {
+//            System.out.println("Python Output: " + line);
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.TEXT_PLAIN);
+//            if (line.contains("Error")) {
+//                return new ResponseEntity<>("Python script executes failed".getBytes(), HttpStatus.INTERNAL_SERVER_ERROR);
+////                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+////                        .headers(headers)
+////                        .body("Python script executes failed".getBytes());
+//            }
+//        }
+//
+//        process.waitFor(); // 等待Python脚本执行完毕
+        List<String> rawData = Arrays.asList(rawFilePath, rawFacePath, desenFilePath);
+        DSObject dsObject = new DSObject(rawData);
+        String resultString = algorithmInfo.execute(dsObject, Integer.valueOf(params)).getList().toString();
+        if(resultString != null) {
+            log.info(resultString);
         }
-
-        process.waitFor(); // 等待Python脚本执行完毕
         // 结束时间
         endtime = System.currentTimeMillis();
         // 脱敏耗时

@@ -11,6 +11,98 @@
     <link rel="stylesheet" type="text/css" href="${ctx!}/css/multiple-select.min.css">
     <link rel="stylesheet" type="text/css" href="${ctx!}/css/GA.css">
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
+    <style>
+        /*标题*/
+        .ibox-title {
+            height: 200px;
+            border-color: #edf1f2;
+            background-color: #dbeafe;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ibox-title span {
+            font-size: 50px;
+        }
+
+        #submit {
+            background-color: #347aa9;
+            padding: 5px 20px;
+            cursor: pointer;
+            color: black;
+            font-size: 20px;
+            display: inline-block;
+            text-align: center;
+            /*margin-right: 50px;*/
+
+        }
+
+        .btn2 {
+            line-height: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        /*选择框居中*/
+        .midtile {
+            line-height: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        /*上传按钮*/
+        .upload-btn {
+            background-color: #347aa9;
+            color: white;
+            cursor: pointer;
+            padding: 5px 20px;
+            text-align: center;
+            font-size: 20px;
+            display: inline-block;
+            margin: 30px;
+        }
+
+        #pre {
+            text-align: center;
+        }
+
+        #pre img {
+            display: inline-block;
+            max-width: 50%;
+            height: auto;
+        }
+
+        #pre video {
+            display: inline-block;
+            max-width: 50%;
+            height: auto
+        }
+
+        #after {
+            text-align: center;
+        }
+
+        #after img {
+            display: inline-block;
+            max-width: 50%;
+            height: auto;
+        }
+
+        #after video {
+            display: inline-block;
+            max-width: 50%;
+            height: auto
+        }
+
+        .showFile {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
 
 </head>
 <body>
@@ -70,7 +162,7 @@
 
             var html = ""
             if (imageType.includes(fileExtension)) {
-                uploadImage()
+                displayImage()
                 let alg = "<div>" +
                     "<table style=\'margin: auto; font-size: 20px\'>" +
                     "<thead>" +
@@ -279,11 +371,11 @@
             }
         }
     }
-    uploadImage = function () {
-        var input = document.getElementById("fileUpload");
-        var pre = document.getElementById("pre");
-        var file = input.files[0];
-        var reader = new FileReader();
+    displayImage = function () {
+        let input = document.getElementById("fileUpload");
+        let pre = document.getElementById("pre");
+        let file = input.files[0];
+        let reader = new FileReader();
         reader.onload = function (e) {
             var img = new Image();
             img.src = e.target.result;
@@ -367,96 +459,5 @@
 
 </div>
 </body>
-<style>
-    /*标题*/
-    .ibox-title {
-        height: 200px;
-        border-color: #edf1f2;
-        background-color: #dbeafe;
-        color: black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
 
-    .ibox-title span {
-        font-size: 50px;
-    }
-
-    #submit {
-        background-color: #347aa9;
-        padding: 5px 20px;
-        cursor: pointer;
-        color: black;
-        font-size: 20px;
-        display: inline-block;
-        text-align: center;
-        /*margin-right: 50px;*/
-
-    }
-
-    .btn2 {
-        line-height: 30px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
-
-    /*选择框居中*/
-    .midtile {
-        line-height: 30px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
-
-    /*上传按钮*/
-    .upload-btn {
-        background-color: #347aa9;
-        color: white;
-        cursor: pointer;
-        padding: 5px 20px;
-        text-align: center;
-        font-size: 20px;
-        display: inline-block;
-        margin: 30px;
-    }
-
-    #pre {
-        text-align: center;
-    }
-
-    #pre img {
-        display: inline-block;
-        max-width: 50%;
-        height: auto;
-    }
-
-    #pre video {
-        display: inline-block;
-        max-width: 50%;
-        height: auto
-    }
-
-    #after {
-        text-align: center;
-    }
-
-    #after img {
-        display: inline-block;
-        max-width: 50%;
-        height: auto;
-    }
-
-    #after video {
-        display: inline-block;
-        max-width: 50%;
-        height: auto
-    }
-
-    .showFile {
-        display: flex;
-        justify-content: center;
-    }
-</style>
 </html>

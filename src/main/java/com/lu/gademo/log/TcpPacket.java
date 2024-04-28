@@ -3,7 +3,7 @@ package com.lu.gademo.log;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-public class tcpPacket {
+public class TcpPacket {
     //
     private static final short VERSION = 0x0001;
     private short MAIN_CMD;
@@ -19,7 +19,7 @@ public class tcpPacket {
     /**
      * 构造函数，传入数据
       */
-    public tcpPacket(String jsonData, short MAIN_CMD, short SUB_CMD, short MESSAGE_VERSION) {
+    public TcpPacket(String jsonData, short MAIN_CMD, short SUB_CMD, short MESSAGE_VERSION) {
         this.jsonData = jsonData;
         this.packetLength = jsonData.getBytes(StandardCharsets.UTF_8).length + 16 + 18;
         this.authenticationAndValidationField = new byte[16];
@@ -27,7 +27,7 @@ public class tcpPacket {
         this.SUB_CMD = SUB_CMD;
         this.MESSAGE_VERSION = MESSAGE_VERSION;
     }
-    public tcpPacket(String jsonData){
+    public TcpPacket(String jsonData){
         this.jsonData = jsonData;
         this.packetLength = jsonData.getBytes(StandardCharsets.UTF_8).length + 16 + 18;
         this.authenticationAndValidationField = new byte[16];

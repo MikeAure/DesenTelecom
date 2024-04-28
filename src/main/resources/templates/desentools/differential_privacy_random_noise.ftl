@@ -18,7 +18,7 @@
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
-    <link href="${ctx!}/css/animate.css" rel="stylesheet">
+    <link href="{ctx!}/css/animate.css" rel="stylesheet">
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
 </head>
 
@@ -174,7 +174,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                21.基于随机均匀噪声的数值加噪算法</p>
+                22.基于随机均匀噪声的数值加噪算法</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -231,7 +231,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                22.基于随机高斯噪声的数值加噪算法</p>
+                23.基于随机高斯噪声的数值加噪算法</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -288,7 +288,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                23.基于随机拉普拉斯噪声的数值加噪算法</p>
+                24.基于随机拉普拉斯噪声的数值加噪算法</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -345,7 +345,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                24.Noisy Histogram1</p>
+                25.Noisy Histogram1</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -393,7 +393,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                25.Noisy Histogram2</p>
+                26.Noisy Histogram2</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
