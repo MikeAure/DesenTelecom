@@ -72,34 +72,23 @@ public class FileController extends BaseController {
     ) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         // 调用脱敏函数
         String fileName = file.getOriginalFilename();
-        System.out.println(file.getOriginalFilename());
         // 获取文件后缀
-        String[] names = new String[0];
-        if (fileName != null) {
-            names = fileName.split("\\.");
-        }
         //System.out.println(Arrays.toString(names));
-        String fileType = names[names.length - 1];
-        log.info(fileType);
-        System.out.println(sheet);
+        String fileType = fileName.split("\\.")[fileName.split("\\.").length - 1];
+        log.info("File Type: " + fileType);
+        log.info("AlgName: " +algName);
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
-            System.out.println("excel");
             return fileService.dealExcel(file, params, sheet);
         } else if (imageType.contains(fileType)) {
-            System.out.println("image");
             return fileService.dealImage(file, params, algName);
         } else if (videoType.contains(fileType)) {
-            System.out.println("video");
             return fileService.dealVideo(file, params, algName);
         } else if (audioType.contains(fileType)) {
-            System.out.println("audio");
             return fileService.dealAudio(file, params, algName, sheet);
         } else if ("csv".equals(fileType)) {
-            System.out.println("csv");
             return fileService.dealCsv(file, params, algName);
         } else {
-            System.out.println("graph");
             return fileService.dealGraph(file, params);
         }
 
@@ -111,70 +100,8 @@ public class FileController extends BaseController {
                             @RequestParam String textType,
                             @RequestParam String privacyLevel,
                             @RequestParam String algName) throws ParseException {
-        int param = 1;
-        System.out.println(algName);
-        System.out.println(textInput);
-        System.out.println(textType);
-        System.out.println(privacyLevel);
-        String result = null;
-        if (!privacyLevel.isEmpty()) {
-            param = Integer.parseInt(privacyLevel);
-        }
-        textInput = textInput.trim();
-        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
-        switch (algName.trim()) {
-            case "dpDate":
-            case "addressHide":
-            case "numberHide":
-            case "nameHide":
-            case "passReplace":
-            case "truncation":
-            case "floorTime":
-            case "suppressEmail":
-            case "value_hide":
-            case "SHA512":
-            case "suppressAllIp":
-            case "suppressIpRandomParts":
-            {
-                List<String> input = Collections.singletonList(textInput);
-                DSObject rawData = new DSObject(input);
-                result = algorithmInfo.execute(rawData, param).getList().get(0).toString();
-                break;
-            }
+        return fileService.desenText(textInput, textType, privacyLevel, algName);
 
-// {
-//                List<String> input = Collections.singletonList(textInput);
-//                DSObject rawData = new DSObject(input);
-//                result = algorithmInfo.execute(rawData).getList().get(0).toString();
-//                break;
-//            }
-            case "laplaceToValue":
-            case "gaussianToValue":
-            case "randomLaplaceToValue":
-            case "randomUniformToValue":
-            case "randomGaussianToValue":
-            case "valueShift":
-            case "floor":
-            case "valueMapping": {
-                double val = Double.parseDouble(textInput);
-                DSObject rawVal = new DSObject(Collections.singletonList(val));
-                result = algorithmInfo.execute(rawVal, param).getList().get(0) + "";
-                break;
-            }
-            case "dpCode":
-                String[] aaa = textInput.trim().split(",");
-                DSObject codes = new DSObject(Arrays.asList(aaa));
-                StringBuilder sb = new StringBuilder();
-                List<?> result_b = algorithmInfo.execute(codes, param).getList();
-                for (Object a : result_b) {
-                    sb.append(a.toString()).append(",");
-                }
-                result = sb.substring(0, sb.length() - 1);
-                break;
-
-        }
-        System.out.println(result);
-        return result;
     }
 
     @PostMapping("desenSingleExcel")
@@ -185,23 +112,6 @@ public class FileController extends BaseController {
         return fileService.dealSingleExcel(file, params, algName);
     }
 
-//    @PostMapping("removeBackground")
-//    public ResponseEntity<byte[]> removeBackground( @RequestPart("file") MultipartFile file,
-//                                                    @RequestParam("params") String params,
-//                                                    @RequestParam("algName") String algName,
-//                                                    @RequestParam("sheet") MultipartFile sheet
-//    ) throws IOException, InterruptedException, SQLException {
-//        return fileService.replaceVideoBackground(file, params, algName, sheet);
-//    }
-//
-//    @PostMapping("replaceFace")
-//    public ResponseEntity<byte[]> replaceFace( @RequestPart("file") MultipartFile file,
-//                                                    @RequestParam("params") String params,
-//                                                    @RequestParam("algName") String algName,
-//                                                    @RequestParam("sheet") MultipartFile sheet
-//    ) throws IOException, InterruptedException, SQLException {
-//        return fileService.replaceFace(file, params, algName, sheet);
-//    }
 
     @PostMapping(value = {"replaceFaceVideo", "replaceFace", "removeBackground"})
     public ResponseEntity<byte[]> replaceFaceVideo( @RequestPart("file") MultipartFile file,
@@ -228,30 +138,21 @@ public class FileController extends BaseController {
     // 接收信工所Office文档
     @PostMapping(value = "recvFileDesen", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    ResponseEntity<Map<String, Object>> recvFileDesen(@NotNull @RequestPart("file") MultipartFile file) {
+    ResponseEntity<Result<Object>> recvFileDesen(@NotNull @RequestPart("file") MultipartFile file) {
 
         String fileName = file.getOriginalFilename();
         String fileType = fileName.split("\\.")[fileName.split("\\.").length - 1];
         List<String> officeFileTypes = Arrays.asList("xlsx", "docx", "pptx");
 
         if (!officeFileTypes.contains(fileType)) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "error");
-            errorResponse.put("data", "File type not supported.");
-            return ResponseEntity.ok().body(errorResponse);
+            return ResponseEntity.ok().body(new Result<>("error", "File type not supported."));
         }
         try {
-            Map<String, Object> successResponse = new HashMap<>();
-            successResponse.put("message", "ok");
-            successResponse.put("data", recvFileDesen.desenRecvFile(file));
-            return ResponseEntity.ok().body(successResponse);
+            return ResponseEntity.ok().body(new Result<>("ok", recvFileDesen.desenRecvFile(file)));
 
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "error");
-            errorResponse.put("data", e.getMessage());
-            return ResponseEntity.ok().body(errorResponse);
+            return ResponseEntity.ok().body(new Result<>("error", e.getMessage()));
         }
 
     }

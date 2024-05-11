@@ -147,7 +147,7 @@
         // 文件名，扩展名
         if (file) {
             const fileName = file.name;
-            var fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+            let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
                 "<strong>" + fileName + "文件</strong>上传成功"
             "</span>" +
             "</div>";
@@ -156,11 +156,11 @@
             console.log(fileExtension)
 
             //构建formData,发送给后端
-            var formData = new FormData();
+            let formData = new FormData();
             formData.append("file", file);
             formData.append("sheet", "media");
 
-            var html = ""
+            let html = ""
             if (imageType.includes(fileExtension)) {
                 displayImage()
                 let alg = "<div>" +
@@ -202,18 +202,18 @@
                 document.getElementById("privacyLevel").innerHTML = html;
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
-                    var after = document.getElementById("after");
+                    let after = document.getElementById("after");
                     after.innerHTML = "";
                     // 获取保护级别
-                    var table_body = document.getElementById("table2")
-                    var tr = table_body.rows[0];
-                    var param = tr.childNodes[0].firstChild.value;
+                    let table_body = document.getElementById("table2")
+                    let tr = table_body.rows[0];
+                    let param = tr.childNodes[0].firstChild.value;
                     formData.append("params", param);
 
                     // 获取算法类型
                     table_body = document.getElementById("table1")
                     tr = table_body.rows[0];
-                    var type = tr.childNodes[0].firstChild.value;
+                    let type = tr.childNodes[0].firstChild.value;
                     formData.append("sheet", type);
                     fetch('File/desenFile', {
                         method: 'POST',
@@ -221,14 +221,14 @@
                     })
                         .then(response => response.blob())
                         .then(blob => {
-                            var dealedImg = new Image();
+                            let dealedImg = new Image();
                             dealedImg.src = URL.createObjectURL(blob);
                             after.appendChild(dealedImg);
                         })
 
                 }
             } else if (audioType.includes(fileExtension)) {
-                uploadAudio();
+                displayAudio();
                 html += "<div>" +
                     "<table style=\'margin: auto; font-size: 20px\'>" +
                     "<thead>" +
@@ -251,12 +251,12 @@
 
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
-                    var after = document.getElementById("after");
+                    let after = document.getElementById("after");
                     after.innerHTML = "";
                     // 获取保护级别
-                    var table_body = document.getElementById("table2")
-                    var tr = table_body.rows[0];
-                    var param = tr.childNodes[0].firstChild.value;
+                    let table_body = document.getElementById("table2")
+                    let tr = table_body.rows[0];
+                    let param = tr.childNodes[0].firstChild.value;
                     formData.append("params", param);
                     fetch('/File/desenFile', {
                         method: 'POST',
@@ -275,7 +275,7 @@
                         .catch(error => console.error('Error:', error));
                 }
             } else if (videoType.includes(fileExtension)) {
-                uploadVideo()
+                displayVideo()
                 html += "<div>" +
                     "<table style=\'margin: auto; font-size: 20px\'>" +
                     "<thead>" +
@@ -298,12 +298,12 @@
 
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
-                    var after = document.getElementById("after");
+                    let after = document.getElementById("after");
                     after.innerHTML = "";
                     // 获取保护级别
-                    var table_body = document.getElementById("table2")
-                    var tr = table_body.rows[0];
-                    var param = tr.childNodes[0].firstChild.value;
+                    let table_body = document.getElementById("table2")
+                    let tr = table_body.rows[0];
+                    let param = tr.childNodes[0].firstChild.value;
                     formData.append("params", param);
                     fetch('File/desenFile', {
                         method: 'POST',
@@ -311,7 +311,7 @@
                     })
                         .then(response => response.blob())
                         .then(data => {
-                            var video = document.createElement("video");
+                            let video = document.createElement("video");
                             console.log(data)
                             video.src = URL.createObjectURL(data);
                             video.type = "video/mp4";
@@ -346,12 +346,12 @@
 
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
-                    var after = document.getElementById("after");
+                    let after = document.getElementById("after");
                     after.innerHTML = ""
                     // 获取保护级别
-                    var table_body = document.getElementById("table2")
-                    var tr = table_body.rows[0];
-                    var param = tr.childNodes[0].firstChild.value;
+                    let table_body = document.getElementById("table2")
+                    let tr = table_body.rows[0];
+                    let param = tr.childNodes[0].firstChild.value;
                     formData.append("params", param);
                     fetch('/File/desenFile', {
                         method: 'POST',
@@ -377,20 +377,20 @@
         let file = input.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
-            var img = new Image();
+            let img = new Image();
             img.src = e.target.result;
             //img.style.width = '500px';
             pre.appendChild(img);
         };
         reader.readAsDataURL(file);
     }
-    uploadVideo = function () {
-        var input = document.getElementById("fileUpload");
-        var pre = document.getElementById("pre");
-        var file = input.files[0];
-        var reader = new FileReader();
+    displayVideo = function () {
+        let input = document.getElementById("fileUpload");
+        let pre = document.getElementById("pre");
+        let file = input.files[0];
+        let reader = new FileReader();
         reader.onload = function (e) {
-            var video = document.createElement("video");
+            let video = document.createElement("video");
             video.src = e.target.result;
             /*video.style.width = '300px';*/
             video.controls = true;
@@ -398,13 +398,13 @@
         };
         reader.readAsDataURL(file);
     }
-    uploadAudio = function () {
-        var input = document.getElementById("fileUpload");
-        var pre = document.getElementById("pre");
-        var file = input.files[0];
-        var reader = new FileReader();
+    displayAudio = function () {
+        let input = document.getElementById("fileUpload");
+        let pre = document.getElementById("pre");
+        let file = input.files[0];
+        let reader = new FileReader();
         reader.onload = function (e) {
-            var video = document.createElement("audio");
+            let video = document.createElement("audio");
             video.src = e.target.result;
             /*video.style.width = '300px';*/
             video.controls = true;

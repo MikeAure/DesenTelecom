@@ -35,6 +35,38 @@
 <script type="text/javascript">
     window.onload = function () {
         document
+            .getElementById("exponential_submitBtn")
+            .addEventListener("click", function () {
+                let textInput = $("#exponential_textInput").val();
+                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let algName = "exponential";
+                if (textInput === "") {
+                    alert("请输入文本");
+                    return; // Stop further execution if the text input is empty
+                }
+
+                fetch("/DP/desenValue", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body:
+                        "&rawData=" +
+                        encodeURIComponent(textInput) +
+                        /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
+                        "&samples=" +
+                        encodeURIComponent(1) +
+                        "&algName=" +
+                        encodeURIComponent(algName),
+                })
+                    .then((response) => response.text())
+                    .then((data) => {
+                        document.getElementById("exponential_outputText").value =
+                            data;
+                    })
+                    .catch((error) => console.error("Error:", error));
+            });
+        document
             .getElementById("report_noisy_max2_submitBtn")
             .addEventListener("click", function () {
                 let textInput = $("#report_noisy_max2_textInput").val();
@@ -99,38 +131,6 @@
                     .catch((error) => console.error("Error:", error));
             });
 
-        document
-            .getElementById("exponential_submitBtn")
-            .addEventListener("click", function () {
-                let textInput = $("#exponential_textInput").val();
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
-                let algName = "exponential";
-                if (textInput === "") {
-                    alert("请输入文本");
-                    return; // Stop further execution if the text input is empty
-                }
-
-                fetch("/DP/desenValue", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body:
-                        "&rawData=" +
-                        encodeURIComponent(textInput) +
-                        /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
-                        "&samples=" +
-                        encodeURIComponent(1) +
-                        "&algName=" +
-                        encodeURIComponent(algName),
-                })
-                    .then((response) => response.text())
-                    .then((data) => {
-                        document.getElementById("exponential_outputText").value =
-                            data;
-                    })
-                    .catch((error) => console.error("Error:", error));
-            });
     };
 </script>
 <div class="ibox-title"></div>

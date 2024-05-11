@@ -55,61 +55,113 @@
             let html = "";
             console.log("sheet:" + sheet)
 
-            let xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.status === 200 && xhr.readyState === 4) {
-                    let data_str = xhr.responseText;
-                    let data = JSON.parse(data_str);
-                    console.log(data.length)
+            fetch("/" + sheet + "param/list")
+                .then(response => response.json())
+                .then(responseText => {
+                        let data = responseText;
+                        console.log(data.length)
 
-                    html += "<div class=\"table-responsive\">" +
-                        "<table class=\"table table-striped\">" +
-                        "<thead>" +
-                        "<tr>" +
-                        "<th>编号</th>" +
-                        "<th>字段缩写</th>" +
-                        "<th>字段名</th>" +
-                        "<th>字段类型</th>" +
-                        /*  "<th>脱敏算法</th>" +
-                          "<th>隐私保护等级</th>" +*/
-                        "</tr>" +
-                        "</thead>" +
-                        "<tbody id=\"table2\">";
-                    for (let i = 0; i < data.length; i++) {
-                        s = data[i];
-                        //console.log(s)
-                        html += "<tr id = " + "row_" + i + ">";
-                        html += "<td>" + s.id + "</td>";
-                        html += "<td>" + s.fieldName + "</td>";
-                        html += "<td>" + s.columnName + "</td>";
-                        html += "<td>"
-                        switch (s.dataType) {
-                            case 0:
-                                html += "数值型数据"
-                                break;
-                            case 1:
-                                html += "编码型数据"
-                                break;
-                            case 3:
-                                html += "文本型数据"
-                                break;
-                            case 4:
-                                html += "时间数据"
-                                break;
+                        html += "<div class=\"table-responsive\">" +
+                            "<table class=\"table table-striped\">" +
+                            "<thead>" +
+                            "<tr>" +
+                            "<th>编号</th>" +
+                            "<th>字段缩写</th>" +
+                            "<th>字段名</th>" +
+                            "<th>字段类型</th>" +
+                            /*  "<th>脱敏算法</th>" +
+                              "<th>隐私保护等级</th>" +*/
+                            "</tr>" +
+                            "</thead>" +
+                            "<tbody id=\"table2\">";
+                        for (let i = 0; i < data.length; i++) {
+                            s = data[i];
+                            //console.log(s)
+                            html += "<tr id = " + "row_" + i + ">";
+                            html += "<td>" + s.id + "</td>";
+                            html += "<td>" + s.fieldName + "</td>";
+                            html += "<td>" + s.columnName + "</td>";
+                            html += "<td>"
+                            switch (s.dataType) {
+                                case 0:
+                                    html += "数值型数据"
+                                    break;
+                                case 1:
+                                    html += "编码型数据"
+                                    break;
+                                case 3:
+                                    html += "文本型数据"
+                                    break;
+                                case 4:
+                                    html += "时间数据"
+                                    break;
+                            }
+                            html += "</td>"
+                            html += "</tr>";
                         }
-                        html += "</td>"
-                        html += "</tr>";
-                    }
-                    document.getElementById("table_body").innerHTML = html
-                }
-            }
+                        document.getElementById("table_body").innerHTML = html
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("请求Excel脱敏参数失败");
+                });
 
-            xhr.open("get", "/" + sheet + "param/list", false);
-            xhr.send();
+
+            // let xhr = new XMLHttpRequest();
+            // xhr.onreadystatechange = function () {
+            //     if (xhr.status === 200 && xhr.readyState === 4) {
+            //         let data_str = xhr.responseText;
+            //         let data = JSON.parse(data_str);
+            //         console.log(data.length)
+            //
+            //         html += "<div class=\"table-responsive\">" +
+            //             "<table class=\"table table-striped\">" +
+            //             "<thead>" +
+            //             "<tr>" +
+            //             "<th>编号</th>" +
+            //             "<th>字段缩写</th>" +
+            //             "<th>字段名</th>" +
+            //             "<th>字段类型</th>" +
+            //             /*  "<th>脱敏算法</th>" +
+            //               "<th>隐私保护等级</th>" +*/
+            //             "</tr>" +
+            //             "</thead>" +
+            //             "<tbody id=\"table2\">";
+            //         for (let i = 0; i < data.length; i++) {
+            //             s = data[i];
+            //             //console.log(s)
+            //             html += "<tr id = " + "row_" + i + ">";
+            //             html += "<td>" + s.id + "</td>";
+            //             html += "<td>" + s.fieldName + "</td>";
+            //             html += "<td>" + s.columnName + "</td>";
+            //             html += "<td>"
+            //             switch (s.dataType) {
+            //                 case 0:
+            //                     html += "数值型数据"
+            //                     break;
+            //                 case 1:
+            //                     html += "编码型数据"
+            //                     break;
+            //                 case 3:
+            //                     html += "文本型数据"
+            //                     break;
+            //                 case 4:
+            //                     html += "时间数据"
+            //                     break;
+            //             }
+            //             html += "</td>"
+            //             html += "</tr>";
+            //         }
+            //         document.getElementById("table_body").innerHTML = html
+            //     }
+            // }
+            //
+            // xhr.open("get", "/" + sheet + "param/list", false);
+            // xhr.send();
             document.getElementById("table_body").innerHTML = html;
-        })
+        });
         //需求模板
-        document.getElementById("fileUpload").addEventListener("change", choose_file)
+        document.getElementById("fileUpload").addEventListener("change", choose_file);
     }
     choose_file = function (event) {
         // 清空
@@ -141,14 +193,11 @@
                 let after = document.getElementById("after");
                 let html = "";
                 console.log("sheet:" + sheet)
-                let xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function () {
-                    if (xhr.status === 200 && xhr.readyState === 4) {
-                        let data_str = xhr.responseText;
-                        let data = JSON.parse(data_str);
+
+                fetch("/" + sheet + "param/list")
+                    .then(response => response.json())
+                    .then(data =>  {
                         console.log(data.length)
-
-
                         html += "<div class=\"table-responsive\">" +
                             "<table class=\"table table-striped\">" +
                             "<thead>" +
@@ -517,11 +566,391 @@
                             html += "</tr>";
                         }
                         document.getElementById("table_body").innerHTML = html
-                    }
-                }
-
-                xhr.open("get", "/" + sheet + "param/list", false);
-                xhr.send();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        alert("请求参数失败")
+                    })
+                // let xhr = new XMLHttpRequest();
+                // xhr.onreadystatechange = function () {
+                //     if (xhr.status === 200 && xhr.readyState === 4) {
+                //         let data_str = xhr.responseText;
+                //         let data = JSON.parse(data_str);
+                //         console.log(data.length)
+                //
+                //
+                //         html += "<div class=\"table-responsive\">" +
+                //             "<table class=\"table table-striped\">" +
+                //             "<thead>" +
+                //             "<tr>" +
+                //             "<th>编号</th>" +
+                //             "<th>字段缩写</th>" +
+                //             "<th>字段名</th>" +
+                //             "<th>字段类型</th>" +
+                //             "<th>脱敏算法</th>" +
+                //             "<th>隐私保护等级</th>" +
+                //
+                //             "</tr>" +
+                //             "</thead>" +
+                //             "<tbody id=\"table2\">";
+                //         for (let i = 0; i < data.length; i++) {
+                //             s = data[i];
+                //             //console.log(s)
+                //             html += "<tr id = " + "row_" + i + ">";
+                //             html += "<td>" + s.id + "</td>";
+                //             html += "<td>" + s.fieldName + "</td>";
+                //             html += "<td>" + s.columnName + "</td>";
+                //             /* html += "<td>"
+                //              // 字段类型
+                //              switch (s.dataType) {
+                //                  case 0:
+                //                      html += "数值型数据"
+                //                      break;
+                //                  case 1:
+                //                      html += "编码型数据"
+                //                      break;
+                //                  case 3:
+                //                      html += "文本型数据"
+                //                      break;
+                //                  case 4:
+                //                      html += "时间数据"
+                //                      break;
+                //              }
+                //              html += "</td>"*/
+                //             html += "<td><select>"
+                //             /*html += "<option selected value = " + -1 + ">请选择字段数据类型</option>"*/
+                //             switch (s.dataType) {
+                //                 case 0:
+                //                     html += "<option value = " + 0 + " selected>数值型数据</option>"
+                //                     /*html += "<option value = " + 1 + ">编码型数据</option>"
+                //                     html += "<option value = " + 3 + ">文本型数据</option>"
+                //                     html += "<option value = " + 4 + ">时间数据</option>"*/
+                //                     break;
+                //                 case 1:
+                //                     /*html += "<option value = " + 0 + ">数值型数据</option>"*/
+                //                     html += "<option value = " + 1 + " selected>编码型数据</option>"
+                //                     /*html += "<option value = " + 3 + ">文本型数据</option>"
+                //                     html += "<option value = " + 4 + ">时间数据</option>"*/
+                //                     break;
+                //
+                //                 case 3:
+                //                     /* html += "<option value = " + 0 + ">数值型数据</option>"
+                //                      html += "<option value = " + 1 + ">编码型数据</option>"*/
+                //                     html += "<option value = " + 3 + " selected>文本型数据</option>"
+                //                     /*html += "<option value = " + 4 + ">时间数据</option>"*/
+                //                     break;
+                //                 case 4:
+                //                     /* html += "<option value = " + 0 + ">数值型数据</option>"
+                //                      html += "<option value = " + 1 + ">编码型数据</option>"
+                //                      html += "<option value = " + 3 + ">文本型数据</option>"*/
+                //                     html += "<option value = " + 4 + " selected>时间数据</option>"
+                //                     break;
+                //             }
+                //             html += "</select></td>"
+                //
+                //             //算法
+                //             html += "<td><select>"
+                //             switch (s.dataType) {
+                //                 case 0:
+                //                     switch (s.k) {
+                //                         case 3:
+                //                             html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                         case 4:
+                //                             html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                         case 5:
+                //                             html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + " selected>基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                         case 6:
+                //                             html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + " selected>基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                         case 7:
+                //                             html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + " selected>基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                         case 8:
+                //                             html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + " selected>数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                         case 9:
+                //                             html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + " selected>数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                         case 10:
+                //                             html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + " selected>数值映射</option>"
+                //                             break;
+                //                         default:
+                //                             html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
+                //                             // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                //                             html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
+                //                             html += "<option value = " + 8 + ">数值偏移</option>"
+                //                             html += "<option value = " + 9 + ">数值取整</option>"
+                //                             html += "<option value = " + 10 + ">数值映射</option>"
+                //                             break;
+                //                     }
+                //                     break;
+                //                 case 1:
+                //                     html += "<option value = " + 2 + " selected>编码型数据差分隐私脱敏算法</option>"
+                //                     break;
+                //
+                //                 case 3:
+                //                     switch (s.k) {
+                //                         case 11:
+                //                             html += "<option value = " + 11 + " selected>尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 13:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + " selected>邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 14:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + " selected>地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 15:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + " selected>名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 16:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + " selected>编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 17:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + " selected>假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 19:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + " selected>密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 20:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + " selected>数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 21:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + " selected>IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                         case 22:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + ">编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + " selected>IP地址随机抑制</option>"
+                //                             break;
+                //                         default:
+                //                             html += "<option value = " + 11 + ">尾部截断</option>"
+                //                             html += "<option value = " + 13 + ">邮箱抑制算法</option>"
+                //                             html += "<option value = " + 14 + ">地址抑制算法</option>"
+                //                             html += "<option value = " + 15 + ">名称抑制算法</option>"
+                //                             html += "<option value = " + 16 + " selected>编号抑制算法</option>"
+                //                             html += "<option value = " + 17 + ">假名化-哈希算法</option>"
+                //                             html += "<option value = " + 19 + ">密码随机置换</option>"
+                //                             html += "<option value = " + 20 + ">数值替换</option>"
+                //                             html += "<option value = " + 21 + ">IP地址全抑制</option>"
+                //                             html += "<option value = " + 22 + ">IP地址随机抑制</option>"
+                //                             break;
+                //                     }
+                //                     break;
+                //                 case 4:
+                //                     switch (s.k) {
+                //                         case 1:
+                //                             html += "<option value = " + 1 + " selected>基于差分隐私的日期加噪算法</option>"
+                //                             html += "<option value = " + 18 + ">日期分组置换</option>"
+                //                             /*html += "<option value = " + 12 + ">时间取整</option>"*/
+                //                             break;
+                //                         case 18:
+                //                             html += "<option value = " + 1 + ">基于差分隐私的日期加噪算法</option>"
+                //                             html += "<option value = " + 18 + " selected>日期分组置换</option>"
+                //                             /*html += "<option value = " + 12 + ">时间取整</option>"*/
+                //                             break;
+                //                         default:
+                //                             html += "<option value = " + 1 + " selected>基于差分隐私的日期加噪算法</option>"
+                //                             html += "<option value = " + 18 + ">日期分组置换</option>"
+                //                             /*html += "<option value = " + 12 + ">时间取整</option>"*/
+                //                             break;
+                //                     }
+                //                     break;
+                //             }
+                //             html += "</select></td>"
+                //
+                //             // 隐私级别
+                //             html += "<td><select>"
+                //             html += "<option value = " + -1 + ">请选择隐私保护程度</option>"
+                //             switch (s.tmParam) {
+                //                 case 0:
+                //                     html += "<option value = " + 0 + " selected>无隐私保护处理</option>"
+                //                     html += "<option value = " + 1 + ">低程度</option>"
+                //                     html += "<option value = " + 2 + ">中程度</option>"
+                //                     html += "<option value = " + 3 + ">高程度</option>"
+                //                     break;
+                //                 case 1:
+                //                     html += "<option value = " + 0 + ">无隐私保护处理</option>"
+                //                     html += "<option value = " + 1 + " selected>低程度</option>"
+                //                     html += "<option value = " + 2 + ">中程度</option>"
+                //                     html += "<option value = " + 3 + ">高程度</option>"
+                //                     break;
+                //                 case 2:
+                //                     html += "<option value = " + 0 + ">无隐私保护处理</option>"
+                //                     html += "<option value = " + 1 + ">低程度</option>"
+                //                     html += "<option value = " + 2 + " selected>中程度</option>"
+                //                     html += "<option value = " + 3 + ">高程度</option>"
+                //                     break;
+                //                 case 3:
+                //                     html += "<option value = " + 0 + ">无隐私保护处理</option>"
+                //                     html += "<option value = " + 1 + ">低程度</option>"
+                //                     html += "<option value = " + 2 + ">中程度</option>"
+                //                     html += "<option value = " + 3 + " selected>高程度</option>"
+                //                     break;
+                //                 default:
+                //                     html += "<option value = " + 0 + ">无隐私保护处理</option>"
+                //                     html += "<option value = " + 1 + ">低程度</option>"
+                //                     html += "<option value = " + 2 + ">中程度</option>"
+                //                     html += "<option value = " + 3 + " selected>高程度</option>"
+                //                     break;
+                //             }
+                //
+                //             html += "</select></td>"
+                //             html += "</tr>";
+                //         }
+                //         document.getElementById("table_body").innerHTML = html
+                //     }
+                // }
+                // xhr.open("get", "/" + sheet + "param/list", false);
+                // xhr.send();
                 document.getElementById("table_body").innerHTML = html;
 
                 //提交脱敏参数，请求脱敏

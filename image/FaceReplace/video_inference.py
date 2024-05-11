@@ -152,7 +152,8 @@ for file in files:
 
 print("start generate video")
 # videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, size)
-videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('H', '2', '6', '4'), fps, size)
+# videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('H', '2', '6', '4'), fps, size)
+videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('V', 'P', '9', '0'), fps, size)
 
 files = glob.glob(os.path.join(result_frames_path, '*.*g'))
 files.sort()

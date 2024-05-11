@@ -170,9 +170,8 @@
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
                     // 获取保护级别
-                    let table_body = document.getElementById("table3")
-                    let tr = table_body.rows[0];
-                    let param = tr.childNodes[0].firstChild.value;
+                    let selections = document.getElementById("privacyLevel-selections")
+                    let param = selections.value;
 
                     let formData = new FormData();
                     formData.set("file", file);
@@ -182,17 +181,17 @@
                     let idx = $("ul .active").index();
                     if (idx === 0) {
                         formData.set("distortion", "distortion");
-                        table_body = document.getElementById("table1")
-                        tr = table_body.rows[0];
-                        let type1 = tr.childNodes[0].firstChild.value;
+                        let distortionAlgs = document.getElementById("distortion-algs")
+                        let type1 = distortionAlgs.value;
                         formData.set("sheet", type1);
-                    } else {
-                        formData.set("distortion", "nodistortion");
-                        table_body = document.getElementById("table2")
-                        tr = table_body.rows[0];
-                        let type2 = tr.childNodes[0].firstChild.value;
-                        formData.set("sheet", type2);
                     }
+                    // else {
+                    //     formData.set("distortion", "nodistortion");
+                    //     table_body = document.getElementById("table2")
+                    //     tr = table_body.rows[0];
+                    //     let type2 = tr.childNodes[0].firstChild.value;
+                    //     formData.set("sheet", type2);
+                    // }
 
                     fetch('/File/desenFile', {
                         method: 'POST',
@@ -443,7 +442,7 @@
                                 </thead>
                                 <tbody id="table1">
                                 <tr>
-                                    <td><select>
+                                    <td><select id="distortion-algs">
                                             <option value="dp" selected> 差分算法</option>
                                             <#-- <option value="graph2" selected> 图形失真脱敏算法B </option>-->
                                         </select></td>
@@ -461,7 +460,7 @@
                                     </thead>
                                     <tbody id="table3">
                                     <tr>
-                                        <td><select>
+                                        <td><select id="privacyLevel-selections">
                                                 <option value="0"> 低程度</option>
                                                 <option value="1" selected> 中程度</option>
                                                 <option value="2"> 高程度</option>

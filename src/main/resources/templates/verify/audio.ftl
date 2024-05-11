@@ -254,31 +254,77 @@
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
     <script type="text/javascript">
         window.onload = function () {
-            document.getElementById("fileUpload").addEventListener("change", choose_file)
+            document.getElementById("fileUpload").addEventListener("change", chooseFile)
             // 更改算法选项
             document.getElementById("distortionaudio_algName").addEventListener("change", function () {
                 // 清空after
                 let after = document.getElementById("after");
                 after.innerHTML = "";
-
                 // 失真算法名
                 let distortionaudio_algName = document.getElementById("distortionaudio_algName").value;
-                if (distortionaudio_algName === "remove_audio" || distortionaudio_algName === "add_beep") {
+                if (distortionaudio_algName === "voice_replace") {
                     document.getElementById("privacyLevel").style.display = "none";
-                    document.getElementById("audioTime").style.display = "block";
-                    /* formData.append("sheet", "1");
-                     formData.append("algName", distortionaudio_algName);
-                     formData.append("params", document.getElementById("distortionaudio_privacyLevel").value());*/
                 } else {
                     document.getElementById("privacyLevel").style.display = "block";
-                    document.getElementById("audioTime").style.display = "none";
-                    /*formData.append("sheet", document.getElementById("chixu").value());
-                    formData.append("algName", distortionaudio_algName);
-                    formData.append("params", document.getElementById("start").value());*/
                 }
             })
+            document.getElementById("submit").addEventListener("click", originalSubmit);
         }
-        choose_file = function (event) {
+
+        function originalSubmit() {
+            let file = document.getElementById("fileUpload").files[0];
+            if (!file) {
+                alert("未选择待脱敏文件");
+                return;
+            }
+            // 清空after
+            let after = document.getElementById("after");
+            after.innerHTML = "";
+            // 构建formdata
+            let formData = new FormData();
+            formData.set("file", file);
+            //formData.append("params", param);
+            let idx = $("ul .active").index();
+            console.log(idx);
+            let privacyLevelTable = document.getElementById("privacyLevel");
+            let privacyLevel = document.getElementById("distortionaudio_privacyLevel").value;
+            if (idx === 0) {
+                let distortionAudioAlgName = document.getElementById("distortionaudio_algName").value;
+                switch (distortionAudioAlgName) {
+                    case "voice_replace":
+                        formData.set("sheet", distortionAudioAlgName);
+                        formData.set("params", "1");
+                        formData.set("algName", distortionAudioAlgName);
+                        privacyLevelTable.style.display = "none";
+                        break;
+
+                    default:
+                        formData.set("sheet", distortionAudioAlgName);
+                        formData.set("params", privacyLevel);
+                        formData.set("algName", distortionAudioAlgName);
+                        privacyLevelTable.style.display = "block";
+                        break;
+                }
+            }
+            console.log(formData)
+            fetch('/File/desenFile', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    // 创建音频标签
+                    const audioElement = document.createElement('audio');
+                    audioElement.controls = true;
+                    // 使用Blob URL设置音频数据
+                    audioElement.src = URL.createObjectURL(blob);
+                    // 添加到页面中
+                    after.appendChild(audioElement);
+                })
+                .catch(error => console.error('Error:', error));
+
+        }
+        function chooseFile (event) {
             // 清空
             document.getElementById("pre").innerHTML = "";
             document.getElementById("after").innerHTML = "";
@@ -294,70 +340,16 @@
                 console.log(fileExtension)
 
                 if (audioType.includes(fileExtension)) {
-                    uploadAudio()
+                    displayAudio()
                     //提交脱敏参数，请求脱敏
-                    document.getElementById("submit").onclick = function () {
-                        // 清空after
-                        let after = document.getElementById("after");
-                        after.innerHTML = "";
-                        // 构建formdata
-                        let formData = new FormData();
-                        formData.set("file", file);
-                        //formData.append("params", param);
 
-                        let idx = $("ul .active").index();
-                        console.log(idx);
-                        if (idx === 0) {
-                            let distortionaudio_algName = document.getElementById("distortionaudio_algName").value;
-                            if (distortionaudio_algName === "dpAudio") {
-                                formData.set("sheet", "1");
-                                formData.set("algName", distortionaudio_algName);
-                                formData.set("params", document.getElementById("distortionaudio_privacyLevel").value);
-                            } else {
-                                document.getElementById("privacyLevel").style.display = "none";
-                                document.getElementById("audioTime").style.display = "block";
-                                formData.set("sheet", document.getElementById("chixu").value);
-                                formData.set("algName", distortionaudio_algName);
-                                formData.set("params", document.getElementById("start").value);
-                            }
-
-                        }
-                        for (let [key, value] of formData) {
-                            console.log("formData:" + key + " " + value);
-                        }
-                        // else {
-                        // selections = document.getElementById("distortionaudio_algName")
-                        // // tr = table_body.rows[0];
-                        // let type2 = selections.value;
-                        // console.log(type2);
-                        // formData.append("sheet", "2");
-                        // formData.append("algName", type2);
-                        // }
-                        // 获取算法类型
-                        console.log(formData)
-                        fetch('/File/desenFile', {
-                            method: 'POST',
-                            body: formData
-                        })
-                            .then(response => response.blob())
-                            .then(blob => {
-                                // 创建音频标签
-                                const audioElement = document.createElement('audio');
-                                audioElement.controls = true;
-                                // 使用Blob URL设置音频数据
-                                audioElement.src = URL.createObjectURL(blob);
-                                // 添加到页面中
-                                after.appendChild(audioElement);
-                            })
-                            .catch(error => console.error('Error:', error));
-
-                    }
                 } else {
                     alert("请选择音频文件");
                 }
             }
         }
-        uploadAudio = function () {
+
+        function displayAudio () {
             let input = document.getElementById("fileUpload");
             let pre = document.getElementById("pre");
             let file = input.files[0];
@@ -409,7 +401,10 @@
                                 <tr>
                                     <td><select id="distortionaudio_algName">
                                             <option value="dpAudio" selected> 基于差分隐私的声纹特征脱敏算法</option>
-<#--                                            <option value="add_beep"> 基于正弦波的音频替换方法</option>-->
+                                            <option value="voice_replace">声纹替换算法</option>
+                                            <option value="apply_audio_effects">音频变形</option>
+                                            <option value="audio_reshuffle">音频重排</option>
+<#--                                           <option value="add_beep"> 基于正弦波的音频替换方法</option>-->
                                         </select></td>
                                 </tr>
                                 </tbody>

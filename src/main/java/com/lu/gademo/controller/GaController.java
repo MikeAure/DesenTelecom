@@ -22,18 +22,18 @@ public class  GaController extends BaseController{
 		return "welcome";
 	}
 	
-	@RequestMapping(value = {"/statistics"})
-	public String resultShow(){
-		return "statistics";
-	}
+//	@RequestMapping(value = {"/statistics"})
+//	public String resultShow(){
+//		return "statistics";
+//	}
 
-	@RequestMapping(value = {"maptest"})
-	public String maptest(){ return "maptest";}
+//	@RequestMapping(value = {"maptest"})
+//	public String maptest(){ return "maptest";}
 
-	@RequestMapping(value = {"/file"})
-	public String file(){
-		return "file";
-	}
+//	@RequestMapping(value = {"/file"})
+//	public String file(){
+//		return "file";
+//	}
 
 	// 五十场景模板
 	@RequestMapping(value = { "/fifty_scene/{name}" })

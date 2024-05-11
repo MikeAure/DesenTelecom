@@ -1,11 +1,10 @@
 import cv2
-from cv2.typing import MatLike
 import random
 import numpy as np
 import os
 import argparse
 
-def exchange_channel(img: MatLike):
+def exchange_channel(img):
     random.seed(os.urandom(128))
 
     # 获取图片的高度和宽度

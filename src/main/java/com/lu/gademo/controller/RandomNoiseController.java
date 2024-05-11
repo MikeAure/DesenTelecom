@@ -4,6 +4,8 @@ import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.Util;
 import com.lu.gademo.utils.impl.UtilImpl;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +25,11 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping("/RandomNoise")
+@AllArgsConstructor
+@Slf4j
 public class RandomNoiseController {
-    // 工具类
-//    Util util = new UtilImpl();
-    @Autowired
     Dp dp;
+    Util util;
     @ResponseBody
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenValue(@RequestParam String rawData,
@@ -35,54 +37,7 @@ public class RandomNoiseController {
                              @RequestParam String algName) {
         String[] types = algName.split(",");
         algName = types[types.length - 1];
-        System.out.println(algName);
-        System.out.println(rawData);
-//        // python命令
-//        String python = util.isLinux() ? "python3" : "conda run -n torch_env python";
-//        // 当前路径
-//        File directory = new File("");
-//        String currentPath = directory.getAbsolutePath();
-//
-//        try {
-//            // 指定Python脚本路径
-//            String desenApp = Paths.get(currentPath, "perturbation", "other", "randomNoise.py").toString();
-//            System.out.println(desenApp);
-//
-//            // 创建参数列表
-//            String[] command = {python, desenApp, algName, rawData, samples};
-//            System.out.println(Arrays.toString(command));
-//
-//            // 创建ProcessBuilder对象
-////            ProcessBuilder processBuilder = new ProcessBuilder(command);
-//
-//            // 启动进程
-//            System.out.println(String.join(" ", command));
-//            Process process = Runtime.getRuntime().exec(String.join(" ", command));
-//
-//            // 获取进程的输出流
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//
-//            // 存储结果
-//            StringBuilder result = new StringBuilder();
-//
-//            // 读取输出
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                System.out.println("Python输出: " + line);
-//                result.append(line);
-//            }
-//
-//            // 等待进程执行结束
-//            int exitCode = process.waitFor();
-//            System.out.println("Python脚本执行完毕，退出码: " + exitCode);
-//
-//            System.out.println(result);
-//            return result.toString();
-//
-//        } catch (IOException | InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        return rawData;
+        log.info(algName);
         int algNum = 0;
         switch (algName) {
             //
@@ -129,55 +84,7 @@ public class RandomNoiseController {
 
         String[] types = algName.split(",");
         algName = types[types.length - 1];
-        System.out.println(algName);
-        System.out.println(rawData);
-//        // python命令
-//        String python = util.isLinux() ? "python3" : "conda run -n torch_env python";
-//        // 当前路径
-//        File directory = new File("");
-//        String currentPath = directory.getAbsolutePath();
-//
-//        try {
-//            // 指定Python脚本路径
-//            //String pythonScriptPath = "path/to/your/python/script.py";
-//            String desenApp = Paths.get(currentPath, "perturbation", "other", "randomNoise.py").toString();
-//            System.out.println(desenApp);
-//
-//            // 创建参数列表
-//            String[] command = {python, desenApp, algName, rawData, samples, c, t};
-//            System.out.println(Arrays.toString(command));
-//
-//            // 创建ProcessBuilder对象
-////            ProcessBuilder processBuilder = new ProcessBuilder(command);
-//
-//            // 启动进程
-//            System.out.println(String.join(" ", command));
-//            Process process = Runtime.getRuntime().exec(String.join(" ", command));
-//
-//            // 获取进程的输出流
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//
-//            // 存储结果
-//            StringBuilder result = new StringBuilder();
-//
-//            // 读取输出
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                System.out.println("Python输出: " + line);
-//                result.append(line);
-//            }
-//
-//            // 等待进程执行结束
-//            int exitCode = process.waitFor();
-//            System.out.println("Python脚本执行完毕，退出码: " + exitCode);
-//
-//            System.out.println(result);
-//            return result.toString();
-//
-//        } catch (IOException | InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        return rawData;
+        log.info(algName);
         int algNum;
         switch (algName) {
             //

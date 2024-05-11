@@ -99,7 +99,7 @@
                         let pre = document.getElementById("audio_reshuffle_pre");
                         let reader = new FileReader();
                         reader.onload = function (e) {
-                            var video = document.createElement("audio");
+                            let video = document.createElement("audio");
                             video.src = e.target.result;
                             video.controls = true;
                             pre.appendChild(video);

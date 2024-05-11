@@ -2,6 +2,7 @@ package com.lu.gademo.utils;
 
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DSObject {
 
@@ -60,6 +61,7 @@ public class DSObject {
     public void setList(List<?> list) {
         this.list = list;
     }
+
 
     @Override
     public boolean equals(Object obj) {

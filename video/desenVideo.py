@@ -4,6 +4,7 @@ from cv2.typing import MatLike
 import cv2           # Importing the OpenCV library for computer vision tasks
 from cvzone.SelfiSegmentationModule import SelfiSegmentation
 
+
 def add_color_offset(img: MatLike, offset: int):
     offset = offset % 256
 
@@ -66,8 +67,8 @@ def pixelate_video(input_video, output_path, block_size: int = 5):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    #fourcc = cv2.VideoWriter_fourcc('V', 'P', '9', '0')
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    fourcc = cv2.VideoWriter_fourcc('V', 'P', '9', '0')
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
     while True:
@@ -89,7 +90,10 @@ def gaussian_blur_video(input_video, output_path, radius: int = 2):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+
+
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
     while True:
@@ -111,7 +115,9 @@ def box_blur_video(input_video, output_path, radius: int = 2):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4'
+    fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
     while True:
@@ -133,7 +139,9 @@ def replace_video(input_video, output_path):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
     while True:

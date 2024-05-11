@@ -116,7 +116,8 @@ public class SendData {
     /**
      * 工具类
      */
-    Util util = new UtilImpl();
+    @Autowired
+    Util util;
     ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -168,8 +169,8 @@ public class SendData {
 //                    e.printStackTrace();
 //            }
 
-            BufferedReader bfReader = new BufferedReader(new FileReader("src\\main\\resources\\test_request.json"));
-            BufferedWriter bfWriter = new BufferedWriter((new FileWriter("src\\main\\resources\\test_request2.json")));
+//            BufferedReader bfReader = new BufferedReader(new FileReader("src\\main\\resources\\test_request.json"));
+//            BufferedWriter bfWriter = new BufferedWriter((new FileWriter("src\\main\\resources\\test_request2.json")));
 
             byte[] evaRequestTcpPacket = tcpPacket.buildPacket();
             // 发送
@@ -321,7 +322,6 @@ public class SendData {
             dataJson1.set("data", data1);
             TcpPacket tcpPacket1 = new TcpPacket(objectMapper.writeValueAsString(dataJson1));
             byte[] tcp1 = tcpPacket1.buildPacket();
-
 
             // 发送
             outputStream.write(tcp1);

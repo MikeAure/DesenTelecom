@@ -69,11 +69,10 @@ public class CommandExecutor {
         Util util = new UtilImpl();
 //        String python = util.isLinux() ? "python3" : "python";
         String python;
-
-        if (util.isLinux()) {
-            python = "python3";
-        } else if (util.isCondaInstalled()){
+        if (util.isCondaInstalled(util.isLinux())) {
             python = "conda run -n torch_env python";
+        } else if (util.isLinux()) {
+            python = "python3";
         } else {
             python = "python";
         }
@@ -92,7 +91,8 @@ public class CommandExecutor {
             Path fileParent = Paths.get(path).getParent();
             // System.out.println(fileParent.toString());
             // 设置Python working directory
-            return CommandExecutor.openExe(command.toString(), fileParent.normalize().toFile().getAbsolutePath());
+            System.out.println(fileParent.normalize().toFile().getAbsolutePath());
+            return CommandExecutor.openExe(command.toString(), fileParent.toFile().getAbsolutePath());
 
         } catch (Exception e) {
             log.error(e.getMessage());

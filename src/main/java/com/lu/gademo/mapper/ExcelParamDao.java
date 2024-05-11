@@ -3,7 +3,6 @@ package com.lu.gademo.mapper;
 import com.lu.gademo.entity.ExcelParam;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 

@@ -9,7 +9,7 @@ public class UtilsTest {
     public void testConda() {
         UtilImpl util = new UtilImpl();
 
-        if (util.isCondaInstalled()) {
+        if (util.isCondaInstalled(util.isLinux())) {
             System.out.println("conda installed on this machine");
         } else {
             System.out.println("conda not installed");

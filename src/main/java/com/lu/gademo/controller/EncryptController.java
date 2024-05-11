@@ -1,15 +1,16 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.user.Customer;
 import com.lu.gademo.trace.client.user.Driver;
 import com.lu.gademo.trace.server.gui.ServerMain;
-import com.lu.gademo.timeSeries.MainTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/Encrypt")
@@ -28,17 +29,16 @@ public class EncryptController {
     @ResponseBody
     @RequestMapping(value = "/desenGraph", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenGraph(@RequestParam String rawData) throws Exception {
-
         return MainTest.encryptGraph(rawData);
     }
 
     @ResponseBody
     @RequestMapping(value = "/customerSetStartCoordinate", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ServerResponse customerSetStartCoordinate(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
-        try{
+        try {
             customer.setStartLatitude(Double.parseDouble(startLatitude));
             customer.setStartLongitude(Double.parseDouble(startLongitude));
-            System.out.println("Start: " + String.valueOf(customer.getStartLatitude()) + " " + String.valueOf(customer.getStartLongitude()));
+            System.out.println("Start: " + customer.getStartLatitude() + " " + customer.getStartLongitude());
             return new ServerResponse("ok");
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,11 +50,11 @@ public class EncryptController {
     @ResponseBody
     @RequestMapping(value = "/customerSetEndCoordinate", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ServerResponse customerSetEndCoordinate(@RequestParam String endLatitude, @RequestParam String endLongitude) throws Exception {
-        try{
+        try {
             customer.setEndLatitude(Double.parseDouble(endLatitude));
             customer.setEndLongitude(Double.parseDouble(endLongitude));
-            System.out.println("Destination: " + String.valueOf(customer.getEndLatitude()) + " " + String.valueOf(customer.getEndLongitude()));
-            customer.destInfoStr = "纬度：" + String.valueOf(customer.getEndLatitude()) + " 经度：" + String.valueOf(customer.getEndLongitude());
+            System.out.println("Destination: " + customer.getEndLatitude() + " " + customer.getEndLongitude());
+            customer.destInfoStr = "纬度：" + customer.getEndLatitude() + " 经度：" + customer.getEndLongitude();
             return new ServerResponse("ok");
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,6 +62,7 @@ public class EncryptController {
         }
 
     }
+
     @ResponseBody
     @RequestMapping(value = "/traceCustomerLogin", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ServerResponse traceCustomerLogin() throws Exception {

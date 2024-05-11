@@ -5,7 +5,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -461,19 +460,30 @@ public class UtilImpl implements Util {
 //    }
 
     @Override
-    public Boolean isCondaInstalled() {
-        // 假定conda已被添加到系统变量中
+    public Boolean isCondaInstalled(boolean isLinux) {
+        List<String> command = new ArrayList<>();
+        if (isLinux) {
+            command.add("/bin/bash");
+            command.add("-c");
+            command.add("conda env list | grep \"torch_env\"");
+        } else {
+            command.add("cmd.exe");
+            command.add("/c");
+            command.add("conda env list | findstr \"torch_env\"");
+        }
         try {
-            Process process = Runtime.getRuntime().exec("conda --version");
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            Process process = processBuilder.start();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
-            if ((line = bufferedReader.readLine()) != null) {
-                return true;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains("torch_env")) {
+                    return true;
+                }
             }
         } catch (IOException e) {
             return false;
         }
         return false;
-
     }
 }

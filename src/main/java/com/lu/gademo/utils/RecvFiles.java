@@ -48,7 +48,7 @@ public class RecvFiles {
         return jsonResponse.getBody();
     }
 
-    public void updateTaxiParams() throws IOException {
+    public void updateTaxiParams() {
         onlineTaxi2Param columnNameFromTable = onlineTaxi2Dao.getOne(1);
 //        for (onlineTaxi2Param name : columnNameFromTable) {
 //            System.out.println(name);
@@ -71,8 +71,7 @@ public class RecvFiles {
         }
 
         return entities;
-       // TODO
-//        return null;
+
     }
 
     public static void createExcelFile(List<ExcelEntity> entities, String filePath) throws IOException {
@@ -87,7 +86,6 @@ public class RecvFiles {
                 columnMap.computeIfAbsent(entity.getAttributeName(), k -> new ArrayList<>()).add(entity.getInfoContent());
             }
         }
-
         int colIdx = 0;
         for (Map.Entry<String, ArrayList<String>> entry : columnMap.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());

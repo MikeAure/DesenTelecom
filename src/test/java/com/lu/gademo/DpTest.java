@@ -67,7 +67,7 @@ public class DpTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 5, 0.5);
+        DSObject result = dp.service(dsObject, 5, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }

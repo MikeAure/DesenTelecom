@@ -68,5 +68,5 @@ public interface Util {
 //    public void excelToMysql(String tableName, String excelFilePath);
     
     // 检测本机是否安装Conda
-    public Boolean isCondaInstalled();
+    public Boolean isCondaInstalled(boolean isLinux);
 }

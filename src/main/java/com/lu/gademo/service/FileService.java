@@ -26,5 +26,5 @@ public interface FileService {
     ResponseEntity<byte[]> replaceVideoBackground(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException;
     ResponseEntity<byte[]> replaceFace( MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException;
     ResponseEntity<byte[]> replaceFaceVideo( MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException;
-
+    String desenText(String textInput, String textType, String privacyLevel, String algName) throws ParseException;
 }

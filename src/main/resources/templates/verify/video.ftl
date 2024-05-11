@@ -214,7 +214,6 @@
                     };
                     reader.readAsDataURL(imageFile);
                     //提交脱敏参数，请求脱敏
-
                 }
             }
         });
@@ -407,6 +406,8 @@
         // 清空
         document.getElementById("pre").innerHTML = "";
         document.getElementById("after").innerHTML = "";
+        document.getElementById("mid-image").innerHTML = "";
+
         // 视频格式
         const videoType = ['mp4', 'avi']
         //读取文件
@@ -491,7 +492,7 @@
         let privacyLevels = document.getElementById("privacy-levels")
         let param = privacyLevels.value;
         let file = document.getElementById("fileUpload").files[0];
-        if (file === null || file === undefined) {
+        if (!file) {
             alert("未选择待脱敏文件");
             return;
         }
