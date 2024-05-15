@@ -1,10 +1,20 @@
 package com.lu.gademo.entity.evidence;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.beans.factory.annotation.Value;
+
 import javax.persistence.*;
 import java.util.Objects;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Entity
 @Table(name = "req_evidence_save")
+// 存证请求格式
 public class ReqEvidenceSave {
     @Basic
     @Column(name = "system_id")
@@ -13,7 +23,7 @@ public class ReqEvidenceSave {
     @Column(name = "system_ip")
     private String systemIP;
     @Basic
-    @Column(name = "main_cmd")
+    @Value("system_port")
     private Integer mainCMD;
     @Basic
     @Column(name = "sub_cmd")
@@ -38,112 +48,11 @@ public class ReqEvidenceSave {
     @Column(name = "data_sign")
     private String datasign;
 
-    public int getSystemID() {
-        return systemID;
-    }
-
-    public void setSystemID(int systemId) {
-        this.systemID = systemId;
-    }
-
-    public String getSystemIP() {
-        return systemIP;
-    }
-
-    public void setSystemIP(String systemIp) {
-        this.systemIP = systemIp;
-    }
-
-    public Integer getMainCMD() {
-        return mainCMD;
-    }
-
-    public void setMainCMD(Integer mainCmd) {
-        this.mainCMD = mainCmd;
-    }
-
-    public Integer getSubCMD() {
-        return subCMD;
-    }
-
-    public void setSubCMD(Integer subCmd) {
-        this.subCMD = subCmd;
-    }
-
-    public String getEvidenceID() {
-        return evidenceID;
-    }
-
-    public void setEvidenceID(String evidenceId) {
-        this.evidenceID = evidenceId;
-    }
-
-    public Integer getMsgVersion() {
-        return msgVersion;
-    }
-
-    public void setMsgVersion(Integer msgVersion) {
-        this.msgVersion = msgVersion;
-    }
-
-    public String getReqtime() {
-        return reqtime;
-    }
-
-    public void setReqtime(String reqTime) {
-        this.reqtime = reqTime;
-    }
-
-    public Long getObjectSize() {
-        return objectSize;
-    }
-
-    public void setObjectSize(Long objectSize) {
+    public ReqEvidenceSave(String evidenceID, Long objectSize, String objectMode) {
+        this.evidenceID = evidenceID;
         this.objectSize = objectSize;
-    }
-
-    public String getObjectMode() {
-        return objectMode;
-    }
-
-    public void setObjectMode(String objectMode) {
         this.objectMode = objectMode;
     }
 
-    public String getDatasign() {
-        return datasign;
-    }
 
-    public void setDatasign(String dataSign) {
-        this.datasign = dataSign;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ReqEvidenceSave that = (ReqEvidenceSave) o;
-        return systemID == that.systemID && Objects.equals(systemIP, that.systemIP) && Objects.equals(mainCMD, that.mainCMD) && Objects.equals(subCMD, that.subCMD) && Objects.equals(evidenceID, that.evidenceID) && Objects.equals(msgVersion, that.msgVersion) && Objects.equals(reqtime, that.reqtime) && Objects.equals(objectSize, that.objectSize) && Objects.equals(objectMode, that.objectMode) && Objects.equals(datasign, that.datasign);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(systemID, systemIP, mainCMD, subCMD, evidenceID, msgVersion, reqtime, objectSize, objectMode, datasign);
-    }
-
-    @Override
-    public String toString() {
-        return "ReqEvidenceSave{" +
-                "systemID=" + systemID +
-                ", systemIP='" + systemIP + '\'' +
-                ", mainCMD=" + mainCMD +
-                ", subCMD=" + subCMD +
-                ", evidenceID='" + evidenceID + '\'' +
-                ", msgVersion=" + msgVersion +
-                ", reqtime='" + reqtime + '\'' +
-                ", objectSize=" + objectSize +
-                ", objectMode='" + objectMode + '\'' +
-                ", datasign='" + datasign + '\'' +
-                '}';
-    }
 }

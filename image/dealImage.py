@@ -76,7 +76,8 @@ if __name__ == '__main__':
     pixelate_block_size = [5, 10, 15][param]
     gaussian_blur_radius = [2, 4, 8][param]
     box_blur_radius = [2, 4, 8][param]
-    rectangle_range = [(100, 100, 200, 200), (50, 50, 300, 300), (25, 25, 400, 400)][param]  # Example rectangle range (x, y, width, height)
+    rectangle_range = [(100, 100, 200, 200), (50, 50, 300, 300), (25, 25, 400, 400)][param]
+    # Example rectangle range (x, y, width, height)
 
     # 执行算法,并保存
     if algName == "pixelate":

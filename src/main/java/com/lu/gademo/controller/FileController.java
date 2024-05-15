@@ -95,7 +95,7 @@ public class FileController extends BaseController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/desenText", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "desenText", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenText(@RequestParam String textInput,
                             @RequestParam String textType,
                             @RequestParam String privacyLevel,

@@ -6,6 +6,7 @@ import sys
 from sklearn import decomposition
 import shutil
 import os
+from pathlib import Path
 
 
 def get_data_set_features(res_model):
@@ -38,7 +39,7 @@ def read_features(image_path):
 
 
 def get_similar_image(res_model, path, image):
-    features, paths = read_features(path + "\\image\\ImageRetrieval\\data\\FEATURES")
+    features, paths = read_features(path + "\\data\\FEATURES")
     q = CNN.extract_feature(res_model, image)
     features.append(q)
     paths.append("image")
@@ -55,7 +56,7 @@ def get_similar_image(res_model, path, image):
 
 if __name__ == '__main__':
     model = CNN.make_model()
-    current_path = os.getcwd();
+    current_path = os.getcwd()
     print(current_path)
     path = get_similar_image(model, current_path, sys.argv[1])
-    shutil.copy(current_path + "\\image\\ImageRetrieval\\" + path, sys.argv[2])
+    shutil.copy(Path(current_path, path), sys.argv[2])

@@ -296,3 +296,4 @@ raw_files
 *.drawio
 *.pt
 /Test Results - AlgorithmsFactoryTest.html
+src/test/resources/test_data

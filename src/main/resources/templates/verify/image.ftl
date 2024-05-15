@@ -130,6 +130,7 @@
             let privacy_level = document.getElementById("privacyLevel");
             let uploadForm = document.getElementById("uploadForm");
             let facesubUpload = document.getElementById("facesub-upload");
+
             document.getElementById("img_face_sub_src_fileupload").addEventListener("change", function (event) {
                 // 清空
                 document.getElementById("pre").innerHTML = "";
@@ -255,8 +256,16 @@
             let replaceResult = document.getElementById("replace-result");
             replaceResult.innerHTML = "";
             let formData = new FormData();
-            let file = document.getElementById("fileUpload").files[0];
-            formData.set("file", file);
+
+            let fileInput = document.getElementById("fileUpload");
+            if (fileInput.files.length === 0) {
+                alert("未选择文件");
+                return;
+            } else {
+                let file = fileInput.files[0];
+                formData.set("file", file);
+            }
+
             /*formData.append("sheet", "media");*/
 
             let idx = $("ul .active").index();
@@ -279,9 +288,8 @@
                 }
             } else {
                 formData.set("params", 0);
-                let tableBody = document.getElementById("table2")
-                let tr = tableBody.rows[0];
-                let type2 = tr.childNodes[0].firstChild.value;
+                let tableBody = document.getElementById("non-distortion-algos")
+                let type2 = tableBody.value;
                 formData.set("sheet", type2);
                 formData.set("algName", type2);
             }
@@ -299,9 +307,10 @@
                     dealedImg.src = URL.createObjectURL(blob);
                     after.appendChild(dealedImg);
                     console.log("return")
-                })
+                });
 
         }
+
         function chooseFile (event) {
             // 清空
             document.getElementById("pre").innerHTML = "";
@@ -522,7 +531,7 @@
                                 </thead>
                                 <tbody id="table2">
                                 <tr>
-                                    <td><select>
+                                    <td><select id="non-distortion-algos">
                                             <option value="retrieval"> 相似医疗图像安全检索</option>
                                         </select></td>
                                 </tr>

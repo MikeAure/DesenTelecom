@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.springframework.stereotype.Component;
 
 import javax.swing.tree.ExpandVetoException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.MessageDigest;
@@ -120,7 +121,7 @@ public class DpUtilImpl implements DpUtil {
     }
     @Override
     //数值型数据处理()
-    public List<Double> laplaceToValue(List<Object> datas, Integer privacyLevel) {
+    public List<Double> laplaceToValue(List<Object> datas, Integer privacyLevel){
         List<Double> re_data = new ArrayList<>();
         //读取数据
         for (Object data : datas) {
@@ -154,6 +155,7 @@ public class DpUtilImpl implements DpUtil {
         //执行laplace加噪
         return NumberCode_s(re_data, privacyLevel);
     }
+
     //数值型处理
     private List<Double> NumberCode_s(List<Double> re_data, Integer privacyLevel) {
         List<Double> newData = new ArrayList<>();
@@ -792,26 +794,27 @@ public class DpUtilImpl implements DpUtil {
     public List<Date> dpDate(List<Object> datas, Integer privacyLevel) throws ParseException {
 
         List<Date> re_data = new ArrayList<>();
-        java.util.Date utilDate;
-        // Returning null here is not a good way to handle exception,
-        // but it's a compromise that had to be made in order to unify the interface
+        java.util.Date tempDate;
+
         for (Object data : datas) {
-            if (data == null)
+            if (data == null) {
                 re_data.add(null);
-            else {
-
-                utilDate = parseDate(data);
-
-                if (utilDate == null) {
-                    throw new ParseException("Parse date error : " + data, 0);
+            } else {
+                tempDate = parseDate(data);
+                if (tempDate == null) {
+                    // TODO: 应有更好的处理方法
+//                    throw new ParseException("Parse date error : " + data, 0);
+                    re_data.add(null);
+                } else {
+                    Date parsedDate = new Date(tempDate.getTime());
+                    re_data.add(parsedDate);
                 }
-                Date sqlDate = new Date(utilDate.getTime());
-                re_data.add(sqlDate);
             }
         }
         //不保护，直接返回
-        if (privacyLevel == 0)
+        if (privacyLevel == 0) {
             return re_data;
+        }
         List<Date> newDate = new ArrayList<>();
         BigDecimal si = new BigDecimal(1);
         BigDecimal epsilon = new BigDecimal(0.001);
@@ -883,7 +886,7 @@ public class DpUtilImpl implements DpUtil {
         }
         //判断匿名组k大小
         int k = 1 ;
-       if (privacyLevel == 0) {
+        if (privacyLevel == 0) {
            List<Date> reData = new ArrayList<>();
            for (Object data : datas) {
                if (data == null) {
@@ -893,7 +896,7 @@ public class DpUtilImpl implements DpUtil {
                }
            }
            return reData;
-       }
+        }
 
         //获取参数k
         if (privacyLevel == 1) {

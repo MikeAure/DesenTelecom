@@ -37,7 +37,7 @@ def image_exchange_channel(image_path: str, new_image_path: str):
     cv2.imwrite(new_image_path, img)
 
     
-def add_color_offset(img: MatLike, offset: int):
+def add_color_offset(img, offset: int):
     offset = offset % 256
     
     image_array = np.array(img, dtype=np.uint8)

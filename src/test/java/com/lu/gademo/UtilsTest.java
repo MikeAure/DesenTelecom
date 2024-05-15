@@ -4,6 +4,16 @@ package com.lu.gademo;
 import com.lu.gademo.utils.impl.UtilImpl;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class UtilsTest {
     @Test
     public void testConda() {
@@ -14,5 +24,80 @@ public class UtilsTest {
         } else {
             System.out.println("conda not installed");
         }
+    }
+
+    @Test
+    public void testCurrentPath() {
+        Path current = Paths.get("");
+        System.out.println(current.toAbsolutePath());
+
+    }
+
+    @Test
+    public void testPath() throws IOException {
+        // 当前路径
+
+        Path currentPath = Paths.get("");
+        // 时间
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+        // 源文件保存目录
+        Path rawDirectory = currentPath.resolve("raw_files");
+        Path desenDirectory = currentPath.resolve("desen_files");
+
+        if (!Files.exists(rawDirectory)) {
+            Files.createDirectory(rawDirectory);
+        }
+
+        if (!Files.exists(desenDirectory)) {
+            Files.createDirectory(desenDirectory);
+        }
+        // 文件名
+        String rawFileName = "test.txt";
+        String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
+
+
+        // 源文件保存路径
+        Path rawFilePath = rawDirectory.resolve(rawFileName);
+        byte[] content = new byte[40];
+        FileInputStream fileInputStream = new FileInputStream(rawFilePath.toFile());
+        while(fileInputStream.available() > 0) {
+            fileInputStream.read(content);
+        }
+        System.out.println(new String(content, StandardCharsets.UTF_8));
+
+        // 脱敏后文件信息
+        String desenFileName = "desen_" + rawFileName;
+        Path desenFilePath = desenDirectory.resolve("desen_" + rawFileName);
+
+        System.out.println(currentPath.toAbsolutePath());
+        System.out.println(rawFilePath.toAbsolutePath());
+        System.out.println(desenFilePath.toAbsolutePath());
+    }
+
+    @Test
+    void extractInfo() throws IOException {
+        Path filePath = Paths.get("./temp.txt");
+        String content = new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8);
+
+        String regex = "/fifty_scene/(\\w+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+
+        List<String> matches = new ArrayList<>();
+        while (matcher.find()) {
+            matches.add("\"" + matcher.group(1) + "\"");
+        }
+
+        System.out.println(matches);
+    }
+
+    @Test
+    void extrctExcelFilesName() throws IOException {
+        List<String> result = new ArrayList<>();
+        Path excelFileDirectory = Paths.get("src/test/resources/test_data/sheets/Table");
+        Files.list(excelFileDirectory).forEach(p -> {
+            result.add("\"" + p.getFileName().toString() + "\"");
+        });
+        System.out.println(result);
     }
 }

@@ -1,5 +1,7 @@
 package com.lu.gademo.log;
 
+import lombok.Data;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
@@ -20,12 +22,13 @@ public class TcpPacket {
      * 构造函数，传入数据
       */
     public TcpPacket(String jsonData, short MAIN_CMD, short SUB_CMD, short MESSAGE_VERSION) {
-        this.jsonData = jsonData;
-        this.packetLength = jsonData.getBytes(StandardCharsets.UTF_8).length + 16 + 18;
-        this.authenticationAndValidationField = new byte[16];
         this.MAIN_CMD = MAIN_CMD;
         this.SUB_CMD = SUB_CMD;
         this.MESSAGE_VERSION = MESSAGE_VERSION;
+        this.jsonData = jsonData;
+        this.packetLength = jsonData.getBytes(StandardCharsets.UTF_8).length + 16 + 18;
+        this.authenticationAndValidationField = new byte[16];
+
     }
     public TcpPacket(String jsonData){
         this.jsonData = jsonData;

@@ -10,7 +10,6 @@ import com.lu.gademo.entity.effectEva.*;
 import com.lu.gademo.entity.evidence.*;
 import com.lu.gademo.entity.ruleCheck.*;
 import com.lu.gademo.utils.Util;
-import com.lu.gademo.utils.impl.UtilImpl;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,15 +120,12 @@ public class SendData {
     ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     *
-     * @param content     json数据
-     * @param sendEvaReq  评测请求
-     * @param rawFileName 原始文件名
-     * @param desenFileName 脱敏文件名
+     * @param sendEvaReq 评测请求
      */
-    public void send2EffectEva(ObjectNode content, SendEvaReq sendEvaReq, String rawFileName, String desenFileName, byte[] rawFileData,
-                               byte[] desenFileData, byte[] params){
+    public void send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
+                               byte[] desenFileData){
         try {
+            ObjectNode content = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReq));
 
             // 连接服务器
             Socket socket = new Socket(effectEvaAddress, effectEvaPort);
@@ -341,14 +337,15 @@ public class SendData {
         }
     }
 
-
     /**
      *
-     * @param content       json数据
+     *
      * @param sendRuleReq   合规检查请求
      */
-    public void send2RuleCheck(ObjectNode content, SendRuleReq sendRuleReq){
+    public void send2RuleCheck(SendRuleReq sendRuleReq){
         try {
+            ObjectNode content = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendRuleReq));
+
             // 连接服务器
             Socket socket = new Socket(ruleCheckAddress, ruleCheckPort);
             // 构造数据域
@@ -532,7 +529,7 @@ public class SendData {
             reqEvidence.put("mainCMD", reqEvidenceSave.getMainCMD());
             reqEvidence.put("subCMD", reqEvidenceSave.getSubCMD());
             reqEvidence.put("evidenceID", reqEvidenceSave.getEvidenceID());
-            reqEvidence.put("msgVersion", 0x1000);
+            reqEvidence.put("msgVersion", reqEvidenceSave.getMsgVersion());
             reqEvidence.put("reqtime", util.getTime());
             reqEvidence.set("data", reqData);
             reqEvidence.put("datasign", reqEvidenceSave.getDatasign());
@@ -548,6 +545,7 @@ public class SendData {
             remoteOutputStream.write(reqEvidenceTcp);
             remoteOutputStream.flush();
             System.out.println("存证请求发送成功");
+
             // 存证响应
             EvidenceResponse evidenceResponse = new EvidenceResponse();
 
@@ -592,9 +590,15 @@ public class SendData {
             // 向本地存证发送存证信息
             Socket localSocket = new Socket(evidenceLocalAddress, evidenceLocalPort);
 
+            // 填充submitEvidenceLocal
+            submitEvidenceLocal.setParentSystemId(submitEvidenceLocal.getSystemID());
+
+            submitEvidenceLocal.setChildSystemId(evidenceSystemId);
+
             // pathTree
             ObjectNode pathTree = objectMapper.createObjectNode();
             ObjectNode parent = objectMapper.createObjectNode();
+            // TODO: 这里的父节点子节点是什么意思？
             parent.put("systemID", submitEvidenceLocal.getSystemID());
             parent.put("globalID", submitEvidenceLocal.getGlobalID());
             ObjectNode self = objectMapper.createObjectNode();
@@ -609,10 +613,6 @@ public class SendData {
             pathTree.set("self", self);
             pathTree.set("child", child);
 
-            // 填充submitEvidenceLocal
-            submitEvidenceLocal.setParentSystemId(submitEvidenceLocal.getSystemID());
-            submitEvidenceLocal.setStatus("数据已脱敏");
-            submitEvidenceLocal.setChildSystemId(evidenceSystemId);
             // data
             ObjectNode localEvidenceData = objectMapper.createObjectNode();
             localEvidenceData.put("globalID", submitEvidenceLocal.getGlobalID());
@@ -647,7 +647,7 @@ public class SendData {
             //localEvidenceJson.put("subCMD", submitEvidenceLocal.getSubCMD());
             localEvidenceJson.put("subCMD", 0x0031);
             localEvidenceJson.put("evidenceID", submitEvidenceLocal.getEvidenceID());
-            localEvidenceJson.put("submittime", util.getTime());
+            localEvidenceJson.put("submittime", submitEvidenceLocal.getSubmittime());
             localEvidenceJson.put("msgVersion", 0x3110);
             //localEvidenceJson.put("submittime", util.getTime());
             //localEvidenceJson.set("data", localEvidenceData);
