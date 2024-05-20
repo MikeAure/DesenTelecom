@@ -66,8 +66,8 @@ public class SendData {
     int evaluationSystemId;
 
     // 接收课题2的请求
-    @Autowired
-    SocketRecvService socketRecvService;
+//    @Autowired
+//    SocketRecvService socketRecvService;
 
     // 效果评测Dao
     @Autowired

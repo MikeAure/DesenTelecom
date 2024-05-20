@@ -235,9 +235,9 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="dpCode_privacyLevel">
-                                <option value="0"> 低程度</option>
-                                <option value="1" selected> 中程度</option>
-                                <option value="2"> 高程度</option>
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
                             </select>
                         </div>
                     </div>

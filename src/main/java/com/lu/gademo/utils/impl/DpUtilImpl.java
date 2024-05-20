@@ -163,15 +163,31 @@ public class DpUtilImpl implements DpUtil {
         List<Double> newData = new ArrayList<>();
         double a, max;
 
-        max = Collections.max(re_data.stream().filter(Objects::nonNull).collect(Collectors.toList())); ;
+        // 使用最大值计算敏感度
 
-        if (max < 100){
-            a = 1;
-        } else {
-            a = max / 50;
+        max = Collections.max(re_data.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+
+//        System.out.println("max " + max);
+//        if (max < 100){
+//            a = 1;
+//        } else {
+//            a = max / 50;
+//        }
+        // 使用均值计算敏感度
+        double average = 0;
+
+        for (int i = 0; i < re_data.size(); i++) {
+            if (re_data.get(i) == null) {
+                average += 0;
+            } else {
+                average += re_data.get(i);
+            }
         }
+        average = average / re_data.size();
+
+
         //设置参数sensitivety和epsilon
-        BigDecimal sensitivety = new BigDecimal(a);
+        BigDecimal sensitivety = new BigDecimal(average);
 
         //BigDecimal sensitivety = new BigDecimal(50);
         BigDecimal epsilon = new BigDecimal(0.1);
