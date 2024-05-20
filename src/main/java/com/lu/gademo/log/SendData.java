@@ -9,6 +9,7 @@ import com.lu.gademo.dao.ruleCheck.*;
 import com.lu.gademo.entity.effectEva.*;
 import com.lu.gademo.entity.evidence.*;
 import com.lu.gademo.entity.ruleCheck.*;
+import com.lu.gademo.service.SocketRecvService;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +64,10 @@ public class SendData {
     // 评估系统的ID
     @Value("${systemId.evaluationSystemId}")
     int evaluationSystemId;
+
+    // 接收课题2的请求
+    @Autowired
+    SocketRecvService socketRecvService;
 
     // 效果评测Dao
     @Autowired
@@ -174,6 +179,8 @@ public class SendData {
             outputStream.write(evaRequestTcpPacket);
             outputStream.flush();
             log.info("Send the desensitization request to the evaluation");
+            // 本地保存请求
+            sendEvaReqDao.save(sendEvaReq);
 
             // 发送原始文件
             outputStream.write(rawFileData);
@@ -328,8 +335,7 @@ public class SendData {
             dataInputStream.close();
             socket.close();
 
-            // 本地保存请求
-            sendEvaReqDao.save(sendEvaReq);
+
             // 本地保存收据
             sendEvaReceiptDao.save(sendEvaReceipt);
         } catch (IOException e) {

@@ -529,7 +529,6 @@
                                         }
                                     });
                                 };
-
                                 reader1.readAsBinaryString(blob);
 
                                 // 创建一个下载链接

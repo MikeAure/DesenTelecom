@@ -12,12 +12,12 @@ from pathlib import Path
 def get_data_set_features(res_model):
     features = []
     paths = []
-    image_path = "../data/IDRID/a. Training Set"
+    training_path = "./data/IDRID/a. Training Set"
     for i in range(1, 414):
-        image_path = image_path + "/IDRid_" + str(i).zfill(3) + ".jpg"
+        image_path = training_path + "/IDRiD_" + str(i).zfill(3) + ".jpg"
         features.append(CNN.extract_feature(res_model, image_path))
         paths.append(image_path)
-    with open("../data/FEATURES", "w") as csvfile:
+    with open("./data/FEATURES", "w") as csvfile:
         writer = csv.writer(csvfile)
         for i in range(len(features)):
             a = features[i].tolist()
@@ -34,14 +34,16 @@ def read_features(image_path):
         for row in rows:
             if len(row) != 0:
                 features.append(row[:-1])
+                # print(row[len(row) - 1])
                 paths.append(row[len(row) - 1])
     return features, paths
 
 
 def get_similar_image(res_model, path, image):
-    features, paths = read_features(path + "\\data\\FEATURES")
+    features, paths = read_features(os.path.join(path, "data", "FEATURES"))
     q = CNN.extract_feature(res_model, image)
     features.append(q)
+    # print(paths)
     paths.append("image")
     pca = decomposition.PCA(n_components=64)
     pca_features = pca.fit_transform(features)
@@ -55,8 +57,10 @@ def get_similar_image(res_model, path, image):
 
 
 if __name__ == '__main__':
+    # get_data_set_features(CNN.make_model())
     model = CNN.make_model()
     current_path = os.getcwd()
     print(current_path)
     path = get_similar_image(model, current_path, sys.argv[1])
-    shutil.copy(Path(current_path, path), sys.argv[2])
+    # print(os.path.join(current_path, path))
+    shutil.copy(os.path.join(current_path, path), sys.argv[2])

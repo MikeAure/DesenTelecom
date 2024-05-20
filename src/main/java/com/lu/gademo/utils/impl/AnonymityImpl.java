@@ -22,7 +22,7 @@ public class AnonymityImpl implements Anonymity {
         Util util = new UtilImpl();
         String currentPath = directory.getAbsolutePath();
         String locationPrivacy = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
-        String path = Objects.requireNonNull(getClass().getClassLoader().getResource("lib/local_privacy/" + locationPrivacy)).getPath();
+        String path = Paths.get(currentPath, locationPrivacy).toString();
         System.out.println(path);
 
         switch (alg) {

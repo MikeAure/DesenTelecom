@@ -36,7 +36,9 @@ public class DpUtilImpl implements DpUtil {
             new SimpleDateFormat("dd-MM-yyyy"),
             new SimpleDateFormat("yyyy/MM/dd"),
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
-            new SimpleDateFormat("yyyyMMddHHmmss")
+            new SimpleDateFormat("yyyyMMddHHmmss"),
+            new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+
 
     );
 
@@ -161,11 +163,11 @@ public class DpUtilImpl implements DpUtil {
         List<Double> newData = new ArrayList<>();
         double a, max;
 
-        max = Collections.max(re_data) ;
-        if (max<100){
+        max = Collections.max(re_data.stream().filter(Objects::nonNull).collect(Collectors.toList())); ;
+
+        if (max < 100){
             a = 1;
-        }
-        else {
+        } else {
             a = max / 50;
         }
         //设置参数sensitivety和epsilon

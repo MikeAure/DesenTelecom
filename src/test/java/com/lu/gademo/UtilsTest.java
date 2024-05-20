@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,5 +101,13 @@ public class UtilsTest {
             result.add("\"" + p.getFileName().toString() + "\"");
         });
         System.out.println(result);
+    }
+
+    @Test
+    void testMax() {
+        List<Double> content = Arrays.asList(10.0, 9.0, 8.0, 7.0, null, null);
+
+        Double max = Collections.max(content);
+        System.out.println(max);
     }
 }

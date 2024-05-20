@@ -14,16 +14,37 @@ import java.io.InputStreamReader;
 @RestController
 @RequestMapping("/audioMatch")
 public class AudioMatchController {
-    Util util = new UtilImpl();
-    String python = util.isLinux() ? "python3" : "python";
+    Util util;
+    String python;
     // 当前路径
-    File directory = new File("");
-    String currentPath = directory.getAbsolutePath();
-    String appPath = currentPath + File.separator + "audio_match";
+    File directory;
+    String currentPath;
+    String appPath;
     // 脱敏程序路径
-    String desenApp = appPath + File.separator + "sck.py";
+    String desenApp;
+    String command;
 
-    String command = python + " " + desenApp;
+    public AudioMatchController() {
+        this.util = new UtilImpl();
+
+        if (this.util.isCondaInstalled(this.util.isLinux())) {
+            this.python = "conda run -n torch_env python";
+        } else if (this.util.isLinux()) {
+            this.python = "python3";
+        } else {
+            this.python = "python";
+        }
+        System.out.println(this.python);
+        // 当前路径
+        this.directory = new File("");
+        this.currentPath = directory.getAbsolutePath();
+        this.appPath = currentPath + File.separator + "audio_match";
+        // 脱敏程序路径
+        this.desenApp = appPath + File.separator + "sck.py";
+
+        this.command = python + " " + desenApp;
+
+    }
 
     private String saveFile(MultipartFile file) throws IOException {
         File directory = new File("");
@@ -61,10 +82,10 @@ public class AudioMatchController {
             String parameter = "\"" + username + "\"" + " " + rawFilePath;
 
             // 根据当前操作系统类型决定是否使用conda环境
-            if(!util.isLinux()){
-                String conda = "conda run -n torch_env ";
-                command = conda + command;
-            }
+//            if(!util.isLinux()){
+//                String conda = "conda run -n torch_env ";
+//                command = conda + command;
+//            }
             Process signUpProcess = Runtime.getRuntime().exec(command + " " + parameter);
             System.out.println(command + " " + parameter);
             BufferedReader reader = new BufferedReader(new InputStreamReader(signUpProcess.getInputStream()));
@@ -104,10 +125,10 @@ public class AudioMatchController {
             String parameter = "\"" + username + "\"" + " " + rawFilePath;
 
             // 根据当前操作系统类型决定是否使用conda环境
-            if(!util.isLinux()){
-                String conda = "conda run -n torch_env ";
-                command = conda + command;
-            }
+//            if(!util.isLinux()){
+//                String conda = "conda run -n torch_env ";
+//                command = conda + command;
+//            }
             Process signUpProcess = Runtime.getRuntime().exec(command + " " + parameter);
             BufferedReader reader = new BufferedReader(new InputStreamReader(signUpProcess.getInputStream()));
             // 获得python脚本进程的输出

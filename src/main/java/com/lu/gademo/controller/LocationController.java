@@ -1,5 +1,8 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.impl.UtilImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,9 +18,12 @@ import java.util.List;
 @RequestMapping("/Location")
 public class LocationController {
 
+    Util util = new UtilImpl();
+
     File directory = new File("");
     String currentPath = directory.getAbsolutePath();
-    String path = Paths.get(currentPath, "LocationPrivacy.exe").toString();
+    String program = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
+    String path = Paths.get(currentPath, program).toString();
 
     @ResponseBody
     @RequestMapping(value = "/mixzone_1", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")

@@ -1,10 +1,9 @@
 import sys
 import cv2           # Importing the OpenCV library for computer vision tasks
 from cvzone.SelfiSegmentationModule import SelfiSegmentation
+import ffmpegcv
 
 def substitude_background(video: str, new_video:str, background: str, cut_threshold: float) :
-    segmentor = SelfiSegmentation(model=0)
-
     segmentor = SelfiSegmentation()
 
     new_background = cv2.imread(background)
@@ -13,7 +12,7 @@ def substitude_background(video: str, new_video:str, background: str, cut_thresh
     fps = video.get(cv2.CAP_PROP_FPS)
 
     video_width, video_height = int(video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    out = cv2.VideoWriter(new_video, cv2.VideoWriter_fourcc('V', 'P', '9', '0'), fps, (video_width, video_height))
+    out = ffmpegcv.VideoWriter(new_video, fps=fps, resize=(video_width, video_height))
 
     new_background = cv2.resize(new_background, (video_width, video_height), interpolation=cv2.INTER_AREA)
 
@@ -29,8 +28,7 @@ def substitude_background(video: str, new_video:str, background: str, cut_thresh
 
     video.release()
     out.release()
-    cv2.destroyAllWindows()
-    
+    return new_video    
 if __name__ == "__main__":
     if len(sys.argv) != 6:
         print("Usage: python your_script.py algName input_file out_file background_file param")

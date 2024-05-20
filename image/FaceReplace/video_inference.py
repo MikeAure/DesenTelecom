@@ -16,6 +16,7 @@ import configparser
 import os
 import time
 import argparse
+import ffmpegcv
 
 time1 = time.time()
 
@@ -42,7 +43,7 @@ target_video_path = args.target_video_path
 target_frames_path = args.target_frames
 result_frames_path = args.result_frames
 result_video_save_path = args.result_video_save_path
-fps = 30
+# fps = 30
 
 if not Path(result_video_save_path).parent.is_dir():
     Path.mkdir(Path(result_video_save_path).parent)
@@ -60,12 +61,14 @@ success = cap.isOpened()
 frame_count = 0
 if success == False:
     print("error opening video stream or file!")
+    exit(-1)
+fps = cap.get(cv2.CAP_PROP_FPS)
 try:
     while success:
         success, frame = cap.read()
         frame_path = os.path.join(target_frames_path, '%08d.jpg' % frame_count)
         cv2.imwrite(frame_path, frame)
-        if (frame_count % 50 == 0):
+        if (frame_count % 500 == 0):
             print("%dth frame has been processed" % frame_count)
         frame_count += 1
 except Exception as e:
@@ -74,13 +77,14 @@ cap.release()
 
 print("start load models")
 # load models
+is_cuda = torch.cuda.is_available()
 detector = MTCNN()
-device = torch.device('cuda')
+device = torch.device("cuda" if is_cuda else "cpu")
 G = AEI_Net(c_id=512)
 G.eval()
 G.load_state_dict(torch.load('./saved_models/G_latest.pth', map_location=torch.device('cpu')))
-G = G.cuda()
-
+# G = G.cuda()
+G = G.cuda() if is_cuda else G.cpu()
 arcface = Backbone(50, 0.6, 'ir_se').to(device)
 arcface.eval()
 arcface.load_state_dict(torch.load('./face_modules/model_ir_se50.pth', map_location=device), strict=False)
@@ -95,7 +99,7 @@ Xs_raw = cv2.imread(source_image_path)
 Xs = detector.align(Image.fromarray(Xs_raw[:, :, ::-1]), crop_size=(256, 256))
 Xs_raw = np.array(Xs)[:, :, ::-1]
 Xs = test_transform(Xs)
-Xs = Xs.unsqueeze(0).cuda()
+Xs = Xs.unsqueeze(0).cuda() if is_cuda else Xs.unsqueeze(0)
 
 # calculate embedding
 with torch.no_grad():
@@ -123,7 +127,6 @@ for file in files:
     try:
         Xt, trans_inv = detector.align(Image.fromarray(Xt_raw[:, :, ::-1]), crop_size=(256, 256), return_trans_inv=True)
     except Exception as e:
-        print('skip one frame')
         continue
 
     if Xt is None:
@@ -135,7 +138,8 @@ for file in files:
 
     Xt = test_transform(Xt)
 
-    Xt = Xt.unsqueeze(0).cuda()
+    Xt = Xt.unsqueeze(0).cuda() if is_cuda else Xt.unsqueeze(0)
+    
     with torch.no_grad():
         Yt, _ = G(Xt, embeds)
         Yt = Yt.squeeze().detach().cpu().numpy().transpose([1, 2, 0]) * 0.5 + 0.5
@@ -146,14 +150,14 @@ for file in files:
         Yt_trans_inv = mask_ * Yt_trans_inv + (1 - mask_) * Xt_raw
         save_path = os.path.join(result_frames_path, '%08d.jpg' % ind)
         cv2.imwrite(save_path, Yt_trans_inv * 255)
-        if (ind % 50 == 0):
+        if (ind % 500 == 0):
             print("%dth frame has been processed" % ind)
         ind += 1
 
 print("start generate video")
 # videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, size)
 # videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('H', '2', '6', '4'), fps, size)
-videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('V', 'P', '9', '0'), fps, size)
+videowriter = ffmpegcv.VideoWriter(result_video_save_path, fps=fps, resize=size)
 
 files = glob.glob(os.path.join(result_frames_path, '*.*g'))
 files.sort()
@@ -161,9 +165,11 @@ count = 0
 for file in files:
     img = cv2.imread(file)
     videowriter.write(img)
-    if (count % 50 == 0):
+    if (count % 500 == 0):
         print("%dth frames has been convert to video" % count)
     count += 1
 
 time2 = time.time()
 print("total processing time is %f" % (time2 - time1))
+
+

@@ -32,7 +32,7 @@ public class CommandExecutor {
             bufferReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             bufferReaderError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             while ((line = bufferReader.readLine()) != null  || (line = bufferReaderError.readLine()) != null) {
-                log.info("Python ouput: " + line);
+                log.info("Process ouput: " + line);
                 result.add(line);
                 if (line.contains("Error") || line.contains("Traceback")) {
                     return null;

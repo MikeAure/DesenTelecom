@@ -3,6 +3,7 @@ import cv2
 import sys
 import os
 import time
+import ffmpegcv
 
 
 def desenVideo(input_video_path, output_video_path, kernel_size):
@@ -19,7 +20,7 @@ def desenVideo(input_video_path, output_video_path, kernel_size):
     # 创建用于写入输出视频的对象   'V','P','9','0'
     # fourcc = cv2.VideoWriter_fourcc('H', '2', '6', '4')
     fourcc = cv2.VideoWriter_fourcc('V', 'P', '9', '0')
-    output_video = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+    output_video = ffmpegcv.VideoWriter(output_video_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = input_video.read()

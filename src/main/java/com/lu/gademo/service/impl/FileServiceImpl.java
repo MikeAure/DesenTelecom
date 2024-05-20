@@ -75,9 +75,7 @@ public class FileServiceImpl implements FileService {
     private Integer evidenceSubmitMsgVersion;
     // 脱敏完成情况
 //    private Boolean desenCom;
-    // 脱敏对象大小
-    // TODO: 删除该变量
-//    private Integer objectSize;
+
     private Random randomNum;
     private String desenPerformer;
 
@@ -267,7 +265,7 @@ public class FileServiceImpl implements FileService {
 
     private void logExecutionTime(String executionTime, String objectMode) {
         log.info("Desensitization finished in " + executionTime + "ms");
-        log.info(objectMode + " desen finished");
+        log.info(objectMode + " desensitization finished");
     }
 
     @Override
@@ -383,7 +381,6 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
-        ObjectNode effectEvaContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReq));
         executorService.submit(() -> {
             sendData.send2EffectEva(sendEvaReq, rawFileBytes,
                     desenFileBytes);
@@ -2297,7 +2294,7 @@ public class FileServiceImpl implements FileService {
         String imageFileName = fileTimeStamp + sheet.getOriginalFilename();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
-        Path rawFacePath = rawFilePath.resolve(imageFileName);
+        Path rawFacePath = rawFileDirectory.resolve(imageFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         String rawFacePathString  = rawFacePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
@@ -2305,7 +2302,7 @@ public class FileServiceImpl implements FileService {
 
         // 保存源文件
         file.transferTo(rawFilePath.toAbsolutePath());
-        sheet.transferTo(rawFacePath.toFile());
+        sheet.transferTo(rawFacePath.toAbsolutePath());
         // 设置脱敏后文件路径信息
         String desenFileName = "desen_" + rawFileName;
         Path desenFilePath = desenFileDirectory.resolve(desenFileName);
@@ -2323,13 +2320,13 @@ public class FileServiceImpl implements FileService {
         startTimePoint = System.currentTimeMillis();
         // 执行脱敏
 
-        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, rawFilePathString, desenFilePathString));
+        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, rawFacePathString, desenFilePathString));
         algorithmInfo.execute(dsObject);
         // 结束时间
         endTimePoint = System.currentTimeMillis();
         // 脱敏耗时
         executionTime = endTimePoint - startTimePoint;
-        log.info("脱敏用时" + executionTime + "ms");
+        logExecutionTime(String.valueOf(executionTime), objectMode);
 
         // 脱敏结束时间
         String endTime = util.getTime();

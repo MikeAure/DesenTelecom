@@ -195,6 +195,7 @@
 	</dependencies>
 
 	<build>
+<!--		<testOutputDirectory>target/classes</testOutputDirectory>-->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -215,6 +216,16 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+<!--			<plugin>-->
+<!--				<groupId>org.springframework.boot</groupId>-->
+<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					&lt;!&ndash; changing launcher to exec junit instead of spring main class   &ndash;&gt;-->
+<!--					<mainClass>org.junit.runner.JUnitCore</mainClass>-->
+<!--					<includeSystemScope>true</includeSystemScope>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 
 		</plugins>
 	</build>

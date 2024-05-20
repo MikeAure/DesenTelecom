@@ -1,13 +1,11 @@
 package com.lu.gademo.entity.effectEva;
 
 import com.lu.gademo.entity.support.BaseEntity;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor

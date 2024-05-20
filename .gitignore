@@ -297,3 +297,4 @@ raw_files
 *.pt
 /Test Results - AlgorithmsFactoryTest.html
 src/test/resources/test_data
+*.gz

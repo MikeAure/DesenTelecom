@@ -33,11 +33,12 @@ if not Path(save_path).parent.is_dir():
     Path.mkdir(Path(save_path).parent)
 
 detector = MTCNN()
-device = torch.device('cuda')
+is_cuda = torch.cuda.is_available()
+device = torch.device("cuda" if is_cuda else "cpu")
 G = AEI_Net(c_id=512)
 G.eval()
 G.load_state_dict(torch.load('./saved_models/G_latest.pth', map_location=torch.device('cpu')))
-G = G.cuda()
+G = G.cuda() if is_cuda else G.cpu()
 
 arcface = Backbone(50, 0.6, 'ir_se').to(device)
 arcface.eval()
@@ -55,7 +56,7 @@ except Exception as e:
     print('the source image is wrong, please change the image')
 Xs_raw = np.array(Xs)[:, :, ::-1]
 Xs = test_transform(Xs)
-Xs = Xs.unsqueeze(0).cuda()
+Xs = Xs.unsqueeze(0).cuda() if is_cuda else Xs.unsqueeze(0)
 
 with torch.no_grad():
     embeds = arcface(F.interpolate(Xs[:, :, 19:237, 19:237], (112, 112), mode='bilinear', align_corners=True))
@@ -68,7 +69,7 @@ except Exception as e:
     print('the target image is wrong, please change the image')
 Xt_raw = Xt_raw.astype(float) / 255.0
 Xt = test_transform(Xt)
-Xt = Xt.unsqueeze(0).cuda()
+Xt = Xt.unsqueeze(0).cuda() if is_cuda else Xt.unsqueeze(0)
 
 mask = np.zeros([256, 256], dtype=float)
 for i in range(256):
@@ -96,7 +97,7 @@ with torch.no_grad():
         print('the source image is wrong, please change the image')
     Xt_raw = np.array(Xt)[:, :, ::-1]
     Xt = test_transform(Xt)
-    Xt = Xt.unsqueeze(0).cuda()
+    Xt = Xt.unsqueeze(0).cuda() if is_cuda else Xt.unsqueeze(0)
 
     Yt_raw = cv2.imread(save_path)
     try:
@@ -105,7 +106,7 @@ with torch.no_grad():
         print('the source image is wrong, please change the image')
     Yt_raw = np.array(Yt)[:, :, ::-1]
     Yt = test_transform(Yt)
-    Yt = Yt.unsqueeze(0).cuda()
+    Yt = Yt.unsqueeze(0).cuda() if is_cuda else Yt.unsqueeze(0)
     with torch.no_grad():
         embeds_Yt = arcface(F.interpolate(Yt[:, :, 19:237, 19:237], (112, 112), mode='bilinear', align_corners=True))
         embeds_Xt = arcface(F.interpolate(Xt[:, :, 19:237, 19:237], (112, 112), mode='bilinear', align_corners=True))

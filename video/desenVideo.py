@@ -1,11 +1,10 @@
 import numpy as np
 import sys
-from cv2.typing import MatLike
 import cv2           # Importing the OpenCV library for computer vision tasks
 from cvzone.SelfiSegmentationModule import SelfiSegmentation
+import ffmpegcv
 
-
-def add_color_offset(img: MatLike, offset: int):
+def add_color_offset(img, offset: int):
     offset = offset % 256
 
     image_array = np.array(img, dtype=np.uint8)
@@ -68,8 +67,10 @@ def pixelate_video(input_video, output_path, block_size: int = 5):
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    fourcc = cv2.VideoWriter_fourcc('V', 'P', '9', '0')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    # fourcc = cv2.VideoWriter_fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
+
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -91,10 +92,10 @@ def gaussian_blur_video(input_video, output_path, radius: int = 2):
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
 
-
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -116,9 +117,11 @@ def box_blur_video(input_video, output_path, radius: int = 2):
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4'
-    fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
 
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -140,9 +143,11 @@ def replace_video(input_video, output_path):
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
 
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -163,8 +168,12 @@ def pixelate_region_video(input_video, output_path, region_x, region_y, region_w
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
+
+
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -185,8 +194,12 @@ def gaussian_blur_region_video(input_video, output_path, region_x, region_y, reg
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
+
+
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -207,8 +220,12 @@ def box_blur_region_video(input_video, output_path, region_x, region_y, region_w
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
+
+
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -229,8 +246,12 @@ def replace_region_video(input_video, output_path, region_x, region_y, region_w,
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
 
-    fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    # fourcc = cv2.VideoWriter.fourcc('H', '2', '6', '4')
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
+
+
+    out = ffmpegcv.VideoWriter(output_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = cap.read()
@@ -254,8 +275,10 @@ def meanValueVideo(input_video_path, output_video_path, kernel_size):
     # frameCount = int(input_video.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # 创建用于写入输出视频的对象   'V','P','9','0'
-    fourcc = cv2.VideoWriter_fourcc('H', '2', '6', '4')
-    output_video = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+    # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
+    fourcc = cv2.VideoWriter.fourcc(*'avc1')
+
+    out = ffmpegcv.VideoWriter(output_video_path, fps=fps, resize=(width, height))
 
     while True:
         ret, frame = input_video.read()
@@ -267,28 +290,32 @@ def meanValueVideo(input_video_path, output_video_path, kernel_size):
         blurred_frame = cv2.blur(frame, (kernel_size, kernel_size))
 
         # 将滤波后的帧写入输出视频
-        output_video.write(blurred_frame)
+        out.write(blurred_frame)
     print("success")
 
     # 释放资源
     input_video.release()
-    output_video.release()
+    out.release()
+    return output_video_path
 
 def video_add_color_offset(video: str, new_video: str, offset: int):
     cap = cv2.VideoCapture(video)
     height, width = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     fps = cap.get(cv2.CAP_PROP_FPS)
-    video_writer = cv2.VideoWriter(new_video, cv2.VideoWriter_fourcc('H', '2', '6', '4'), fps, (width, height))
+    # video_writer = cv2.VideoWriter(new_video, cv2.VideoWriter_fourcc('H', '2', '6', '4'), fps, (width, height))
+
+    out = ffmpegcv.VideoWriter(new_video, fps=fps, resize=(width, height))
 
     while True :
         success, frame = cap.read()
         if not success:
             break
         img = add_color_offset(frame, offset)
-        video_writer.write(img)
+        out.write(img)
 
-    video_writer.release()
+    out.release()
     cap.release()
+    return new_video
 
 def substitude_background(video: str, new_video:str, background: str, cut_threshold: float) :
     segmentor = SelfiSegmentation(model=0)
@@ -301,7 +328,9 @@ def substitude_background(video: str, new_video:str, background: str, cut_thresh
     fps = video.get(cv2.CAP_PROP_FPS)
 
     video_width, video_height = int(video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    out = cv2.VideoWriter(new_video, cv2.VideoWriter_fourcc('H', '2', '6', '4'), fps, (video_width, video_height))
+    # out = cv2.VideoWriter(new_video, cv2.VideoWriter_fourcc('V', 'P', '9', '0'), fps, (video_width, video_height))
+
+    out = ffmpegcv.VideoWriter(new_video, fps=fps, resize=(video_width, video_height))
 
     new_background = cv2.resize(new_background, (video_width, video_height), interpolation=cv2.INTER_AREA)
 
@@ -317,7 +346,7 @@ def substitude_background(video: str, new_video:str, background: str, cut_thresh
 
     video.release()
     out.release()
-    cv2.destroyAllWindows()
+    return new_video
 
 if __name__ == '__main__':
     if len(sys.argv) != 5:
