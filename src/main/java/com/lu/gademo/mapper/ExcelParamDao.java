@@ -18,11 +18,11 @@ public interface ExcelParamDao {
             @Result(column = "k", property = "k", jdbcType = JdbcType.VARCHAR),
             @Result(column = "tm_param", property = "tmParam", jdbcType = JdbcType.VARCHAR),
     })
-    public List<ExcelParam> getParams(String name);
+    List<ExcelParam> getParams(String name);
 
     //删除所有数据
     @Delete("DELETE FROM ${name}")
-    public void deleteAll(String name);
+    void deleteAll(String name);
 
     // 插入数据
     @Insert({
@@ -34,6 +34,6 @@ public interface ExcelParamDao {
             "</foreach>",
             "</script>"
     })
-    public void insertAll(@Param("tableName") String tableName, @Param("list") List<ExcelParam> dataList);
+    void insertAll(@Param("tableName") String tableName, @Param("list") List<ExcelParam> dataList);
 
 }

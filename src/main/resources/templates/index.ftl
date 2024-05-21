@@ -12,7 +12,7 @@
     <!--[if lt IE 9]>
     <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
-<#--    <link rel="shortcut icon" href="favicon.ico">-->
+    <#--    <link rel="shortcut icon" href="favicon.ico">-->
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">

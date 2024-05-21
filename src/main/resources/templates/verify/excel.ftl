@@ -111,23 +111,23 @@
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
 
-        document.getElementById("choose_template_sheet").value = "111";
-        //document.getElementById('choose_sheet').selectedIndex = 0;
-        // 场景名
-        let sheet = document.getElementById("choose_sheet").value;
-        //读取文件
-        const file = event.target.files[0]
-        // 文件名，扩展名
-        const fileName = file.name;
-        const fileExtension = fileName.split('.').pop().toLowerCase();
-        if (file) {
-            if ("xlsx" === fileExtension) {
-                let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                    "<strong>" + fileName + "文件</strong>上传成功"
-                "</span>" +
-                "</div>";
-                document.getElementById("fileInfo").innerHTML = fileLoad
-                //console.log(fileExtension)
+            document.getElementById("choose_template_sheet").value = "111";
+            //document.getElementById('choose_sheet').selectedIndex = 0;
+            // 场景名
+            let sheet = document.getElementById("choose_sheet").value;
+            //读取文件
+            const file = event.target.files[0]
+            // 文件名，扩展名
+            const fileName = file.name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+            if (file) {
+                if ("xlsx" === fileExtension) {
+                    let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                        "<strong>" + fileName + "文件</strong>上传成功"
+                    "</span>" +
+                    "</div>";
+                    document.getElementById("fileInfo").innerHTML = fileLoad
+                    //console.log(fileExtension)
 
                     //构建formData,发送给后端
                     // TODO: 改成fetch发送

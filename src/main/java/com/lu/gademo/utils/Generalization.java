@@ -1,5 +1,5 @@
 package com.lu.gademo.utils;
 
-public interface Generalization extends BaseDesenAlgorithm{
+public interface Generalization extends BaseDesenAlgorithm {
 
 }

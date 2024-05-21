@@ -16,6 +16,7 @@ public class Client {
     private final int PORT = 20006;//使用端口
     private final Context context;
     public Socket s;
+
     public Client(Context context) {
         this.context = context;
     }

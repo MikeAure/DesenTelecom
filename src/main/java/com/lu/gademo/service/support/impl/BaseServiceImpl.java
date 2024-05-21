@@ -24,7 +24,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity, ID extends Serializa
         return getBaseDao().findById(id).get();
     }
 
-    @Override	
+    @Override
     public List<T> findAll() {
         return getBaseDao().findAll();
     }
@@ -64,6 +64,7 @@ public abstract class BaseServiceImpl<T extends BaseEntity, ID extends Serializa
     public void save(T entity) {
         getBaseDao().save(entity);
     }
+
     @Override
 
     public void save(Iterable<T> entitys) {

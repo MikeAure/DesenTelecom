@@ -17,6 +17,21 @@ public class TestImageButton extends JFrame {
     private final JPanel contentPane;
 
     /**
+     * Create the frame.
+     *
+     * @throws IOException
+     */
+    public TestImageButton() throws IOException {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 450, 300);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+        cropImageAndSetButton("img/output.png", 8, contentPane);
+    }
+
+    /**
      * Launch the application.
      */
     public static void main(String[] args) {
@@ -30,21 +45,6 @@ public class TestImageButton extends JFrame {
                 }
             }
         });
-    }
-
-    /**
-     * Create the frame.
-     *
-     * @throws IOException
-     */
-    public TestImageButton() throws IOException {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 450, 300);
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
-        contentPane.setLayout(null);
-        cropImageAndSetButton("img/output.png", 8, contentPane);
     }
 
     public void cropImageAndSetButton(String url, int x, JPanel panel) {// crop image to x * x

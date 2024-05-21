@@ -1,10 +1,6 @@
 package com.lu.gademo.utils.impl;
 
-import com.lu.gademo.utils.DSObject;
-import com.lu.gademo.utils.Generalization;
-import com.lu.gademo.utils.DpUtil;
-import com.lu.gademo.utils.CommandExecutor;
-import com.lu.gademo.utils.Util;
+import com.lu.gademo.utils.*;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -12,11 +8,10 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class GeneralizationImpl implements Generalization {
-    public DSObject service(DSObject object, Integer alg, Number...params) {
+    public DSObject service(DSObject object, Integer alg, Number... params) {
 
         if (object == null) return null;
         DpUtil dpUtil = new DpUtilImpl();
@@ -38,7 +33,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 1 : {
+            case 1: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -51,7 +46,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：数值列表
                 输出：数值列表
             */
-            case 2 : {
+            case 2: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -67,7 +62,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 3 : {
+            case 3: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -80,7 +75,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 4 : {
+            case 4: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -93,7 +88,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：日期数组、分组大小 k = (1, 2, 3)
                 输出：日期数组
             */
-            case 5 : {
+            case 5: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -112,7 +107,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：经度、纬度、用户id、进入区域的时间、区域点集
                 输出：字符串（用户假名id）
             */
-            case 6 : {
+            case 6: {
                 if (params.length != 2) return null;
 
                 String position = object.getStringVal();
@@ -124,7 +119,7 @@ public class GeneralizationImpl implements Generalization {
 
                 String[] s = position.split(",");
                 String param = "5 " + s[0] + " " + s[1] + " " + id + " " + time;
-                for(Object point : value) {
+                for (Object point : value) {
                     String[] temp = point.toString().split(",");
                     param += " " + temp[0] + " " + temp[1];
                 }
@@ -139,7 +134,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：经度、纬度、用户id、进入区域的时间、区域点集
                 输出：字符串（用户假名id）
             */
-            case 7 : {
+            case 7: {
                 if (params.length != 2) return null;
 
                 String position = object.getStringVal();
@@ -151,7 +146,7 @@ public class GeneralizationImpl implements Generalization {
 
                 String[] s = position.split(",");
                 String param = "6 " + s[0] + " " + s[1] + " " + id + " " + time;
-                for(Object point : value) {
+                for (Object point : value) {
                     String[] temp = point.toString().split(",");
                     param += " " + temp[0] + " " + temp[1];
                 }
@@ -165,7 +160,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：用户真实位置
                 输出：处理后的位置
             */
-            case 8 : {
+            case 8: {
                 String position = object.getStringVal();
 
                 String[] s = position.split(",");
@@ -181,7 +176,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原图片文件路径，脱敏图片存放路径，像素块大小：0 1 2
                 输出：脱敏执行信息
             */
-            case 9 : {
+            case 9: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "pixelate", path2, params[0].toString());
@@ -195,7 +190,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原图片文件路径，脱敏图片存放路径，模糊半径：0 1 2
                 输出：脱敏执行信息
             */
-            case 10 : {
+            case 10: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "gaussian_blur", path2, params[0].toString());
@@ -209,7 +204,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原图片文件路径，脱敏图片存放路径，模糊半径：0 1 2
                 输出：脱敏执行信息
             */
-            case 11 : {
+            case 11: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "box_blur", path2, params[0].toString());
@@ -223,11 +218,10 @@ public class GeneralizationImpl implements Generalization {
                 输入：原图片文件路径，脱敏图片存放路径，滤波核大小：0 1 2
                 输出：脱敏执行信息
             */
-            case 12 : {
+            case 12: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                String path3 = Paths.get(currentPath, "image", "meanValueImage.py").toString();
-                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path3, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "meanValueImage", path2, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -238,7 +232,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原图片文件路径，脱敏图片存放路径，级别 0 1 2
                 输出：脱敏执行信息
             */
-            case 13 : {
+            case 13: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "replace_region", path2, params[0].toString());
@@ -252,7 +246,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原视频文件路径，脱敏视频存放路径，像素块大小 0 1 2
                 输出：脱敏执行信息
             */
-            case 14 : {
+            case 14: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "pixelate_video", path4, params[0].toString());
@@ -266,7 +260,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原视频文件路径，脱敏视频存放路径，模糊半径 0 1 2
                 输出：脱敏执行信息
             */
-            case 15 : {
+            case 15: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "gaussian_blur_video", path4, params[0].toString());
@@ -280,7 +274,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原视频文件路径，脱敏视频存放路径，模糊半径 0 1 2
                 输出：脱敏执行信息
             */
-            case 16 : {
+            case 16: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "box_blur_video", path4, params[0].toString());
@@ -294,11 +288,10 @@ public class GeneralizationImpl implements Generalization {
                 输入：原视频文件路径，脱敏视频存放路径，滤波核大小：0 1 2
                 输出：脱敏执行信息
             */
-            case 17 : {
+            case 17: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                String path5 = Paths.get(currentPath, "video", "meanValueVideo.py").toString();
-                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path5, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "meanValueVideo", path4, params[0].toString());
                 return new DSObject(results);
             }
 
@@ -309,7 +302,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原视频文件路径，脱敏视频存放路径，级别 0 1 2
                 输出：脱敏执行信息
             */
-            case 18 : {
+            case 18: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "replace_region_video", path4, params[0].toString());
@@ -323,7 +316,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原音频文件路径，脱敏音频存放路径，级别 0 1 2 ...
                 输出：脱敏执行信息
             */
-            case 19 : {
+            case 19: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "floor", path6, params[0].toString());
@@ -337,7 +330,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原音频文件路径，脱敏音频存放路径
                 输出：脱敏执行信息
             */
-            case 20 : {
+            case 20: {
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "spec", path6, "0");
                 return new DSObject(results);
@@ -350,7 +343,7 @@ public class GeneralizationImpl implements Generalization {
                 输入：原音频文件路径，脱敏音频存放路径
                 输出：脱敏执行信息
             */
-            case 21 : {
+            case 21: {
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "augmentation", path6, "0");
                 return new DSObject(results);
@@ -363,14 +356,15 @@ public class GeneralizationImpl implements Generalization {
                 输入：原音频文件路径，脱敏音频存放路径，分块长度 0 1 2 ...
                 输出：脱敏执行信息
             */
-            case 22 : {
+            case 22: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "median", path6, params[0].toString());
                 return new DSObject(results);
             }
 
-            default: return null;
+            default:
+                return null;
         }
     }
 

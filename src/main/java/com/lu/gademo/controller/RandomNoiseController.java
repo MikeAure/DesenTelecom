@@ -3,19 +3,14 @@ package com.lu.gademo.controller;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.Util;
-import com.lu.gademo.utils.impl.UtilImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +25,7 @@ import java.util.stream.Collectors;
 public class RandomNoiseController {
     Dp dp;
     Util util;
+
     @ResponseBody
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenValue(@RequestParam String rawData,
@@ -74,13 +70,14 @@ public class RandomNoiseController {
         }
         return resultString.toString();
     }
+
     @ResponseBody
     @RequestMapping(value = "/desenValue2", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String desenValue2(@RequestParam String rawData,
                               @RequestParam String samples,
                               @RequestParam String algName,
                               @RequestParam String c,
-                              @RequestParam String t){
+                              @RequestParam String t) {
 
         String[] types = algName.split(",");
         algName = types[types.length - 1];

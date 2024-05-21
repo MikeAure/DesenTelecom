@@ -34,7 +34,7 @@ public class EvidenceReceiptNormal {
     @Column(name = "certificate_hash")
     private String certificateHash;
     @Column(name = "certificate_sign")
-    private  String certificateSign;
+    private String certificateSign;
 
     public String getCertificateSign() {
         return certificateSign;

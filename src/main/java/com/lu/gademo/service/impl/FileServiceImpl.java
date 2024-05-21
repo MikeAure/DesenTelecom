@@ -19,7 +19,10 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -123,8 +126,8 @@ public class FileServiceImpl implements FileService {
         if (!Files.exists(desenFileDirectory)) {
             Files.createDirectory(desenFileDirectory);
         }
-        log.info("rawFileDirectory: " + rawFileDirectory.toAbsolutePath().toString());
-        log.info("desenFileDirectory: " + desenFileDirectory.toAbsolutePath().toString());
+        log.info("rawFileDirectory: " + rawFileDirectory.toAbsolutePath());
+        log.info("desenFileDirectory: " + desenFileDirectory.toAbsolutePath());
     }
 
     // 构造存证请求
@@ -243,7 +246,7 @@ public class FileServiceImpl implements FileService {
                                          StringBuilder desenAlg, StringBuilder desenAlgParam,
                                          String startTime, String endTime, StringBuilder desenLevel,
                                          Boolean desenCom
-                                         ) {
+    ) {
         SendRuleReq sendRuleReq = new SendRuleReq();
         sendRuleReq.setEvidenceId(evidenceID);
         sendRuleReq.setDesenInfoAfterIden(desenInfoAfterIden.toString());
@@ -459,7 +462,7 @@ public class FileServiceImpl implements FileService {
         if (!Files.exists(paramDirectory)) {
             Files.createDirectory(paramDirectory);
         }
-        String paramsFileName = "params" + rawFileName.substring(0,rawFileName.lastIndexOf('.')) + ".txt";
+        String paramsFileName = "params" + rawFileName.substring(0, rawFileName.lastIndexOf('.')) + ".txt";
         String paramsFilePath = paramDirectory.resolve(paramsFileName).toAbsolutePath().toString();
 
         // 数据类型
@@ -556,7 +559,7 @@ public class FileServiceImpl implements FileService {
                                     .collect(Collectors.toList());
                             if (columnName.contains("年龄")) {
                                 datas = datas.stream()
-                                        .map(item -> item instanceof Double ? Math.floor(item) : null )
+                                        .map(item -> item instanceof Double ? Math.floor(item) : null)
                                         .collect(Collectors.toList());
                             }
                             // 写列数据
@@ -580,7 +583,7 @@ public class FileServiceImpl implements FileService {
                                     .collect(Collectors.toList());
                             if (columnName.contains("年龄")) {
                                 datas = datas.stream()
-                                        .map(item -> item instanceof Double ? Math.floor(item) : null )
+                                        .map(item -> item instanceof Double ? Math.floor(item) : null)
                                         .collect(Collectors.toList());
                             }
                             // 写列数据
@@ -604,7 +607,7 @@ public class FileServiceImpl implements FileService {
                                     .collect(Collectors.toList());
                             if (columnName.contains("年龄")) {
                                 datas = datas.stream()
-                                        .map(item -> item instanceof Double ? Math.floor(item) : null )
+                                        .map(item -> item instanceof Double ? Math.floor(item) : null)
                                         .collect(Collectors.toList());
                             }
                             // 写列数据
@@ -628,7 +631,7 @@ public class FileServiceImpl implements FileService {
                                     .collect(Collectors.toList());
                             if (columnName.contains("年龄")) {
                                 datas = datas.stream()
-                                        .map(item -> item instanceof Double ? Math.floor(item) : null )
+                                        .map(item -> item instanceof Double ? Math.floor(item) : null)
                                         .collect(Collectors.toList());
                             }
                             // 写列数据
@@ -2019,19 +2022,19 @@ public class FileServiceImpl implements FileService {
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         Path rawBgPath = rawFileDirectory.resolve(imageFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
-        String rawBgPathString  = rawBgPath.toAbsolutePath().toString();
+        String rawBgPathString = rawBgPath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
         Long rawFileSize = file.getSize();
 
         // 保存源文件
         file.transferTo(rawFilePath.toAbsolutePath());
         sheet.transferTo(rawBgPath.toAbsolutePath());
-        
+
         // 设置脱敏后文件路径信息
         String desenFileName = "desen_" + rawFileName;
         Path desenFilePath = desenFileDirectory.resolve(desenFileName);
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();
-        
+
 
         String desenParam = String.valueOf(params.charAt(params.length() - 1));
 
@@ -2160,7 +2163,7 @@ public class FileServiceImpl implements FileService {
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         Path rawFacePath = rawFileDirectory.resolve(imageFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
-        String rawFacePathString  = rawFacePath.toAbsolutePath().toString();
+        String rawFacePathString = rawFacePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
         Long rawFileSize = file.getSize();
 
@@ -2296,7 +2299,7 @@ public class FileServiceImpl implements FileService {
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         Path rawFacePath = rawFileDirectory.resolve(imageFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
-        String rawFacePathString  = rawFacePath.toAbsolutePath().toString();
+        String rawFacePathString = rawFacePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
         Long rawFileSize = file.getSize();
 

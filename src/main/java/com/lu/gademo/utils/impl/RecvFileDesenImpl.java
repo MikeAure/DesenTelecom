@@ -15,13 +15,11 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTMarkupRange;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.namespace.QName;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -47,6 +45,21 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     private final Util util;
     private final Anonymity anonymity;
     private final Generalization generalization;
+
+    private static Map<Integer, XWPFRun> getPosToRuns(XWPFParagraph paragraph) {
+        int pos = 0;
+        Map<Integer, XWPFRun> map = new HashMap<Integer, XWPFRun>(10);
+        for (XWPFRun run : paragraph.getRuns()) {
+            String runText = run.text();
+            if (runText != null) {
+                for (int i = 0; i < runText.length(); i++) {
+                    map.put(pos + i, run);
+                }
+                pos += runText.length();
+            }
+        }
+        return (map);
+    }
 
     @Override
     public byte[] desenRecvFile(MultipartFile file) throws Exception {
@@ -81,9 +94,9 @@ public class RecvFileDesenImpl implements RecvFileDesen {
 
     private void extractExcel(Path rawFilePath, Path desenFilePath) throws Exception {
         try (
-            InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
-            XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
-            OutputStream outputStream = Files.newOutputStream(desenFilePath);
+                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
+                XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
+                OutputStream outputStream = Files.newOutputStream(desenFilePath)
         ) {
 
             Sheet sheet = wb.getSheetAt(0);
@@ -119,8 +132,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
                 XWPFDocument document = new XWPFDocument(rawFileInputStream);
-                OutputStream outputStream = Files.newOutputStream(desenFilePath);)
-        {
+                OutputStream outputStream = Files.newOutputStream(desenFilePath)) {
             XmlCursor cursor = document.getDocument().getBody().newCursor();
             QName idQname = new javax.xml.namespace.QName("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "id");
             while (cursor.toNextToken() != XmlCursor.TokenType.NONE) {
@@ -178,7 +190,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                             continue;
                         }
                         System.out.println("Target: " + target);
-                        String desenResult  = desenData(target, replacement, 3, 1).getList().get(0).toString();
+                        String desenResult = desenData(target, replacement, 3, 1).getList().get(0).toString();
                         System.out.println("desenResult: " + desenResult);
                         if (desenResult.equals(target)) {
                             continue;
@@ -196,17 +208,16 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     private void extractPowerPoint(Path rawFilePath, Path desenFilePath) throws Exception {
         try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
-                XMLSlideShow  ppt = new XMLSlideShow (rawFileInputStream);
-                OutputStream outputStream = Files.newOutputStream(desenFilePath);
-        )
-        {
+                XMLSlideShow ppt = new XMLSlideShow(rawFileInputStream);
+                OutputStream outputStream = Files.newOutputStream(desenFilePath)
+        ) {
             // 遍历PPT全部批注
             for (XSLFSlide slide : ppt.getSlides()) {
                 Dimension slideSize = slide.getSlideShow().getPageSize();
                 System.out.println("Slide Width: " + slideSize.width + " Slide Height: " + slideSize.height);
                 List<XSLFComment> comments = slide.getComments();
                 // 逐个文本框扫描分析批注位置是否在文本框内
-                for(XSLFComment comment : comments) {
+                for (XSLFComment comment : comments) {
                     // 提取commentText中的脱敏内容
                     String commentText = comment.getText();
                     String patternString = "([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)\\s+(.*)";
@@ -229,8 +240,8 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                         privacyLevel = 3;
                     }
 
-                    for(XSLFShape shape : slide.getShapes()) {
-                        if (shape instanceof XSLFTextShape){
+                    for (XSLFShape shape : slide.getShapes()) {
+                        if (shape instanceof XSLFTextShape) {
                             System.out.println("Anchor: " + shape.getAnchor());
                             String shapeText = ((XSLFTextShape) shape).getText();
                             System.out.println("Shape Text: " + ((XSLFTextShape) shape).getText());
@@ -253,21 +264,6 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         }
     }
 
-    private static Map<Integer, XWPFRun> getPosToRuns(XWPFParagraph paragraph) {
-        int pos = 0;
-        Map<Integer, XWPFRun> map = new HashMap<Integer, XWPFRun>(10);
-        for (XWPFRun run : paragraph.getRuns()) {
-            String runText = run.text();
-            if (runText != null) {
-                for (int i = 0; i < runText.length(); i++) {
-                    map.put(pos + i, run);
-                }
-                pos += runText.length();
-            }
-        }
-        return (map);
-    }
-
     private <V> void replace(XWPFParagraph paragraph, String searchText, V replacement) {
         boolean found = true;
         while (found) {
@@ -281,7 +277,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                 XWPFRun lastRun = posToRuns.get(pos + searchText.length() - 1);
                 int runNum = paragraph.getRuns().indexOf(run);
                 int lastRunNum = paragraph.getRuns().indexOf(lastRun);
-                String texts[] = replacement.toString().split("\n");
+                String[] texts = replacement.toString().split("\n");
                 run.setText(texts[0], 0);
                 XWPFRun newRun = run;
                 for (int i = 1; i < texts.length; i++) {
@@ -319,9 +315,10 @@ public class RecvFileDesenImpl implements RecvFileDesen {
 
     /**
      * 获取数据脱敏结果
-     * @param cell 电子表格单元格
-     * @param algorithm 选择的脱敏算法
-     * @param algoNum 脱敏算法编号
+     *
+     * @param cell         电子表格单元格
+     * @param algorithm    选择的脱敏算法
+     * @param algoNum      脱敏算法编号
      * @param privacyLevel 隐私保护级别
      * @return 脱敏结果
      */
@@ -335,7 +332,6 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     }
 
     /**
-     *
      * @param content
      * @param algorithm
      * @param algoNum
@@ -351,7 +347,8 @@ public class RecvFileDesenImpl implements RecvFileDesen {
 
     /**
      * 获取电子表格中带有批注的单元格的隐私保护等级
-     * @param e Comment单元格位置
+     *
+     * @param e       Comment单元格位置
      * @param pattern 用于匹配文本的Pattern
      * @return 返回脱敏级别
      */
@@ -388,8 +385,6 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         }
         return privacyLevel;
     }
-
-
 
 
 }

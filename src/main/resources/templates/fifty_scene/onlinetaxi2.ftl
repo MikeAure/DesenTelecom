@@ -15,7 +15,7 @@
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
     <link href="${ctx!}/css/GA.css" rel="stylesheet">
-<#--    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>-->
+    <#--    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>-->
     <!-- 全局js -->
     <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
     <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
@@ -56,13 +56,13 @@
                             fileNameRec = matchSimple ? matchSimple[1] : fileNameRec;
                         }
                         console.log(fileNameRec)
-                        return response.blob().then(blob => ({ blob, fileNameRec }));
+                        return response.blob().then(blob => ({blob, fileNameRec}));
                     })
-                    .then(({ blob, fileNameRec }) => {
+                    .then(({blob, fileNameRec}) => {
                         // const file = blob;
 
                         // 文件名，扩展名
-                        const fileName = fileNameRec.substring(0, fileNameRec.length-1);
+                        const fileName = fileNameRec.substring(0, fileNameRec.length - 1);
                         const fileExtension = fileName.split(".").pop().toLowerCase();
                         const file = new File([blob], fileName, {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
                         console.log(fileExtension);
@@ -176,7 +176,7 @@
                                     // 拼接html
                                     let html = "";
                                     console.log("sheet:" + sheet)
-                                    fetch ("/" + sheet + "param/list")
+                                    fetch("/" + sheet + "param/list")
                                         .then(response => response.json())
                                         .then(data => {
                                             console.log(data.length)
@@ -803,7 +803,7 @@
             //         .then(error => console.error('Error:', error));
             // });
 
-            document.getElementById("fileUpload").addEventListener("change", function(event) {
+            document.getElementById("fileUpload").addEventListener("change", function (event) {
                 const file = event.target.files[0];
                 const fileName = file.name
                 const fileSuffix = fileName.split(".")[1];
@@ -847,7 +847,7 @@
                                         console.error('未知的文件类型');
                                         return; // 或处理这种情况
                                 }
-                                const blob = new Blob([byteArray], { type: fileType });
+                                const blob = new Blob([byteArray], {type: fileType});
 
                                 // 触发下载
                                 const downloadUrl = window.URL.createObjectURL(blob);
@@ -1116,7 +1116,7 @@
             };
         };
 
-    </script >
+    </script>
 
 </head>
 <body>

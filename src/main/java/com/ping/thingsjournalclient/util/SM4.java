@@ -7,33 +7,6 @@ public class SM4 {
     public static final int SM4_ENCRYPT = 1;
 
     public static final int SM4_DECRYPT = 0;
-
-    private long GET_ULONG_BE(byte[] b, int i) {
-        long n = (long) (b[i] & 0xff) << 24 | (long) ((b[i + 1] & 0xff) << 16) | (long) ((b[i + 2] & 0xff) << 8) | (long) (b[i + 3] & 0xff) & 0xffffffffL;
-        return n;
-    }
-
-    private void PUT_ULONG_BE(long n, byte[] b, int i) {
-        b[i] = (byte) (int) (0xFF & n >> 24);
-        b[i + 1] = (byte) (int) (0xFF & n >> 16);
-        b[i + 2] = (byte) (int) (0xFF & n >> 8);
-        b[i + 3] = (byte) (int) (0xFF & n);
-    }
-
-    private long SHL(long x, int n) {
-        return (x & 0xFFFFFFFF) << n;
-    }
-
-    private long ROTL(long x, int n) {
-        return SHL(x, n) | x >> (32 - n);
-    }
-
-    private void SWAP(long[] sk, int i) {
-        long t = sk[i];
-        sk[i] = sk[(31 - i)];
-        sk[(31 - i)] = t;
-    }
-
     public static final byte[] SboxTable = {(byte) 0xd6, (byte) 0x90, (byte) 0xe9, (byte) 0xfe,
             (byte) 0xcc, (byte) 0xe1, 0x3d, (byte) 0xb7, 0x16, (byte) 0xb6,
             0x14, (byte) 0xc2, 0x28, (byte) 0xfb, 0x2c, 0x05, 0x2b, 0x67,
@@ -73,9 +46,7 @@ public class SM4 {
             (byte) 0xc5, 0x6e, (byte) 0xc6, (byte) 0x84, 0x18, (byte) 0xf0,
             0x7d, (byte) 0xec, 0x3a, (byte) 0xdc, 0x4d, 0x20, 0x79,
             (byte) 0xee, 0x5f, 0x3e, (byte) 0xd7, (byte) 0xcb, 0x39, 0x48};
-
     public static final int[] FK = {0xa3b1bac6, 0x56aa3350, 0x677d9197, 0xb27022dc};
-
     public static final int[] CK = {0x00070e15, 0x1c232a31, 0x383f464d, 0x545b6269,
             0x70777e85, 0x8c939aa1, 0xa8afb6bd, 0xc4cbd2d9,
             0xe0e7eef5, 0xfc030a11, 0x181f262d, 0x343b4249,
@@ -84,6 +55,32 @@ public class SM4 {
             0x30373e45, 0x4c535a61, 0x686f767d, 0x848b9299,
             0xa0a7aeb5, 0xbcc3cad1, 0xd8dfe6ed, 0xf4fb0209,
             0x10171e25, 0x2c333a41, 0x484f565d, 0x646b7279};
+
+    private long GET_ULONG_BE(byte[] b, int i) {
+        long n = (long) (b[i] & 0xff) << 24 | (long) ((b[i + 1] & 0xff) << 16) | (long) ((b[i + 2] & 0xff) << 8) | (long) (b[i + 3] & 0xff) & 0xffffffffL;
+        return n;
+    }
+
+    private void PUT_ULONG_BE(long n, byte[] b, int i) {
+        b[i] = (byte) (int) (0xFF & n >> 24);
+        b[i + 1] = (byte) (int) (0xFF & n >> 16);
+        b[i + 2] = (byte) (int) (0xFF & n >> 8);
+        b[i + 3] = (byte) (int) (0xFF & n);
+    }
+
+    private long SHL(long x, int n) {
+        return (x & 0xFFFFFFFF) << n;
+    }
+
+    private long ROTL(long x, int n) {
+        return SHL(x, n) | x >> (32 - n);
+    }
+
+    private void SWAP(long[] sk, int i) {
+        long t = sk[i];
+        sk[i] = sk[(31 - i)];
+        sk[(31 - i)] = t;
+    }
 
     private byte sm4Sbox(byte inch) {
         int i = inch & 0xFF;

@@ -9,16 +9,16 @@ import java.util.Random;
 
 public class QU_AGRQ_P {
 
-    private final int[] k = new int[4];//参数K
-    private BigInteger s, s_Inverse, p, alpha;//参数s，s的逆，p,α
-    private final BigInteger[] c_in = new BigInteger[6];//数组c
-    private BigInteger r_i;//数组r
-    private String key_QU;//会话密钥
-    private String QUID;//用户表示
     private static final int thresholdValue = 20000;//时延门限值
     private static final String symbol1 = "%%";//分隔符1
     private static final String symbol2 = "&&";//分隔符2
     private static final String symbol3 = "@@";//分隔符3
+    private final int[] k = new int[4];//参数K
+    private final BigInteger[] c_in = new BigInteger[6];//数组c
+    private BigInteger s, s_Inverse, p, alpha;//参数s，s的逆，p,α
+    private BigInteger r_i;//数组r
+    private String key_QU;//会话密钥
+    private String QUID;//用户表示
 
 
     public QU_AGRQ_P() {
@@ -34,6 +34,28 @@ public class QU_AGRQ_P {
 
 //	public 
 //	public QU_AGRQ_P()
+
+    public static void main(String[] args) throws Exception {
+        boolean c = true;
+        int i = 0;
+        while (c) {
+            i++;
+            QU_AGRQ_P test = new QU_AGRQ_P(SMUtils.sm4generateKey(), "1");
+            ArrayList<Vertex> testVertex = new ArrayList();
+            testVertex.add(new Vertex(1, 1));
+            testVertex.add(new Vertex(101, 1));
+            testVertex.add(new Vertex(101, 101));
+            testVertex.add(new Vertex(1, 101));
+            String a = test.QU_AGRQ_P_QDC(testVertex);
+            String b = test.UF_AGRQ_P_RDC(a, new Vertex(70, 70));
+
+            c = test.QU_AGRQ_P_QRR(b);
+            if (i == 50) {
+                break;
+            }
+        }
+        System.out.println(i);
+    }
 
     public String getKey_QU() {
         return key_QU;
@@ -51,7 +73,6 @@ public class QU_AGRQ_P {
         QUID = qUID;
     }
 
-
     /**
      * 系统必要初始化
      */
@@ -60,7 +81,7 @@ public class QU_AGRQ_P {
         k[1] = 160;
         k[2] = 75;
         k[3] = 75;
-		
+
 		/*
 		p=BigInteger.probablePrime(k[0], new Random(System.currentTimeMillis()));//k1 p
 		alpha=BigInteger.probablePrime(k[1], new Random(System.currentTimeMillis()));//k2 alpha
@@ -306,28 +327,6 @@ public class QU_AGRQ_P {
             System.out.println("RDT验证失败：超时");
         }
         return false;
-    }
-
-    public static void main(String[] args) throws Exception {
-        boolean c = true;
-        int i = 0;
-        while (c) {
-            i++;
-            QU_AGRQ_P test = new QU_AGRQ_P(SMUtils.sm4generateKey(), "1");
-            ArrayList<Vertex> testVertex = new ArrayList();
-            testVertex.add(new Vertex(1, 1));
-            testVertex.add(new Vertex(101, 1));
-            testVertex.add(new Vertex(101, 101));
-            testVertex.add(new Vertex(1, 101));
-            String a = test.QU_AGRQ_P_QDC(testVertex);
-            String b = test.UF_AGRQ_P_RDC(a, new Vertex(70, 70));
-
-            c = test.QU_AGRQ_P_QRR(b);
-            if (i == 50) {
-                break;
-            }
-        }
-        System.out.println(i);
     }
 
 

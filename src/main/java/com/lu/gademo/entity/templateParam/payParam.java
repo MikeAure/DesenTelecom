@@ -7,12 +7,12 @@ import javax.persistence.*;
 import java.io.IOException;
 
 @Entity
-@Table(name="pay" + "_param")
+@Table(name = "pay" + "_param")
 public class payParam extends BaseEntity {
     private static final long serialVersionUID = 1L;
     //数据存储id
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -29,8 +29,7 @@ public class payParam extends BaseEntity {
     private Integer k;
 
     //高中低 0,1,2,3
-    private  Integer  tmParam;
-
+    private Integer tmParam;
 
 
     public payParam(String json) throws IOException {
@@ -46,6 +45,7 @@ public class payParam extends BaseEntity {
 
     public payParam() {
     }
+
     public Integer getId() {
         return id;
     }
@@ -85,7 +85,6 @@ public class payParam extends BaseEntity {
     public void setTmParam(Integer tmParam) {
         this.tmParam = tmParam;
     }
-
 
 
     public Integer getK() {

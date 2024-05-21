@@ -3,21 +3,14 @@ package com.lu.gademo.controller;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.Util;
-import com.lu.gademo.utils.impl.UtilImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +25,7 @@ import java.util.stream.Collectors;
 public class DPController {
     Dp dp;
     Util util;
+
     @ResponseBody
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String desenValue(@RequestParam String rawData,
@@ -84,7 +78,7 @@ public class DPController {
         DSObject resultDS = null;
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
         if (algName.equals("report_noisy_max1")) {
-            resultDS = dp.service(rawObject, algNum,  1, Integer.parseInt(samples));
+            resultDS = dp.service(rawObject, algNum, 1, Integer.parseInt(samples));
         } else {
             resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples));
         }

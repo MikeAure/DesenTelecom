@@ -7,8 +7,7 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-public class Result<T> implements Serializable
-{
+public class Result<T> implements Serializable {
 
     String message;
     T data;

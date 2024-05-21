@@ -4,6 +4,17 @@ import java.math.BigInteger;
 
 public class Util {
     /**
+     * 用于建立十六进制字符的输出的小写字符数组
+     */
+    private static final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    /**
+     * 用于建立十六进制字符的输出的大写字符数组
+     */
+    private static final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    /**
      * 整形转换成网络传输的字节流（字节数组）型数据
      *
      * @param num 一个整型数据
@@ -168,18 +179,6 @@ public class Util {
     public static byte charToByte(char c) {
         return (byte) "0123456789ABCDEF".indexOf(c);
     }
-
-    /**
-     * 用于建立十六进制字符的输出的小写字符数组
-     */
-    private static final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-    /**
-     * 用于建立十六进制字符的输出的大写字符数组
-     */
-    private static final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
      * 将字节数组转换为十六进制字符数组
@@ -608,7 +607,7 @@ public class Util {
 
     public static byte[] subByte(byte[] input, int startIndex, int length) {
         byte[] bt = new byte[length];
-        System.arraycopy(input, 0 + startIndex, bt, 0, length);
+        System.arraycopy(input, startIndex, bt, 0, length);
         return bt;
     }
 }

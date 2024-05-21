@@ -8,19 +8,21 @@ import java.net.Socket;
 
 public class certStoReqLog {
     //文件全局ID
-    private String fileGloID;
+    private final String fileGloID;
     //脱敏对象大小
-    private int objectSize;
+    private final int objectSize;
     //脱敏对象模态
-    private String objectMode = "text";
+    private final String objectMode = "text";
     //套接字
-    private Socket socket;
+    private final Socket socket;
+
     //构造函数
-    public certStoReqLog(String fileGloID, int objectSize, Socket socket){
+    public certStoReqLog(String fileGloID, int objectSize, Socket socket) {
         this.fileGloID = fileGloID;
         this.objectSize = objectSize;
         this.socket = socket;
     }
+
     public void send() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         //json数据

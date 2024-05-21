@@ -5,9 +5,14 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 public class LatLng {
+    private static final DecimalFormat a;
+
+    static {
+        a = new DecimalFormat("0.000000", new DecimalFormatSymbols(Locale.US));
+    }
+
     public final double latitude;
     public final double longitude;
-    private static DecimalFormat a;
 
     public LatLng(double var1, double var3) {
         if (-180.0 <= var3 && var3 < 180.0) {
@@ -34,9 +39,9 @@ public class LatLng {
         byte var1 = 31;
         int var2 = 1;
         long var3 = Double.doubleToLongBits(this.latitude);
-        var2 = var1 * var2 + (int)(var3 ^ var3 >>> 32);
+        var2 = var1 * var2 + (int) (var3 ^ var3 >>> 32);
         var3 = Double.doubleToLongBits(this.longitude);
-        var2 = var1 * var2 + (int)(var3 ^ var3 >>> 32);
+        var2 = var1 * var2 + (int) (var3 ^ var3 >>> 32);
         return var2;
     }
 
@@ -46,7 +51,7 @@ public class LatLng {
         } else if (!(var1 instanceof LatLng)) {
             return false;
         } else {
-            LatLng var2 = (LatLng)var1;
+            LatLng var2 = (LatLng) var1;
             return this.latitude == var2.latitude && this.longitude == var2.longitude;
         }
     }
@@ -57,10 +62,5 @@ public class LatLng {
 
     public int describeContents() {
         return 0;
-    }
-
-
-    static {
-        a = new DecimalFormat("0.000000", new DecimalFormatSymbols(Locale.US));
     }
 }

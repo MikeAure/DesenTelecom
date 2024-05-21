@@ -1,31 +1,29 @@
 package com.lu.gademo.entity.templateParam;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.support.BaseEntity;
 
 import javax.persistence.*;
-import java.io.IOException;
 
 @Entity
-@Table(name="onlinetaxi_param")
+@Table(name = "onlinetaxi_param")
 public class onlineTaxiParam extends BaseEntity {
     private static final long serialVersionUID = 1L;
     //数据存储id
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
     //数据库中所存的字段名
-    @Column(name="field_name")
+    @Column(name = "field_name")
     private String fieldName;
 
     //英文缩写的中文说明
-    @Column(name="column_name")
+    @Column(name = "column_name")
     private String columnName;
 
     //数据类型：数值(0)，单编码(1)，文本(3)，日期(4)
-    @Column(name="data_type")
+    @Column(name = "data_type")
     private Integer dataType;
 
     // 算法
@@ -34,8 +32,7 @@ public class onlineTaxiParam extends BaseEntity {
 
     //高中低 0,1,2,3
     @Column(name = "tm_param")
-    private  Integer  tmParam;
-
+    private Integer tmParam;
 
 
 //    public onlineTaxiParam(String json) throws IOException {
@@ -51,6 +48,7 @@ public class onlineTaxiParam extends BaseEntity {
 
     public onlineTaxiParam() {
     }
+
     public Integer getId() {
         return id;
     }
@@ -90,7 +88,6 @@ public class onlineTaxiParam extends BaseEntity {
     public void setTmParam(Integer tmParam) {
         this.tmParam = tmParam;
     }
-
 
 
     public Integer getK() {

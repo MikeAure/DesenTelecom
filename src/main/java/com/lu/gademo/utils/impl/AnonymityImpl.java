@@ -1,22 +1,19 @@
 package com.lu.gademo.utils.impl;
 
-import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Anonymity;
 import com.lu.gademo.utils.CommandExecutor;
+import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Util;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class AnonymityImpl implements Anonymity {
-    public DSObject service(DSObject object, Integer alg, Number...params) {
+    public DSObject service(DSObject object, Integer alg, Number... params) {
 
         File directory = new File("");
         Util util = new UtilImpl();
@@ -34,7 +31,7 @@ public class AnonymityImpl implements Anonymity {
                 输入：数值或标识符型 csv 文件
                 输出：csv文件
             */
-            case 1 : {
+            case 1: {
                 if (params.length != 1) return null;
                 int[] k_anonymity_param = new int[]{5, 10, 20};
                 List<?> value = object.getList();
@@ -56,7 +53,7 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
-            case 2 : {
+            case 2: {
                 if (params.length != 3) return null;
                 String position = object.getStringVal();
                 String[] s = position.split(",");
@@ -76,7 +73,7 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
-            case 3 : {
+            case 3: {
                 if (params.length != 2) return null;
                 String position = object.getStringVal();
                 String[] s = position.split(",");
@@ -98,7 +95,7 @@ public class AnonymityImpl implements Anonymity {
                 输出：经度数组、纬度数组
 
             */
-            case 4 : {
+            case 4: {
                 if (params.length != 1) return null;
                 String position = object.getStringVal();
                 String[] s = position.split(",");
@@ -106,7 +103,8 @@ public class AnonymityImpl implements Anonymity {
                 List<Object> value = new ArrayList<>(list);
                 String[] s1 = value.get(0).toString().split(",");
                 String[] s2 = value.get(1).toString().split(",");
-                String cmd  = path + " 4 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + s1[0] + " "  + s1[1] + " " + s2[0] + " " + s2[1];
+                String cmd = path + " 4 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + s1[0] + " " + s1[1] + " " + s2[0] + " " + s2[1];
+                System.out.println(cmd);
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 
@@ -123,7 +121,7 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度、算法类型(1, 2)
                 输出：经度向量、纬度向量
             */
-            case 5 : {
+            case 5: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
                 String param = "9 " + s[0] + " " + s[1] + " " + params[0].toString();
@@ -138,7 +136,7 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
-            case 6 : {
+            case 6: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
                 String param = "1 " + s[0] + " " + s[1] + " " + params[0].toString();
@@ -153,7 +151,7 @@ public class AnonymityImpl implements Anonymity {
                 输入：数值或标识符型 csv 文件
                 输出：csv文件
             */
-            case 7 : {
+            case 7: {
                 if (params.length != 1) return null;
                 int[] l_diversity_param = new int[]{2, 4, 6};
                 List<?> value = object.getList();
@@ -169,9 +167,9 @@ public class AnonymityImpl implements Anonymity {
                 输入：数值或标识符型 csv 文件
                 输出：csv文件
             */
-            case 10 : {
+            case 10: {
                 if (params.length != 1) return null;
-                double[] t_closeness_param = new double[] {0.6, 0.4, 0.2};
+                double[] t_closeness_param = new double[]{0.6, 0.4, 0.2};
                 List<?> value = object.getList();
                 String path_t = Paths.get(currentPath, "generalization", "t_closeness.py").toString();
                 String param = Double.toString(t_closeness_param[params[0].intValue()]);
@@ -185,7 +183,7 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
-            case 11 : {
+            case 11: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
                 String param = "8 " + s[0] + " " + s[1] + " " + params[0].toString();
@@ -205,11 +203,11 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
-            case 12 : {
+            case 12: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
                 String param = "7 " + s[0] + " " + s[1] + " " + params[0].toString();
-                for(Object point : object.getList()) {
+                for (Object point : object.getList()) {
                     String[] temp = point.toString().split(",");
                     param += " " + temp[0] + " " + temp[1];
                 }
@@ -217,7 +215,8 @@ public class AnonymityImpl implements Anonymity {
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 
-            default: return null;
+            default:
+                return null;
         }
     }
 

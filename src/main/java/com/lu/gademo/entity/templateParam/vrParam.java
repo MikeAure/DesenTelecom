@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.io.IOException;
 
 @Entity
-@Table(name="vr" + "_param")
+@Table(name = "vr" + "_param")
 public class vrParam extends BaseEntity {
     private static final long serialVersionUID = 1L;
     //数据存储id

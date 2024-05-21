@@ -71,7 +71,7 @@ public class AnonymityTest {
     }
 
     @Test
-    public void testAnonymity()  {
+    public void testKAnonymityPosition()  {
         Anonymity anonymity = new AnonymityImpl();
         DSObject dsObject = new DSObject("116.359642,39.659324");
         DSObject result = anonymity.service(dsObject, 6, 2);

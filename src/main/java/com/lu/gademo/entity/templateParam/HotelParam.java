@@ -8,13 +8,13 @@ import java.io.IOException;
 
 //前台传入的参数对象
 @Entity
-@Table(name="hotel_param")
+@Table(name = "hotel_param")
 public class HotelParam extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
     //数据存储id
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -31,8 +31,7 @@ public class HotelParam extends BaseEntity {
     private Integer k;
 
     //高中低 0,1,2,3
-    private  Integer  tmParam;
-
+    private Integer tmParam;
 
 
     public HotelParam(String json) throws IOException {
@@ -89,7 +88,6 @@ public class HotelParam extends BaseEntity {
     public void setTmParam(Integer tmParam) {
         this.tmParam = tmParam;
     }
-
 
 
     public Integer getK() {

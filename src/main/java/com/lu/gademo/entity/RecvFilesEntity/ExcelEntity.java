@@ -1,12 +1,7 @@
 package com.lu.gademo.entity.RecvFilesEntity;
 
 
-import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.stereotype.Component;
-
-import javax.persistence.Entity;
-import java.io.Serializable;
-import java.util.Date;
 
 @Component
 public class ExcelEntity {//返回给京东的数据格式

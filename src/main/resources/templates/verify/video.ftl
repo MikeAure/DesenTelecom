@@ -180,8 +180,7 @@
                             pre.appendChild(video);
                         };
                         reader.readAsDataURL(videoFile);
-                    }
-                    else {
+                    } else {
                         alert("请选择视频文件");
                     }
                 }
@@ -277,7 +276,7 @@
             });
         }
 
-        function faceSubSubmit () {
+        function faceSubSubmit() {
             document.getElementById("after").innerHTML = "";
             // debugger
             // 清空
@@ -345,7 +344,7 @@
             }
         }
 
-        function removeBgSubmit () {
+        function removeBgSubmit() {
             // 清空
             const videoFile = document.getElementById("video_remove_bg_fileupload").files[0];
             const imageFile = document.getElementById("video_remove_bg_img_fileupload").files[0];
@@ -432,7 +431,7 @@
             let privacyLevel = document.getElementById("privacyLevel");
             let submitBtn = document.getElementById("submit")
 
-            switch(algoName) {
+            switch (algoName) {
                 case "video_remove_bg":
                     defaultBtns.style.display = "none";
                     videoBgBtns.style.display = "flex";
@@ -563,7 +562,7 @@
                     </form>
                 </div>
             </div>
-<#--            用于视频人脸替换算法文件上传的按钮组-->
+            <#--            用于视频人脸替换算法文件上传的按钮组-->
             <div id="video-face-sub-btns" class="midtile" style="display: none">
                 <div class="align-items-center">
                     <form id="uploadForm" enctype="multipart/form-data">
@@ -618,7 +617,8 @@
                                             </option>
                                             <option value="gaussian_blur_video">泛化-基于高斯滤波器的视频帧像素替换方法
                                             </option>
-                                            <option value="box_blur_video">泛化-基于盒式滤波器的视频帧像素替换方法</option>
+                                            <option value="box_blur_video">泛化-基于盒式滤波器的视频帧像素替换方法
+                                            </option>
                                             <option value="replace_region_video">泛化-基于像素块的视频帧像素替换方法
                                             </option>
                                             <option value="video_add_color_offset">替换-基于像素块的视频帧像素颜色偏移方法

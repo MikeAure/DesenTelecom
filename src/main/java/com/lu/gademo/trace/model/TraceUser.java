@@ -34,6 +34,7 @@ public class TraceUser implements Serializable {
         this.roleId = roleId;
         this.ID = ID;
     }
+
     public TraceUser(String userName, String password, int roleId) {
         this.userName = userName;
         this.password = password;

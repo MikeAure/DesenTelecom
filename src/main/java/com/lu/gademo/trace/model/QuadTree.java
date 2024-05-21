@@ -11,6 +11,10 @@ public class QuadTree {
     private int depth;
     private boolean isRead = false;
 
+    public QuadTree() {
+
+    }
+
     public boolean isAllChildrenRead() {
         return this.firstChild.isRead && this.secondChild.isRead && this.thirdChild.isRead && this.fourthChild.isRead;
     }
@@ -65,10 +69,6 @@ public class QuadTree {
 
     public void setMapData(String mapData) {
         this.mapData = mapData;
-    }
-
-    public QuadTree() {
-
     }
 
     public boolean isRead() {

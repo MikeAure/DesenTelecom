@@ -1,6 +1,9 @@
 package com.lu.gademo.utils.impl;
 
-import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.CommandExecutor;
+import com.lu.gademo.utils.DSObject;
+import com.lu.gademo.utils.DpUtil;
+import com.lu.gademo.utils.Replace;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -10,12 +13,11 @@ import java.util.List;
 
 @Component
 public class ReplaceImpl implements Replace {
-    public DSObject service(DSObject object, Integer alg, Number...params) {
+    public DSObject service(DSObject object, Integer alg, Number... params) {
 
         DpUtil dpUtil = new DpUtilImpl();
-        File directory = new File("");
         String currentPath = Paths.get("./").normalize().toAbsolutePath().toString();
-        String path1 = Paths.get(currentPath, "image", "channel_exchange.py").toString();
+        String dealImagePath = Paths.get(currentPath, "image", "dealImage.py").toString();
         String path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();
 
         switch (alg) {
@@ -27,7 +29,7 @@ public class ReplaceImpl implements Replace {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 1 : {
+            case 1: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -41,7 +43,7 @@ public class ReplaceImpl implements Replace {
                 输入：Double 数值列表
                 输出：Double 数值列表
             */
-            case 2 : {
+            case 2: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -55,7 +57,7 @@ public class ReplaceImpl implements Replace {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 3 : {
+            case 3: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -69,7 +71,7 @@ public class ReplaceImpl implements Replace {
                 输入：Double 数值列表
                 输出：Double 数值列表
             */
-            case 4 : {
+            case 4: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -83,7 +85,7 @@ public class ReplaceImpl implements Replace {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 5 : {
+            case 5: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -97,7 +99,7 @@ public class ReplaceImpl implements Replace {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 6 : {
+            case 6: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -111,7 +113,7 @@ public class ReplaceImpl implements Replace {
                 输入：数字字符串列表
                 输出：数字字符串列表
             */
-            case 7 : {
+            case 7: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -124,7 +126,7 @@ public class ReplaceImpl implements Replace {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 8 : {
+            case 8: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -137,7 +139,7 @@ public class ReplaceImpl implements Replace {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 9 : {
+            case 9: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -150,7 +152,7 @@ public class ReplaceImpl implements Replace {
                 输入：字符串列表
                 输出：字符串列表
             */
-            case 10 : {
+            case 10: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -163,11 +165,11 @@ public class ReplaceImpl implements Replace {
                 输入：原图片文件路径，输出图片文件路径
                 输出：图像文件（存放在指定路径）
             */
-            case 11 : {
+            case 11: {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommandExecutor.executePython(rawData, "image_exchange_channel", path1));
+                return new DSObject(CommandExecutor.executePython(rawData, "image_exchange_channel", dealImagePath));
             }
 
             /*
@@ -178,13 +180,13 @@ public class ReplaceImpl implements Replace {
                 输出：图片文件（存放在指定路径）
 
             */
-            case 12 : {
+            case 12: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                String[] desenParams = new String[] {"20", "50", "100"};
-                return new DSObject(CommandExecutor.executePython(rawData, "image_add_color_offset", path1, "-p " + desenParams[params[0].intValue()]));
+
+                return new DSObject(CommandExecutor.executePython(rawData, "image_add_color_offset", dealImagePath, String.valueOf(params[0])));
             }
 
             /*
@@ -194,7 +196,7 @@ public class ReplaceImpl implements Replace {
                 输入：原图片文件路径，输出图片文件路径
                 输出：图像文件[存放在指定路径]
             */
-            case 13 : {
+            case 13: {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString() + " " + value.get(2).toString();
@@ -209,7 +211,7 @@ public class ReplaceImpl implements Replace {
                 输入：原视频文件路径，输出视频文件路径
                 输出：视频文件[存放在指定路径]
             */
-            case 14 : {
+            case 14: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -225,7 +227,7 @@ public class ReplaceImpl implements Replace {
                 输入：原视频文件路径，输出视频文件路径，目标人脸图像路径
                 输出：视频文件[存放在指定路径]
             */
-            case 15 : {
+            case 15: {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString() + " " + value.get(2).toString();
@@ -240,7 +242,7 @@ public class ReplaceImpl implements Replace {
                 输入：视频文件路径，背景图像路径
                 输出：视频文件[存放在指定路径]
             */
-            case 16 : {
+            case 16: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -256,7 +258,7 @@ public class ReplaceImpl implements Replace {
                 输入：原音频文件路径、输出音频文件路径，音频分块数量
                 输出：音频文件[存放在指定路径]
             */
-            case 17 : {
+            case 17: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -271,7 +273,7 @@ public class ReplaceImpl implements Replace {
                 输入：原音频文件路径、输出音频文件路径 参数 0 1 2
                 输出：音频文件[存放在指定路径]
             */
-            case 18 : {
+            case 18: {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
@@ -286,14 +288,15 @@ public class ReplaceImpl implements Replace {
                 输入：原音频文件路径，输出音频文件路径
                 输出：音频文件[存放在指定路径]
             */
-            case 19 : {
+            case 19: {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
                 return new DSObject(CommandExecutor.executePython(rawData, "voice_replace", path_audio, "0"));
             }
 
-            default: return null;
+            default:
+                return null;
         }
     }
 

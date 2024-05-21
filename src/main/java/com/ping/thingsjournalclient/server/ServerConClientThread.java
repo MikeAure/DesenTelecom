@@ -1,11 +1,10 @@
 package com.ping.thingsjournalclient.server;
 
-import com.lu.gademo.trace.server.gui.StatusList;
 import com.lu.gademo.trace.model.MapData;
 import com.lu.gademo.trace.model.MessageType;
 import com.lu.gademo.trace.model.TMessage;
 import com.lu.gademo.trace.model.TraceUser;
-//import com.ping.thingsjournalclient.util.DbUtil;
+import com.lu.gademo.trace.server.gui.StatusList;
 import com.ping.thingsjournalclient.common.QU_AGRQ_P;
 
 import java.io.IOException;
@@ -14,19 +13,17 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 public class ServerConClientThread extends Thread {
 
     private final int[][] mapBlockIndex = {{21, 22, 25, 26, 37, 38, 41, 42}, {23, 24, 27, 28, 39, 40, 43, 44},
             {29, 30, 33, 34, 45, 46, 49, 50}, {31, 32, 35, 36, 47, 48, 51, 52}, {53, 54, 57, 58, 69, 70, 73, 74},
             {55, 56, 59, 60, 71, 72, 75, 76}, {61, 62, 65, 66, 77, 78, 81, 82},
             {63, 64, 67, 68, 79, 80, 83, 84}};
-    private Socket socket;
-    private TraceUser user;
-//    private final DbUtil dbUtil = new DbUtil();
+    //    private final DbUtil dbUtil = new DbUtil();
     // private final Connection conn = dbUtil.getCon();
     private final QU_AGRQ_P p_func = new QU_AGRQ_P();
+    private Socket socket;
+    private TraceUser user;
 
     public ServerConClientThread(Socket socket, TraceUser user) {
         this.socket = socket;
@@ -289,7 +286,7 @@ public class ServerConClientThread extends Thread {
                         ArrayList<Integer> dest = new ArrayList<Integer>();
                         dest = findPos(mapData);
                         this.user.setPos(dest);
-                        System.out.println(String.valueOf(user.getPos()));
+                        System.out.println(user.getPos());
                         break;
                     case 2:// 如果接收的是加密的圆的数据
                         TMessage tmsgu2 = new TMessage();// tmessage to u2

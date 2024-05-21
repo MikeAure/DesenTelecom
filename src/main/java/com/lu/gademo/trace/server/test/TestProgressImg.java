@@ -11,6 +11,27 @@ public class TestProgressImg extends JFrame {
     private final JPanel contentPane;
 
     /**
+     * Create the frame.
+     */
+    public TestProgressImg() {
+        setUndecorated(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 90, 60);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+
+        ImageIcon icon = new ImageIcon("img/progressImg.gif");
+        // JButton btn = new JButton(new
+        // ImageIcon(icon.getImage().getScaledInstance(300, 225, Image.SCALE_FAST)));
+        JButton btn = new JButton(icon);
+        btn.setBorderPainted(false);
+        contentPane.add(btn, BorderLayout.CENTER);
+
+    }
+
+    /**
      * Launch the application.
      */
     public static void main(String[] args) {
@@ -34,27 +55,6 @@ public class TestProgressImg extends JFrame {
                 }
             }
         });
-    }
-
-    /**
-     * Create the frame.
-     */
-    public TestProgressImg() {
-        setUndecorated(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 90, 60);
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.setLayout(new BorderLayout(0, 0));
-        setContentPane(contentPane);
-
-        ImageIcon icon = new ImageIcon("img/progressImg.gif");
-        // JButton btn = new JButton(new
-        // ImageIcon(icon.getImage().getScaledInstance(300, 225, Image.SCALE_FAST)));
-        JButton btn = new JButton(icon);
-        btn.setBorderPainted(false);
-        contentPane.add(btn, BorderLayout.CENTER);
-
     }
 
 }

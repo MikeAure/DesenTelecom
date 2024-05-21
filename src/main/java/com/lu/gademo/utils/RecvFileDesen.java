@@ -2,9 +2,8 @@ package com.lu.gademo.utils;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
-
 public interface RecvFileDesen {
 
+    // 接收信工所Office文档
     byte[] desenRecvFile(MultipartFile file) throws Exception;
 }

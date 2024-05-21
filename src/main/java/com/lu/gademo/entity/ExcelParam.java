@@ -3,8 +3,11 @@ package com.lu.gademo.entity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.support.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.io.IOException;
+
 //文件脱敏参数实体
 @Entity
 public class ExcelParam extends BaseEntity {
@@ -16,6 +19,7 @@ public class ExcelParam extends BaseEntity {
     private Integer dataType;
     private Integer k;
     private Integer tmParam;
+
     //有参构造
     public ExcelParam(String json) throws IOException {
         ExcelParam param = new ObjectMapper().readValue(json, ExcelParam.class);
@@ -26,8 +30,11 @@ public class ExcelParam extends BaseEntity {
         this.tmParam = param.tmParam;
         this.k = param.k;
     }
+
     //无参构造
-    public ExcelParam(){}
+    public ExcelParam() {
+    }
+
     public Integer getId() {
         return id;
     }

@@ -16,57 +16,59 @@ import java.util.List;
 public interface Util {
 
     //获取ip地址
-    public String getIP();
+    String getIP();
 
     //SHA256哈希
-    public String getSHA256Hash(String input);
+    String getSHA256Hash(String input);
+
     //获取时间
-    public String getTime();
+    String getTime();
 
     // SM3哈希
-    public String getSM3Hash(byte[] input);
+    String getSM3Hash(byte[] input);
 
     // 构建数据库并插入数据
-    public void createDB(Sheet sheet, List<Integer> dataType, String tableName) throws IOException, SQLException;
-    // SM2签名
-    public String sm2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException;
-    // 系统类型
-    public boolean isLinux();
+    void createDB(Sheet sheet, List<Integer> dataType, String tableName) throws IOException, SQLException;
 
-    public void saveExcel(String tableName, String fileName);
+    // SM2签名
+    String sm2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException;
+
+    // 系统类型
+    boolean isLinux();
+
+    void saveExcel(String tableName, String fileName);
 
     //将对象序列化为字节数组
-    public <T> byte[] serializeToByteArray(List<T> list);
+    <T> byte[] serializeToByteArray(List<T> list);
 
     // 字节数组转字符串
-    public String convertToString(byte[] byteArray);
+    String convertToString(byte[] byteArray);
 
     // 字符串转字节数组
-    public byte[] convertToByteArray(String byteString);
+    byte[] convertToByteArray(String byteString);
 
     // 反序列化
-    public <T extends Serializable> List<T> convertToList(byte[] byteArray);
-    /**
-     *
-     * @param sheet sheet
-     * @param lastRowNum 行数
-     * @param i 第i列
-     * @param datas 脱敏数据
-     * @param <T>
-     */
-    public <T> void write2Excel(Sheet sheet, int lastRowNum, int i, List<T> datas);
+    <T extends Serializable> List<T> convertToList(byte[] byteArray);
 
     /**
-     *
+     * @param sheet      sheet
+     * @param lastRowNum 行数
+     * @param i          第i列
+     * @param datas      脱敏数据
+     * @param <T>
+     */
+    <T> void write2Excel(Sheet sheet, int lastRowNum, int i, List<T> datas);
+
+    /**
      * @param inputStream 输入流
      * @return 对应字符串
      */
-    public  String inputStreamToString(InputStream inputStream);
+    String inputStreamToString(InputStream inputStream);
 
-    public  void mySqlDump(String tableName);
+    void mySqlDump(String tableName);
 
 //    public void excelToMysql(String tableName, String excelFilePath);
-    
+
     // 检测本机是否安装Conda
-    public Boolean isCondaInstalled(boolean isLinux);
+    Boolean isCondaInstalled(boolean isLinux);
 }

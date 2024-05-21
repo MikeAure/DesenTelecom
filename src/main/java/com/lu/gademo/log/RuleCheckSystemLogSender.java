@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.ruleCheck.*;
 import com.lu.gademo.entity.ruleCheck.*;
-import com.lu.gademo.log.TcpPacket;
+import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.NaturalId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-
-import com.lu.gademo.utils.Util;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Data
@@ -34,7 +32,7 @@ public class RuleCheckSystemLogSender {
 
     @Autowired
     Util util;
-
+    ObjectMapper objectMapper = new ObjectMapper();
     // 合规检查Dao
     @Autowired
     private SendRuleReqDao sendRuleReqDao;
@@ -53,10 +51,7 @@ public class RuleCheckSystemLogSender {
     @Autowired
     private RecRuleTimeDao recRuleTimeDao;
 
-    ObjectMapper objectMapper = new ObjectMapper();
-
-
-    public void send2RuleCheck(SendRuleReq sendRuleReq){
+    public void send2RuleCheck(SendRuleReq sendRuleReq) {
         try {
             ObjectNode content = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendRuleReq));
 
@@ -64,7 +59,7 @@ public class RuleCheckSystemLogSender {
             Socket socket = new Socket(ruleCheckAddress, ruleCheckPort);
             // 构造数据域
             ObjectNode data = objectMapper.createObjectNode();
-            data.put("DataType",0x3140);
+            data.put("DataType", 0x3140);
             data.set("content", content);
             ObjectNode dataJson = objectMapper.createObjectNode();
             dataJson.set("data", data);
@@ -101,7 +96,7 @@ public class RuleCheckSystemLogSender {
             // 依次读取
             //while(first || second || third || forth || fifth || sixth){
             int i = 0;
-            while(i < 6){
+            while (i < 6) {
                 // 读取tcp头
                 // 读取头部
                 byte[] header = new byte[14];
@@ -111,7 +106,7 @@ public class RuleCheckSystemLogSender {
                 // 读取数据域内容
                 byte[] dataBytes = new byte[dataLength];
                 inputStream.read(dataBytes);
-                String jsonData = new String(dataBytes, "UTF-8");
+                String jsonData = new String(dataBytes, StandardCharsets.UTF_8);
                 System.out.println(jsonData);
                 // 认证与校验
                 byte[] auth = new byte[16];
@@ -121,7 +116,7 @@ public class RuleCheckSystemLogSender {
                 JsonNode recData = jsonNode.get("data");
                 JsonNode recContent = jsonNode.get("content");
                 // 接收收据
-                if (recData.get("DataType").asInt() == 0x3141){
+                if (recData.get("DataType").asInt() == 0x3141) {
                     // 获取实体
                     ruleReqReceipt = objectMapper.treeToValue(recContent, RecRuleReqReceipt.class);
                     // 检测重复
@@ -155,7 +150,7 @@ public class RuleCheckSystemLogSender {
                     System.out.println("接收脱敏算法、参数异常消息");
                 }
                 // 脱敏后信息类型不符合脱敏要求异常消息
-                else if (recData.get("DataType").asInt() == 0x3202){
+                else if (recData.get("DataType").asInt() == 0x3202) {
                     // 获取实体
                    /* ruleInfoType = objectMapper.treeToValue(recContent, RecRuleInfoType.class);
                     // 检测重复
@@ -166,7 +161,7 @@ public class RuleCheckSystemLogSender {
                     System.out.println("接收信息类型不符合脱敏要求异常消息");
                 }
                 // 接收脱敏过程操作不合规异常消息
-                else if (recData.get("DataType").asInt() == 0x3203){
+                else if (recData.get("DataType").asInt() == 0x3203) {
                     // 获取实体
                   /*  ruleOperate = objectMapper.treeToValue(recContent, RecRuleOperate.class);
                     // 检测重复
@@ -177,7 +172,7 @@ public class RuleCheckSystemLogSender {
                     System.out.println("接收脱敏过程操作不合规异常消息");
                 }
                 // 接收脱敏时间不符合脱敏要求异常消息
-                else if (recData.get("DataType").asInt() == 0x3204){
+                else if (recData.get("DataType").asInt() == 0x3204) {
                     // 获取实体
                    /* ruleTime = objectMapper.treeToValue(recContent, RecRuleTime.class);
                     // 检测重复
@@ -193,11 +188,11 @@ public class RuleCheckSystemLogSender {
 
             // 发送收据
             ruleReceipt.setReportId(ruleResult.getReportId());
-            ruleReceipt.setCertificateId(util.getSM3Hash( (ruleResult.getReportId() + util.getTime()).getBytes()));
+            ruleReceipt.setCertificateId(util.getSM3Hash((ruleResult.getReportId() + util.getTime()).getBytes()));
             ruleReceipt.setHash(util.getSM3Hash((ruleReceipt.getCertificateId() + ruleReceipt.getReportId()).getBytes()));
             ObjectNode ruleRecepitContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(ruleReceipt));
             ObjectNode data1 = objectMapper.createObjectNode();
-            data1.put("DataType",0x3043);
+            data1.put("DataType", 0x3043);
             data1.set("content", ruleRecepitContent);
             ObjectNode dataJson1 = objectMapper.createObjectNode();
             dataJson1.set("data", data1);

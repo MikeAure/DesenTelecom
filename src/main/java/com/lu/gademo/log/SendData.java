@@ -9,7 +9,6 @@ import com.lu.gademo.dao.ruleCheck.*;
 import com.lu.gademo.entity.effectEva.*;
 import com.lu.gademo.entity.evidence.*;
 import com.lu.gademo.entity.ruleCheck.*;
-import com.lu.gademo.service.SocketRecvService;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -68,7 +70,25 @@ public class SendData {
     // 接收课题2的请求
 //    @Autowired
 //    SocketRecvService socketRecvService;
-
+    // 存证系统Dao
+    @Autowired
+    EvidenceReceiptErrDao evidenceReceiptErrDao;
+    @Autowired
+    EvidenceReceiptNormalDao evidenceReceiptNormalDao;
+    @Autowired
+    EvidenceResponseDao evidenceResponseDao;
+    @Autowired
+    ReqEvidenceSaveDao reqEvidenceSaveDao;
+    @Autowired
+    SubmitEvidenceLocalDao submitEvidenceLocalDao;
+    @Autowired
+    SubmitEvidenceRemoteDao submitEvidenceRemoteDao;
+    /**
+     * 工具类
+     */
+    @Autowired
+    Util util;
+    ObjectMapper objectMapper = new ObjectMapper();
     // 效果评测Dao
     @Autowired
     private SendEvaReqDao sendEvaReqDao;
@@ -83,6 +103,7 @@ public class SendData {
     @Autowired
     private SendEvaReceiptDao sendEvaReceiptDao;
 
+    // 拆分重构Dao
     // 合规检查Dao
     @Autowired
     private SendRuleReqDao sendRuleReqDao;
@@ -101,34 +122,11 @@ public class SendData {
     @Autowired
     private RecRuleTimeDao recRuleTimeDao;
 
-    // 拆分重构Dao
-
-    // 存证系统Dao
-    @Autowired
-    EvidenceReceiptErrDao evidenceReceiptErrDao;
-    @Autowired
-    EvidenceReceiptNormalDao evidenceReceiptNormalDao;
-    @Autowired
-    EvidenceResponseDao evidenceResponseDao;
-    @Autowired
-    ReqEvidenceSaveDao reqEvidenceSaveDao;
-    @Autowired
-    SubmitEvidenceLocalDao submitEvidenceLocalDao;
-    @Autowired
-    SubmitEvidenceRemoteDao submitEvidenceRemoteDao;
-
-    /**
-     * 工具类
-     */
-    @Autowired
-    Util util;
-    ObjectMapper objectMapper = new ObjectMapper();
-
     /**
      * @param sendEvaReq 评测请求
      */
     public void send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
-                               byte[] desenFileData){
+                               byte[] desenFileData) {
         try {
             ObjectNode content = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReq));
 
@@ -154,7 +152,7 @@ public class SendData {
             pathTree.set("self", self);
             pathTree.set("child", child);
 
-            data.put("DataType",0x3130);
+            data.put("DataType", 0x3130);
 
             data.set("content", content);
             data.set("pathtree", pathTree);
@@ -243,12 +241,12 @@ public class SendData {
                 dataInputStream.read(header);
                 // 响应数据域长度
                 int dataLength = dataInputStream.readInt();
-                System.out.println("DataLength: " + String.valueOf(dataLength));
+                System.out.println("DataLength: " + dataLength);
                 // 读取数据域内容
                 byte[] dataBytes = new byte[dataLength - 34];
 
                 dataInputStream.read(dataBytes);
-                String jsonData = new String(dataBytes, "UTF-8");
+                String jsonData = new String(dataBytes, StandardCharsets.UTF_8);
                 System.out.println(jsonData);
                 // Write dataBytes to file
 //                try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("D:\\test.json"), "UTF-8")) {
@@ -267,12 +265,12 @@ public class SendData {
 
                 int dataTypeNum = jsonNode.get("dataType").asInt();
                 // 接收收据
-                if (dataTypeNum  == 0x3131){
+                if (dataTypeNum == 0x3131) {
 
                     // 获取实体
                     recEvaReqReceipt = mapper.treeToValue(recContent, RecEvaReqReceipt.class);
 //                     检测重复
-                    if (recEvaReqReceiptDao.existsById(recEvaReqReceipt.getCertificateID())){
+                    if (recEvaReqReceiptDao.existsById(recEvaReqReceipt.getCertificateID())) {
                         recEvaReqReceiptDao.deleteById(recEvaReqReceipt.getCertificateID());
                     }
                     // 插入数据库
@@ -288,7 +286,7 @@ public class SendData {
                     evaResultId = recContent.get("evaResultID").asText();
                     System.out.println(evaResultId);
 //                     检测重复
-                    if (recEvaResultDao.existsById(recEvaResult.getEvaResultID())){
+                    if (recEvaResultDao.existsById(recEvaResult.getEvaResultID())) {
                         recEvaResultDao.deleteById(recEvaResult.getEvaResultID());
                     }
                     // 插入数据库
@@ -315,11 +313,11 @@ public class SendData {
             //System.out.println(recEvaResult.getEvaResultId());
             //sendEvaReceipt.setEvaResultId(recEvaResult.getEvaResultId());
             sendEvaReceipt.setEvaResultID(evaResultId);
-            sendEvaReceipt.setCertificateID(util.getSM3Hash( (sendEvaReceipt.getEvaResultID()+ util.getTime()).getBytes()));
-            sendEvaReceipt.setHash(util.getSM3Hash((sendEvaReceipt.getEvaResultID()+sendEvaReceipt.getCertificateID()).getBytes()));
+            sendEvaReceipt.setCertificateID(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + util.getTime()).getBytes()));
+            sendEvaReceipt.setHash(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + sendEvaReceipt.getCertificateID()).getBytes()));
             ObjectNode evaReceiptContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReceipt));
             ObjectNode data1 = objectMapper.createObjectNode();
-            data1.put("DataType",0x3130);
+            data1.put("DataType", 0x3130);
             data1.set("content", evaReceiptContent);
             ObjectNode dataJson1 = objectMapper.createObjectNode();
             dataJson1.set("data", data1);
@@ -344,11 +342,9 @@ public class SendData {
     }
 
     /**
-     *
-     *
-     * @param sendRuleReq   合规检查请求
+     * @param sendRuleReq 合规检查请求
      */
-    public void send2RuleCheck(SendRuleReq sendRuleReq){
+    public void send2RuleCheck(SendRuleReq sendRuleReq) {
         try {
             ObjectNode content = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendRuleReq));
 
@@ -356,7 +352,7 @@ public class SendData {
             Socket socket = new Socket(ruleCheckAddress, ruleCheckPort);
             // 构造数据域
             ObjectNode data = objectMapper.createObjectNode();
-            data.put("DataType",0x3140);
+            data.put("DataType", 0x3140);
             data.set("content", content);
             ObjectNode dataJson = objectMapper.createObjectNode();
             dataJson.set("data", data);
@@ -393,7 +389,7 @@ public class SendData {
             // 依次读取
             //while(first || second || third || forth || fifth || sixth){
             int i = 0;
-            while(i < 6){
+            while (i < 6) {
                 // 读取tcp头
                 // 读取头部
                 byte[] header = new byte[14];
@@ -403,7 +399,7 @@ public class SendData {
                 // 读取数据域内容
                 byte[] dataBytes = new byte[dataLength];
                 inputStream.read(dataBytes);
-                String jsonData = new String(dataBytes, "UTF-8");
+                String jsonData = new String(dataBytes, StandardCharsets.UTF_8);
                 System.out.println(jsonData);
                 // 认证与校验
                 byte[] auth = new byte[16];
@@ -413,7 +409,7 @@ public class SendData {
                 JsonNode recData = jsonNode.get("data");
                 JsonNode recContent = jsonNode.get("content");
                 // 接收收据
-                if (recData.get("DataType").asInt() == 0x3141){
+                if (recData.get("DataType").asInt() == 0x3141) {
                     // 获取实体
                     ruleReqReceipt = objectMapper.treeToValue(recContent, RecRuleReqReceipt.class);
                     // 检测重复
@@ -447,7 +443,7 @@ public class SendData {
                     System.out.println("接收脱敏算法、参数异常消息");
                 }
                 // 脱敏后信息类型不符合脱敏要求异常消息
-                else if (recData.get("DataType").asInt() == 0x3202){
+                else if (recData.get("DataType").asInt() == 0x3202) {
                     // 获取实体
                    /* ruleInfoType = objectMapper.treeToValue(recContent, RecRuleInfoType.class);
                     // 检测重复
@@ -458,7 +454,7 @@ public class SendData {
                     System.out.println("接收信息类型不符合脱敏要求异常消息");
                 }
                 // 接收脱敏过程操作不合规异常消息
-                else if (recData.get("DataType").asInt() == 0x3203){
+                else if (recData.get("DataType").asInt() == 0x3203) {
                     // 获取实体
                   /*  ruleOperate = objectMapper.treeToValue(recContent, RecRuleOperate.class);
                     // 检测重复
@@ -469,7 +465,7 @@ public class SendData {
                     System.out.println("接收脱敏过程操作不合规异常消息");
                 }
                 // 接收脱敏时间不符合脱敏要求异常消息
-                else if (recData.get("DataType").asInt() == 0x3204){
+                else if (recData.get("DataType").asInt() == 0x3204) {
                     // 获取实体
                    /* ruleTime = objectMapper.treeToValue(recContent, RecRuleTime.class);
                     // 检测重复
@@ -485,11 +481,11 @@ public class SendData {
 
             // 发送收据
             ruleReceipt.setReportId(ruleResult.getReportId());
-            ruleReceipt.setCertificateId(util.getSM3Hash( (ruleResult.getReportId() + util.getTime()).getBytes()));
+            ruleReceipt.setCertificateId(util.getSM3Hash((ruleResult.getReportId() + util.getTime()).getBytes()));
             ruleReceipt.setHash(util.getSM3Hash((ruleReceipt.getCertificateId() + ruleReceipt.getReportId()).getBytes()));
             ObjectNode ruleRecepitContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(ruleReceipt));
             ObjectNode data1 = objectMapper.createObjectNode();
-            data1.put("DataType",0x3043);
+            data1.put("DataType", 0x3043);
             data1.set("content", ruleRecepitContent);
             ObjectNode dataJson1 = objectMapper.createObjectNode();
             dataJson1.set("data", data1);
@@ -510,19 +506,18 @@ public class SendData {
         }
     }
 
-    public void send2Split(){
+    public void send2Split() {
         List<Integer> integers = new LinkedList<>();
 
 
     }
 
     /**
-     *
-     * @param reqEvidenceSave      请求存证
-     * @param submitEvidenceLocal   本地存证
-     * @param submitEvidenceLocal   中心存证
+     * @param reqEvidenceSave     请求存证
+     * @param submitEvidenceLocal 本地存证
+     * @param submitEvidenceLocal 中心存证
      */
-    public void send2Evidence(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal){
+    public void send2Evidence(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal) {
         try {
             // 中心存证
             ObjectNode reqData = objectMapper.createObjectNode();
@@ -622,7 +617,7 @@ public class SendData {
             // data
             ObjectNode localEvidenceData = objectMapper.createObjectNode();
             localEvidenceData.put("globalID", submitEvidenceLocal.getGlobalID());
-            localEvidenceData.put("status",submitEvidenceLocal.getStatus());
+            localEvidenceData.put("status", submitEvidenceLocal.getStatus());
             localEvidenceData.put("optTime", util.getTime());
             submitEvidenceLocal.setOptTime(localEvidenceData.get("optTime").asText());
             localEvidenceData.put("fileTitle", submitEvidenceLocal.getFileTitle());
@@ -703,7 +698,7 @@ public class SendData {
             // 认证与校验
             //byte[] auth = new byte[16];
             //localInputStream.read(auth);
-            String receipt = new String(recDataBytes, "UTF-8");
+            String receipt = new String(recDataBytes, StandardCharsets.UTF_8);
             //String转json 存储响应信息
             JsonNode recJson = objectMapper.readTree(receipt);
             //打印
@@ -711,7 +706,7 @@ public class SendData {
             String recjson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(recJson);
             System.out.println(recjson);
             //  发生异常
-            if (recJson.has("errCode")){
+            if (recJson.has("errCode")) {
                 evidenceReceiptErr.setSystemID(recJson.get("systemID").asInt());
                 evidenceReceiptErr.setMainCMD(recJson.get("mainCMD").asInt());
                 evidenceReceiptErr.setSubCMD(recJson.get("subCMD").asInt());
@@ -722,9 +717,9 @@ public class SendData {
                 evidenceReceiptErr.setErrCode(recJson.get("errCode").asInt());
                 //存储
                 evidenceReceiptErrDao.save(evidenceReceiptErr);
-                if (recJson.get("errCode").asInt() == 0x01){
+                if (recJson.get("errCode").asInt() == 0x01) {
                     System.out.println("未进行请求认证");
-                }else{
+                } else {
                     System.out.println("上报数据格式不正确");
                 }
             }

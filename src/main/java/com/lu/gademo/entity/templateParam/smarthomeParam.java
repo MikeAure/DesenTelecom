@@ -5,13 +5,14 @@ import com.lu.gademo.entity.support.BaseEntity;
 
 import javax.persistence.*;
 import java.io.IOException;
+
 @Entity
-@Table(name="smarthome" + "_param")
+@Table(name = "smarthome" + "_param")
 public class smarthomeParam extends BaseEntity {
     private static final long serialVersionUID = 1L;
     //数据存储id
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -28,8 +29,7 @@ public class smarthomeParam extends BaseEntity {
     private Integer k;
 
     //高中低 0,1,2,3
-    private  Integer  tmParam;
-
+    private Integer tmParam;
 
 
     public smarthomeParam(String json) throws IOException {
@@ -45,6 +45,7 @@ public class smarthomeParam extends BaseEntity {
 
     public smarthomeParam() {
     }
+
     public Integer getId() {
         return id;
     }
@@ -84,7 +85,6 @@ public class smarthomeParam extends BaseEntity {
     public void setTmParam(Integer tmParam) {
         this.tmParam = tmParam;
     }
-
 
 
     public Integer getK() {

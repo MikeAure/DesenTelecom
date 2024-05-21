@@ -3,7 +3,6 @@ package com.lu.gademo.entity.evidence;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Data
 @Entity

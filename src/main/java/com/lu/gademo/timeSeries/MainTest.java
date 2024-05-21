@@ -97,37 +97,37 @@ public class MainTest {
 
         //for (int i = 0; i < cycle; i++) {
 
-            // encryption by our scheme
-            HashMap<Integer, ArrayList<Integer>> pivotsList = PreCompute.ChoosePivots(intDataList, k);
-            HashMap<Integer, int[]> distanceList = PreCompute.PreComputeDistance(intDataList, pivotsList, lamda);
-            Node T = KDTree.TreeBuild(distanceList, upBoundLeafNode, k);
-            EncryptNode encryptT = KDTree.encryptTree(intDataList, T, k, filterParam, verifyParam, A);
+        // encryption by our scheme
+        HashMap<Integer, ArrayList<Integer>> pivotsList = PreCompute.ChoosePivots(intDataList, k);
+        HashMap<Integer, int[]> distanceList = PreCompute.PreComputeDistance(intDataList, pivotsList, lamda);
+        Node T = KDTree.TreeBuild(distanceList, upBoundLeafNode, k);
+        EncryptNode encryptT = KDTree.encryptTree(intDataList, T, k, filterParam, verifyParam, A);
 
-            //for (int j = 0; j < 20; j++) {
+        //for (int j = 0; j < 20; j++) {
 
-                //int loc = (int) (Math.random() * n);
+        //int loc = (int) (Math.random() * n);
                /* ArrayList<Integer> q = intDataList.get(loc);
         System.out.println("raw:" + loc);
         System.out.println(q);*/
-                //System.out.println(q);
-                //q.remove(q.size()-1);
-                //ArrayList<Integer> q = new ArrayList<>(java.util.Arrays.asList(4, 5, 6, 7, 8, 9, 10,123));
+        //System.out.println(q);
+        //q.remove(q.size()-1);
+        //ArrayList<Integer> q = new ArrayList<>(java.util.Arrays.asList(4, 5, 6, 7, 8, 9, 10,123));
 
-                // token generation by our scheme
-                Token token = Token.generateToken(q, pivotsList, lamda, delta, A, filterParam, verifyParam, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero);
+        // token generation by our scheme
+        Token token = Token.generateToken(q, pivotsList, lamda, delta, A, filterParam, verifyParam, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero);
 
-                // query processing with our scheme
-                HashMap<BigInteger, ArrayList<BigInteger>> filterResult = KDTree.SearchTreeFiltration(encryptT, token, filterParam, verifyParam);
-                System.out.println("operationTime:" + filterResult.size());
+        // query processing with our scheme
+        HashMap<BigInteger, ArrayList<BigInteger>> filterResult = KDTree.SearchTreeFiltration(encryptT, token, filterParam, verifyParam);
+        System.out.println("operationTime:" + filterResult.size());
 
 
-                operationTime = operationTime + filterResult.size();
+        operationTime = operationTime + filterResult.size();
 
         //}
-        int index =(int) KDTree.SearchTreeVerification(filterResult, token, verifyParam, VerifycipherMiunsOne, VerifyCipherOne, SecretKeyS1, SecretKeyS2);
+        int index = (int) KDTree.SearchTreeVerification(filterResult, token, verifyParam, VerifycipherMiunsOne, VerifyCipherOne, SecretKeyS1, SecretKeyS2);
         System.out.println(index);
 //        operationTime = operationTime / cycle / 20;
-        operationTime = operationTime / cycle ;
+        operationTime = operationTime / cycle;
 
         System.out.println(intDataList.get(index).toString());
 
@@ -448,7 +448,7 @@ public class MainTest {
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         /*"time" + "ElectricDevices_TEST.tsv"*/
-        String filename = Paths.get(currentPath, "ElectricDevices_TEST.tsv").toString() ;
+        String filename = Paths.get(currentPath, "ElectricDevices_TEST.tsv").toString();
         String split = "\\s+";
 
 
@@ -487,8 +487,6 @@ public class MainTest {
         //QueryProcessingD(filename, split, filterParam, verifyParam, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifycipherMinusOne);
 
 
-
-
     }
 
     public static String encryptGraph(String rawData) throws Exception {
@@ -515,7 +513,7 @@ public class MainTest {
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         /*"time" + "ElectricDevices_TEST.tsv"*/
-        String filename = Paths.get(currentPath, "ElectricDevices_TEST.tsv").toString() ;
+        String filename = Paths.get(currentPath, "ElectricDevices_TEST.tsv").toString();
         String split = "\\s+";
 
 
@@ -550,7 +548,6 @@ public class MainTest {
         return String.valueOf(QueryProcessingN(q, filename, split, filterParam, verifyParam, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifycipherMinusOne));
 
     }
-
 
 
 }

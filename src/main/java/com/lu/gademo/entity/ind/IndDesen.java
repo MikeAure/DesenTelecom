@@ -30,7 +30,6 @@ public class IndDesen {
     private String desenControlSet;
 
 
-
     public String getRecFlagInfoId() {
         return recFlagInfoId;
     }

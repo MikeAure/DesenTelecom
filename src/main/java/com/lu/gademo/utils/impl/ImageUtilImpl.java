@@ -21,9 +21,66 @@ public class ImageUtilImpl implements ImageUtil {
 
     static {
         // 在 Windows 上设置本地库路径
-            URL url = ImageUtilImpl.class.getClassLoader().getResource("lib/opencv/opencv_java455.dll");
-            System.load(url.getPath());
+        URL url = ImageUtilImpl.class.getClassLoader().getResource("lib/opencv/opencv_java455.dll");
+        System.load(url.getPath());
     }
+
+    private static BufferedImage convertToGray(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        BufferedImage grayImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                Color color = new Color(image.getRGB(i, j));
+                int grayValue = (int) (0.299 * color.getRed() + 0.587 * color.getGreen() + 0.114 * color.getBlue());
+                int grayPixel = new Color(grayValue, grayValue, grayValue).getRGB();
+                grayImage.setRGB(i, j, grayPixel);
+            }
+        }
+
+        return grayImage;
+    }
+
+    private static int[] countPixelValues(BufferedImage image) {
+        int[] pixelCounts = new int[256];
+
+        for (int i = 0; i < image.getWidth(); i++) {
+            for (int j = 0; j < image.getHeight(); j++) {
+                int grayValue = new Color(image.getRGB(i, j)).getRed();
+                pixelCounts[grayValue]++;
+            }
+        }
+
+        return pixelCounts;
+    }
+
+    private static double[] calculateProbabilities(int[] pixelCounts, int totalPixels) {
+        double[] probabilities = new double[256];
+
+        for (int i = 0; i < 256; i++) {
+            probabilities[i] = (double) pixelCounts[i] / totalPixels;
+        }
+
+        return probabilities;
+    }
+
+    private static double calculateEntropy(double[] probabilities) {
+        double entropy = 0.0;
+
+        for (double probability : probabilities) {
+            if (probability > 0) {
+                entropy -= probability * Math.log(probability) / Math.log(2);
+            }
+        }
+
+
+        DecimalFormat df = new DecimalFormat("#.000");
+        Double formattedValue = Double.parseDouble(df.format(entropy));
+
+        return formattedValue;
+    }
+
     // 计算PSNR的方法
     @Override
     public Double calculatePSNR(BufferedImage img1, BufferedImage img2) {
@@ -55,7 +112,7 @@ public class ImageUtilImpl implements ImageUtil {
         }
 
         // 计算均方误差的平均值
-        mse /= width * height;
+        mse /= (long) width * height;
 
         // 计算PSNR
         double maxPixelValue = 255.0;
@@ -119,64 +176,6 @@ public class ImageUtilImpl implements ImageUtil {
 
         return entropy;
     }
-
-    private static BufferedImage convertToGray(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage grayImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                Color color = new Color(image.getRGB(i, j));
-                int grayValue = (int) (0.299 * color.getRed() + 0.587 * color.getGreen() + 0.114 * color.getBlue());
-                int grayPixel = new Color(grayValue, grayValue, grayValue).getRGB();
-                grayImage.setRGB(i, j, grayPixel);
-            }
-        }
-
-        return grayImage;
-    }
-
-    private static int[] countPixelValues(BufferedImage image) {
-        int[] pixelCounts = new int[256];
-
-        for (int i = 0; i < image.getWidth(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
-                int grayValue = new Color(image.getRGB(i, j)).getRed();
-                pixelCounts[grayValue]++;
-            }
-        }
-
-        return pixelCounts;
-    }
-
-    private static double[] calculateProbabilities(int[] pixelCounts, int totalPixels) {
-        double[] probabilities = new double[256];
-
-        for (int i = 0; i < 256; i++) {
-            probabilities[i] = (double) pixelCounts[i] / totalPixels;
-        }
-
-        return probabilities;
-    }
-
-    private static double calculateEntropy(double[] probabilities) {
-        double entropy = 0.0;
-
-        for (double probability : probabilities) {
-            if (probability > 0) {
-                entropy -= probability * Math.log(probability) / Math.log(2);
-            }
-        }
-
-
-        DecimalFormat df = new DecimalFormat("#.000");
-        Double formattedValue = Double.parseDouble(df.format(entropy));
-
-        return formattedValue;
-    }
-
-
 
 
 }

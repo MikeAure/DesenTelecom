@@ -6,7 +6,6 @@ import com.lu.gademo.trace.client.common.QU_AGRQ_P;
 import com.lu.gademo.trace.client.common.Vertex;
 import com.lu.gademo.trace.client.util.CoordinateConversion;
 import com.lu.gademo.trace.client.util.MapUtils;
-
 import com.lu.gademo.trace.model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,36 +25,32 @@ import java.util.Map;
 @Component
 public class Customer {
 
-    TraceUser user = new TraceUser("user0", "123456", 1);
-
-    private int radius = 4000;
-    private double startLatitude = 34.20;
-    private double startLongitude = 109.00;
-    private double endLatitude = 34.20;
-    private double endLongitude = 109.10;
-
-    private LatLng latLngLeftTop;
-    private LatLng latLngRightTop;
-    private LatLng latLngRightBottom;
-    private LatLng latLngLeftBottom;
-
-    public List<TraceUser> driverList = new ArrayList<TraceUser>();
-
-    public String destInfoStr = "纬度：" + String.valueOf(endLatitude) + " 经度：" + String.valueOf(endLongitude);
-    public CoordinateConversion coor = new CoordinateConversion();
-    private CircleArea queryCircle;
+    private static final Logger logger = LogManager.getLogger(Customer.class);
     private final String ADDRESS = "127.0.0.1";//地址
     private final int PORT = 20006;//使用端口
-//    private final Context context;
+    public List<TraceUser> driverList = new ArrayList<TraceUser>();
+    public CoordinateConversion coor = new CoordinateConversion();
+    //    private final Context context;
     public Socket connSocket;
     public boolean loginFlag = false;
     public CustomerConnThread connThread;
     public MapUtils mapUtils;
-    private static final Logger logger = LogManager.getLogger(Customer.class);
-
     public boolean IS_ORDER_ACCEPTED = false;
+    TraceUser user = new TraceUser("user0", "123456", 1);
+    private final int radius = 4000;
+    private double startLatitude = 34.20;
+    private double startLongitude = 109.00;
+    private double endLatitude = 34.20;
+    private double endLongitude = 109.10;
+    public String destInfoStr = "纬度：" + endLatitude + " 经度：" + endLongitude;
+    private LatLng latLngLeftTop;
+    private LatLng latLngRightTop;
+    private LatLng latLngRightBottom;
+    private LatLng latLngLeftBottom;
+    private CircleArea queryCircle;
 
-    public Customer () {}
+    public Customer() {
+    }
 
     public Customer(String userName, String password, int roleId, double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
         user.setUserName(userName);
@@ -66,51 +61,67 @@ public class Customer {
         this.endLatitude = endLatitude;
         this.endLongitude = endLongitude;
     }
-    public Customer (String userName, String password, int roleId) {
+
+    public Customer(String userName, String password, int roleId) {
         user.setUserName(userName);
         user.setPassword(password);
         user.setRoleId(roleId);
     }
 
-    public void setStartLatitude(double startLatitude) {
-        this.startLatitude = startLatitude;
+    /**
+     * 已知距离，第一个点的坐标和两点的夹角，得到另一个点的坐标
+     *
+     * @param distance 距离单位为km
+     * @param latlngA  第一个点的经纬度
+     * @param angle    从正北顺时针开始的角度
+     * @return
+     */
+    public static LatLng getLatlng(float distance, LatLng latlngA, double angle) {
+        return new LatLng(latlngA.latitude + (distance * Math.cos(angle * Math.PI / 180)) / 111,
+                latlngA.longitude + (distance * Math.sin(angle * Math.PI / 180)) / (111 * Math.cos(latlngA.latitude * Math.PI / 180))
+        );
     }
 
     public double getStartLatitude() {
         return startLatitude;
     }
 
-    public void setStartLongitude(double startLongitude) {
-        this.startLongitude = startLongitude;
+    public void setStartLatitude(double startLatitude) {
+        this.startLatitude = startLatitude;
     }
 
     public double getStartLongitude() {
         return startLongitude;
     }
 
-    public void setEndLatitude(double endLatitude) {
-        this.endLatitude = endLatitude;
+    public void setStartLongitude(double startLongitude) {
+        this.startLongitude = startLongitude;
     }
 
     public double getEndLatitude() {
         return endLatitude;
     }
 
-    public void setEndLongitude(double endLongitude) {
-        this.endLongitude = endLongitude;
+    public void setEndLatitude(double endLatitude) {
+        this.endLatitude = endLatitude;
     }
 
     public double getEndLongitude() {
         return endLongitude;
     }
+
+    public void setEndLongitude(double endLongitude) {
+        this.endLongitude = endLongitude;
+    }
+
     public void driverAccept(String driverName, int userId) {
-        logger.info("司机: " + driverName + " " + userId + " "  + "接单了");
+        logger.info("司机: " + driverName + " " + userId + " " + "接单了");
         TraceUser driver = new TraceUser(driverName, "", 2, userId);
         driverList.add(driver);
         IS_ORDER_ACCEPTED = true;
     }
 
-    public void login() throws IOException{
+    public void login() throws IOException {
 //        if (android.os.Build.VERSION.SDK_INT > 9) {
 //            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 //            StrictMode.setThreadPolicy(policy);
@@ -122,17 +133,16 @@ public class Customer {
         user.setMsgType(MessageType.LOGIN);
         logger.info("account: " + user.getUserName());
         logger.info("psd: " + user.getPassword());
-        logger.info("role id: " + String.valueOf(user.getRoleId()));
+        logger.info("role id: " + user.getRoleId());
         boolean isLoginSuc = sendLoginInfo(user);
 //        Log.e("isLoginSuc",isLoginSuc+"");
         if (isLoginSuc) {
-            logger.info(user.getUserName() +"注册成功");
+            logger.info(user.getUserName() + "注册成功");
         } else {
-            logger.error(user.getUserName() +"注册失败");
+            logger.error(user.getUserName() + "注册失败");
             throw new IOException("Login Failed");
         }
     }
-
 
     public boolean sendLoginInfo(TraceUser user) {
 
@@ -220,7 +230,7 @@ public class Customer {
 
             tMessage.setMapData(mapData);
             oos.writeObject(tMessage);
-            logger.info("sendED: 写入数据完成！msgType: " + String.valueOf(type));
+            logger.info("sendED: 写入数据完成！msgType: " + type);
         } catch (IOException e) {
             logger.error("ED: 读取输出流失败！");
         }
@@ -271,9 +281,9 @@ public class Customer {
 
         logger.info("onClick: " +
                 distance + "m:" + startLatitude + "," + startLongitude + ";" + latLngTopCenter.latitude + "," + latLngLeftCenter.longitude + ";" +
-                        +latLngTopCenter.latitude + "," + latLngRightCenter.longitude + ";"
-                        + latLngBottomCenter.latitude + "," + latLngRightCenter.longitude + ";"
-                        + latLngBottomCenter.latitude + "," + latLngLeftCenter.longitude);
+                +latLngTopCenter.latitude + "," + latLngRightCenter.longitude + ";"
+                + latLngBottomCenter.latitude + "," + latLngRightCenter.longitude + ";"
+                + latLngBottomCenter.latitude + "," + latLngLeftCenter.longitude);
         //*****************************************************************下面为发送的圆形数据，通过服务器发送给所有范围内的车主
         StringBuffer stringBufferCircle = encryptedCircleData(distance, startLatitude, startLongitude);
         sendEncryptedData(stringBufferCircle, 2);
@@ -321,8 +331,8 @@ public class Customer {
         boolean result = false;
         try {
             result = qu_agrq_c.QU_AGRQ_P_QRR(stringBuffer.toString(), queryCircle);
-            logger.info("收到与圆计算的结果:" + stringBuffer.toString());
-            logger.info("解密圆计算的结果: " + String.valueOf(result));
+            logger.info("收到与圆计算的结果:" + stringBuffer);
+            logger.info("解密圆计算的结果: " + result);
         } catch (Exception e) {
             logger.error("用户圆形范围车辆判断: 数据处理出错！");
             logger.error(e.getMessage());
@@ -351,21 +361,7 @@ public class Customer {
 
     public void OnReceivedRealDriverPos(String driverNameReal, double realPosLat, double realPosLng) {
         double distance = Math.sqrt(Math.pow((realPosLat - startLatitude), 2) + Math.pow((realPosLng - startLongitude), 2));
-        logger.info("司机名称" + driverNameReal + "两人距离： " + String.valueOf(distance));
-    }
-
-    /**
-     * 已知距离，第一个点的坐标和两点的夹角，得到另一个点的坐标
-     *
-     * @param distance 距离单位为km
-     * @param latlngA  第一个点的经纬度
-     * @param angle    从正北顺时针开始的角度
-     * @return
-     */
-    public static LatLng getLatlng(float distance, LatLng latlngA, double angle) {
-        return new LatLng(latlngA.latitude + (distance * Math.cos(angle * Math.PI / 180)) / 111,
-                latlngA.longitude + (distance * Math.sin(angle * Math.PI / 180)) / (111 * Math.cos(latlngA.latitude * Math.PI / 180))
-        );
+        logger.info("司机名称" + driverNameReal + "两人距离： " + distance);
     }
 
     public void close() {

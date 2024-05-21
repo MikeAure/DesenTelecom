@@ -1,13 +1,15 @@
 package com.lu.gademo.utils;
 
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
+import java.util.Objects;
 
 
 public class DSObject {
 
     Integer intVal;
-    
+
     Double doubleVal;
 
     String string;
@@ -24,20 +26,33 @@ public class DSObject {
         this.doubleVal = doubleVal;
     }
 
-    public DSObject(String string) { this.string = string; }
+    public DSObject(String string) {
+        this.string = string;
+    }
 
     public DSObject(List<?> list) {
         this.list = list;
     }
 
-    public DSObject(String string, List<?> list) { this.string = string; this.list = list; }
+    public DSObject(String string, List<?> list) {
+        this.string = string;
+        this.list = list;
+    }
 
     public Integer getIntVal() {
         return intVal;
     }
 
+    public void setIntVal(Integer intVal) {
+        this.intVal = intVal;
+    }
+
     public Double getDoubleVal() {
         return this.doubleVal;
+    }
+
+    public void setDoubleVal(Double doubleVal) {
+        this.doubleVal = doubleVal;
     }
 
     public String getStringVal() {
@@ -48,18 +63,12 @@ public class DSObject {
         return list;
     }
 
-    public void setIntVal(Integer intVal) {
-        this.intVal = intVal;
-    }
-
-    public void setDoubleVal(Double doubleVal) {
-        this.doubleVal = doubleVal;
-    }
-
-    public void setString(String string) { this.string = string; }
-
     public void setList(List<?> list) {
         this.list = list;
+    }
+
+    public void setString(String string) {
+        this.string = string;
     }
 
     @Override
@@ -72,15 +81,14 @@ public class DSObject {
             boolean doublesEqual = this.doubleVal == dsObject.doubleVal;
 
             // 安全地比较字符串，处理可能的null值
-            boolean stringsEqual = (this.string == null ? dsObject.string == null : this.string.equals(dsObject.string));
+            boolean stringsEqual = (Objects.equals(this.string, dsObject.string));
 
             // 安全地比较列表，处理可能的null值
-            boolean listsEqual = (this.list == null ? dsObject.list == null : this.list.equals(dsObject.list));
+            boolean listsEqual = (Objects.equals(this.list, dsObject.list));
 
             return intsEqual && doublesEqual && stringsEqual && listsEqual;
 
-        }
-        else {
+        } else {
             return false;
         }
     }

@@ -4,6 +4,17 @@ import java.math.BigInteger;
 
 public class Util {
     /**
+     * 鐢ㄤ簬寤虹珛鍗佸叚杩涘埗瀛楃鐨勮緭鍑虹殑灏忓啓瀛楃鏁扮粍
+     */
+    private static final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    /**
+     * 鐢ㄤ簬寤虹珛鍗佸叚杩涘埗瀛楃鐨勮緭鍑虹殑澶у啓瀛楃鏁扮粍
+     */
+    private static final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    /**
      * 鏁村舰杞崲鎴愮綉缁滀紶杈撶殑瀛楄妭娴侊紙瀛楄妭鏁扮粍锛夊瀷鏁版嵁
      *
      * @param num 涓�涓暣鍨嬫暟鎹�
@@ -168,18 +179,6 @@ public class Util {
     public static byte charToByte(char c) {
         return (byte) "0123456789ABCDEF".indexOf(c);
     }
-
-    /**
-     * 鐢ㄤ簬寤虹珛鍗佸叚杩涘埗瀛楃鐨勮緭鍑虹殑灏忓啓瀛楃鏁扮粍
-     */
-    private static final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-    /**
-     * 鐢ㄤ簬寤虹珛鍗佸叚杩涘埗瀛楃鐨勮緭鍑虹殑澶у啓瀛楃鏁扮粍
-     */
-    private static final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
      * 灏嗗瓧鑺傛暟缁勮浆鎹负鍗佸叚杩涘埗瀛楃鏁扮粍
@@ -608,7 +607,7 @@ public class Util {
 
     public static byte[] subByte(byte[] input, int startIndex, int length) {
         byte[] bt = new byte[length];
-        System.arraycopy(input, 0 + startIndex, bt, 0, length);
+        System.arraycopy(input, startIndex, bt, 0, length);
         return bt;
     }
 }

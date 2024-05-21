@@ -8,11 +8,11 @@ import org.bouncycastle.math.ec.ECPoint;
 import java.math.BigInteger;
 
 public class Cipher {
+    private final byte[] key;
     private int ct;
     private ECPoint p2;
     private SM3Digest sm3keybase;
     private SM3Digest sm3c3;
-    private final byte[] key;
     private byte keyOff;
 
     public Cipher() {

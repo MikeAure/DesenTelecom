@@ -2,13 +2,17 @@ package com.lu.gademo.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.lu.gademo.dao.templateParam.onlineTaxi2ParamDao;
+import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,19 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.lu.gademo.entity.RecvFilesEntity.*;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.nio.file.*;
 import java.util.Map;
-
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @Component
 public class RecvFiles {
@@ -48,14 +46,6 @@ public class RecvFiles {
         return jsonResponse.getBody();
     }
 
-    public void updateTaxiParams() {
-        onlineTaxi2Param columnNameFromTable = onlineTaxi2Dao.getOne(1);
-//        for (onlineTaxi2Param name : columnNameFromTable) {
-//            System.out.println(name);
-//        }
-        System.out.println(columnNameFromTable.getColumnName());
-
-    }
     public static List<ExcelEntity> parseJsonToEntities(JsonNode responseBody) throws JsonProcessingException, JSONException {
         ObjectMapper mapper = new ObjectMapper();
         List<ExcelEntity> entities = new ArrayList<>();
@@ -103,9 +93,9 @@ public class RecvFiles {
                     row = sheet.createRow(rowIdx);
                 }
                 row.createCell(colIdx).setCellValue(value); // Write the value to the cell in the header row.
-                rowIdx ++;
+                rowIdx++;
             }
-            colIdx ++;
+            colIdx++;
         }
 
         try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
@@ -122,5 +112,14 @@ public class RecvFiles {
     public static void main(String[] args) throws Exception {
         RecvFiles recvFiles = new RecvFiles();
         recvFiles.updateTaxiParams();
+    }
+
+    public void updateTaxiParams() {
+        onlineTaxi2Param columnNameFromTable = onlineTaxi2Dao.getOne(1);
+//        for (onlineTaxi2Param name : columnNameFromTable) {
+//            System.out.println(name);
+//        }
+        System.out.println(columnNameFromTable.getColumnName());
+
     }
 }

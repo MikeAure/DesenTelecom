@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StatusList {
-	// 所有用户的通信socket
+    // 所有用户的通信socket
     public static Map<Integer, ServerConClientThread> socketListMap = new HashMap<>();
-	// 存储矩形区域中的所有司机的socket
+    // 存储矩形区域中的所有司机的socket
     public static Map<Integer, ServerConClientThread> destListMap = new HashMap<>();
-	// 存储接单的司机的socket
+    // 存储接单的司机的socket
     public static Map<Integer, ServerConClientThread> driverAquiredMap = new HashMap<>();
 
     public static int consumerCount = 0;

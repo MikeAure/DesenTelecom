@@ -10,6 +10,14 @@ public class TMessage implements Serializable {
     private TraceUser fromUser;
     private TraceUser toUser;
 
+    public TMessage() {
+
+    }
+
+    public TMessage(int msgType) {
+        this.msgType = msgType;
+    }
+
     public String getDestData() {
         return destData;
     }
@@ -32,14 +40,6 @@ public class TMessage implements Serializable {
 
     public void setFromUser(TraceUser fromUser) {
         this.fromUser = fromUser;
-    }
-
-    public TMessage() {
-
-    }
-
-    public TMessage(int msgType) {
-        this.msgType = msgType;
     }
 
     public int getMsgType() {

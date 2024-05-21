@@ -9,24 +9,24 @@ import javax.persistence.*;
 import java.io.IOException;
 
 @Entity
-@Table(name="onlinetaxi2_param")
+@Table(name = "onlinetaxi2_param")
 @Data
 @NoArgsConstructor
 public class onlineTaxi2Param extends BaseEntity {
     private static final long serialVersionUID = 1L;
     //数据存储id
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
     @Basic
-    @Column(name="field_name")
+    @Column(name = "field_name")
     //数据库中所存的字段名
     private String fieldName;
 
     //英文缩写的中文说明
-    @Column(name="column_name")
+    @Column(name = "column_name")
     private String columnName;
 
     //数据类型：数值(0)，单编码(1)，文本(3)，日期(4)
@@ -39,7 +39,7 @@ public class onlineTaxi2Param extends BaseEntity {
 
     //高中低 0,1,2,3
     @Column(name = "tm_param")
-    private  Integer  tmParam;
+    private Integer tmParam;
 
     public onlineTaxi2Param(String json) throws IOException {
 //        System.out.println("json数据："+json);

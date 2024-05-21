@@ -5,6 +5,10 @@ import java.util.Map;
 
 public class CoordinateConversion {
 
+    public CoordinateConversion() {
+
+    }
+
     public static void main(String[] args) {
         CoordinateConversion coor = new CoordinateConversion();
         String coorResult = coor.latLon2UTM(37.8657190540, 101.3206770738);
@@ -13,10 +17,6 @@ public class CoordinateConversion {
         System.out.println(results[1]);
         System.out.println(results[2]);
         System.out.println(results[3]);
-    }
-
-    public CoordinateConversion() {
-
     }
 
     public double[] utm2LatLon(String UTM) {
@@ -73,6 +73,48 @@ public class CoordinateConversion {
     }
 
     private class LatLon2UTM {
+        // equatorial radius
+        double equatorialRadius = 6378137;
+        // polar radius
+        double polarRadius = 6356752.314;
+        // flattening
+        double flattening = 0.00335281066474748;// (equatorialRadius-polarRadius)/equatorialRadius;
+        // inverse flattening 1/flattening
+        double inverseFlattening = 298.257223563;// 1/flattening;
+        // Mean radius
+        double rm = POW(equatorialRadius * polarRadius, 1 / 2.0);
+
+        // Lat Lon to UTM variables
+        // scale factor
+        double k0 = 0.9996;
+        // eccentricity
+        double e = Math.sqrt(1 - POW(polarRadius / equatorialRadius, 2));
+        double e1sq = e * e / (1 - e * e);
+        double n = (equatorialRadius - polarRadius) / (equatorialRadius + polarRadius);
+        // r curv 1
+        double rho = 6368573.744;
+        // r curv 2
+        double nu = 6389236.914;
+        // Calculate Meridional Arc Length
+        // Meridional Arc
+        double S = 5103266.421;
+        double A0 = 6367449.146;
+        double B0 = 16038.42955;
+        double C0 = 16.83261333;
+        double D0 = 0.021984404;
+        double E0 = 0.000312705;
+        // Calculation Constants
+        // Delta Long
+        double p = -0.483084;
+        double sin1 = 4.84814E-06;
+        // Coefficients for UTM Coordinates
+        double K1 = 5101225.115;
+        double K2 = 3750.291596;
+        double K3 = 1.397608151;
+        double K4 = 214839.3105;
+        double K5 = -2.995382942;
+        double A6 = -1.00541E-07;
+
         public String convertLatLonToUTM(double latitude, double longitude) {
             validate(latitude, longitude);
             String UTM = "";
@@ -157,72 +199,6 @@ public class CoordinateConversion {
         protected double getEasting() {
             return 500000 + (K4 * p + K5 * POW(p, 3));
         }
-
-        // Lat Lon to UTM variables
-
-        // equatorial radius
-        double equatorialRadius = 6378137;
-
-        // polar radius
-        double polarRadius = 6356752.314;
-
-        // flattening
-        double flattening = 0.00335281066474748;// (equatorialRadius-polarRadius)/equatorialRadius;
-
-        // inverse flattening 1/flattening
-        double inverseFlattening = 298.257223563;// 1/flattening;
-
-        // Mean radius
-        double rm = POW(equatorialRadius * polarRadius, 1 / 2.0);
-
-        // scale factor
-        double k0 = 0.9996;
-
-        // eccentricity
-        double e = Math.sqrt(1 - POW(polarRadius / equatorialRadius, 2));
-
-        double e1sq = e * e / (1 - e * e);
-
-        double n = (equatorialRadius - polarRadius) / (equatorialRadius + polarRadius);
-
-        // r curv 1
-        double rho = 6368573.744;
-
-        // r curv 2
-        double nu = 6389236.914;
-
-        // Calculate Meridional Arc Length
-        // Meridional Arc
-        double S = 5103266.421;
-
-        double A0 = 6367449.146;
-
-        double B0 = 16038.42955;
-
-        double C0 = 16.83261333;
-
-        double D0 = 0.021984404;
-
-        double E0 = 0.000312705;
-
-        // Calculation Constants
-        // Delta Long
-        double p = -0.483084;
-
-        double sin1 = 4.84814E-06;
-
-        // Coefficients for UTM Coordinates
-        double K1 = 5101225.115;
-
-        double K2 = 3750.291596;
-
-        double K3 = 1.397608151;
-
-        double K4 = 214839.3105;
-
-        double K5 = -2.995382942;
-
-        double A6 = -1.00541E-07;
 
     }
 
@@ -331,6 +307,35 @@ public class CoordinateConversion {
         int zone;
 
         String southernHemisphere = "ACDEFGHJKLM";
+        double arc;
+        double mu;
+        double ei;
+        double ca;
+        double cb;
+        double cc;
+        double cd;
+        double n0;
+        double r0;
+        double _a1;
+        double dd0;
+        double t0;
+        double Q0;
+        double lof1;
+        double lof2;
+        double lof3;
+        double _a2;
+        double phi1;
+        double fact1;
+        double fact2;
+        double fact3;
+        double fact4;
+        double zoneCM;
+        double _a3;
+        double b = 6356752.314;
+        double a = 6378137;
+        double e = 0.081819191;
+        double e1sq = 0.006739497;
+        double k0 = 0.9996;
 
         protected String getHemisphere(String latZone) {
             String hemisphere = "N";
@@ -411,64 +416,6 @@ public class CoordinateConversion {
             _a3 = _a2 * 180 / Math.PI;
 
         }
-
-        double arc;
-
-        double mu;
-
-        double ei;
-
-        double ca;
-
-        double cb;
-
-        double cc;
-
-        double cd;
-
-        double n0;
-
-        double r0;
-
-        double _a1;
-
-        double dd0;
-
-        double t0;
-
-        double Q0;
-
-        double lof1;
-
-        double lof2;
-
-        double lof3;
-
-        double _a2;
-
-        double phi1;
-
-        double fact1;
-
-        double fact2;
-
-        double fact3;
-
-        double fact4;
-
-        double zoneCM;
-
-        double _a3;
-
-        double b = 6356752.314;
-
-        double a = 6378137;
-
-        double e = 0.081819191;
-
-        double e1sq = 0.006739497;
-
-        double k0 = 0.9996;
 
     }
 

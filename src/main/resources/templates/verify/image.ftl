@@ -15,6 +15,7 @@
         th {
             text-align: center;
         }
+
         /*标题*/
         .ibox-title {
             height: 200px;
@@ -189,7 +190,7 @@
                     }
                 }
             })
-            document.getElementById("algonames").addEventListener("change", function(event) {
+            document.getElementById("algonames").addEventListener("change", function (event) {
 
                 if ($("ul .active").index() === 0) {
                     switch (event.target.value) {
@@ -311,7 +312,7 @@
 
         }
 
-        function chooseFile (event) {
+        function chooseFile(event) {
             // 清空
             document.getElementById("pre").innerHTML = "";
             document.getElementById("after").innerHTML = "";
@@ -335,6 +336,7 @@
                 }
             }
         }
+
         let displayImage = function () {
             let input = document.getElementById("fileUpload");
             let pre = document.getElementById("pre");
@@ -435,18 +437,20 @@
             </div>
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
-                    <div id="uploadForm" >
+                    <div id="uploadForm">
                         <input type="file" id="fileUpload" style="display: none;">
                         <label for="fileUpload" class="upload-btn">
                             选择文件
                         </label>
                     </div>
                     <div id="facesub-upload" style="display: none">
-                        <input type="file" id="img_face_sub_src_fileupload" accept=".jpg, .jpeg, .png, .gif" style="display: none;">
+                        <input type="file" id="img_face_sub_src_fileupload" accept=".jpg, .jpeg, .png, .gif"
+                               style="display: none;">
                         <label for="img_face_sub_src_fileupload" class="upload-btn">
                             选择目标面孔
                         </label>
-                        <input type="file" id="img_face_sub_target_fileupload" accept=".jpg, .jpeg, .png, .gif" style="display: none;">
+                        <input type="file" id="img_face_sub_target_fileupload" accept=".jpg, .jpeg, .png, .gif"
+                               style="display: none;">
                         <label for="img_face_sub_target_fileupload" class="upload-btn">
                             选择源文件
                         </label>

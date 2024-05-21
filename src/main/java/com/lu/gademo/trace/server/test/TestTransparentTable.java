@@ -17,22 +17,6 @@ public class TestTransparentTable extends JFrame {
     private final JTable table;
 
     /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    TestTransparentTable frame = new TestTransparentTable();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
      * Create the frame.
      */
     public TestTransparentTable() {
@@ -124,6 +108,22 @@ public class TestTransparentTable extends JFrame {
 
         });
         contentPane.setLayout(gl_contentPane);
+    }
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    TestTransparentTable frame = new TestTransparentTable();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     class MyCellRenderer extends JLabel implements TableCellRenderer {

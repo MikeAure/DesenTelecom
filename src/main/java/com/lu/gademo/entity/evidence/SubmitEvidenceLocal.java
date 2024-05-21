@@ -38,7 +38,7 @@ public class SubmitEvidenceLocal {
     @Column(name = "global_id")
     private String globalID;
     @Column(name = "opt_time")
-    private  String optTime;
+    private String optTime;
     @Basic
     @Column(name = "file_title")
     private String fileTitle;

@@ -3,11 +3,9 @@ package com.lu.gademo.entity.evidence;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor

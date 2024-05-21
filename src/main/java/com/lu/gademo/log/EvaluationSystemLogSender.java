@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Data
@@ -29,7 +30,9 @@ public class EvaluationSystemLogSender {
     String effectEvaAddress;
     @Value("${effectEva.port}")
     int effectEvaPort;
-
+    @Autowired
+    Util util;
+    ObjectMapper objectMapper = new ObjectMapper();
     // 效果评测Dao
     @Autowired
     private SendEvaReqDao sendEvaReqDao;
@@ -44,11 +47,8 @@ public class EvaluationSystemLogSender {
     @Autowired
     private SendEvaReceiptDao sendEvaReceiptDao;
 
-    @Autowired
-    Util util;
-    ObjectMapper objectMapper = new ObjectMapper();
     public void send2EffectEva(ObjectNode content, SendEvaReq sendEvaReq, String rawFileName, String desenFileName, byte[] rawFileData,
-                               byte[] desenFileData, byte[] params){
+                               byte[] desenFileData, byte[] params) {
         try {
 
             // 连接服务器
@@ -73,7 +73,7 @@ public class EvaluationSystemLogSender {
             pathTree.set("self", self);
             pathTree.set("child", child);
 
-            data.put("DataType",0x3130);
+            data.put("DataType", 0x3130);
 
             data.set("content", content);
             data.set("pathtree", pathTree);
@@ -160,12 +160,12 @@ public class EvaluationSystemLogSender {
                 dataInputStream.read(header);
                 // 响应数据域长度
                 int dataLength = dataInputStream.readInt();
-                System.out.println("DataLength: " + String.valueOf(dataLength));
+                System.out.println("DataLength: " + dataLength);
                 // 读取数据域内容
                 byte[] dataBytes = new byte[dataLength - 34];
 
                 dataInputStream.read(dataBytes);
-                String jsonData = new String(dataBytes, "UTF-8");
+                String jsonData = new String(dataBytes, StandardCharsets.UTF_8);
                 System.out.println(jsonData);
                 // Write dataBytes to file
 //                try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("D:\\test.json"), "UTF-8")) {
@@ -184,12 +184,12 @@ public class EvaluationSystemLogSender {
 
                 int dataTypeNum = jsonNode.get("dataType").asInt();
                 // 接收收据
-                if (dataTypeNum  == 0x3131){
+                if (dataTypeNum == 0x3131) {
 
                     // 获取实体
                     recEvaReqReceipt = mapper.treeToValue(recContent, RecEvaReqReceipt.class);
 //                     检测重复
-                    if (recEvaReqReceiptDao.existsById(recEvaReqReceipt.getCertificateID())){
+                    if (recEvaReqReceiptDao.existsById(recEvaReqReceipt.getCertificateID())) {
                         recEvaReqReceiptDao.deleteById(recEvaReqReceipt.getCertificateID());
                     }
                     // 插入数据库
@@ -205,7 +205,7 @@ public class EvaluationSystemLogSender {
                     evaResultId = recContent.get("evaResultID").asText();
                     System.out.println(evaResultId);
 //                     检测重复
-                    if (recEvaResultDao.existsById(recEvaResult.getEvaResultID())){
+                    if (recEvaResultDao.existsById(recEvaResult.getEvaResultID())) {
                         recEvaResultDao.deleteById(recEvaResult.getEvaResultID());
                     }
                     // 插入数据库
@@ -232,11 +232,11 @@ public class EvaluationSystemLogSender {
             //System.out.println(recEvaResult.getEvaResultId());
             //sendEvaReceipt.setEvaResultId(recEvaResult.getEvaResultId());
             sendEvaReceipt.setEvaResultID(evaResultId);
-            sendEvaReceipt.setCertificateID(util.getSM3Hash( (sendEvaReceipt.getEvaResultID()+ util.getTime()).getBytes()));
-            sendEvaReceipt.setHash(util.getSM3Hash((sendEvaReceipt.getEvaResultID()+sendEvaReceipt.getCertificateID()).getBytes()));
+            sendEvaReceipt.setCertificateID(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + util.getTime()).getBytes()));
+            sendEvaReceipt.setHash(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + sendEvaReceipt.getCertificateID()).getBytes()));
             ObjectNode evaReceiptContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReceipt));
             ObjectNode data1 = objectMapper.createObjectNode();
-            data1.put("DataType",0x3130);
+            data1.put("DataType", 0x3130);
             data1.set("content", evaReceiptContent);
             ObjectNode dataJson1 = objectMapper.createObjectNode();
             dataJson1.set("data", data1);

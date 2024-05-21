@@ -10,6 +10,6 @@ public class AppConfig {
     public Driver driver1() {
         return new Driver("driver1", "123456", 2, 34.247, 108.946);
     }
-    
+
 
 }

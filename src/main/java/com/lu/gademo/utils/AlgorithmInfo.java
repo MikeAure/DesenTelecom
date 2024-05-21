@@ -1,9 +1,6 @@
 package com.lu.gademo.utils;
 
-import com.lu.gademo.utils.BaseDesenAlgorithm;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -22,7 +19,6 @@ public class AlgorithmInfo {
     private List<Object> params;
     //
     private BaseDesenAlgorithm executor;
-
 
     public AlgorithmInfo(String name, int id, AlgorithmType type, int originalId, List<Object> params, BaseDesenAlgorithm executor) {
         this.name = name;
@@ -59,7 +55,7 @@ public class AlgorithmInfo {
 
     // 获取分类表中的算法ID
     public String getOriginalIdInfo() {
-        return String.valueOf(type.getValue()) + String.valueOf(originalId);
+        return String.valueOf(type.getValue()) + originalId;
     }
 
     @Override

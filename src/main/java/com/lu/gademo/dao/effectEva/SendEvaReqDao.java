@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 /*public interface SendEvaReqDao extends JpaRepository<SendEvaReq, String> {
 }*/
-public interface SendEvaReqDao extends IBaseDao<SendEvaReq,String>{
+public interface SendEvaReqDao extends IBaseDao<SendEvaReq, String> {
 
 }

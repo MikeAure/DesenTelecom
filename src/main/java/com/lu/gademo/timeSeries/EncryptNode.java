@@ -1,7 +1,7 @@
 package com.lu.gademo.timeSeries;
 
 public class EncryptNode {
-	
-	public boolean isLeafNode;
+
+    public boolean isLeafNode;
 
 }

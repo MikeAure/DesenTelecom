@@ -2,8 +2,9 @@ package com.lu.gademo.trace.client.util;
 
 //import sun.misc.BASE64Decoder;
 //import sun.misc.BASE64Encoder;
-import java.util.Base64;
+
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

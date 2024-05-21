@@ -11,7 +11,7 @@ import java.util.Date;
 public class TimeUtils {
 
     //获取时间戳
-    public static String getCurrentTime(){
+    public static String getCurrentTime() {
         //创建 SimpleDateFormat 对象以定义所需的日期时间格式
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 获取当前时间
@@ -30,9 +30,9 @@ public class TimeUtils {
             Date endTime = dateFormat.parse(endTimeStr);
 
             // 计算时间差，得到毫秒数
-            long timeDifferenceInMilliseconds = (endTime.getTime() - startTime.getTime()) ;
+            long timeDifferenceInMilliseconds = (endTime.getTime() - startTime.getTime());
             // 转换为 double 形式，精确到小数秒
-            timeDifferenceInSeconds = (double) timeDifferenceInMilliseconds /1000.0;
+            timeDifferenceInSeconds = (double) timeDifferenceInMilliseconds / 1000.0;
 
             System.out.println("时间差为 " + timeDifferenceInSeconds + " 秒");
         } catch (ParseException e) {

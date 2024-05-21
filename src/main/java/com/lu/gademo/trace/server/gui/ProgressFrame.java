@@ -9,22 +9,6 @@ public class ProgressFrame extends JFrame {
     private final JPanel contentPane;
 
     /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    ProgressFrame frame = new ProgressFrame();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
      * Create the frame.
      */
     public ProgressFrame() {
@@ -46,6 +30,22 @@ public class ProgressFrame extends JFrame {
         JButton btn = new JButton(icon);
         btn.setBorderPainted(false);
         contentPane.add(btn, BorderLayout.CENTER);
+    }
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    ProgressFrame frame = new ProgressFrame();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 }

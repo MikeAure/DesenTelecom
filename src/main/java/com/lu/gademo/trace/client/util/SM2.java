@@ -30,11 +30,6 @@ public class SM2 {
             "32C4AE2C1F1981195F9904466A39C9948FE30BBFF2660BE1715A4589334C74C7",
             "BC3736A2F4F6779C59BDCEE36B692153D0A9877CC62A474002DF32E52139F0A0"
     };
-
-    public static SM2 Instance() {
-        return new SM2();
-    }
-
     public final BigInteger ecc_p;
     public final BigInteger ecc_a;
     public final BigInteger ecc_b;
@@ -47,7 +42,6 @@ public class SM2 {
     public final ECKeyPairGenerator ecc_key_pair_generator;
     public final ECFieldElement ecc_gx_fieldelement;
     public final ECFieldElement ecc_gy_fieldelement;
-
     public SM2() {
         this.ecc_p = new BigInteger(ecc_param[0], 16);
         this.ecc_a = new BigInteger(ecc_param[1], 16);
@@ -68,5 +62,9 @@ public class SM2 {
 
         this.ecc_key_pair_generator = new ECKeyPairGenerator();
         this.ecc_key_pair_generator.init(ecc_ecgenparam);
+    }
+
+    public static SM2 Instance() {
+        return new SM2();
     }
 }

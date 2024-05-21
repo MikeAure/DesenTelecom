@@ -1,26 +1,24 @@
 package com.lu.gademo.log;
 
-import lombok.Data;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class TcpPacket {
     //
     private static final short VERSION = 0x0001;
-    private short MAIN_CMD;
-    private short SUB_CMD;
-    private short MESSAGE_VERSION;
     private static final byte ENCRYPTION_MODE = 0x00;
     private static final byte AUTHENTICATION_MODE = 0x00;
     private static final int RESERVED = 0;
+    private short MAIN_CMD;
+    private short SUB_CMD;
+    private short MESSAGE_VERSION;
     private int packetLength;
     private String jsonData;
     private byte[] authenticationAndValidationField;
 
     /**
      * 构造函数，传入数据
-      */
+     */
     public TcpPacket(String jsonData, short MAIN_CMD, short SUB_CMD, short MESSAGE_VERSION) {
         this.MAIN_CMD = MAIN_CMD;
         this.SUB_CMD = SUB_CMD;
@@ -30,7 +28,8 @@ public class TcpPacket {
         this.authenticationAndValidationField = new byte[16];
 
     }
-    public TcpPacket(String jsonData){
+
+    public TcpPacket(String jsonData) {
         this.jsonData = jsonData;
         this.packetLength = jsonData.getBytes(StandardCharsets.UTF_8).length + 16 + 18;
         this.authenticationAndValidationField = new byte[16];
@@ -38,6 +37,7 @@ public class TcpPacket {
 
     /**
      * 构建数据包，
+     *
      * @return 数据包字节数组
      */
     public byte[] buildPacket() throws UnsupportedEncodingException {
@@ -56,10 +56,10 @@ public class TcpPacket {
         packet[7] = (byte) (MESSAGE_VERSION & 0xFF);
         packet[8] = ENCRYPTION_MODE;
         packet[9] = AUTHENTICATION_MODE;
-        packet[10] = (byte) ((RESERVED >> 24)& 0xFF);
-        packet[11] = (byte) ((RESERVED >> 16)& 0xFF);
-        packet[12] = (byte) ((RESERVED >> 8)& 0xFF);
-        packet[13] = (byte) ((RESERVED& 0xFF)& 0xFF);
+        packet[10] = (byte) ((RESERVED >> 24) & 0xFF);
+        packet[11] = (byte) ((RESERVED >> 16) & 0xFF);
+        packet[12] = (byte) ((RESERVED >> 8) & 0xFF);
+        packet[13] = (byte) ((RESERVED & 0xFF) & 0xFF);
         packet[14] = (byte) ((packetLength >> 24) & 0xFF);
         packet[15] = (byte) ((packetLength >> 16) & 0xFF);
         packet[16] = (byte) ((packetLength >> 8) & 0xFF);
@@ -81,6 +81,10 @@ public class TcpPacket {
         return MAIN_CMD;
     }
 
+    public void setCOMMAND_CATEGORY(short COMMAND_CATEGORY) {
+        this.MAIN_CMD = COMMAND_CATEGORY;
+    }
+
     public short getSUB_CMD() {
         return SUB_CMD;
     }
@@ -95,10 +99,6 @@ public class TcpPacket {
 
     public void setMESSAGE_VERSION(short MESSAGE_VERSION) {
         this.MESSAGE_VERSION = MESSAGE_VERSION;
-    }
-
-    public void setCOMMAND_CATEGORY(short COMMAND_CATEGORY) {
-        this.MAIN_CMD = COMMAND_CATEGORY;
     }
 
     public int getPacketLength() {

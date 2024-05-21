@@ -1,10 +1,8 @@
 package com.lu.gademo.dao.templateParam;
 
-import com.lu.gademo.dao.support.IBaseDao;
 import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

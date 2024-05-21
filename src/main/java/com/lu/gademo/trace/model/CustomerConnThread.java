@@ -3,6 +3,7 @@ package com.lu.gademo.trace.model;
 //import android.content.Intent;
 //import android.util.Log;
 //import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.lu.gademo.trace.client.user.Customer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,14 +14,19 @@ import java.net.Socket;
 
 
 public class CustomerConnThread extends Thread {
-    private Customer customer = null;
-    private volatile boolean running = true;
-
     private static final Logger logger = LogManager.getLogger(CustomerConnThread.class);
-
-//    private final Context context;
+    private Customer customer = null;
+    private final boolean running = true;
+    //    private final Context context;
     private Socket socket;
     private int roleId;
+
+    public CustomerConnThread(Customer customer, Socket socket, int roleId) {
+        super();
+        this.customer = customer;
+        this.socket = socket;
+        this.roleId = roleId;
+    }
 
     public Socket getSocket() {
         return socket;
@@ -35,13 +41,6 @@ public class CustomerConnThread extends Thread {
     }
 
     public void setRoleId(int roleId) {
-        this.roleId = roleId;
-    }
-
-    public CustomerConnThread(Customer customer, Socket socket, int roleId) {
-        super();
-        this.customer = customer;
-        this.socket = socket;
         this.roleId = roleId;
     }
 
@@ -80,7 +79,7 @@ public class CustomerConnThread extends Thread {
                 ois = new ObjectInputStream(socket.getInputStream());
                 TMessage tmsg = (TMessage) ois.readObject();
                 int msgType = tmsg.getMsgType();
-                logger.info("消息类型" + "" + msgType);
+                logger.info("消息类型" + msgType);
                 switch (msgType) {
 //                    case 10: {//如果车主收到加密的圆形数据，则应该在这里处理自身与该圆形数据进行计算并返回的过程，但是不一定能提供服务（在圆内）
 //                        String[] names = {"message", "TmessageEM"};

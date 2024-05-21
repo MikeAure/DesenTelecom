@@ -9,14 +9,22 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 
 public class DriverConnThread extends Thread {
-    private Driver driver = null;
-    private volatile boolean running = true;
-
     private static final Logger logger = LogManager.getLogger(DriverConnThread.class);
-
+    private Driver driver = null;
+    private final boolean running = true;
     //    private final Context context;
     private Socket socket;
     private int roleId;
+
+    public DriverConnThread() {
+    }
+
+    public DriverConnThread(Driver driver, Socket socket, int roleId) {
+        super();
+        this.driver = driver;
+        this.socket = socket;
+        this.roleId = roleId;
+    }
 
     public Socket getSocket() {
         return socket;
@@ -34,16 +42,6 @@ public class DriverConnThread extends Thread {
         this.roleId = roleId;
     }
 
-    public DriverConnThread() {
-    }
-
-    public DriverConnThread(Driver driver, Socket socket, int roleId) {
-        super();
-        this.driver = driver;
-        this.socket = socket;
-        this.roleId = roleId;
-    }
-
     public void run() {
         while (!isInterrupted()) {//这里其实可以不用分成两种角色来判断，因为服务器会根据角色来转发信息。
             ObjectInputStream ois = null;
@@ -51,7 +49,7 @@ public class DriverConnThread extends Thread {
                 ois = new ObjectInputStream(socket.getInputStream());
                 TMessage tmsg = (TMessage) ois.readObject();
                 int msgType = tmsg.getMsgType();
-                logger.info("消息类型" + "" + msgType);
+                logger.info("消息类型" + msgType);
                 switch (msgType) {
                     case 10: {//如果车主收到加密的圆形数据，则应该在这里处理自身与该圆形数据进行计算并返回的过程，但是不一定能提供服务（在圆内）
                         String emMapData = tmsg.getMapData().getEncryptedMap().toString();

@@ -41,14 +41,14 @@ public class UtilImpl implements Util {
     }
 
     @Override
-    public String getTime(){
+    public String getTime() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime currentTime = LocalDateTime.now();
         return currentTime.format(formatter);
     }
 
     @Override
-    public  String getSHA256Hash(String input) {
+    public String getSHA256Hash(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = md.digest(input.getBytes(StandardCharsets.UTF_8));
@@ -70,11 +70,11 @@ public class UtilImpl implements Util {
     }
 
     @Override
-    public String getSM3Hash(byte[] input){
-        SM3Digest digest=new SM3Digest();
-        digest.update(input,0, input.length);
+    public String getSM3Hash(byte[] input) {
+        SM3Digest digest = new SM3Digest();
+        digest.update(input, 0, input.length);
         byte[] bytes = new byte[digest.getDigestSize()];
-        digest.doFinal(bytes,0);
+        digest.doFinal(bytes, 0);
 
         // Convert the byte array to a hexadecimal string representation
         StringBuilder sb = new StringBuilder();
@@ -272,6 +272,7 @@ public class UtilImpl implements Util {
             return new byte[0];
         }
     }
+
     @Override
     // 反序列化
     public <T extends Serializable> List<T> convertToList(byte[] byteArray) {
@@ -294,16 +295,19 @@ public class UtilImpl implements Util {
             return null;
         }
     }
+
     @Override
     // 字节数组转字符串
     public String convertToString(byte[] byteArray) {
         return new String(Base64.getEncoder().encodeToString(byteArray).getBytes(), StandardCharsets.UTF_8);
     }
+
     @Override
     // 字符串转字节数组
     public byte[] convertToByteArray(String byteString) {
         return Base64.getDecoder().decode(byteString);
     }
+
     @Override
     /**
      *
@@ -319,13 +323,13 @@ public class UtilImpl implements Util {
             if (row != null) {
                 Cell cell = row.getCell(i);
                 if (cell != null) {
-                    T element = datas.get(j-1);
+                    T element = datas.get(j - 1);
                     //if (datas.get(j-1)!=null) {
                     if (element instanceof Double) {
                         cell.setCellValue((Double) element);
                     } else if (element instanceof Date) {
                         //cell.setCellValue((Date) element);
-                        cell.setCellValue( element + "");
+                        cell.setCellValue(element + "");
                     } else if (element instanceof String) {
                         cell.setCellValue((String) element);
                     }
@@ -341,7 +345,7 @@ public class UtilImpl implements Util {
      * @param inputStream 输入流
      * @return 对应字符串
      */
-    public  String inputStreamToString(InputStream inputStream) {
+    public String inputStreamToString(InputStream inputStream) {
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 

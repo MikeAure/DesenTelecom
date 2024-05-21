@@ -8,16 +8,16 @@ import java.util.Random;
 
 public class QU_AGRQ_C {
 
-    private final int[] k = new int[4];//参数K
-    private BigInteger s, s_Inverse, p, alpha;//参数s，s的逆，p,α
-    private final BigInteger[] c_in = new BigInteger[4];//数组c
-    private final BigInteger[] r_i = new BigInteger[2];//数组r
-    private String key_QU;//会话密钥
-    private String QUID;//用户表示
     private static final int thresholdValue = 20000;//时延门限值
     private static final String symbol1 = "%%";//分隔符1
     private static final String symbol2 = "&&";//分隔符2
     private static final String symbol3 = "@@";//分隔符3
+    private final int[] k = new int[4];//参数K
+    private final BigInteger[] c_in = new BigInteger[4];//数组c
+    private final BigInteger[] r_i = new BigInteger[2];//数组r
+    private BigInteger s, s_Inverse, p, alpha;//参数s，s的逆，p,α
+    private String key_QU;//会话密钥
+    private String QUID;//用户表示
     private BigInteger A = null;//半径的平方和
     private BigInteger r = null;//半径
 
@@ -29,6 +29,23 @@ public class QU_AGRQ_C {
 
     public QU_AGRQ_C() {
         init();
+    }
+
+    public static void main(String[] args) throws Exception {
+        int i = 0;
+        for (i = 0; i < 100; i++) {
+            QU_AGRQ_C test = new QU_AGRQ_C(SMUtils.sm4generateKey(), "1");
+            String a = test.QU_AGRQ_C_QDC(new CircleArea(3000, 4000, 4000));
+            String b = test.UF_AGRQ_C_RDC(a, new Vertex(3123, 3123));
+            if (b == null) {
+                System.exit(0);
+            }
+            if (!test.QU_AGRQ_P_QRR(b, new CircleArea(3000, 4000, 4000))) {
+                break;
+            }
+
+        }
+        System.out.println(i);
     }
 
     public String getKey_QU() {
@@ -46,7 +63,6 @@ public class QU_AGRQ_C {
     public void setQUID(String qUID) {
         QUID = qUID;
     }
-
 
     /**
      * 系统必要初始化
@@ -255,22 +271,5 @@ public class QU_AGRQ_C {
             System.out.println("QDT验证失败：超时");
         }
         return false;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int i = 0;
-        for (i = 0; i < 100; i++) {
-            QU_AGRQ_C test = new QU_AGRQ_C(SMUtils.sm4generateKey(), "1");
-            String a = test.QU_AGRQ_C_QDC(new CircleArea(3000, 4000, 4000));
-            String b = test.UF_AGRQ_C_RDC(a, new Vertex(3123, 3123));
-            if (b == null) {
-                System.exit(0);
-            }
-            if (!test.QU_AGRQ_P_QRR(b, new CircleArea(3000, 4000, 4000))) {
-                break;
-            }
-
-        }
-        System.out.println(i);
     }
 }

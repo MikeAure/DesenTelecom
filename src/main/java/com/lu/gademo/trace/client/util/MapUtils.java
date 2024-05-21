@@ -2,13 +2,11 @@ package com.lu.gademo.trace.client.util;
 
 //import android.content.Context;
 //import android.widget.Toast;
+
 import com.lu.gademo.trace.model.QuadTree;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -18,14 +16,13 @@ public class MapUtils {
      * 排序后的地图数据
      */
     public static String[] mapData;
-    public int index = 0;
-
     /**
      * 公共参数α与p与私钥
      */
     public static BigInteger alpha;
     public static BigInteger p;
     public static String p_key;
+    public int index = 0;
 
 //     private final Context context;
 

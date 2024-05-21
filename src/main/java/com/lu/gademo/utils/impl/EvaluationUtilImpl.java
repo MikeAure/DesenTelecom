@@ -10,10 +10,56 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 
-
 //数值型评测处理工具
 //脱敏前后对比
 public class EvaluationUtilImpl implements EvaluationUtil {
+
+    public static void main(String[] args) {
+        // 定义测试数据
+        List<Object> testData1 = new ArrayList<>();
+        List<Object> testData2 = new ArrayList<>();
+        testData1.add(1.0);
+        testData1.add(2.0);
+        testData1.add(3.0);
+        testData1.add(1.0);
+        testData1.add(2.0);
+        testData1.add(null);
+
+        testData2.add(1.5);
+        testData2.add(2.5);
+        testData2.add(0.0);
+        testData2.add(1.0);
+        testData2.add(2.5);
+        testData2.add(3.0);
+
+        EvaluationUtil evaluationUtil = new EvaluationUtilImpl();
+
+        double distance = evaluationUtil.calculateEuclideanDistance(testData1, testData2);
+        System.out.println("欧式距离：" + distance);
+
+        double entropyDifference = evaluationUtil.calculateEntropyDifference(testData1, testData2);
+        System.out.println("信息熵差值：" + entropyDifference);
+
+        double MAE = evaluationUtil.calculateMAE(testData1, testData2);
+        System.out.println("平均绝对误差：" + MAE);
+
+        double MSE = evaluationUtil.calculateMSE(testData1, testData2);
+        System.out.println("均方误差：" + MSE);
+
+        Map<Object, Double> histogram1 = evaluationUtil.calculateHistogram(testData1);
+        Map<Object, Double> histogram2 = evaluationUtil.calculateHistogram(testData2);
+        for (Object key : histogram1.keySet()) {
+            System.out.println("Value: " + key + ", Frequency: " + histogram1.get(key));
+        }
+        for (Object key : histogram2.keySet()) {
+            System.out.println("Value: " + key + ", Frequency: " + histogram2.get(key));
+        }
+
+        double klDivergence = evaluationUtil.calculateKLDivergence(histogram1, histogram2);
+        System.out.println("KL Divergence: " + klDivergence);
+
+
+    }
 
     //偏差性度量
     //均方误差
@@ -112,8 +158,11 @@ public class EvaluationUtilImpl implements EvaluationUtil {
         return formattedValue;
     }
 
+
+    //信息损失性
+
     @Override
-    public  Double calculateMAE(Map<Object, Double> prob1, Map<Object, Double> prob2) {
+    public Double calculateMAE(Map<Object, Double> prob1, Map<Object, Double> prob2) {
         // 检查输入是否合法
         if (prob1 == null || prob2 == null || prob1.size() != prob2.size()) {
             throw new IllegalArgumentException("概率分布不合法或长度不一致");
@@ -147,19 +196,15 @@ public class EvaluationUtilImpl implements EvaluationUtil {
         return formattedValue;
     }
 
-
-
-    //信息损失性
-
     //分布频率
     //生成一个频率分布的直方图(折线图、饼图)
     @Override
     public Map<Object, Double> calculateHistogram(List<Object> data) {
         Map<Object, Double> hist = new HashMap<>();
-        int dataSize=0;
+        int dataSize = 0;
 
         for (Object value : data) {
-            if(value!=null){
+            if (value != null) {
                 hist.put(value, hist.getOrDefault(value, 0.0) + 1.0);
                 dataSize++;
             }
@@ -172,7 +217,6 @@ public class EvaluationUtilImpl implements EvaluationUtil {
         }
         return hist;
     }
-
 
     //Kl散度，需要先计算概率分布
     @Override
@@ -192,7 +236,6 @@ public class EvaluationUtilImpl implements EvaluationUtil {
 
         return formattedValue;
     }
-
 
     //信息熵
     @Override
@@ -235,7 +278,6 @@ public class EvaluationUtilImpl implements EvaluationUtil {
         return formattedValue;
     }
 
-
     @Override
     public Double calculateEntropy(Map<Object, Double> probabilities) {
         double entropy = 0.0;
@@ -244,7 +286,7 @@ public class EvaluationUtilImpl implements EvaluationUtil {
         for (Map.Entry<Object, Double> entry : probabilities.entrySet()) {
             double probability = entry.getValue();
             if (probability > 0) { // 避免 log(0)
-                entropy -= probability *(Math.log(probability) / Math.log(2));
+                entropy -= probability * (Math.log(probability) / Math.log(2));
             }
         }
 
@@ -302,7 +344,7 @@ public class EvaluationUtilImpl implements EvaluationUtil {
                     sumSquaredError += squaredError;
                 }
 
-            } else if (originalObject instanceof Integer ) {
+            } else if (originalObject instanceof Integer) {
                 Integer originalValue = (Integer) originalObject;
                 if (originalValue != null && desensitizedValue != null) {
                     double squaredError = Math.pow(originalValue - desensitizedValue, 2);
@@ -341,9 +383,6 @@ public class EvaluationUtilImpl implements EvaluationUtil {
         return formattedValue;
     }
 
-
-
-
     public double[] readVectorFromFile(String filePath) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line = reader.readLine();
@@ -356,54 +395,5 @@ public class EvaluationUtilImpl implements EvaluationUtil {
             }
         }
         throw new IOException("Failed to read vector from file: " + filePath);
-    }
-
-
-    public static void main(String[] args) {
-        // 定义测试数据
-        List<Object> testData1 = new ArrayList<>();
-        List<Object> testData2 = new ArrayList<>();
-        testData1.add(1.0);
-        testData1.add(2.0);
-        testData1.add(3.0);
-        testData1.add(1.0);
-        testData1.add(2.0);
-        testData1.add(null);
-
-        testData2.add(1.5);
-        testData2.add(2.5);
-        testData2.add(0.0);
-        testData2.add(1.0);
-        testData2.add(2.5);
-        testData2.add(3.0);
-
-        EvaluationUtil evaluationUtil=new EvaluationUtilImpl();
-
-        double distance = evaluationUtil.calculateEuclideanDistance(testData1, testData2);
-        System.out.println("欧式距离：" + distance);
-
-        double entropyDifference = evaluationUtil.calculateEntropyDifference(testData1, testData2);
-        System.out.println("信息熵差值：" + entropyDifference);
-
-        double MAE = evaluationUtil.calculateMAE(testData1, testData2);
-        System.out.println("平均绝对误差：" + MAE);
-
-        double MSE = evaluationUtil.calculateMSE(testData1, testData2);
-        System.out.println("均方误差：" + MSE);
-
-        Map<Object, Double> histogram1 = evaluationUtil.calculateHistogram(testData1);
-        Map<Object, Double> histogram2 = evaluationUtil.calculateHistogram(testData2);
-        for (Object key : histogram1.keySet()) {
-            System.out.println("Value: " + key + ", Frequency: " + histogram1.get(key));
-        }
-        for (Object key : histogram2.keySet()) {
-            System.out.println("Value: " + key + ", Frequency: " + histogram2.get(key));
-        }
-
-        double klDivergence = evaluationUtil.calculateKLDivergence(histogram1, histogram2);
-        System.out.println("KL Divergence: " + klDivergence);
-
-
-
     }
 }

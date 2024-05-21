@@ -11,6 +11,17 @@ public class DbUtil {
 
     }
 
+    public static void main(String[] args) {
+        DbUtil dbUtil = new DbUtil();
+        try {
+            dbUtil.getCon();
+            System.out.println("connected success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("connected failed");
+        }
+    }
+
     public Connection getCon() {
         try {
             Class.forName(PropertiesUtil.getValue("jdbcName"));
@@ -33,17 +44,6 @@ public class DbUtil {
     public void closeCon(Connection con) throws Exception {
         if (con != null) {
             con.close();
-        }
-    }
-
-    public static void main(String[] args) {
-        DbUtil dbUtil = new DbUtil();
-        try {
-            dbUtil.getCon();
-            System.out.println("connected success");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("connected failed");
         }
     }
 }

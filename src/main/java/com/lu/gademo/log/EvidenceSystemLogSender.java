@@ -67,7 +67,6 @@ public class EvidenceSystemLogSender {
     Integer evidenceRequestMsgVersion;
 
 
-
     @Autowired
     Util util;
 
@@ -75,7 +74,7 @@ public class EvidenceSystemLogSender {
     ObjectMapper objectMapper = new ObjectMapper();
 
     // 发送并接收请求
-    public void send2Evidence(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal){
+    public void send2Evidence(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal) {
         try {
             ObjectNode reqEvidence = objectMapper.createObjectNode();
             ObjectNode reqData = objectMapper.createObjectNode();
@@ -178,7 +177,7 @@ public class EvidenceSystemLogSender {
             // data
             ObjectNode localEvidenceData = objectMapper.createObjectNode();
             localEvidenceData.put("globalID", submitEvidenceLocal.getGlobalID());
-            localEvidenceData.put("status",submitEvidenceLocal.getStatus());
+            localEvidenceData.put("status", submitEvidenceLocal.getStatus());
             localEvidenceData.put("optTime", util.getTime());
             submitEvidenceLocal.setOptTime(localEvidenceData.get("optTime").asText());
             localEvidenceData.put("fileTitle", submitEvidenceLocal.getFileTitle());
@@ -259,7 +258,7 @@ public class EvidenceSystemLogSender {
             // 认证与校验
             //byte[] auth = new byte[16];
             //localInputStream.read(auth);
-            String receipt = new String(recDataBytes, "UTF-8");
+            String receipt = new String(recDataBytes, StandardCharsets.UTF_8);
             //String转json 存储响应信息
             JsonNode recJson = objectMapper.readTree(receipt);
             //打印
@@ -267,7 +266,7 @@ public class EvidenceSystemLogSender {
             String recjson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(recJson);
             System.out.println(recjson);
             //  发生异常
-            if (recJson.has("errCode")){
+            if (recJson.has("errCode")) {
                 evidenceReceiptErr.setSystemID(recJson.get("systemID").asInt());
                 evidenceReceiptErr.setMainCMD(recJson.get("mainCMD").asInt());
                 evidenceReceiptErr.setSubCMD(recJson.get("subCMD").asInt());
@@ -278,9 +277,9 @@ public class EvidenceSystemLogSender {
                 evidenceReceiptErr.setErrCode(recJson.get("errCode").asInt());
                 //存储
                 evidenceReceiptErrDao.save(evidenceReceiptErr);
-                if (recJson.get("errCode").asInt() == 0x01){
+                if (recJson.get("errCode").asInt() == 0x01) {
                     System.out.println("未进行请求认证");
-                }else{
+                } else {
                     System.out.println("上报数据格式不正确");
                 }
             }

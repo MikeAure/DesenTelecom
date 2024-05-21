@@ -4,6 +4,7 @@ import numpy as np
 import os
 import argparse
 
+
 def exchange_channel(img):
     random.seed(os.urandom(128))
 
@@ -29,6 +30,7 @@ def exchange_channel(img):
             img[y, x] = new_order
     return img
 
+
 def image_exchange_channel(image_path: str, new_image_path: str):
     img = cv2.imread(image_path)
     img = exchange_channel(img)
@@ -36,57 +38,60 @@ def image_exchange_channel(image_path: str, new_image_path: str):
     # 保存处理后的图片
     cv2.imwrite(new_image_path, img)
 
-    
+
 def add_color_offset(img, offset: int):
     offset = offset % 256
-    
+
     image_array = np.array(img, dtype=np.uint8)
     image_array = np.mod(image_array + offset, 256).astype(np.uint8)
 
     return image_array
+
 
 def image_add_color_offset(image: str, new_image: str, offset: int):
     img = cv2.imread(image)
     img = add_color_offset(img, offset)
     cv2.imwrite(new_image, img)
 
- 
+
 def video_exchange_channel(video: str, new_video: str):
     cap = cv2.VideoCapture(video)
     height, width = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     fps = cap.get(cv2.CAP_PROP_FPS)
     video_writer = cv2.VideoWriter(new_video, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
-    while True :
+    while True:
         success, frame = cap.read()
         if not success:
             break
         img = exchange_channel(frame)
         video_writer.write(img)
-        
+
     video_writer.release()
     cap.release()
-    
+
+
 def video_add_color_offset(video: str, new_video: str, offset: int):
     cap = cv2.VideoCapture(video)
     height, width = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     fps = cap.get(cv2.CAP_PROP_FPS)
     video_writer = cv2.VideoWriter(new_video, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
-    
-    while True :
+
+    while True:
         success, frame = cap.read()
         if not success:
             break
         img = add_color_offset(frame, offset)
         video_writer.write(img)
-        
+
     video_writer.release()
     cap.release()
-    
-        
-    
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("algo_name", type=str, choices=["image_exchange_channel", "image_add_color_offset", "video_exchange_channel", "video_add_color_offset"])
+    parser.add_argument("algo_name", type=str,
+                        choices=["image_exchange_channel", "image_add_color_offset", "video_exchange_channel",
+                                 "video_add_color_offset"])
     parser.add_argument("input_file_path", type=str)
     parser.add_argument("output_file_path", type=str)
     parser.add_argument("-p", "--params", default=100, type=int)

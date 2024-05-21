@@ -276,7 +276,6 @@ def meanValueVideo(input_video_path, output_video_path, kernel_size):
 
     # 创建用于写入输出视频的对象   'V','P','9','0'
     # fourcc = cv2.VideoWriter.fourcc('V', 'P', '9', '0')
-    fourcc = cv2.VideoWriter.fourcc(*'avc1')
 
     out = ffmpegcv.VideoWriter(output_video_path, fps=fps, resize=(width, height))
 
@@ -368,7 +367,7 @@ if __name__ == '__main__':
     pixelize_block_size = [5, 10, 15][param]
     blur_radius = [2, 4, 8][param]
     rectangle_range = [(100, 100, 200, 200), (50, 50, 300, 300), (25, 25, 400, 400)][param]  # Example rectangle range (x, y, width, height)
-    kernel_size = [9, 15, 21][param]
+    kernel_size = [9, 16, 25][param]
     color_offsets = [20, 50, 100][param]
     outline_params = [0.4, 0.6, 0.8][param]
     # 执行算法,并保存

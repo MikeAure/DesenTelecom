@@ -9,41 +9,41 @@ import java.io.Serializable;
 import java.util.List;
 
 //封装通用的查询方法
-public interface IBaseService<T,  ID extends Serializable> {
-    public abstract T find(ID id);
+public interface IBaseService<T, ID extends Serializable> {
+    T find(ID id);
 
-    public abstract List<T> findAll();
+    List<T> findAll();
 
-    public abstract List<T> findList(ID[] ids);
+    List<T> findList(ID[] ids);
 
-    public abstract List<T> findList(Iterable<ID> ids);
+    List<T> findList(Iterable<ID> ids);
 
-    public abstract Page<T> findAll(Pageable pageable);
+    Page<T> findAll(Pageable pageable);
 
-    public abstract Page<T> findAll(Specification<T> spec, Pageable pageable);
+    Page<T> findAll(Specification<T> spec, Pageable pageable);
 
-    public abstract long count();
+    long count();
 
-    public abstract long count(Specification<T> spec);
+    long count(Specification<T> spec);
 
-    public abstract boolean exists(ID id);
+    boolean exists(ID id);
 
-    public abstract void save(T entity);
+    void save(T entity);
 
-    public void save(Iterable<T> entitys);
+    void save(Iterable<T> entitys);
 
-    public abstract T update(T entity);
+    T update(T entity);
 
-    public abstract void delete(ID id);
+    void delete(ID id);
 
-    public abstract void deleteByIds(@SuppressWarnings("unchecked") ID... ids);
+    void deleteByIds(@SuppressWarnings("unchecked") ID... ids);
 
-    public abstract void delete(T[] entitys);
+    void delete(T[] entitys);
 
-    public void delete(Iterable<T> entitys);
+    void delete(Iterable<T> entitys);
 
-    public abstract void delete(T entity);
+    void delete(T entity);
 
-    public List<T> findList(Specification<T> spec, Sort sort);
+    List<T> findList(Specification<T> spec, Sort sort);
 
 }

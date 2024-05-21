@@ -4,11 +4,8 @@ package com.lu.gademo.controller;
 import com.lu.gademo.entity.Config;
 import com.lu.gademo.service.FileService;
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,10 +18,10 @@ import java.util.Map;
 @Slf4j
 @RequestMapping("/telecom")
 public class TelecomController {
-    FileService fileService;
     private final List<String> imageType;
     private final List<String> videoType;
     private final List<String> audioType;
+    FileService fileService;
 
     public TelecomController(FileService fileService) {
         this.fileService = fileService;
@@ -32,7 +29,8 @@ public class TelecomController {
         this.videoType = Arrays.asList("mp4", "avi", "mkv");
         this.audioType = Arrays.asList("mp3", "wav");
     }
-    @PostMapping(value="/api/desenFile")
+
+    @PostMapping(value = "/api/desenFile")
     @CrossOrigin("*")
     ResponseEntity<Map<String, Object>> fileDesen(@RequestPart("config") Config config,
                                                   @NotNull @RequestPart("file") MultipartFile file) {
@@ -42,7 +40,7 @@ public class TelecomController {
         String algName = config.getAlgName();
         String sheet = config.getSheet();
 
-        log.info("File Size: " + String.valueOf(file.getSize()));
+        log.info("File Size: " + file.getSize());
         log.info("File Name: " + file.getOriginalFilename());
 
         // 调用脱敏函数
@@ -62,19 +60,19 @@ public class TelecomController {
         // 判断数据模态
         try {
             if ("xlsx".equals(fileType)) {
-                responseData =  fileService.dealExcel(file, params, sheet).getBody();
+                responseData = fileService.dealExcel(file, params, sheet).getBody();
             } else if (imageType.contains(fileType)) {
                 responseData = fileService.dealImage(file, params, algName).getBody();
             } else if (videoType.contains(fileType)) {
-                responseData =  fileService.dealVideo(file, params, algName).getBody();
+                responseData = fileService.dealVideo(file, params, algName).getBody();
             } else if (audioType.contains(fileType)) {
-                responseData =  fileService.dealAudio(file, params, algName, sheet).getBody();
+                responseData = fileService.dealAudio(file, params, algName, sheet).getBody();
             } else if ("csv".equals(fileType)) {
-                responseData =  fileService.dealCsv(file, params, algName).getBody();
+                responseData = fileService.dealCsv(file, params, algName).getBody();
             } else {
-                responseData =  fileService.dealGraph(file, params).getBody();
+                responseData = fileService.dealGraph(file, params).getBody();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             response.put("message", "error");
             response.put("data", e.getMessage());
             return ResponseEntity.ok().body(response);

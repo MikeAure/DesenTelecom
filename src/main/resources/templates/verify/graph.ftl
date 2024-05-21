@@ -190,7 +190,7 @@
                     //     table_body = document.getElementById("table2")
                     //     tr = table_body.rows[0];
                     //     let type2 = tr.childNodes[0].firstChild.value;
-                    //     formData.set("sheet", type2);
+                    //     formData.set("sheet", "nodistortion");
                     // }
 
                     fetch('/File/desenFile', {

@@ -15,6 +15,7 @@
         th {
             text-align: center;
         }
+
         /*标题*/
         .ibox-title {
             height: 200px;
@@ -324,7 +325,8 @@
                 .catch(error => console.error('Error:', error));
 
         }
-        function chooseFile (event) {
+
+        function chooseFile(event) {
             // 清空
             document.getElementById("pre").innerHTML = "";
             document.getElementById("after").innerHTML = "";
@@ -349,7 +351,7 @@
             }
         }
 
-        function displayAudio () {
+        function displayAudio() {
             let input = document.getElementById("fileUpload");
             let pre = document.getElementById("pre");
             let file = input.files[0];
@@ -404,7 +406,7 @@
                                             <option value="voice_replace">声纹替换算法</option>
                                             <option value="apply_audio_effects">音频变形</option>
                                             <option value="audio_reshuffle">音频重排</option>
-<#--                                           <option value="add_beep"> 基于正弦波的音频替换方法</option>-->
+                                            <#--                                           <option value="add_beep"> 基于正弦波的音频替换方法</option>-->
                                         </select></td>
                                 </tr>
                                 </tbody>

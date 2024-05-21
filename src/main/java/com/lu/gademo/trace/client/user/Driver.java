@@ -3,7 +3,6 @@ package com.lu.gademo.trace.client.user;
 import com.lu.gademo.trace.client.common.QU_AGRQ_C;
 import com.lu.gademo.trace.client.common.QU_AGRQ_P;
 import com.lu.gademo.trace.client.common.Vertex;
-
 import com.lu.gademo.trace.client.util.CoordinateConversion;
 import com.lu.gademo.trace.client.util.MapUtils;
 import com.lu.gademo.trace.model.*;
@@ -11,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,20 +21,20 @@ import java.net.UnknownHostException;
 @Component
 @Primary
 public class Driver {
-    TraceUser user = new TraceUser("driver0", "123456", 2);
+    private static final Logger logger = LogManager.getLogger(Driver.class);
+    private final String ADDRESS = "127.0.0.1";//地址
+    private final int PORT = 20006;//使用端口
     public Socket connSocket;
     public boolean loginFlag = false;
     public DriverConnThread connThread;
     public MapUtils mapUtils;
-    private static final Logger logger = LogManager.getLogger(Driver.class);
-
+    TraceUser user = new TraceUser("driver0", "123456", 2);
     private double startLatitude = 34.201;
     private double startLongitude = 109.013;
 
-    private final String ADDRESS = "127.0.0.1";//地址
-    private final int PORT = 20006;//使用端口
+    public Driver() {
+    }
 
-    public Driver() {}
     public Driver(String userName, String password, int roleId, double startLatitude, double startLongitude) {
         user.setUserName(userName);
         user.setPassword(password);
@@ -61,7 +59,8 @@ public class Driver {
     public void setStartLongitude(double startLongitude) {
         this.startLongitude = startLongitude;
     }
-    public void login() throws IOException{
+
+    public void login() throws IOException {
 //        if (android.os.Build.VERSION.SDK_INT > 9) {
 //            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 //            StrictMode.setThreadPolicy(policy);
@@ -73,13 +72,13 @@ public class Driver {
         user.setMsgType(MessageType.LOGIN);
         logger.info("account: " + user.getUserName());
         logger.info("psd: " + user.getPassword());
-        logger.info("role id: " + String.valueOf(user.getRoleId()));
+        logger.info("role id: " + user.getRoleId());
         boolean isLoginSuc = sendLoginInfo(user);
 //        Log.e("isLoginSuc",isLoginSuc+"");
         if (isLoginSuc) {
-            logger.info(user.getUserName() +"注册成功");
+            logger.info(user.getUserName() + "注册成功");
         } else {
-            logger.error(user.getUserName() +"注册失败");
+            logger.error(user.getUserName() + "注册失败");
             throw new IOException("Login Failed");
         }
     }
@@ -138,7 +137,7 @@ public class Driver {
         return loginFlag;
     }
 
-    public void sendEncryptedMapData(double latitude, double longitude) throws IOException{
+    public void sendEncryptedMapData(double latitude, double longitude) throws IOException {
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(connSocket.getOutputStream());
@@ -172,7 +171,7 @@ public class Driver {
 
             tMessage.setMapData(mapData);
             oos.writeObject(tMessage);
-            logger.info("sendED: 写入数据完成！msgType: " + String.valueOf(type));
+            logger.info("sendED: 写入数据完成！msgType: " + type);
         } catch (IOException e) {
             logger.error("ED: 读取输出流失败！");
         }
@@ -283,7 +282,7 @@ public class Driver {
             logger.info("dialog: 读取输出流失败！");
         }
         double distance = Math.sqrt(Math.pow((realPosLat - startLatitude), 2) + Math.pow((realPosLng - startLongitude), 2));
-        logger.info("两人距离： " + String.valueOf(distance));
+        logger.info("两人距离： " + distance);
     }
 
     public void OnReceivedUserDenial(String userNameDenial) {

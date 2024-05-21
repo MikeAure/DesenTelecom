@@ -5,8 +5,9 @@ import com.lu.gademo.entity.support.BaseEntity;
 
 import javax.persistence.*;
 import java.io.IOException;
+
 @Entity
-@Table(name="telemedicine" + "_param")
+@Table(name = "telemedicine" + "_param")
 public class telemedicineParam extends BaseEntity {
     private static final long serialVersionUID = 1L;
     //数据存储id

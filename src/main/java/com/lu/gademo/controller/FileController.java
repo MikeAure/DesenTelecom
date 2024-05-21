@@ -4,7 +4,10 @@ import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
-import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.AlgorithmsFactory;
+import com.lu.gademo.utils.RecvFileDesen;
+import com.lu.gademo.utils.RecvFiles;
+import com.lu.gademo.utils.Result;
 import com.mashape.unirest.http.JsonNode;
 import com.sun.istack.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +25,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,29 +44,44 @@ import java.util.*;
 @Controller
 @RequestMapping("/File")
 public class FileController extends BaseController {
-    @Autowired
-    private FileService fileService;
-    @Autowired
     AlgorithmsFactory algorithmsFactory;
     // 系统id
-    @Autowired
-    RecvFileDesen recvFileDesen;
-    // param  service
-    @Autowired
-    private ExcelParamService excelParamService;
-    Boolean readyState = true;
+    RecvFileDesen officeFileDesen;
+    Boolean readyState;
     // SendBackFileName
-    String sendBackFileName = "";
+    String sendBackFileName;
     // 脱敏完成情况
-    boolean sendBackFlag = false;
+    boolean sendBackFlag;
     // 图像格式
-    List<String> imageType = Arrays.asList("jpg", "jpeg", "png");
+    List<String> imageType;
     // 视频格式
-    List<String> videoType = Arrays.asList("mp4", "avi");
+    List<String> videoType;
     // 音频格式
-    List<String> audioType = Arrays.asList("mp3", "wav");
+    List<String> audioType;
 
+    private FileService fileService;
+    // param  service
 
+    private ExcelParamService excelParamService;
+
+    @Autowired
+    public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService, ExcelParamService excelParamService) {
+        this.algorithmsFactory = algorithmsFactory;
+        this.officeFileDesen = officeFileDesen;
+        this.fileService = fileService;
+        this.excelParamService = excelParamService;
+        this.readyState = true;
+        this.sendBackFileName = "";
+        this.sendBackFlag = false;
+        this.imageType = Arrays.asList("jpg", "jpeg", "png");
+        this.videoType = Arrays.asList("mp4", "avi");
+        this.audioType = Arrays.asList("mp3", "wav");
+
+    }
+
+    private String getFileSuffix(String fileName) {
+        return fileName.split("\\.")[fileName.split("\\.").length - 1];
+    }
     /**
      * 参数分别为脱敏文件、脱敏参数
      */
@@ -72,11 +93,14 @@ public class FileController extends BaseController {
     ) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         // 调用脱敏函数
         String fileName = file.getOriginalFilename();
-        // 获取文件后缀
-        //System.out.println(Arrays.toString(names));
-        String fileType = fileName.split("\\.")[fileName.split("\\.").length - 1];
+        if (fileName == null) {
+            return ResponseEntity.badRequest().body("Request file name is null".getBytes());
+        }
+
+        String fileType = getFileSuffix(fileName);
         log.info("File Type: " + fileType);
-        log.info("AlgName: " +algName);
+        log.info("AlgName: " + algName);
+        // TODO: 检查文件完整性
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
             return fileService.dealExcel(file, params, sheet);
@@ -114,19 +138,19 @@ public class FileController extends BaseController {
 
 
     @PostMapping(value = {"replaceFaceVideo", "replaceFace", "removeBackground"})
-    public ResponseEntity<byte[]> replaceFaceVideo( @RequestPart("file") MultipartFile file,
-                                                    @RequestParam("params") String params,
-                                                    @RequestParam("algName") String algName,
-                                                    @RequestParam("sheet") MultipartFile sheet
+    public ResponseEntity<byte[]> replaceFaceVideo(@RequestPart("file") MultipartFile file,
+                                                   @RequestParam("params") String params,
+                                                   @RequestParam("algName") String algName,
+                                                   @RequestParam("sheet") MultipartFile sheet
     ) throws IOException, InterruptedException, SQLException {
         switch (algName) {
-            case "video_face_sub":{
+            case "video_face_sub": {
                 return fileService.replaceFaceVideo(file, params, algName, sheet);
             }
-            case "image_face_sub":{
+            case "image_face_sub": {
                 return fileService.replaceFace(file, params, algName, sheet);
             }
-            case "video_remove_bg":{
+            case "video_remove_bg": {
                 return fileService.replaceVideoBackground(file, params, algName, sheet);
             }
             default:
@@ -141,14 +165,18 @@ public class FileController extends BaseController {
     ResponseEntity<Result<Object>> recvFileDesen(@NotNull @RequestPart("file") MultipartFile file) {
 
         String fileName = file.getOriginalFilename();
-        String fileType = fileName.split("\\.")[fileName.split("\\.").length - 1];
+        if (fileName == null) {
+            return ResponseEntity.ok().body(new Result<>("error", "Request file name is null"));
+        }
+
+        String fileType = getFileSuffix(fileName);
         List<String> officeFileTypes = Arrays.asList("xlsx", "docx", "pptx");
 
         if (!officeFileTypes.contains(fileType)) {
             return ResponseEntity.ok().body(new Result<>("error", "File type not supported."));
         }
         try {
-            return ResponseEntity.ok().body(new Result<>("ok", recvFileDesen.desenRecvFile(file)));
+            return ResponseEntity.ok().body(new Result<>("ok", officeFileDesen.desenRecvFile(file)));
 
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -157,7 +185,7 @@ public class FileController extends BaseController {
 
     }
 
-//    @GetMapping(value = "recvOnLineTaxiFile")
+    //    @GetMapping(value = "recvOnLineTaxiFile")
 //    @ResponseBody
     public ResponseEntity<byte[]> recvOnLineTaxiFile() {
         List<ExcelParam> excelParamList = excelParamService.getParams("onlinetaxi2" + "_param");
@@ -177,7 +205,7 @@ public class FileController extends BaseController {
             System.out.println(responseBody.toString());
             List<ExcelEntity> excelEntityList = RecvFiles.parseJsonToEntities(responseBody);
             for (ExcelEntity element : excelEntityList) {
-                if (element.getAttributeName().equals("乘客性别")){
+                if (element.getAttributeName().equals("乘客性别")) {
                     String gender = element.getInfoContent();
                     if (gender.equals("男")) {
                         element.setInfoContent("M");
@@ -231,7 +259,7 @@ public class FileController extends BaseController {
 
     }
 
-//    @GetMapping(value = "getDesenFile", produces = "application/json;charset=UTF-8")
+    //    @GetMapping(value = "getDesenFile", produces = "application/json;charset=UTF-8")
 //    @ResponseBody
     public ResponseEntity<Map<String, Object>> getDesenFile() {
         if (sendBackFileName.isEmpty()) {
@@ -266,8 +294,8 @@ public class FileController extends BaseController {
 
                 if (excelFile.exists()) {
                     try (
-                        FileInputStream fileInputStream = new FileInputStream(excelFile);
-                         Workbook workbook = new XSSFWorkbook(fileInputStream)
+                            FileInputStream fileInputStream = new FileInputStream(excelFile);
+                            Workbook workbook = new XSSFWorkbook(fileInputStream)
                     ) {
                         Sheet sheet = workbook.getSheetAt(0);
                         List<Map<String, Object>> excelData = new ArrayList<>();
@@ -317,7 +345,7 @@ public class FileController extends BaseController {
 
     }
 
-//    @GetMapping(value = "fileDesenRequest")
+    //    @GetMapping(value = "fileDesenRequest")
 //    @ResponseBody
     ResponseEntity<Map<String, Object>> fileDesenRequest() {
         Map<String, Object> response = new HashMap<>();
@@ -325,8 +353,7 @@ public class FileController extends BaseController {
         if (readyState) {
             response.put("message", "ok");
             response.put("data", "");
-        }
-        else {
+        } else {
             response.put("message", "error");
             response.put("data", "system is not ready");
         }

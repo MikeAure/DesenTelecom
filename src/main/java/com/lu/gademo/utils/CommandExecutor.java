@@ -16,6 +16,7 @@ public class CommandExecutor {
     public static List<String> openExe(String cmd) {
         return openExe(cmd, "");
     }
+
     public static List<String> openExe(String cmd, String context) {
         BufferedReader bufferReader = null;
         BufferedReader bufferReaderError;
@@ -24,14 +25,13 @@ public class CommandExecutor {
         try {
             if (context.isEmpty()) {
                 p = Runtime.getRuntime().exec(cmd);
-            }
-            else {
+            } else {
                 p = Runtime.getRuntime().exec(cmd, null, new java.io.File(context));
             }
             String line;
             bufferReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             bufferReaderError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            while ((line = bufferReader.readLine()) != null  || (line = bufferReaderError.readLine()) != null) {
+            while ((line = bufferReader.readLine()) != null || (line = bufferReaderError.readLine()) != null) {
                 log.info("Process ouput: " + line);
                 result.add(line);
                 if (line.contains("Error") || line.contains("Traceback")) {
@@ -57,14 +57,14 @@ public class CommandExecutor {
     /**
      * Execute a Python script with specified parameters.
      *
-     * @param  rawData    the input and output file path
-     * @param  algName    the name of the algorithm to be executed
-     * @param  path       the path to the Python script
-     * @param  params     additional parameters to be passed to the Python script
-     * @return            the list of strings returned by the Python script execution
+     * @param rawData the input and output file path
+     * @param algName the name of the algorithm to be executed
+     * @param path    the path to the Python script
+     * @param params  additional parameters to be passed to the Python script
+     * @return the list of strings returned by the Python script execution
      */
 
-    public static List<String> executePython(String rawData, String algName, String path, String...params) {
+    public static List<String> executePython(String rawData, String algName, String path, String... params) {
 
         Util util = new UtilImpl();
 //        String python = util.isLinux() ? "python3" : "python";

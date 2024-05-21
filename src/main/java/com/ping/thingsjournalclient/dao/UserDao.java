@@ -10,11 +10,11 @@ import java.sql.SQLException;
 
 public class UserDao {
 
+    public DbUtil dbu = new DbUtil();
+
     public UserDao() {
 
     }
-
-    public DbUtil dbu = new DbUtil();
 
     public TraceUser UserLog(String username, String psd, int roleId) {
         TraceUser resultUser = null;

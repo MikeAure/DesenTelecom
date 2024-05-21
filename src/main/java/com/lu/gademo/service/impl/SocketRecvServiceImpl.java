@@ -4,7 +4,6 @@ import com.lu.gademo.service.SocketRecvService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
@@ -13,13 +12,13 @@ import java.net.Socket;
 
 @Slf4j
 @Data
-@Service
+
 public class SocketRecvServiceImpl implements SocketRecvService {
     private int port;
 
     private ServerSocket serverSocket;
 
-    public SocketRecvServiceImpl(@Value("${socketrecv.port}")int port) throws IOException {
+    public SocketRecvServiceImpl(@Value("${socketrecv.port}") int port) throws IOException {
         this.port = port;
         this.serverSocket = new ServerSocket(port);
         log.info("Serversocket binds to {}", port);
@@ -33,7 +32,7 @@ public class SocketRecvServiceImpl implements SocketRecvService {
             try {
                 Socket socket = serverSocket.accept();
                 log.info("New connection from {}", socket.getInetAddress());
-                counter ++;
+                counter++;
             } catch (IOException e) {
                 e.printStackTrace();
             }

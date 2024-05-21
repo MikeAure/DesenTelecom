@@ -18,6 +18,32 @@ public class SM4Utils {
     public SM4Utils() {
     }
 
+    public static void main(String[] args) throws IOException {
+        String plainText = "ererfeiisgod";
+
+        SM4Utils sm4 = new SM4Utils();
+        sm4.secretKey = "JeF8U9wHFOMfs2Y8";
+        sm4.hexString = false;
+
+        System.out.println("ECB模式");
+        String cipherText = sm4.encryptData_ECB(plainText);
+        System.out.println("密文: " + cipherText);
+        System.out.println();
+
+        plainText = sm4.decryptData_ECB(cipherText);
+        System.out.println("明文: " + plainText);
+        System.out.println();
+
+        System.out.println("CBC模式");
+        sm4.iv = "UISwD9fW6cFh9SNS";
+        cipherText = sm4.encryptData_CBC(plainText);
+        System.out.println("密文: " + cipherText);
+        System.out.println();
+
+        plainText = sm4.decryptData_CBC(cipherText);
+        System.out.println("明文: " + plainText);
+    }
+
     public String encryptData_ECB(String plainText) {
         try {
             SM4_Context ctx = new SM4_Context();
@@ -154,31 +180,5 @@ public class SM4Utils {
 
     public void setHexString(boolean hexString) {
         this.hexString = hexString;
-    }
-
-    public static void main(String[] args) throws IOException {
-        String plainText = "ererfeiisgod";
-
-        SM4Utils sm4 = new SM4Utils();
-        sm4.secretKey = "JeF8U9wHFOMfs2Y8";
-        sm4.hexString = false;
-
-        System.out.println("ECB模式");
-        String cipherText = sm4.encryptData_ECB(plainText);
-        System.out.println("密文: " + cipherText);
-        System.out.println();
-
-        plainText = sm4.decryptData_ECB(cipherText);
-        System.out.println("明文: " + plainText);
-        System.out.println();
-
-        System.out.println("CBC模式");
-        sm4.iv = "UISwD9fW6cFh9SNS";
-        cipherText = sm4.encryptData_CBC(plainText);
-        System.out.println("密文: " + cipherText);
-        System.out.println();
-
-        plainText = sm4.decryptData_CBC(cipherText);
-        System.out.println("明文: " + plainText);
     }
 }
