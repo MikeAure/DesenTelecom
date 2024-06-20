@@ -4,6 +4,7 @@ import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.DpUtil;
 import com.lu.gademo.utils.Replace;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -13,9 +14,13 @@ import java.util.List;
 
 @Component
 public class ReplaceImpl implements Replace {
-    public DSObject service(DSObject object, Integer alg, Number... params) {
+    private final DpUtil dpUtil;
 
-        DpUtil dpUtil = new DpUtilImpl();
+    @Autowired
+    public ReplaceImpl(DpUtil dpUtil) {
+        this.dpUtil = dpUtil;
+    }
+    public DSObject service(DSObject object, Integer alg, Number... params) {
         String currentPath = Paths.get("./").normalize().toAbsolutePath().toString();
         String dealImagePath = Paths.get(currentPath, "image", "dealImage.py").toString();
         String path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();

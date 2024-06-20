@@ -4,6 +4,7 @@ import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Replace;
 import com.lu.gademo.utils.impl.ReplaceImpl;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
@@ -13,10 +14,16 @@ import java.util.List;
 
 @SpringBootTest
 public class ReplaceTest {
+    private Replace replace;
+
+    @Autowired
+    public ReplaceTest(Replace replace) {
+        this.replace = replace;
+    }
 
     @Test
     public void testValueHide()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 1,1);
@@ -27,7 +34,7 @@ public class ReplaceTest {
 
     @Test
     public void testShift()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<Double> rawData = Arrays.asList(1234567.0, 89102.0);
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 2, 1);
@@ -38,7 +45,7 @@ public class ReplaceTest {
 
     @Test
     public void testHash()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 3, 0);
@@ -49,7 +56,7 @@ public class ReplaceTest {
 
     @Test
     public void testEnumeration()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<Double> rawData = Arrays.asList(123.0, 456.0, 237.0);
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 4, 1);
@@ -60,7 +67,7 @@ public class ReplaceTest {
 
     @Test
     public void testRandomReplace()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 5, 1);
@@ -72,7 +79,7 @@ public class ReplaceTest {
     // 信工所
     @Test
     public void testNameHide()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("赵一二", "钱三四", "孙五六");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 6, 1);
@@ -84,7 +91,7 @@ public class ReplaceTest {
     // 信工所
     @Test
     public void testNumberHide()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("199293845297", "7654321", "17789012345");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 7, 1);
@@ -96,7 +103,7 @@ public class ReplaceTest {
     // 信工所
     @Test
     public void testSuppressEmail()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("199@163.com", "qwertyuiop@qq.com", "217hdu1d17@gmail.com");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 8, 0);
@@ -107,10 +114,10 @@ public class ReplaceTest {
 
     @Test
     public void testSuppressAllIPAddress()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 9, 0);
+        DSObject result = replace.service(dsObject, 9, 1);
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -118,7 +125,7 @@ public class ReplaceTest {
 
     @Test
     public void testSupressRandomIPAddress()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 10, 1);
@@ -129,7 +136,7 @@ public class ReplaceTest {
 
     @Test
     public void testExchangeChannelImage()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "image", "1.png").toString();
@@ -144,7 +151,7 @@ public class ReplaceTest {
 
     @Test
     public void testAddColorOffsetImage()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "image", "1.png").toString();
@@ -159,7 +166,7 @@ public class ReplaceTest {
 
     @Test
     public void testFaceReplaceImage()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "image", "Honeyview_glass.jpg").toString();
@@ -175,7 +182,7 @@ public class ReplaceTest {
 
     @Test
     public void testAddColorOffsetVideo()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "raw_files", "3.mp4").toString();
@@ -190,7 +197,7 @@ public class ReplaceTest {
 
     @Test
     public void testFaceReplaceVideo()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "video", "1.mp4").toString();
@@ -206,7 +213,7 @@ public class ReplaceTest {
 
     @Test
     public void testBackgroundReplaceVideo()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "video", "1.mp4").toString();
@@ -222,7 +229,7 @@ public class ReplaceTest {
 
     @Test
     public void testAudioReshuffle()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "audio", "0001.wav").toString();
@@ -237,7 +244,7 @@ public class ReplaceTest {
 
     @Test
     public void testAudioApplyEffects()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "audio", "0001.wav").toString();
@@ -252,7 +259,7 @@ public class ReplaceTest {
 
     @Test
     public void testAudioReplaceVoicePrint()  {
-        Replace replace = new ReplaceImpl();
+        // Replace replace = new ReplaceImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         String path1 = Paths.get(currentPath, "audio", "0001.wav").toString();

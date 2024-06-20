@@ -1,5 +1,8 @@
 package com.lu.gademo.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class DesenInfoStringBuilders {
     // 脱敏前信息类型标识
     public StringBuilder desenInfoPreIden;

@@ -616,7 +616,7 @@
                                     $('#paginationContainer').show();
                                     renderPagination();
 
-                                    $('#goToPage').click(function () {
+                                    $('#goToPage').on("click", function () {
                                         let pageNumber = parseInt($('#pageInput').val());
                                         if (pageNumber >= 1 && pageNumber <= pageCount) {
                                             currentPage = pageNumber;
@@ -726,6 +726,108 @@
 
     </script>
 
+    <style>
+        .tabs-container ul {
+            height: 70px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        /* 设置表格样式 */
+        #dataTableContainer {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        #dataTable {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        #paginationInfo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #paginationInfo input {
+            width: 5em;
+            text-align: center;
+        }
+
+        /* 设置表格样式 */
+        #dataTableContainer1 {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        #dataTable1 {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        #paginationInfo1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #paginationInfo1 input {
+            width: 5em;
+            text-align: center;
+        }
+
+        /*标题*/
+        .ibox-title {
+            height: 200px;
+            border-color: #edf1f2;
+            background-color: #dbeafe;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #submit {
+            background-color: #347aa9;
+            padding: 5px 20px;
+            cursor: pointer;
+            color: black;
+            font-size: 20px;
+            display: inline-block;
+            text-align: center;
+            /*margin-right: 50px;*/
+        }
+
+        .btn2 {
+            line-height: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        /*选择框居中*/
+        .midtile {
+            line-height: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        /*上传按钮*/
+        .upload-btn {
+            background-color: #347aa9;
+            color: white;
+            cursor: pointer;
+            padding: 5px 20px;
+            text-align: center;
+            font-size: 20px;
+            display: inline-block;
+            margin: 30px;
+        }
+    </style>
+
 </head>
 <body>
 <div class="row">
@@ -733,287 +835,209 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
             </div>
-            <div class="midtile">
-                <div class="col-sm-5 m-b-xs">
-                    <label for="choose_template_sheet" style="font-size: 20px">应用场景模板选择</label>
-                    <select name="template_sheet" id="choose_template_sheet"
-                            style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
-                        <option value="111" selected>请选择应用场景</option>
-                        <option value="map">地图导航类场景</option>
-                        <option value="onlinetaxi">网络约车类场景</option>
-                        <option value="communication">即时通信场景</option>
-                        <option value="community">网络社区类场景</option>
-                        <option value="onlinepayment">网络支付类场景</option>
-                        <option value="onlineshopping">网上购物类场景</option>
-                        <option value="takeaway">餐饮外卖类场景</option>
-                        <option value="express">邮件快件寄递场景</option>
-                        <option value="transportationticket">交通票务场景</option>
-                        <option value="marry">婚恋相亲场景</option>
-                        <option value="employment">求职招聘场景</option>
-                        <option value="onlinelending">网络借贷场景</option>
-                        <option value="house">房屋租售场景</option>
-                        <option value="usedcar">二手车交易场景</option>
-                        <option value="consultation">问诊挂号场景</option>
-                        <option value="travel">旅游服务类场景</option>
-                        <option value="hotel">酒店服务类场景</option>
-                        <option value="game">网络游戏类场景</option>
-                        <option value="education">学习教育类场景</option>
-                        <option value="locallife">本地生活类场景</option>
-                        <option value="woman">女性健康类场景</option>
-                        <option value="usecar">用车服务类场景</option>
-                        <option value="investment">投资理财类场景</option>
-                        <option value="bank">手机银行类场景</option>
-                        <option value="mailbox">邮箱云盘类场景</option>
-                        <option value="meeting">远程会议类场景</option>
-                        <option value="webcast">网络直播类场景</option>
-                        <option value="onlinemovie">在线影音类场景</option>
-                        <option value="shortvideo">短视频类场景</option>
-                        <option value="news">新闻资讯类场景</option>
-                        <option value="sports">运动健身类场景</option>
-                        <option value="browser">浏览器类场景</option>
-                        <option value="input">输入法类场景</option>
-                        <option value="security">安全管理类场景</option>
-                        <option value="ebook">电子图书场景</option>
-                        <option value="capture">拍摄美化场景</option>
-                        <option value="appstore">应用商店场景</option>
-                        <option value="tools">实用工具场景</option>
-                        <option value="performanceticket">演出票务场景</option>
-                        <option value="networkaccess">电话/有线电视入网类场景</option>
-                        <option value="telecommunication">电信业务使用类场景</option>
-                        <option value="monitor">安防监控类场景</option>
-                        <option value="pay">生活缴费类场景</option>
-                        <option value="customerservice">客服类场景</option>
-                        <option value="schoolservice">校园服务类场景</option>
-                        <option value="smarthome">智慧家居类场景</option>
-                        <option value="autonomousdriving">自动驾驶类场景</option>
-                        <option value="telemedicine">远程诊疗类场景</option>
-                        <option value="vr">虚拟现实类场景</option>
-                        <option value="onlinevoting">网上投票类场景</option>
-                    </select>
+
+            <div class="tabs-container">
+                <ul id="tab-type" class="nav nav-tabs" style="font-size: 20px">
+                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane active" style="text-align: center;">
+
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="choose_template_sheet" style="font-size: 20px">应用场景模板选择</label>
+                                <select name="template_sheet" id="choose_template_sheet"
+                                        style="font-size: 20px; text-align: center">
+                                    <option value="111" selected>请选择应用场景</option>
+                                    <option value="map">地图导航类场景</option>
+                                    <option value="onlinetaxi">网络约车类场景</option>
+                                    <option value="communication">即时通信场景</option>
+                                    <option value="community">网络社区类场景</option>
+                                    <option value="onlinepayment">网络支付类场景</option>
+                                    <option value="onlineshopping">网上购物类场景</option>
+                                    <option value="takeaway">餐饮外卖类场景</option>
+                                    <option value="express">邮件快件寄递场景</option>
+                                    <option value="transportationticket">交通票务场景</option>
+                                    <option value="marry">婚恋相亲场景</option>
+                                    <option value="employment">求职招聘场景</option>
+                                    <option value="onlinelending">网络借贷场景</option>
+                                    <option value="house">房屋租售场景</option>
+                                    <option value="usedcar">二手车交易场景</option>
+                                    <option value="consultation">问诊挂号场景</option>
+                                    <option value="travel">旅游服务类场景</option>
+                                    <option value="hotel">酒店服务类场景</option>
+                                    <option value="game">网络游戏类场景</option>
+                                    <option value="education">学习教育类场景</option>
+                                    <option value="locallife">本地生活类场景</option>
+                                    <option value="woman">女性健康类场景</option>
+                                    <option value="usecar">用车服务类场景</option>
+                                    <option value="investment">投资理财类场景</option>
+                                    <option value="bank">手机银行类场景</option>
+                                    <option value="mailbox">邮箱云盘类场景</option>
+                                    <option value="meeting">远程会议类场景</option>
+                                    <option value="webcast">网络直播类场景</option>
+                                    <option value="onlinemovie">在线影音类场景</option>
+                                    <option value="shortvideo">短视频类场景</option>
+                                    <option value="news">新闻资讯类场景</option>
+                                    <option value="sports">运动健身类场景</option>
+                                    <option value="browser">浏览器类场景</option>
+                                    <option value="input">输入法类场景</option>
+                                    <option value="security">安全管理类场景</option>
+                                    <option value="ebook">电子图书场景</option>
+                                    <option value="capture">拍摄美化场景</option>
+                                    <option value="appstore">应用商店场景</option>
+                                    <option value="tools">实用工具场景</option>
+                                    <option value="performanceticket">演出票务场景</option>
+                                    <option value="networkaccess">电话/有线电视入网类场景</option>
+                                    <option value="telecommunication">电信业务使用类场景</option>
+                                    <option value="monitor">安防监控类场景</option>
+                                    <option value="pay">生活缴费类场景</option>
+                                    <option value="customerservice">客服类场景</option>
+                                    <option value="schoolservice">校园服务类场景</option>
+                                    <option value="smarthome">智慧家居类场景</option>
+                                    <option value="autonomousdriving">自动驾驶类场景</option>
+                                    <option value="telemedicine">远程诊疗类场景</option>
+                                    <option value="vr">虚拟现实类场景</option>
+                                    <option value="onlinevoting">网上投票类场景</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="choose_sheet"
+                                       style="font-size: 20px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;设置需求模板</label>
+                                <select name="sheet" id="choose_sheet"
+                                        style="font-size: 20px; text-align: center">
+                                    <option value="111" selected>请选择应用场景</option>
+                                    <option value="map">地图导航类场景</option>
+                                    <option value="onlinetaxi">网络约车类场景</option>
+                                    <option value="communication">即时通信场景</option>
+                                    <option value="community">网络社区类场景</option>
+                                    <option value="onlinepayment">网络支付类场景</option>
+                                    <option value="onlineshopping">网上购物类场景</option>
+                                    <option value="takeaway">餐饮外卖类场景</option>
+                                    <option value="express">邮件快件寄递场景</option>
+                                    <option value="transportationticket">交通票务场景</option>
+                                    <option value="marry">婚恋相亲场景</option>
+                                    <option value="employment">求职招聘场景</option>
+                                    <option value="onlinelending">网络借贷场景</option>
+                                    <option value="house">房屋租售场景</option>
+                                    <option value="usedcar">二手车交易场景</option>
+                                    <option value="consultation">问诊挂号场景</option>
+                                    <option value="travel">旅游服务类场景</option>
+                                    <option value="hotel">酒店服务类场景</option>
+                                    <option value="game">网络游戏类场景</option>
+                                    <option value="education">学习教育类场景</option>
+                                    <option value="locallife">本地生活类场景</option>
+                                    <option value="woman">女性健康类场景</option>
+                                    <option value="usecar">用车服务类场景</option>
+                                    <option value="investment">投资理财类场景</option>
+                                    <option value="bank">手机银行类场景</option>
+                                    <option value="mailbox">邮箱云盘类场景</option>
+                                    <option value="meeting">远程会议类场景</option>
+                                    <option value="webcast">网络直播类场景</option>
+                                    <option value="onlinemovie">在线影音类场景</option>
+                                    <option value="shortvideo">短视频类场景</option>
+                                    <option value="news">新闻资讯类场景</option>
+                                    <option value="sports">运动健身类场景</option>
+                                    <option value="browser">浏览器类场景</option>
+                                    <option value="input">输入法类场景</option>
+                                    <option value="security">安全管理类场景</option>
+                                    <option value="ebook">电子图书场景</option>
+                                    <option value="capture">拍摄美化场景</option>
+                                    <option value="appstore">应用商店场景</option>
+                                    <option value="tools">实用工具场景</option>
+                                    <option value="performanceticket">演出票务场景</option>
+                                    <option value="networkaccess">电话/有线电视入网类场景</option>
+                                    <option value="telecommunication">电信业务使用类场景</option>
+                                    <option value="monitor">安防监控类场景</option>
+                                    <option value="pay">生活缴费类场景</option>
+                                    <option value="customerservice">客服类场景</option>
+                                    <option value="schoolservice">校园服务类场景</option>
+                                    <option value="smarthome">智慧家居类场景</option>
+                                    <option value="autonomousdriving">自动驾驶类场景</option>
+                                    <option value="telemedicine">远程诊疗类场景</option>
+                                    <option value="vr">虚拟现实类场景</option>
+                                    <option value="onlinevoting">网上投票类场景</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="uploadForm">
+                                <input type="file" id="fileUpload" style="display: none;">
+                                <label for="fileUpload" class="upload-btn">
+                                    选择文件
+                                </label>
+                            </div>
+                        </form>
+
+
+                        <!--文件上传信息-->
+                        <div id="fileInfo">
+                        </div>
+                        <div id="after">
+                        </div>
+                        <div class="ibox-content">
+                            <div id=table_body></div>
+                        </div>
+
+                        <div class="btn2">
+                            <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                        </div>
+
+                        <div class="table-area">
+                            <div>
+                                <span id="preData" class="center-text"></span>
+                            </div>
+                            <div id="dataTableContainer">
+                                <table id="dataTable" class="table table-bordered">
+                                    <!-- 这里将用 JavaScript 动态创建表格内容 -->
+                                </table>
+                            </div>
+                            <div id="paginationContainer" class="mt-3" style="display: none;">
+                                <nav>
+                                    <div id="paginationInfo" class="d-flex justify-content-between align-items-center">
+                                        <ul class="pagination mb-0" id="pagination"></ul>
+                                        <div class="form-group mb-0 text-center">
+                                            <label for="pageInput">跳转至：</label>
+                                            <input type="number" class="form-control" id="pageInput" min="1">
+                                            <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
+                                        </div>
+                                        <div id="totalPages"></div>
+                                    </div>
+                                </nav>
+                            </div>
+                            <div>
+                                <span id="afterData" class="center-text"></span>
+                            </div>
+                            <div id="dataTableContainer1">
+                                <table id="dataTable1" class="table table-bordered">
+                                    <!-- 这里将用 JavaScript 动态创建表格内容 -->
+                                </table>
+                            </div>
+                            <div id="paginationContainer1" class="mt-3" style="display: none;">
+                                <nav>
+                                    <div id="paginationInfo1" class="d-flex justify-content-between align-items-center">
+                                        <ul class="pagination mb-0" id="pagination1"></ul>
+                                        <div class="form-group mb-0 text-center">
+                                            <label for="pageInput1">跳转至：</label>
+                                            <input type="number" class="form-control" id="pageInput1" min="1">
+                                            <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
+                                        </div>
+                                        <div id="totalPages1"></div>
+                                    </div>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-2" class="tab-pane"></div>
                 </div>
-            </div>
-            <div class="midtile">
-                <div class="col-sm-5 m-b-xs">
-                    <label for="choose_sheet"
-                           style="font-size: 20px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;设置需求模板</label>
-                    <select name="sheet" id="choose_sheet"
-                            style=" display: inline-block; height: 30px; font-size: 20px; text-align: center">
-                        <option value="111" selected>请选择应用场景</option>
-                        <option value="map">地图导航类场景</option>
-                        <option value="onlinetaxi">网络约车类场景</option>
-                        <option value="communication">即时通信场景</option>
-                        <option value="community">网络社区类场景</option>
-                        <option value="onlinepayment">网络支付类场景</option>
-                        <option value="onlineshopping">网上购物类场景</option>
-                        <option value="takeaway">餐饮外卖类场景</option>
-                        <option value="express">邮件快件寄递场景</option>
-                        <option value="transportationticket">交通票务场景</option>
-                        <option value="marry">婚恋相亲场景</option>
-                        <option value="employment">求职招聘场景</option>
-                        <option value="onlinelending">网络借贷场景</option>
-                        <option value="house">房屋租售场景</option>
-                        <option value="usedcar">二手车交易场景</option>
-                        <option value="consultation">问诊挂号场景</option>
-                        <option value="travel">旅游服务类场景</option>
-                        <option value="hotel">酒店服务类场景</option>
-                        <option value="game">网络游戏类场景</option>
-                        <option value="education">学习教育类场景</option>
-                        <option value="locallife">本地生活类场景</option>
-                        <option value="woman">女性健康类场景</option>
-                        <option value="usecar">用车服务类场景</option>
-                        <option value="investment">投资理财类场景</option>
-                        <option value="bank">手机银行类场景</option>
-                        <option value="mailbox">邮箱云盘类场景</option>
-                        <option value="meeting">远程会议类场景</option>
-                        <option value="webcast">网络直播类场景</option>
-                        <option value="onlinemovie">在线影音类场景</option>
-                        <option value="shortvideo">短视频类场景</option>
-                        <option value="news">新闻资讯类场景</option>
-                        <option value="sports">运动健身类场景</option>
-                        <option value="browser">浏览器类场景</option>
-                        <option value="input">输入法类场景</option>
-                        <option value="security">安全管理类场景</option>
-                        <option value="ebook">电子图书场景</option>
-                        <option value="capture">拍摄美化场景</option>
-                        <option value="appstore">应用商店场景</option>
-                        <option value="tools">实用工具场景</option>
-                        <option value="performanceticket">演出票务场景</option>
-                        <option value="networkaccess">电话/有线电视入网类场景</option>
-                        <option value="telecommunication">电信业务使用类场景</option>
-                        <option value="monitor">安防监控类场景</option>
-                        <option value="pay">生活缴费类场景</option>
-                        <option value="customerservice">客服类场景</option>
-                        <option value="schoolservice">校园服务类场景</option>
-                        <option value="smarthome">智慧家居类场景</option>
-                        <option value="autonomousdriving">自动驾驶类场景</option>
-                        <option value="telemedicine">远程诊疗类场景</option>
-                        <option value="vr">虚拟现实类场景</option>
-                        <option value="onlinevoting">网上投票类场景</option>
-                    </select>
-                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload" style="display: none;">
-                        <label for="fileUpload" class="upload-btn">
-                            选择文件
-                        </label>
-                    </form>
-                </div>
-            </div>
-            <!--文件上传信息-->
-            <div id="fileInfo">
-            </div>
-            <div id="after">
-            </div>
-            <div class="ibox-content">
-                <div id=table_body></div>
-            </div>
-            <div class="button1">
-                <div class="btn2">
-                    <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
-                </div>
-            </div>
-            <div id="showTable">
             </div>
         </div>
     </div>
-</div>
-<div>
-    <div>
-        <span id="preData" class="center-text"></span>
-    </div>
-    <div id="dataTableContainer">
-        <table id="dataTable" class="table table-bordered">
-            <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-    </div>
-    <div id="paginationContainer" class="mt-3" style="display: none;">
-        <nav>
-            <div id="paginationInfo" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination mb-0" id="pagination"></ul>
-                <div class="form-group mb-0 text-center">
-                    <label for="pageInput">跳转至：</label>
-                    <input type="number" class="form-control" id="pageInput" min="1">
-                    <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
-                </div>
-                <div id="totalPages"></div>
-            </div>
-        </nav>
-    </div>
-    <div>
-        <span id="afterData" class="center-text"></span>
-    </div>
-    <div id="dataTableContainer1">
-        <table id="dataTable1" class="table table-bordered">
-            <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-    </div>
-    <div id="paginationContainer1" class="mt-3" style="display: none;">
-        <nav>
-            <div id="paginationInfo1" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination mb-0" id="pagination1"></ul>
-                <div class="form-group mb-0 text-center">
-                    <label for="pageInput1">跳转至：</label>
-                    <input type="number" class="form-control" id="pageInput1" min="1">
-                    <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
-                </div>
-                <div id="totalPages1"></div>
-            </div>
-        </nav>
-    </div>
-</div>
+
 
 </body>
-<style>
-    /* 设置表格样式 */
-    #dataTableContainer {
-        width: 100%;
-        overflow-x: auto;
-    }
 
-    #dataTable {
-        width: 100%;
-        margin: 0 auto;
-    }
-
-    #paginationInfo {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    #paginationInfo input {
-        width: 5em;
-        text-align: center;
-    }
-
-    /* 设置表格样式 */
-    #dataTableContainer1 {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    #dataTable1 {
-        width: 100%;
-        margin: 0 auto;
-    }
-
-    #paginationInfo1 {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    #paginationInfo1 input {
-        width: 5em;
-        text-align: center;
-    }
-
-    /*标题*/
-    .ibox-title {
-        height: 200px;
-        border-color: #edf1f2;
-        background-color: #dbeafe;
-        color: black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #submit {
-        background-color: #347aa9;
-        padding: 5px 20px;
-        cursor: pointer;
-        color: black;
-        font-size: 20px;
-        display: inline-block;
-        text-align: center;
-        /*margin-right: 50px;*/
-    }
-
-    .btn2 {
-        line-height: 30px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
-
-    /*选择框居中*/
-    .midtile {
-        line-height: 30px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
-
-    /*上传按钮*/
-    .upload-btn {
-        background-color: #347aa9;
-        color: white;
-        cursor: pointer;
-        padding: 5px 20px;
-        text-align: center;
-        font-size: 20px;
-        display: inline-block;
-        margin: 30px;
-    }
-</style>
 </html>

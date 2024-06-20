@@ -37,170 +37,198 @@
 <script type="text/javascript">
     window.onload = function () {
         // 时间取整
-        document.getElementById("floorTime_submitBtn").addEventListener("click", function () {
-            let textInput = $("#floorTime_input").val();
-            var privacyLevel = 1
-            var textType = "address"
-            var algName = "floorTime"
-            if (textInput === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/File/desenText", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: '&textInput=' + encodeURIComponent(textInput) +
-                    '&textType=' + encodeURIComponent(textType) +
-                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
-                    '&algName=' + encodeURIComponent(algName)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("floorTime_output").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
+        desenTextApi("floorTime");
         // 数值取整
-        document.getElementById("floor_submitBtn").addEventListener("click", function () {
-            let textInput = $("#floor_input").val();
-            var privacyLevel = 1
-            var textType = "address"
-            var algName = "floor"
-            if (textInput === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/File/desenText", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: '&textInput=' + encodeURIComponent(textInput) +
-                    '&textType=' + encodeURIComponent(textType) +
-                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
-                    '&algName=' + encodeURIComponent(algName)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("floor_output").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
+        desenTextApi("floor");
         // 截断
-        document.getElementById("truncation_submitBtn").addEventListener("click", function () {
-            let textInput = $("#truncation_input").val();
-            var privacyLevel = 1
-            var textType = "address"
-            var algName = "truncation"
-            if (textInput === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/File/desenText", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: '&textInput=' + encodeURIComponent(textInput) +
-                    '&textType=' + encodeURIComponent(textType) +
-                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
-                    '&algName=' + encodeURIComponent(algName)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("truncation_output").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
+        desenTextApi("truncation");
 
         // mixzone_1
-        document.getElementById("mixzone_1_submitBtn").addEventListener("click", function () {
-            let position = $("#mixzone_1_position").val();
-            let id = $("#mixzone_1_id").val();
-            let time = $("#mixzone_1_time").val();
-            let points = $("#mixzone_1_points").val();
+        // document.getElementById("mixzone_1_submitBtn").addEventListener("click", function () {
+        //     let position = $("#mixzone_1_position").val();
+        //     let id = $("#mixzone_1_id").val();
+        //     let time = $("#mixzone_1_time").val();
+        //     let points = $("#mixzone_1_points").val();
+        //
+        //     if (position === "") {
+        //         alert("请输入文本");
+        //         return; // Stop further execution if the text input is empty
+        //     }
+        //
+        //     fetch("/Location/mixzone_1", {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/x-www-form-urlencoded'
+        //         },
+        //         body:
+        //             '&position=' + encodeURIComponent(position) +
+        //             '&id=' + encodeURIComponent(id) +
+        //             '&time=' + encodeURIComponent(time) +
+        //             '&points=' + encodeURIComponent(points)
+        //     })
+        //         .then(response => response.text())
+        //         .then(data => {
+        //             document.getElementById("mixzone_1_outputText").value = data;
+        //         })
+        //         .catch(error => console.error('Error:', error));
+        // })
 
-            if (position === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/Location/mixzone_1", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body:
-                    '&position=' + encodeURIComponent(position) +
-                    '&id=' + encodeURIComponent(id) +
-                    '&time=' + encodeURIComponent(time) +
-                    '&points=' + encodeURIComponent(points)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("mixzone_1_outputText").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
 
         //mixzone_3
-        document.getElementById("mixzone_3_submitBtn").addEventListener("click", function () {
-            let position = $("#mixzone_3_position").val();
-            let id = $("#mixzone_3_id").val();
-            let time = $("#mixzone_3_time").val();
-            let points = $("#mixzone_3_points").val();
+        // document.getElementById("mixzone_3_submitBtn").addEventListener("click", function () {
+        //     let position = $("#mixzone_3_position").val();
+        //     let id = $("#mixzone_3_id").val();
+        //     let time = $("#mixzone_3_time").val();
+        //     let points = $("#mixzone_3_points").val();
+        //
+        //     if (position === "") {
+        //         alert("请输入文本");
+        //         return; // Stop further execution if the text input is empty
+        //     }
+        //
+        //     fetch("/Location/mixzone_3", {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/x-www-form-urlencoded'
+        //         },
+        //         body:
+        //             '&position=' + encodeURIComponent(position) +
+        //             '&id=' + encodeURIComponent(id) +
+        //             '&time=' + encodeURIComponent(time) +
+        //             '&points=' + encodeURIComponent(points)
+        //     })
+        //         .then(response => response.text())
+        //         .then(data => {
+        //             document.getElementById("mixzone_3_outputText").value = data;
+        //         })
+        //         .catch(error => console.error('Error:', error));
+        // })
 
-            if (position === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/Location/mixzone_3", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body:
-                    '&position=' + encodeURIComponent(position) +
-                    '&id=' + encodeURIComponent(id) +
-                    '&time=' + encodeURIComponent(time) +
-                    '&points=' + encodeURIComponent(points)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("mixzone_3_outputText").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
+        mixZoneApi("mixzone_1");
+        mixZoneApi("mixzone_3");
         //Accuracy_reduction
-        document.getElementById("Accuracy_reduction").addEventListener("click", function () {
-            let position = $("#Accuracy_reduction_position").val();
+        // document.getElementById("Accuracy_reduction").addEventListener("click", function () {
+        //     let position = $("#Accuracy_reduction_position").val();
+        //
+        //     if (position === "") {
+        //         alert("请输入文本");
+        //         return; // Stop further execution if the text input is empty
+        //     }
+        //
+        //     fetch("/Location/Accuracy_reduction", {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/x-www-form-urlencoded'
+        //         },
+        //         body:
+        //             '&rawData=' + encodeURIComponent(position)
+        //     })
+        //         .then(response => response.text())
+        //         .then(data => {
+        //             document.getElementById("Accuracy_reduction_outputText").value = data;
+        //         })
+        //         .catch(error => console.error('Error:', error));
+        // })
+        accuracyReductionApi("Accuracy_reduction");
+    };
 
-            if (position === "") {
+    let desenTextApi = (algoName) => {
+        let buttonName = algoName + "_submitBtn";
+        let inputName = algoName + "_input";
+        let outputArea = algoName + "_output";
+        $("#" + buttonName).on("click", function () {
+            let textInput = $("#" + inputName).val();
+            let privacyLevel = 1
+            let textType = "address"
+            let algName = "floorTime"
+            if (textInput === "") {
                 alert("请输入文本");
                 return; // Stop further execution if the text input is empty
             }
 
-            fetch("/Location/Accuracy_reduction", {
+            fetch("/File/desenText", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: '&textInput=' + encodeURIComponent(textInput) +
+                    '&textType=' + encodeURIComponent(textType) +
+                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
+                    '&algName=' + encodeURIComponent(algName)
+            })
+                .then(response => response.text())
+                .then(data => {
+                    $("#"+ outputArea).val(data);
+                })
+                .catch(error => console.error('Error:', error));
+        })
+    };
+
+    let mixZoneApi = (algoName) => {
+        let submitBtn = algoName + "_submitBtn";
+        let position = algoName + "_position";
+        let id = algoName + "_id";
+        let time = algoName + "_time";
+        let points = algoName + "_points";
+        let outputArea = algoName + "_outputText";
+        let url = "/Location/" + algoName;
+        $("#" + submitBtn).on("click", function () {
+            let positionVal = $("#" + position).val();
+            let idVal = $("#" + id).val();
+            let timeVal = $("#" + time).val();
+            let pointsVal = $("#" + points).val();
+
+            if (positionVal === "") {
+                alert("请输入文本");
+                return; // Stop further execution if the text input is empty
+            }
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body:
-                    '&rawData=' + encodeURIComponent(position)
+                    '&position=' + encodeURIComponent(positionVal) +
+                    '&id=' + encodeURIComponent(idVal) +
+                    '&time=' + encodeURIComponent(timeVal) +
+                    '&points=' + encodeURIComponent(pointsVal)
             })
                 .then(response => response.text())
                 .then(data => {
-                    document.getElementById("Accuracy_reduction_outputText").value = data;
+                    $("#" + outputArea).val(data);
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    };
+
+    let accuracyReductionApi = (algoName) => {
+        let url = "/Location/" + algoName;
+        let position = algoName + "_position";
+        let outputArea = algoName + "_outputText";
+        $("#"+algoName).on("click", function () {
+            let positionVal = $("#" + position).val();
+
+            if (positionVal === "") {
+                alert("请输入文本");
+                return; // Stop further execution if the text input is empty
+            }
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body:
+                    '&rawData=' + encodeURIComponent(positionVal)
+            })
+                .then(response => response.text())
+                .then(data => {
+                    $("#"+ outputArea).val(data);
                 })
                 .catch(error => console.error('Error:', error));
         })
-    }
+    };
 
 </script>
 <div class="ibox-title">

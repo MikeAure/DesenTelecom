@@ -21,7 +21,6 @@ public class ExcelParamServiceImpl implements ExcelParamService {
         excelParamDao.deleteAll(name);
     }
 
-
     public void insertAll(String name, List<ExcelParam> dataList) {
         excelParamDao.insertAll(name, dataList);
     }

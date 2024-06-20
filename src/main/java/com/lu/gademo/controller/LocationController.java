@@ -19,11 +19,8 @@ import java.util.stream.Collectors;
 public class LocationController {
 
     Util util;
-
     Generalization generalization;
-
     Anonymity anonymity;
-
     File directory;
     String currentPath;
     String program;

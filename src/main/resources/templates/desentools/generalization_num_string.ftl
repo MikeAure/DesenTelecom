@@ -36,114 +36,43 @@
 <script type="text/javascript" src="${ctx!}/js/index.js"></script>
 <script type="text/javascript">
     window.onload = function () {
-        // 时间取整
-        document.getElementById("floorTime_submitBtn").addEventListener("click", function () {
-            let textInput = $("#floorTime_input").val();
-            var privacyLevel = 1
-            var textType = "address"
-            var algName = "floorTime"
-            if (textInput === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/File/desenText", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: '&textInput=' + encodeURIComponent(textInput) +
-                    '&textType=' + encodeURIComponent(textType) +
-                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
-                    '&algName=' + encodeURIComponent(algName)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("floorTime_output").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
-        // 数值取整
-        document.getElementById("floor_submitBtn").addEventListener("click", function () {
-            let textInput = $("#floor_input").val();
-            var privacyLevel = 1
-            var textType = "address"
-            var algName = "floor"
-            if (textInput === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/File/desenText", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: '&textInput=' + encodeURIComponent(textInput) +
-                    '&textType=' + encodeURIComponent(textType) +
-                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
-                    '&algName=' + encodeURIComponent(algName)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("floor_output").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
-        // 截断
-        document.getElementById("truncation_submitBtn").addEventListener("click", function () {
-            let textInput = $("#truncation_input").val();
-            var privacyLevel = 1
-            var textType = "address"
-            var algName = "truncation"
-            if (textInput === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/File/desenText", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: '&textInput=' + encodeURIComponent(textInput) +
-                    '&textType=' + encodeURIComponent(textType) +
-                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
-                    '&algName=' + encodeURIComponent(algName)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("truncation_output").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
-        document.getElementById("addressHide_submitBtn").addEventListener("click", function () {
-            let textInput = $("#addressHide_textInput").val();
-            var privacyLevel = 1
-            var textType = "addressHide"
-            var algName = "addressHide"
-            if (textInput === "") {
-                alert("请输入文本");
-                return; // Stop further execution if the text input is empty
-            }
-
-            fetch("/File/desenText", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: '&textInput=' + encodeURIComponent(textInput) +
-                    '&textType=' + encodeURIComponent(textType) +
-                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
-                    '&algName=' + encodeURIComponent(algName)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("addressHide_outputText").value = data;
-                })
-                .catch(error => console.error('Error:', error));
-        })
+        desenTextApi("floorTime");
+        desenTextApi("floor");
+        desenTextApi("truncation");
+        desenTextApi("addressHide");
     }
+
+    let desenTextApi = (algoName) => {
+        let buttonName = algoName + "_submitBtn";
+        let inputName = algoName + "_input";
+        let outputArea = algoName + "_output";
+        $("#" + buttonName).on("click", function () {
+            let textInput = $("#" + inputName).val();
+            let privacyLevel = 1
+            let textType = "address"
+            let algName = algoName;
+            if (textInput === "") {
+                alert("请输入文本");
+                return; // Stop further execution if the text input is empty
+            }
+
+            fetch("/File/desenText", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: '&textInput=' + encodeURIComponent(textInput) +
+                    '&textType=' + encodeURIComponent(textType) +
+                    '&privacyLevel=' + encodeURIComponent(privacyLevel) +
+                    '&algName=' + encodeURIComponent(algName)
+            })
+                .then(response => response.text())
+                .then(data => {
+                    $("#"+ outputArea).val(data);
+                })
+                .catch(error => console.error('Error:', error));
+        })
+    };
 
 </script>
 <div class="ibox-title">
@@ -313,7 +242,7 @@
                 <div class="row justify-content-center" style="display: grid; place-items: center;">
                     <div class="col-lg-5">
                         <div class="input-group">
-                            <input type="text" id="addressHide_textInput" class="form-control" placeholder="请输入文本"
+                            <input type="text" id="addressHide_input" class="form-control" placeholder="请输入文本"
                                    style="font-size: 20px">
                             <span class="input-group-btn">
                     <button class="btn btn-default" id="addressHide_submitBtn" type="button"
@@ -323,10 +252,10 @@
                         </span>
                         </div>
                         <div class="text-center">
-                            <label for="addressHide_outputText"
+                            <label for="addressHide_output"
                                    style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                             <div style="display: flex; flex-direction: column; align-items: center;">
-                                <textarea id="addressHide_outputText" rows="2" cols="50" readonly
+                                <textarea id="addressHide_output" rows="2" cols="50" readonly
                                           style="margin-top: 10px;"></textarea>
                             </div>
                         </div>

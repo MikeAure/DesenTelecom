@@ -17,7 +17,7 @@ public class AlgorithmsFactory {
     private Anonymity anonymity;
     private Replace replacement;
 
-    private Map<String, AlgorithmInfo> algorithmInfoMap = new HashMap<>();
+    private Map<String, AlgorithmInfo> algorithmInfoMap;
 
     @Autowired
     public AlgorithmsFactory(Dp dp, Generalization generalization, Anonymity anonymity, Replace replacement) {
@@ -25,6 +25,7 @@ public class AlgorithmsFactory {
         this.generalization = generalization;
         this.anonymity = anonymity;
         this.replacement = replacement;
+        this.algorithmInfoMap = new HashMap<>();
     }
 
     @PostConstruct
@@ -78,7 +79,10 @@ public class AlgorithmsFactory {
         algorithmInfoMap.put("apply_audio_effects", new AlgorithmInfo("apply_audio_effects", 73, AlgorithmType.REPLACEMENT, 18, Arrays.asList(
                 Arrays.asList(-3, 0.7, -5, 5), Arrays.asList(2, 0.8, -10, 10), Arrays.asList(5, 0.9, -20, 20)), this.replacement));
         algorithmInfoMap.put("audio_reshuffle", new AlgorithmInfo("audio_reshuffle", 74, AlgorithmType.REPLACEMENT, 17, Arrays.asList(5, 10, 15), this.replacement));
-
+        algorithmInfoMap.put("audio_floor", new AlgorithmInfo("audio_floor", 75, AlgorithmType.GENERALIZATION, 19, Arrays.asList(0, 1, 2), this.generalization));
+        algorithmInfoMap.put("audio_spec", new AlgorithmInfo("audio_spec", 76, AlgorithmType.GENERALIZATION, 20, null, this.generalization));
+        algorithmInfoMap.put("audio_augmentation", new AlgorithmInfo("audio_augmentation", 76, AlgorithmType.GENERALIZATION, 21, null, this.generalization));
+        algorithmInfoMap.put("audio_median", new AlgorithmInfo("audio_median", 77, AlgorithmType.GENERALIZATION, 22, Arrays.asList(0, 1, 2), this.generalization));
     }
 
 
@@ -87,11 +91,14 @@ public class AlgorithmsFactory {
     }
 
     public AlgorithmInfo getAlgorithmInfoFromId(int id) {
-        for (Map.Entry<String, AlgorithmInfo> entry : algorithmInfoMap.entrySet()) {
-            if (entry.getValue().getId() == id) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        return algorithmInfoMap.values().stream()
+                .filter(algorithmInfo -> algorithmInfo.getId() == id)
+                .findFirst().orElse(null);
+//        for (Map.Entry<String, AlgorithmInfo> entry : algorithmInfoMap.entrySet()) {
+//            if (entry.getValue().getId() == id) {
+//                return entry.getValue();
+//            }
+//        }
+//        return null;
     }
 }

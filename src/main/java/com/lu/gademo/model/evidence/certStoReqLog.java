@@ -1,4 +1,4 @@
-package com.lu.gademo.log.evidence;
+package com.lu.gademo.model.evidence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;

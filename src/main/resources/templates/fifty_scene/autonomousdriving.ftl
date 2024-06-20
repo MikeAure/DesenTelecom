@@ -51,95 +51,52 @@
             document.getElementById("table_body").innerHTML = ""
             // 拼接html
             let html = "";
-            console.log("sheet:" + sheet)
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.status === 200 && xhr.readyState === 4) {
-                    var data_str = xhr.responseText;
-                    var data = JSON.parse(data_str);
-                    console.log(data.length)
+            console.log("sheet:" + sheet);
+            fetch("/" + sheet + "param/list")
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data.length);
 
-                    html += "<div class=\"table-responsive\">" +
-                        "<table class=\"table table-striped\">" +
+                    html +=
+                        '<div class="table-responsive">' +
+                        '<table class="table table-striped">' +
                         "<thead>" +
                         "<tr>" +
                         "<th>编号</th>" +
                         "<th>字段缩写</th>" +
                         "<th>字段名</th>" +
                         "<th>字段类型</th>" +
-                        /*  "<th>脱敏算法</th>" +
-                          "<th>隐私保护等级</th>" +*/
                         "</tr>" +
                         "</thead>" +
-                        "<tbody id=\"table2\">";
-                    for (var i = 0; i < data.length; i++) {
+                        '<tbody id="table2">';
+                    for (let i = 0; i < data.length; i++) {
                         s = data[i];
                         //console.log(s)
                         html += "<tr id = " + "row_" + i + ">";
                         html += "<td>" + s.id + "</td>";
                         html += "<td>" + s.fieldName + "</td>";
                         html += "<td>" + s.columnName + "</td>";
-                        html += "<td>"
+                        html += "<td>";
                         switch (s.dataType) {
                             case 0:
-                                html += "数值型数据"
+                                html += "数值型数据";
                                 break;
                             case 1:
-                                html += "编码型数据"
+                                html += "编码型数据";
                                 break;
                             case 3:
-                                html += "文本型数据"
+                                html += "文本型数据";
                                 break;
                             case 4:
-                                html += "时间数据"
+                                html += "时间数据";
                                 break;
                         }
-                        html += "</td>"
-                        /* html += "<td>"
-                         switch (s.k) {
-                             case 0:
-                                 if (s.dataType === 0 || s.dataType === 4) {
-                                     html += "差分隐私"
-                                 } else {
-                                     html += "默认处理"
-                                 }
-                                 break;
-                             case 1:
-                                 if (s.dataType === 0 || s.dataType === 4) {
-                                     html += "k-匿名"
-                                 } else {
-                                     html += "默认处理"
-                                 }
-                                 break;
-                         }
-                         html += "</td>"
-
-                         html += "<td>"
-                         switch (s.tmParam) {
-                             case 0:
-                                 html += "无隐私保护处理"
-                                 break;
-                             case 1:
-                                 html += "低程度"
-                                 break;
-                             case 2:
-                                 html += "中程度"
-                                 break;
-
-                             default:
-                                 html += "高程度"
-                                 break;
-                         }
-
-                         html += "</td>"*/
+                        html += "</td>";
                         html += "</tr>";
                     }
-                    document.getElementById("table_body").innerHTML = html
-                }
-            }
-
-            xhr.open("get", "/" + sheet + "param/list", false);
-            xhr.send();
+                    document.getElementById("table_body").innerHTML = html;
+                })
+                .catch((error) => console.log("Error", error));
             document.getElementById("table_body").innerHTML = html;
         })
         document.getElementById("setTemplate").addEventListener("click", function () {
@@ -151,14 +108,11 @@
             // 拼接html
             let html = "";
             console.log("sheet:" + sheet)
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.status === 200 && xhr.readyState === 4) {
-                    var data_str = xhr.responseText;
-                    var data = JSON.parse(data_str);
+
+            fetch("/" + sheet + "param/list")
+                .then((response) => response.json())
+                .then((data) => {
                     console.log(data.length)
-
-
                     html += "<div class=\"table-responsive\">" +
                         "<table class=\"table table-striped\">" +
                         "<thead>" +
@@ -172,30 +126,13 @@
                         "</tr>" +
                         "</thead>" +
                         "<tbody id=\"table2\">";
-                    for (var i = 0; i < data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         s = data[i];
                         console.log(s)
                         html += "<tr id = " + "row_" + i + ">";
                         html += "<td>" + s.id + "</td>";
                         html += "<td>" + s.fieldName + "</td>";
                         html += "<td>" + s.columnName + "</td>";
-                        /*  html += "<td>"
-                          // 字段类型
-                          switch (s.dataType) {
-                              case 0:
-                                  html += "数值型数据"
-                                  break;
-                              case 1:
-                                  html += "编码型数据"
-                                  break;
-                              case 3:
-                                  html += "文本型数据"
-                                  break;
-                              case 4:
-                                  html += "时间数据"
-                                  break;
-                          }
-                          html += "</td>"*/
 
                         html += "<td><select>"
                         /*html += "<option selected value = " + -1 + ">请选择字段数据类型</option>"*/
@@ -529,18 +466,15 @@
                         html += "</tr>";
                     }
                     document.getElementById("table_body").innerHTML = html
-                }
-            }
+                })
 
-            xhr.open("get", "/" + sheet + "param/list", false);
-            xhr.send();
             document.getElementById("table_body").innerHTML = html;
 
             //document.getElementById("fileUpload").addEventListener("change", choose_file)
         })
         document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function (event) {
+    let choose_file = function (event) {
         //读取文件
         const file = event.target.files[0]
         // 文件名，扩展名
@@ -549,24 +483,24 @@
 
         if (file) {
             if ("xlsx" === fileExtension) {
-                var fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
                     "<strong>" + fileName + "文件</strong>已选择"
                 "</span>" +
                 "</div>";
                 document.getElementById("fileInfo").innerHTML = fileLoad
                 console.log(fileExtension)
                 //构建formData,发送给后端
-                var formData = new FormData();
-                formData.append("file", file);
-                formData.append("sheet", sheet);
-                formData.append("algName", "distortion");
+                let formData = new FormData();
+                formData.set("file", file);
+                formData.set("sheet", sheet);
+                formData.set("algName", "distortion");
                 console.log("sheet:" + sheet)
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
-                    var tr;
-                    var dataArray = [];
-                    var table_body = document.getElementById("table2")
-                    for (var i = 0; i < table_body.rows.length; i++) {
+                    let tr;
+                    let dataArray = [];
+                    let table_body = document.getElementById("table2")
+                    for (let i = 0; i < table_body.rows.length; i++) {
                         data = {};
                         tr = table_body.rows[i];
                         //console.log(tr);
@@ -590,35 +524,37 @@
                         .then(blob => {
                             // 脱敏前
                             document.getElementById("preData").innerHTML = "脱敏前数据"
-                            var reader = new FileReader();
+                            let reader = new FileReader();
                             reader.onload = function (e) {
-                                var data = new Uint8Array(e.target.result);
-                                var workbook = XLSX.read(data, {type: 'array'});
+                                let data = new Uint8Array(e.target.result);
+                                let workbook = XLSX.read(data, {type: 'array'});
 
-                                var sheetName = workbook.SheetNames[0];
-                                var sheet = workbook.Sheets[sheetName];
+                                let sheetName = workbook.SheetNames[0];
+                                let sheet = workbook.Sheets[sheetName];
 
-                                var jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                                let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                                console.log("Print jsondata: ")
+                                console.log(jsonData)
 
-                                var pageSize = 10;
-                                var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                                var currentPage = 1;
+                                let pageSize = 10;
+                                let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                                let currentPage = 1;
 
                                 function displayTable(page) {
-                                    var startIndex = (page - 1) * pageSize + 1; // 跳过表头
-                                    var endIndex = Math.min(startIndex + pageSize, jsonData.length);
+                                    let startIndex = (page - 1) * pageSize + 1; // 跳过表头
+                                    let endIndex = Math.min(startIndex + pageSize, jsonData.length);
 
-                                    var tableContent = '<thead><tr>';
-                                    var headers = jsonData[0];
+                                    let tableContent = '<thead><tr>';
+                                    let headers = jsonData[0];
                                     headers.forEach(function (header) {
                                         tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
                                     });
                                     tableContent += '</tr></thead><tbody>';
 
-                                    for (var i = startIndex; i < endIndex; i++) {
+                                    for (let i = startIndex; i < endIndex; i++) {
                                         tableContent += '<tr>';
-                                        for (var j = 0; j < headers.length; j++) {
-                                            var cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                        for (let j = 0; j < headers.length; j++) {
+                                            let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
                                             tableContent += '<td>' + cellValue + '</td>';
                                         }
                                         tableContent += '</tr>';
@@ -632,14 +568,14 @@
                                 displayTable(currentPage);
 
                                 function renderPagination() {
-                                    var pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
+                                    let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
                                     pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
 
                                     $('#pagination').html(pagination);
 
                                     $('#pagination a').click(function (e) {
                                         e.preventDefault();
-                                        var page = $(this).data('page');
+                                        let page = $(this).data('page');
                                         console.log(page)
                                         if (page === 'prev') {
                                             currentPage = Math.max(1, currentPage - 1);
@@ -657,7 +593,7 @@
                                 renderPagination();
 
                                 $('#goToPage').click(function () {
-                                    var pageNumber = parseInt($('#pageInput').val());
+                                    let pageNumber = parseInt($('#pageInput').val());
                                     if (pageNumber >= 1 && pageNumber <= pageCount) {
                                         currentPage = pageNumber;
                                         displayTable(currentPage);
@@ -678,25 +614,25 @@
                                 const sheetName = workbook.SheetNames[0];
                                 const sheet = workbook.Sheets[sheetName];
                                 const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-                                var pageSize = 10;
-                                var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                                var currentPage1 = 1;
+                                let pageSize = 10;
+                                let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                                let currentPage1 = 1;
 
                                 function displayTable1(page1) {
-                                    var startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
-                                    var endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
+                                    let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
+                                    let endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
 
-                                    var tableContent1 = '<thead><tr>';
-                                    var headers1 = jsonData[0];
+                                    let tableContent1 = '<thead><tr>';
+                                    let headers1 = jsonData[0];
                                     headers1.forEach(function (header1) {
                                         tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
                                     });
                                     tableContent1 += '</tr></thead><tbody>';
 
-                                    for (var i = startIndex1; i < endIndex; i++) {
+                                    for (let i = startIndex1; i < endIndex; i++) {
                                         tableContent1 += '<tr>';
-                                        for (var j = 0; j < headers1.length; j++) {
-                                            var cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                        for (let j = 0; j < headers1.length; j++) {
+                                            let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
                                             tableContent1 += '<td>' + cellValue + '</td>';
                                         }
                                         tableContent1 += '</tr>';
@@ -710,14 +646,14 @@
                                 displayTable1(currentPage1);
 
                                 function renderPagination1() {
-                                    var pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
+                                    let pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
                                     pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
 
                                     $('#pagination1').html(pagination1);
 
                                     $('#pagination1 a').click(function (e) {
                                         e.preventDefault();
-                                        var page = $(this).data('page');
+                                        let page = $(this).data('page');
                                         console.log(page)
                                         if (page === 'prev1') {
                                             currentPage1 = Math.max(1, currentPage1 - 1);
@@ -735,7 +671,7 @@
                                 renderPagination1();
 
                                 $('#goToPage1').click(function () {
-                                    var pageNumber1 = parseInt($('#pageInput1').val());
+                                    let pageNumber1 = parseInt($('#pageInput1').val());
                                     if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
                                         currentPage1 = pageNumber1;
                                         displayTable1(currentPage1);

@@ -100,7 +100,7 @@ public class FileController extends BaseController {
         String fileType = getFileSuffix(fileName);
         log.info("File Type: " + fileType);
         log.info("AlgName: " + algName);
-        // TODO: 检查文件完整性
+
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
             return fileService.dealExcel(file, params, sheet);
@@ -141,7 +141,7 @@ public class FileController extends BaseController {
     public ResponseEntity<byte[]> replaceFaceVideo(@RequestPart("file") MultipartFile file,
                                                    @RequestParam("params") String params,
                                                    @RequestParam("algName") String algName,
-                                                   @RequestParam("sheet") MultipartFile sheet
+                                                   @RequestPart("sheet") MultipartFile sheet
     ) throws IOException, InterruptedException, SQLException {
         switch (algName) {
             case "video_face_sub": {

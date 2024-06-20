@@ -84,7 +84,7 @@ public class FileControllerAudioTest {
         mvc.perform(multipart(URL)
                         .file(audioFile)
                         .param("params", PARAMS)
-                        .param("algName", "audio_reshufflepython")
+                        .param("algName", "audio_reshuffle")
                         .param("sheet", SHEET))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())

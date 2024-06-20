@@ -12,11 +12,13 @@
     <!--[if lt IE 9]>
     <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
-    <#--    <link rel="shortcut icon" href="favicon.ico">-->
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
+    <link rel="shortcut icon" href="${ctx!}/favicon.ico">
+
+
 </head>
 
 <body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
@@ -381,9 +383,9 @@
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/generalization_video"> 视频泛化 </a>
                                 </li>
-                                <#--                                <li>-->
-                                <#--                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_audio"> 音频泛化 </a>-->
-                                <#--                                </li>-->
+                                <li>
+                                    <a class="J_menuItem" href="${ctx!}/desentools/generalization_audio"> 音频泛化 </a>
+                                </li>
                             </ul>
                         </li>
                         <li>

@@ -47,9 +47,15 @@
 
         document.getElementById("CirDummy_submitBtn").addEventListener("click", function () {
             let position = $("#CirDummy_position").val();
-            let k = $("#CirDummy_k").val();
-            let s_cd = $("#CirDummy_s_cd").val();
-            let rho = $("#CirDummy_rho").val();
+            let params = new URLSearchParams(
+                {
+                    position: $("#CirDummy_position").val(),
+                    k: $("#CirDummy_k").val(),
+                    s_cd: $("#CirDummy_s_cd").val(),
+                    rho: $("#CirDummy_rho").val(),
+                }
+            )
+
 
             if (position === "") {
                 alert("请输入文本");
@@ -62,10 +68,7 @@
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body:
-                    '&position=' + encodeURIComponent(position) +
-                    '&k=' + encodeURIComponent(k) +
-                    '&s_cd=' + encodeURIComponent(s_cd) +
-                    '&rho=' + encodeURIComponent(rho)
+                    params
             })
                 .then(response => response.text())
                 .then(data => {
@@ -112,16 +115,19 @@
                 return; // Stop further execution if the text input is empty
             }
 
+            let params = new URLSearchParams({
+                rawData: position,
+                k: k,
+                min: min,
+                max: max
+            });
+
             fetch("/Location/adaptiveIntervalCloakingWrapper", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body:
-                    '&rawData=' + encodeURIComponent(position) +
-                    '&k=' + encodeURIComponent(k) +
-                    '&min=' + encodeURIComponent(min) +
-                    '&max=' + encodeURIComponent(max)
+                body: params
             })
                 .then(response => response.text())
                 .then(data => {

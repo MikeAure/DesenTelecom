@@ -85,8 +85,7 @@ public class SMUtils {
         keyGenerator.init(new SecureRandom());
         SecretKey secretKye = keyGenerator.generateKey();
         byte[] keyBytes = secretKye.getEncoded();
-        String key = Util.byteToHex(keyBytes);
-        return key;
+        return Util.byteToHex(keyBytes);
     }
 
     /**
@@ -96,8 +95,7 @@ public class SMUtils {
      * @return
      */
     public static String encryptBySm4(String sourceStr, String secretKey) {
-        String cipherText = SM4Util.encryptData_ECB(sourceStr, secretKey);
-        return cipherText;
+        return SM4Util.encryptData_ECB(sourceStr, secretKey);
     }
 
     /**
@@ -107,8 +105,7 @@ public class SMUtils {
      * @return
      */
     public static String decryptBySm4(String cipherText, String secretKey) {
-        String plainText = SM4Util.decryptData_ECB(cipherText, secretKey);
-        return plainText;
+        return SM4Util.decryptData_ECB(cipherText, secretKey);
     }
 
     public static void main(String[] args) throws Exception {

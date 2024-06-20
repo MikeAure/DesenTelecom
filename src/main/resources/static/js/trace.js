@@ -1,12 +1,12 @@
-// ³õÊ¼»¯µØÍ¼
+// åˆå§‹åŒ–åœ°å›¾
 function initMap(containerId, options) {
     return new AMap.Map(containerId, {
-        center: options.center, // µØÍ¼ÖĞĞÄµã
-        zoom: options.zoom // µØÍ¼ÏÔÊ¾µÄËõ·Å¼¶±ğ
+        center: options.center, // åœ°å›¾ä¸­å¿ƒç‚¹
+        zoom: options.zoom // åœ°å›¾æ˜¾ç¤ºçš„ç¼©æ”¾çº§åˆ«
     });
 }
 
-// Ìí¼Ó¿ÉÍÏ¶¯µÄMarker
+// æ·»åŠ å¯æ‹–åŠ¨çš„Marker
 function addDraggableMarker(map, position, markerId, iconUrl) {
     var marker = new AMap.Marker({
         position: position,
@@ -24,56 +24,56 @@ function addDraggableMarker(map, position, markerId, iconUrl) {
         })
         marker.setIcon(icon);
     }
-    // ¼àÌıMarkerÍÏ¶¯ÊÂ¼ş¸üĞÂ¶ÔÓ¦µÄ¾­Î³¶ÈÏÔÊ¾
+    // ç›‘å¬Markeræ‹–åŠ¨äº‹ä»¶æ›´æ–°å¯¹åº”çš„ç»çº¬åº¦æ˜¾ç¤º
     marker.on('dragend', function (e) {
-        document.getElementById(markerId).innerHTML = "<span>¾­¶È£º" + e.lnglat.getLng() + ", Î³¶È£º" + e.lnglat.getLat() + "</span>";
+        document.getElementById(markerId).innerHTML = "<span>ç»åº¦ï¼š" + e.lnglat.getLng() + ", çº¬åº¦ï¼š" + e.lnglat.getLat() + "</span>";
     });
 
     return marker;
 }
 
-// Ëø¶¨Marker
+// é”å®šMarker
 function lockMarkerDriver1(marker, buttonId) {
     document.getElementById(buttonId).addEventListener('click', function () {
-        marker.setDraggable(false); // ÉèÖÃMarker²»¿ÉÍÏ¶¯
+        marker.setDraggable(false); // è®¾ç½®Markerä¸å¯æ‹–åŠ¨
         var position = marker.getPosition();
-        var latitude = position.lat; // Î³¶È
-        var longitude = position.lng; // ¾­¶È
+        var latitude = position.lat; // çº¬åº¦
+        var longitude = position.lng; // ç»åº¦
         driver1SendCoordinatesToBackend(latitude, longitude);
     });
 }
 
 function lockMarkerDriver2(marker, buttonId) {
     document.getElementById(buttonId).addEventListener('click', function () {
-        marker.setDraggable(false); // ÉèÖÃMarker²»¿ÉÍÏ¶¯
+        marker.setDraggable(false); // è®¾ç½®Markerä¸å¯æ‹–åŠ¨
         var position = marker.getPosition();
-        var latitude = position.lat; // Î³¶È
-        var longitude = position.lng; // ¾­¶È
+        var latitude = position.lat; // çº¬åº¦
+        var longitude = position.lng; // ç»åº¦
         driver2SendCoordinatesToBackend(latitude, longitude);
     });
 }
 
 function lockMarkerCustomer(marker, buttonId, startOrEnd) {
     document.getElementById(buttonId).addEventListener('click', function () {
-        marker.setDraggable(false); // ÉèÖÃMarker²»¿ÉÍÏ¶¯
+        marker.setDraggable(false); // è®¾ç½®Markerä¸å¯æ‹–åŠ¨
 
-        // »ñÈ¡MarkerµÄµ±Ç°Î»ÖÃ
+        // è·å–Markerçš„å½“å‰ä½ç½®
         var position = marker.getPosition();
-        var latitude = position.lat; // Î³¶È
-        var longitude = position.lng; // ¾­¶È
+        var latitude = position.lat; // çº¬åº¦
+        var longitude = position.lng; // ç»åº¦
 
-        // // ¸ù¾İÊÇÆğµã»¹ÊÇÖÕµã£¬×¼±¸·¢ËÍÇëÇó
+        // // æ ¹æ®æ˜¯èµ·ç‚¹è¿˜æ˜¯ç»ˆç‚¹ï¼Œå‡†å¤‡å‘é€è¯·æ±‚
         // if (startOrEnd === 'start') {
-        //     // ±£´æÆğµã×ø±ê
+        //     // ä¿å­˜èµ·ç‚¹åæ ‡
         //     window.customerStartLatitude = latitude;
         //     window.customerStartLongitude = longitude;
         // } else if (startOrEnd === 'end') {
-        //     // ±£´æÖÕµã×ø±ê
+        //     // ä¿å­˜ç»ˆç‚¹åæ ‡
         //     window.customerEndLatitude = latitude;
         //     window.customerEndLongitude = longitude;
         // }
         //
-        // // Èç¹ûÆğµãºÍÖÕµã×ø±ê¶¼ÒÑ¾­ÉèÖÃ£¬Ôò·¢ËÍÊı¾İµ½ºó¶Ë
+        // // å¦‚æœèµ·ç‚¹å’Œç»ˆç‚¹åæ ‡éƒ½å·²ç»è®¾ç½®ï¼Œåˆ™å‘é€æ•°æ®åˆ°åç«¯
         // if (window.customerStartLatitude && window.customerStartLongitude && window.customerEndLatitude && window.customerEndLongitude) {
         //     sendCoordinatesToBackend(window.customerStartLatitude, window.customerStartLongitude, window.customerEndLatitude, window.customerEndLongitude);
         // }
@@ -82,11 +82,11 @@ function lockMarkerCustomer(marker, buttonId, startOrEnd) {
     });
 }
 
-// ·¢ËÍ×ø±êµ½ºó¶ËµÄº¯Êı
+// å‘é€åæ ‡åˆ°åç«¯çš„å‡½æ•°
 function sendCoordinatesToBackend(latitude, longitude, startOrEnd) {
     if (startOrEnd === 'start') {
         fetch('/Encrypt/customerSetStartCoordinate?startLatitude=' + latitude + '&startLongitude=' + longitude, {
-            method: 'GET', // »òÕß 'POST' Èç¹ûºó¶ËÆÚÍûPOSTÇëÇó
+            method: 'GET', // æˆ–è€… 'POST' å¦‚æœåç«¯æœŸæœ›POSTè¯·æ±‚
             headers: {
                 'Content-Type': 'application/json;charset=UTF-8'
             }
@@ -99,7 +99,7 @@ function sendCoordinatesToBackend(latitude, longitude, startOrEnd) {
             .catch(error => console.error('Error:', error));
     } else if (startOrEnd === 'end') {
         fetch('/Encrypt/customerSetEndCoordinate?endLatitude=' + latitude + '&endLongitude=' + longitude, {
-            method: 'GET', // »òÕß 'POST' Èç¹ûºó¶ËÆÚÍûPOSTÇëÇó
+            method: 'GET', // æˆ–è€… 'POST' å¦‚æœåç«¯æœŸæœ›POSTè¯·æ±‚
             headers: {
                 'Content-Type': 'application/json;charset=UTF-8'
             }
@@ -114,7 +114,7 @@ function sendCoordinatesToBackend(latitude, longitude, startOrEnd) {
 function driver1SendCoordinatesToBackend(startLatitude, startLongitude) {
     const logArea = document.getElementById('driver1LogArea');
     fetch('/Encrypt/traceDriver1Login?startLatitude=' + startLatitude + '&startLongitude=' + startLongitude, {
-        method: 'GET', // »òÕß 'POST' Èç¹ûºó¶ËÆÚÍûPOSTÇëÇó
+        method: 'GET', // æˆ–è€… 'POST' å¦‚æœåç«¯æœŸæœ›POSTè¯·æ±‚
         headers: {
             'Content-Type': 'application/json;charset=UTF-8'
         }
@@ -123,9 +123,9 @@ function driver1SendCoordinatesToBackend(startLatitude, startLongitude) {
         .then(data => {
 
             if (data.status === "ok") {
-                logArea.value += 'driver1·¢ËÍÎ»ÖÃĞÅÏ¢³É¹¦\n';
+                logArea.value += 'driver1å‘é€ä½ç½®ä¿¡æ¯æˆåŠŸ\n';
             } else if (data.status === "error") {
-                logArea.value += 'driver1·¢ËÍÎ»ÖÃĞÅÏ¢Ê§°Ü\n';
+                logArea.value += 'driver1å‘é€ä½ç½®ä¿¡æ¯å¤±è´¥\n';
             }
         })
         .catch(error => console.error('Error:', error));
@@ -143,30 +143,30 @@ function driver2SendCoordinatesToBackend(startLatitude, startLongitude) {
         .then(data => {
 
             if (data.status === "ok") {
-                logArea.value += 'driver2·¢ËÍÎ»ÖÃĞÅÏ¢³É¹¦\n';
+                logArea.value += 'driver2å‘é€ä½ç½®ä¿¡æ¯æˆåŠŸ\n';
             } else if (data.status === "error") {
-                logArea.value += 'driver2·¢ËÍÎ»ÖÃĞÅÏ¢Ê§°Ü\n';
+                logArea.value += 'driver2å‘é€ä½ç½®ä¿¡æ¯å¤±è´¥\n';
             }
         })
         .catch(error => console.error('Error:', error));
 }
 
-// ³õÊ¼»¯³Ë¿ÍµØÍ¼
+// åˆå§‹åŒ–ä¹˜å®¢åœ°å›¾
 var customerMap = initMap('customerMap', {center: [108.945, 34.285], zoom: 11});
 customerMap.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]));
 var startMarker = addDraggableMarker(customerMap, [108.945, 34.285], 'startCoord', 'http://webapi.amap.com/theme/v1.3/markers/n/start.png');
 var endMarker = addDraggableMarker(customerMap, [108.946, 34.285], 'endCoord', 'http://webapi.amap.com/theme/v1.3/markers/n/end.png');
-// ĞŞ¸Ä³õÊ¼»¯MarkerµÄµ÷ÓÃ
+// ä¿®æ”¹åˆå§‹åŒ–Markerçš„è°ƒç”¨
 lockMarkerCustomer(startMarker, 'lockStart', 'start');
 lockMarkerCustomer(endMarker, 'lockEnd', 'end');
 
-// ³õÊ¼»¯Ë¾»úµØÍ¼1
+// åˆå§‹åŒ–å¸æœºåœ°å›¾1
 var driverMap1 = initMap('driverMap1', {center: [108.945, 34.285], zoom: 11});
 driverMap1.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]))
 var driver1Marker = addDraggableMarker(driverMap1, [108.945, 34.285], 'driver1Coord', 'Default');
 lockMarkerDriver1(driver1Marker, 'lockDriver1');
 
-// ³õÊ¼»¯Ë¾»úµØÍ¼2
+// åˆå§‹åŒ–å¸æœºåœ°å›¾2
 var driverMap2 = initMap('driverMap2', {center: [108.945, 34.285], zoom: 11});
 driverMap2.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]));
 var driver2Marker = addDraggableMarker(driverMap2, [108.945, 34.285], 'driver2Coord', 'Default');
@@ -179,182 +179,182 @@ const driver1StopBtn = document.getElementById('driver1Stop');
 const driver2StopBtn = document.getElementById('driver2Stop');
 const cusReqBtn = document.getElementById('sendRequest');
 
-// ¼àÌı°´Å¥µã»÷ÊÂ¼ş
+// ç›‘å¬æŒ‰é’®ç‚¹å‡»äº‹ä»¶
 startButton.addEventListener('click', function () {
     const logArea = document.getElementById('serverLogArea');
-    // µ÷ÓÃAPI
+    // è°ƒç”¨API
     fetch('/Encrypt/serverStart', {
-        method: 'GET', // »òÕßÊÇ 'POST', È¡¾öÓÚAPIµÄÒªÇó
-        // ÕâÀï¿ÉÒÔÌí¼ÓÇëÇóÍ·²¿µÈĞÅÏ¢£¬Èç¹ûĞèÒªµÄ»°
+        method: 'GET', // æˆ–è€…æ˜¯ 'POST', å–å†³äºAPIçš„è¦æ±‚
+        // è¿™é‡Œå¯ä»¥æ·»åŠ è¯·æ±‚å¤´éƒ¨ç­‰ä¿¡æ¯ï¼Œå¦‚æœéœ€è¦çš„è¯
         headers: {
-            'Content-Type': 'application/json', // ¼ÙÉèAPIÆÚÍûJSON¸ñÊ½µÄÇëÇóÍ·
+            'Content-Type': 'application/json', // å‡è®¾APIæœŸæœ›JSONæ ¼å¼çš„è¯·æ±‚å¤´
         },
     })
-        .then(response => response.json()) // ´¦ÀíJSONÏìÓ¦
+        .then(response => response.json()) // å¤„ç†JSONå“åº”
         .then(data => {
-            // ¸ù¾İ·µ»ØÖµ¸üĞÂÈÕÖ¾ÇøÓò
+            // æ ¹æ®è¿”å›å€¼æ›´æ–°æ—¥å¿—åŒºåŸŸ
 
-            if (data.status === 'ok') { // ¼ÙÉè·µ»ØµÄJSON¶ÔÏó°üº¬Ò»¸öÃûÎªstatusµÄ×Ö¶Î
-                logArea.value += 'trace·şÎñÆ÷Æô¶¯³É¹¦\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            if (data.status === 'ok') { // å‡è®¾è¿”å›çš„JSONå¯¹è±¡åŒ…å«ä¸€ä¸ªåä¸ºstatusçš„å­—æ®µ
+                logArea.value += 'traceæœåŠ¡å™¨å¯åŠ¨æˆåŠŸ\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             } else if (data.status === 'error') {
-                logArea.value += 'trace·şÎñÆ÷Æô¶¯Ê§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+                logArea.value += 'traceæœåŠ¡å™¨å¯åŠ¨å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             }
         })
         .catch(error => {
-            console.error('ÇëÇóÊ§°Ü:', error);
-            // ´¦ÀíÇëÇóÊ§°ÜµÄÇé¿ö
-            logArea.value += 'trace·şÎñÆ÷Æô¶¯ÇëÇóÊ§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            console.error('è¯·æ±‚å¤±è´¥:', error);
+            // å¤„ç†è¯·æ±‚å¤±è´¥çš„æƒ…å†µ
+            logArea.value += 'traceæœåŠ¡å™¨å¯åŠ¨è¯·æ±‚å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
         });
 });
 
 stopButton.addEventListener('click', function () {
     const logArea = document.getElementById('serverLogArea');
-    // µ÷ÓÃAPI
+    // è°ƒç”¨API
     fetch('/Encrypt/serverStop', {
-        method: 'GET', // »òÕßÊÇ 'POST', È¡¾öÓÚAPIµÄÒªÇó
-        // ÕâÀï¿ÉÒÔÌí¼ÓÇëÇóÍ·²¿µÈĞÅÏ¢£¬Èç¹ûĞèÒªµÄ»°
+        method: 'GET', // æˆ–è€…æ˜¯ 'POST', å–å†³äºAPIçš„è¦æ±‚
+        // è¿™é‡Œå¯ä»¥æ·»åŠ è¯·æ±‚å¤´éƒ¨ç­‰ä¿¡æ¯ï¼Œå¦‚æœéœ€è¦çš„è¯
         headers: {
-            'Content-Type': 'application/json', // ¼ÙÉèAPIÆÚÍûJSON¸ñÊ½µÄÇëÇóÍ·
+            'Content-Type': 'application/json', // å‡è®¾APIæœŸæœ›JSONæ ¼å¼çš„è¯·æ±‚å¤´
         },
     })
-        .then(response => response.json()) // ´¦ÀíJSONÏìÓ¦
+        .then(response => response.json()) // å¤„ç†JSONå“åº”
         .then(data => {
-            // ¸ù¾İ·µ»ØÖµ¸üĞÂÈÕÖ¾ÇøÓò
+            // æ ¹æ®è¿”å›å€¼æ›´æ–°æ—¥å¿—åŒºåŸŸ
 
-            if (data.status === 'ok') { // ¼ÙÉè·µ»ØµÄJSON¶ÔÏó°üº¬Ò»¸öÃûÎªstatusµÄ×Ö¶Î
-                logArea.value += 'trace·şÎñÆ÷Í£Ö¹³É¹¦\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            if (data.status === 'ok') { // å‡è®¾è¿”å›çš„JSONå¯¹è±¡åŒ…å«ä¸€ä¸ªåä¸ºstatusçš„å­—æ®µ
+                logArea.value += 'traceæœåŠ¡å™¨åœæ­¢æˆåŠŸ\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             } else if (data.status === 'error') {
-                logArea.value += 'trace·şÎñÆ÷Í£Ö¹Ê§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+                logArea.value += 'traceæœåŠ¡å™¨åœæ­¢å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             }
         })
         .catch(error => {
-            console.error('ÇëÇóÊ§°Ü:', error);
-            // ´¦ÀíÇëÇóÊ§°ÜµÄÇé¿ö
+            console.error('è¯·æ±‚å¤±è´¥:', error);
+            // å¤„ç†è¯·æ±‚å¤±è´¥çš„æƒ…å†µ
 
-            logArea.value += 'trace·şÎñÆ÷Æô¶¯ÇëÇóÊ§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            logArea.value += 'traceæœåŠ¡å™¨å¯åŠ¨è¯·æ±‚å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
         });
 });
 
 customerStopBtn.addEventListener('click', function () {
     const logArea = document.getElementById('customerLogArea');
-    // µ÷ÓÃAPI
+    // è°ƒç”¨API
     fetch('/Encrypt/customerStop', {
-        method: 'GET', // »òÕßÊÇ 'POST', È¡¾öÓÚAPIµÄÒªÇó
-        // ÕâÀï¿ÉÒÔÌí¼ÓÇëÇóÍ·²¿µÈĞÅÏ¢£¬Èç¹ûĞèÒªµÄ»°
+        method: 'GET', // æˆ–è€…æ˜¯ 'POST', å–å†³äºAPIçš„è¦æ±‚
+        // è¿™é‡Œå¯ä»¥æ·»åŠ è¯·æ±‚å¤´éƒ¨ç­‰ä¿¡æ¯ï¼Œå¦‚æœéœ€è¦çš„è¯
         headers: {
-            'Content-Type': 'application/json', // ¼ÙÉèAPIÆÚÍûJSON¸ñÊ½µÄÇëÇóÍ·
+            'Content-Type': 'application/json', // å‡è®¾APIæœŸæœ›JSONæ ¼å¼çš„è¯·æ±‚å¤´
         },
     })
-        .then(response => response.json()) // ´¦ÀíJSONÏìÓ¦
+        .then(response => response.json()) // å¤„ç†JSONå“åº”
         .then(data => {
-            // ¸ù¾İ·µ»ØÖµ¸üĞÂÈÕÖ¾ÇøÓò
+            // æ ¹æ®è¿”å›å€¼æ›´æ–°æ—¥å¿—åŒºåŸŸ
 
-            if (data.status === 'ok') { // ¼ÙÉè·µ»ØµÄJSON¶ÔÏó°üº¬Ò»¸öÃûÎªstatusµÄ×Ö¶Î
-                logArea.value += 'customerÒÑÍ£Ö¹\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            if (data.status === 'ok') { // å‡è®¾è¿”å›çš„JSONå¯¹è±¡åŒ…å«ä¸€ä¸ªåä¸ºstatusçš„å­—æ®µ
+                logArea.value += 'customerå·²åœæ­¢\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
                 startMarker.setDraggable(true);
                 endMarker.setDraggable(true);
             } else if (data.status === 'error') {
-                logArea.value += 'customerÍ£Ö¹Ê§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+                logArea.value += 'customeråœæ­¢å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             }
         })
         .catch(error => {
-            console.error('ÇëÇóÊ§°Ü:', error);
-            // ´¦ÀíÇëÇóÊ§°ÜµÄÇé¿ö
-            logArea.value += 'customerÍ£Ö¹ÇëÇóÊ§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            console.error('è¯·æ±‚å¤±è´¥:', error);
+            // å¤„ç†è¯·æ±‚å¤±è´¥çš„æƒ…å†µ
+            logArea.value += 'customeråœæ­¢è¯·æ±‚å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
         });
 });
 
 driver1StopBtn.addEventListener('click', function () {
     const logArea = document.getElementById('driver1LogArea');
-    // µ÷ÓÃAPI
+    // è°ƒç”¨API
     fetch('/Encrypt/driver1Stop', {
-        method: 'GET', // »òÕßÊÇ 'POST', È¡¾öÓÚAPIµÄÒªÇó
-        // ÕâÀï¿ÉÒÔÌí¼ÓÇëÇóÍ·²¿µÈĞÅÏ¢£¬Èç¹ûĞèÒªµÄ»°
+        method: 'GET', // æˆ–è€…æ˜¯ 'POST', å–å†³äºAPIçš„è¦æ±‚
+        // è¿™é‡Œå¯ä»¥æ·»åŠ è¯·æ±‚å¤´éƒ¨ç­‰ä¿¡æ¯ï¼Œå¦‚æœéœ€è¦çš„è¯
         headers: {
-            'Content-Type': 'application/json', // ¼ÙÉèAPIÆÚÍûJSON¸ñÊ½µÄÇëÇóÍ·
+            'Content-Type': 'application/json', // å‡è®¾APIæœŸæœ›JSONæ ¼å¼çš„è¯·æ±‚å¤´
         },
     })
-        .then(response => response.json()) // ´¦ÀíJSONÏìÓ¦
+        .then(response => response.json()) // å¤„ç†JSONå“åº”
         .then(data => {
-            // ¸ù¾İ·µ»ØÖµ¸üĞÂÈÕÖ¾ÇøÓò
+            // æ ¹æ®è¿”å›å€¼æ›´æ–°æ—¥å¿—åŒºåŸŸ
 
-            if (data.status === 'ok') { // ¼ÙÉè·µ»ØµÄJSON¶ÔÏó°üº¬Ò»¸öÃûÎªstatusµÄ×Ö¶Î
-                logArea.value += 'driver1ÒÑÍ£Ö¹\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            if (data.status === 'ok') { // å‡è®¾è¿”å›çš„JSONå¯¹è±¡åŒ…å«ä¸€ä¸ªåä¸ºstatusçš„å­—æ®µ
+                logArea.value += 'driver1å·²åœæ­¢\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
                 driver1Marker.setDraggable(true);
             } else if (data.status === 'error') {
-                logArea.value += 'driver1Í£Ö¹Ê§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+                logArea.value += 'driver1åœæ­¢å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             }
         })
         .catch(error => {
-            console.error('ÇëÇóÊ§°Ü:', error);
-            // ´¦ÀíÇëÇóÊ§°ÜµÄÇé¿ö
+            console.error('è¯·æ±‚å¤±è´¥:', error);
+            // å¤„ç†è¯·æ±‚å¤±è´¥çš„æƒ…å†µ
 
-            logArea.value += 'driver1Í£Ö¹ÇëÇóÊ§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            logArea.value += 'driver1åœæ­¢è¯·æ±‚å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
         });
 });
 driver2StopBtn.addEventListener('click', function () {
     const logArea = document.getElementById('driver2LogArea');
-    // µ÷ÓÃAPI
+    // è°ƒç”¨API
     fetch('/Encrypt/driver2Stop', {
-        method: 'GET', // »òÕßÊÇ 'POST', È¡¾öÓÚAPIµÄÒªÇó
-        // ÕâÀï¿ÉÒÔÌí¼ÓÇëÇóÍ·²¿µÈĞÅÏ¢£¬Èç¹ûĞèÒªµÄ»°
+        method: 'GET', // æˆ–è€…æ˜¯ 'POST', å–å†³äºAPIçš„è¦æ±‚
+        // è¿™é‡Œå¯ä»¥æ·»åŠ è¯·æ±‚å¤´éƒ¨ç­‰ä¿¡æ¯ï¼Œå¦‚æœéœ€è¦çš„è¯
         headers: {
-            'Content-Type': 'application/json', // ¼ÙÉèAPIÆÚÍûJSON¸ñÊ½µÄÇëÇóÍ·
+            'Content-Type': 'application/json', // å‡è®¾APIæœŸæœ›JSONæ ¼å¼çš„è¯·æ±‚å¤´
         },
     })
-        .then(response => response.json()) // ´¦ÀíJSONÏìÓ¦
+        .then(response => response.json()) // å¤„ç†JSONå“åº”
         .then(data => {
-            // ¸ù¾İ·µ»ØÖµ¸üĞÂÈÕÖ¾ÇøÓò
+            // æ ¹æ®è¿”å›å€¼æ›´æ–°æ—¥å¿—åŒºåŸŸ
 
-            if (data.status === 'ok') { // ¼ÙÉè·µ»ØµÄJSON¶ÔÏó°üº¬Ò»¸öÃûÎªstatusµÄ×Ö¶Î
-                logArea.value += 'driver2ÒÑÍ£Ö¹\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            if (data.status === 'ok') { // å‡è®¾è¿”å›çš„JSONå¯¹è±¡åŒ…å«ä¸€ä¸ªåä¸ºstatusçš„å­—æ®µ
+                logArea.value += 'driver2å·²åœæ­¢\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
                 driver2Marker.setDraggable(true);
             } else if (data.status === 'error') {
-                logArea.value += 'driver2Í£Ö¹Ê§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+                logArea.value += 'driver2åœæ­¢å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             }
         })
         .catch(error => {
-            console.error('ÇëÇóÊ§°Ü:', error);
-            // ´¦ÀíÇëÇóÊ§°ÜµÄÇé¿ö
-            logArea.value += 'driver2Í£Ö¹ÇëÇóÊ§°Ü\n'; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            console.error('è¯·æ±‚å¤±è´¥:', error);
+            // å¤„ç†è¯·æ±‚å¤±è´¥çš„æƒ…å†µ
+            logArea.value += 'driver2åœæ­¢è¯·æ±‚å¤±è´¥\n'; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
         });
 });
 
 cusReqBtn.addEventListener('click', function () {
     const logArea = document.getElementById('customerLogArea');
-    // µ÷ÓÃAPI
+    // è°ƒç”¨API
     fetch('/Encrypt/traceCustomerLogin', {
-        method: 'GET', // »òÕßÊÇ 'POST', È¡¾öÓÚAPIµÄÒªÇó
-        // ÕâÀï¿ÉÒÔÌí¼ÓÇëÇóÍ·²¿µÈĞÅÏ¢£¬Èç¹ûĞèÒªµÄ»°
+        method: 'GET', // æˆ–è€…æ˜¯ 'POST', å–å†³äºAPIçš„è¦æ±‚
+        // è¿™é‡Œå¯ä»¥æ·»åŠ è¯·æ±‚å¤´éƒ¨ç­‰ä¿¡æ¯ï¼Œå¦‚æœéœ€è¦çš„è¯
         headers: {
-            'Content-Type': 'application/json', // ¼ÙÉèAPIÆÚÍûJSON¸ñÊ½µÄÇëÇóÍ·
+            'Content-Type': 'application/json', // å‡è®¾APIæœŸæœ›JSONæ ¼å¼çš„è¯·æ±‚å¤´
         },
     })
-        .then(response => response.json()) // ´¦ÀíJSONÏìÓ¦
+        .then(response => response.json()) // å¤„ç†JSONå“åº”
         .then(data => {
-            // ¸ù¾İ·µ»ØÖµ¸üĞÂÈÕÖ¾ÇøÓò
+            // æ ¹æ®è¿”å›å€¼æ›´æ–°æ—¥å¿—åŒºåŸŸ
 
-            if (data.status === 'ok') { // ¼ÙÉè·µ»ØµÄJSON¶ÔÏó°üº¬Ò»¸öÃûÎªstatusµÄ×Ö¶Î
-                logArea.value += "customer³É¹¦·¢ËÍ´ò³µÇëÇó\n";
+            if (data.status === 'ok') { // å‡è®¾è¿”å›çš„JSONå¯¹è±¡åŒ…å«ä¸€ä¸ªåä¸ºstatusçš„å­—æ®µ
+                logArea.value += "customeræˆåŠŸå‘é€æ‰“è½¦è¯·æ±‚\n";
                 logArea.scrollTop = logArea.scrollHeight;
 
             } else if (data.status === 'error') {
-                logArea.value += "customer·¢ËÍ´ò³µÇëÇóÊ§°Ü\n"; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+                logArea.value += "customerå‘é€æ‰“è½¦è¯·æ±‚å¤±è´¥\n"; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
             }
         })
         .catch(error => {
-            console.error('ÇëÇóÊ§°Ü:', error);
-            // ´¦ÀíÇëÇóÊ§°ÜµÄÇé¿ö
+            console.error('è¯·æ±‚å¤±è´¥:', error);
+            // å¤„ç†è¯·æ±‚å¤±è´¥çš„æƒ…å†µ
 
-            logArea.value += "customer·¢ËÍ´ò³µÇëÇóÊ§°Ü\n"; // Ìí¼ÓÒ»ĞĞÈÕÖ¾
+            logArea.value += "customerå‘é€æ‰“è½¦è¯·æ±‚å¤±è´¥\n"; // æ·»åŠ ä¸€è¡Œæ—¥å¿—
         });
 });
 
-let pollingInterval; // ÒÆµ½ÍâÃæÒÔ±ã¿ØÖÆ¿ªÊ¼ºÍÍ£Ö¹
-let counter = 0; // ¼ÆÊıÆ÷Ò²Ó¦¸ÃÔÚÍâÃæÒÔ±£³Ö×´Ì¬
+let pollingInterval; // ç§»åˆ°å¤–é¢ä»¥ä¾¿æ§åˆ¶å¼€å§‹å’Œåœæ­¢
+let counter = 0; // è®¡æ•°å™¨ä¹Ÿåº”è¯¥åœ¨å¤–é¢ä»¥ä¿æŒçŠ¶æ€
 
 function pollServerForStatus() {
-    if (!pollingInterval) { // È·±£ÂÖÑ¯Ö»±»Æô¶¯Ò»´Î
+    if (!pollingInterval) { // ç¡®ä¿è½®è¯¢åªè¢«å¯åŠ¨ä¸€æ¬¡
         pollingInterval = setInterval(() => {
             fetch('/Encrypt/orderResult')
                 .then(response => response.json())
@@ -362,13 +362,13 @@ function pollServerForStatus() {
                     let customerLogArea = document.getElementById('customerLogArea');
                     if (data.status === 'ok') {
                         clearInterval(pollingInterval);
-                        pollingInterval = null; // ÖØÖÃÂÖÑ¯¼ä¸ô¿ØÖÆ±äÁ¿
+                        pollingInterval = null; // é‡ç½®è½®è¯¢é—´éš”æ§åˆ¶å˜é‡
                         customerLogArea.value += data.message + "\n";
                     } else if (data.status === "error") {
                         if (counter >= 5) {
                             clearInterval(pollingInterval);
-                            pollingInterval = null; // ÖØÖÃÂÖÑ¯¼ä¸ô¿ØÖÆ±äÁ¿
-                            customerLogArea.value += "Ñ°ÕÒË¾»úÊ§°Ü" + "\n";
+                            pollingInterval = null; // é‡ç½®è½®è¯¢é—´éš”æ§åˆ¶å˜é‡
+                            customerLogArea.value += "å¯»æ‰¾å¸æœºå¤±è´¥" + "\n";
                         } else {
                             customerLogArea.value += data.message + "\n";
                             counter++;

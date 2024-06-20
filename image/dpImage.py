@@ -4,11 +4,15 @@ from scipy.stats import matrix_normal
 import cv2
 import sys
 
+
 def coder_distance(eps, x, z):
     hist_x, _ = np.histogram(x, bins=1024)
     hist_z, _ = np.histogram(z, bins=1024)
-    d = np.linalg.norm(x - z) / (np.prod(x.shape)) + distance.jensenshannon(hist_x, hist_z)
+    d = np.linalg.norm(x - z) / (np.prod(x.shape)) + distance.jensenshannon(
+        hist_x, hist_z
+    )
     return np.exp(-eps * d)
+
 
 def add_noise(img, eps):
     distra = matrix_normal(mean=img)
@@ -23,6 +27,7 @@ def add_noise(img, eps):
             break
 
     return noisy_img
+
 
 def gray_to_color(src, src_gray):
     B = src[:, :, 0]
@@ -41,6 +46,7 @@ def gray_to_color(src, src_gray):
 
     return src_new
 
+
 def main(file_path, selection):
     params = [1.0, 0.5, 0.1]
     img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
@@ -57,7 +63,13 @@ def main(file_path, selection):
         arr3_noise = add_noise(arr3, params[selection])
 
         return np.concatenate(
-            (arr1_noise[:, :, np.newaxis], arr2_noise[:, :, np.newaxis], arr3_noise[:, :, np.newaxis]), axis=2)
+            (
+                arr1_noise[:, :, np.newaxis],
+                arr2_noise[:, :, np.newaxis],
+                arr3_noise[:, :, np.newaxis],
+            ),
+            axis=2,
+        )
 
 
 if __name__ == "__main__":

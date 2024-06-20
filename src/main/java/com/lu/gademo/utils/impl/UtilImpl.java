@@ -1,6 +1,7 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.Util;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
+@Slf4j
 @Component
 public class UtilImpl implements Util {
     @Override
@@ -35,7 +37,7 @@ public class UtilImpl implements Util {
             InetAddress localhost = InetAddress.getLocalHost();
             return localhost.getHostAddress();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -55,16 +57,16 @@ public class UtilImpl implements Util {
             //System.out.println(Arrays.toString(hashBytes));
 
             // Convert the byte array to a hexadecimal string representation
-            StringBuilder sb = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
             for (byte hashByte : hashBytes) {
                 String hex = String.format("%02x", hashByte);
-                sb.append(hex);
+                stringBuilder.append(hex);
             }
 
             //return sb.toString();
             return Arrays.toString(hashBytes);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }

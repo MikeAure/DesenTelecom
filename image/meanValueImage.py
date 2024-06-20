@@ -2,6 +2,7 @@
 import sys
 import cv2
 
+
 def mean_filter(input_image_path, output_file, kernel_size):
     # 读取图片
     image = cv2.imread(input_image_path)

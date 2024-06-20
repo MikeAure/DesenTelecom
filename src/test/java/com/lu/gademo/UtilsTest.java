@@ -2,6 +2,8 @@ package com.lu.gademo;
 
 
 import com.lu.gademo.utils.impl.UtilImpl;
+import org.deidentifier.arx.*;
+import org.deidentifier.arx.criteria.KAnonymity;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -9,10 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,5 +108,57 @@ public class UtilsTest {
 
         Double max = Collections.max(content);
         System.out.println(max);
+    }
+
+    @Test
+    void testArx() throws IOException {
+        // Define data
+        Data.DefaultData data = Data.create();
+        data.add("age", "gender", "zipcode");
+        data.add("34", "male", "81667");
+        data.add("45", "female", "81675");
+        data.add("66", "male", "81925");
+        data.add("70", "female", "81931");
+        data.add("34", "female", "81931");
+        data.add("70", "male", "81931");
+        data.add("45", "male", "81931");
+
+        // Define hierarchies
+        AttributeType.Hierarchy.DefaultHierarchy age = AttributeType.Hierarchy.create();
+        age.add("34", "<50", "*");
+        age.add("45", "<50", "*");
+        age.add("66", ">=50", "*");
+        age.add("70", ">=50", "*");
+
+        AttributeType.Hierarchy.DefaultHierarchy gender = AttributeType.Hierarchy.create();
+        gender.add("male", "*");
+        gender.add("female", "*");
+
+        // Only excerpts for readability
+        AttributeType.Hierarchy.DefaultHierarchy zipcode = AttributeType.Hierarchy.create();
+        zipcode.add("81667", "8166*", "816**", "81***", "8****", "*****");
+        zipcode.add("81675", "8167*", "816**", "81***", "8****", "*****");
+        zipcode.add("81925", "8192*", "819**", "81***", "8****", "*****");
+        zipcode.add("81931", "8193*", "819**", "81***", "8****", "*****");
+
+        data.getDefinition().setAttributeType("age", age);
+        data.getDefinition().setAttributeType("gender", gender);
+        data.getDefinition().setAttributeType("zipcode", zipcode);
+
+        // Create an instance of the anonymizer
+        ARXAnonymizer anonymizer = new ARXAnonymizer();
+        ARXConfiguration config = ARXConfiguration.create();
+        config.addPrivacyModel(new KAnonymity(3));
+        config.setSuppressionLimit(0d);
+
+        ARXResult result = anonymizer.anonymize(data, config);
+
+        System.out.println(" - Transformed data:");
+        Iterator<String[]> transformed = result.getOutput(false).iterator();
+        while (transformed.hasNext()) {
+            System.out.print("   ");
+            System.out.println(Arrays.toString(transformed.next()));
+        }
+
     }
 }

@@ -3,6 +3,7 @@ package com.lu.gademo.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.utils.Util;
 import com.lu.gademo.utils.impl.UtilImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+@Slf4j
 @RestController
 @RequestMapping("/audioMatch")
 public class AudioMatchController {
@@ -34,7 +36,7 @@ public class AudioMatchController {
         } else {
             this.python = "python";
         }
-        System.out.println(this.python);
+//        System.out.println(this.python);
         // 当前路径
         this.directory = new File("");
         this.currentPath = directory.getAbsolutePath();
@@ -73,7 +75,7 @@ public class AudioMatchController {
             rawFilePath = saveFile(file);
             System.out.println(rawFilePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return new ServerResponse("error", "Save file failed");
         }
         // Invoke Python script to verify if the user has signed up
@@ -103,7 +105,7 @@ public class AudioMatchController {
             final ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(line, ServerResponse.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return new ServerResponse("error", "Server returns message error");
         }
     }
@@ -116,7 +118,7 @@ public class AudioMatchController {
             rawFilePath = saveFile(file);
             System.out.println(rawFilePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return new ServerResponse("error", "Save file failed");
         }
         // Invoke Python script to verify if the user has signed up
@@ -146,7 +148,7 @@ public class AudioMatchController {
             final ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(line, ServerResponse.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return new ServerResponse("error", "Server returns message error");
         }
 

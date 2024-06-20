@@ -18,6 +18,7 @@ def get_spans(data, partition, scale=None):
         spans[column] = span
     return spans
 
+
 def split(data, partition, column):
     data_pt = data[column][partition]
     if column in category:  # 类别型数据根据类别长度的中位值分为两个子集合
@@ -67,6 +68,7 @@ def agg_category_column(series):
 
 def agg_numerical_column(series):
     return series.mean()
+
 
 def build_anonymized_dataset(data, partitions, quasi_id, sensitive, max_partitions=None):
     rows = []

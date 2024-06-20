@@ -1,4 +1,4 @@
-package com.lu.gademo.log;
+package com.lu.gademo.model;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;

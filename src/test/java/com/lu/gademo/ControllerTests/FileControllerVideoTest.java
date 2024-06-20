@@ -53,14 +53,16 @@ public class FileControllerVideoTest {
     @Test
     public void imageControllerMeanValueVideoTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(videoFile)
-                        .param("params", PARAMS)
-                        .param("algName", "meanValueVideo")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(videoFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "meanValueVideo")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -68,14 +70,16 @@ public class FileControllerVideoTest {
     @Test
     public void imageControllerPixelateVideoTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(videoFile)
-                        .param("params", PARAMS)
-                        .param("algName", "pixelate_video")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(videoFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "pixelate_video")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -84,14 +88,16 @@ public class FileControllerVideoTest {
     public void imageControllerGaussianBlurVideoTest() throws Exception {
 
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
                             .file(videoFile)
-                        .param("params", PARAMS)
-                        .param("algName", "gaussian_blur_video")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+                            .param("params", String.valueOf(i))
+                            .param("algName", "gaussian_blur_video")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -99,14 +105,16 @@ public class FileControllerVideoTest {
     @Test
     public void imageControllerBoxBlurVideoTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(videoFile)
-                        .param("params", PARAMS)
-                        .param("algName", "box_blur_video")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(videoFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "box_blur_video")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -114,14 +122,16 @@ public class FileControllerVideoTest {
     @Test
     public void imageControllerReplaceRegionVideoTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(videoFile)
-                        .param("params", PARAMS)
-                        .param("algName", "replace_region_video")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(videoFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "replace_region_video")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -129,46 +139,48 @@ public class FileControllerVideoTest {
     @Test
     public void imageControllerVideoAddColorOffsetTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(videoFile)
-                        .param("params", PARAMS)
-                        .param("algName", "video_add_color_offset")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(videoFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "video_add_color_offset")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
 
-    // 视频背景替换算法
-//    @Test
-//    public void imageControllerVideoRemoveBgTest() throws Exception {
-//        // 模拟multipart/form-data请求
-//        mvc.perform(multipart(URL) // 使用你的实际请求路径
-//                        .file(videoFile)
-//                        .param("params", PARAMS)
-//                        .param("algName", "video_remove_bg")
-//                        .param("sheet", SHEET))
-//                .andExpect(status().isOk())
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//
-//    }
-//
-//    // 视频人脸替换算法
-//    @Test
-//    public void imageControllerVideoFaceSubTest() throws Exception {
-//        // 模拟multipart/form-data请求
-//        mvc.perform(multipart(URL) // 使用你的实际请求路径
-//                        .file(videoFile)
-//                        .param("params", PARAMS)
-//                        .param("algName", "video_face_sub")
-//                        .param("sheet", SHEET))
-//                .andExpect(status().isOk())
-//                .andDo(MockMvcResultHandlers.print())
-//                .andReturn();
-//
-//    }
+//     视频背景替换算法
+    @Test
+    public void imageControllerVideoRemoveBgTest() throws Exception {
+        // 模拟multipart/form-data请求
+            mvc.perform(multipart("/File/removeBackground") // 使用你的实际请求路径
+                            .file(videoFile)
+                            .file(faceImageFile)
+                            .param("params", PARAMS)
+                            .param("algName", "video_remove_bg"))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+
+    }
+
+    // 视频人脸替换算法
+    @Test
+    public void imageControllerVideoFaceSubTest() throws Exception {
+        // 模拟multipart/form-data请求
+            mvc.perform(multipart("/File/replaceFaceVideo") // 使用你的实际请求路径
+                            .file(videoFile)
+                            .file(faceImageFile)
+                            .param("params", PARAMS)
+                            .param("algName", "video_face_sub"))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print()).andReturn();
+
+
+    }
 
 }

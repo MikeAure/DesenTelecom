@@ -8,11 +8,10 @@ import com.lu.gademo.entity.effectEva.SendEvaReq;
 import com.lu.gademo.entity.evidence.ReqEvidenceSave;
 import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
 import com.lu.gademo.entity.ruleCheck.SendRuleReq;
-import com.lu.gademo.log.SendData;
+import com.lu.gademo.model.SendData;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.utils.*;
-import com.lu.gademo.utils.impl.DpUtilImpl;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -40,6 +39,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.collections4.CollectionUtils.collect;
+
 @Slf4j
 @Service
 @Data
@@ -58,6 +59,8 @@ public class FileServiceImpl implements FileService {
     private SendData sendData;
 
     private ExcelParamService excelParamService;
+
+    private final DpUtil dpUtil;
     // 工具类
 
     private Util util;
@@ -69,7 +72,6 @@ public class FileServiceImpl implements FileService {
     private Integer evidenceRequestSubCommand;
 
     private Integer evidenceRequestMsgVersion;
-
 
     private Integer evidenceSubmitMainCommand;
 
@@ -86,10 +88,18 @@ public class FileServiceImpl implements FileService {
     private Path rawFileDirectory;
     private Path desenFileDirectory;
 
+    private <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
+        return  algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
+                .stream()
+                .map(item -> item != null ? (T) item : null)
+                .collect(Collectors.toList());
+    }
+
     @Autowired
     public FileServiceImpl(AlgorithmsFactory algorithmsFactory, Dp dp,
                            Replace replacement, Generalization generalization, Anonymity anonymity,
                            SendData sendData, Util util, ExcelParamService excelParamService,
+                           DpUtil dpUtil,
                            @Value("${systemId.desenToolsetSystemId}") int systemID,
                            @Value("${evidenceSystem.evidenceRequest.mainCommand}") Integer evidenceRequestMainCommand,
                            @Value("${evidenceSystem.evidenceRequest.subCommand}") Integer evidenceRequestSubCommand,
@@ -105,6 +115,7 @@ public class FileServiceImpl implements FileService {
         this.sendData = sendData;
         this.util = util;
         this.excelParamService = excelParamService;
+        this.dpUtil = dpUtil;
         this.systemID = systemID;
         this.evidenceRequestMainCommand = evidenceRequestMainCommand;
         this.evidenceRequestSubCommand = evidenceRequestSubCommand;
@@ -441,6 +452,7 @@ public class FileServiceImpl implements FileService {
 
         // 保存源文件
         file.transferTo(rawFilePath.toAbsolutePath());
+
         // 设置脱敏后文件路径信息
         String desenFileName = "desen_" + rawFileName;
         Path desenFilePath = desenFileDirectory.resolve(desenFileName);
@@ -450,8 +462,8 @@ public class FileServiceImpl implements FileService {
         //脱敏参数处理,转为json
         List<ExcelParam> excelParamList = jsonStringToParams(params);
         // 保存参数到数据库中
-//        excelParamService.deleteAll(sheetName + "_param");
-//        excelParamService.insertAll(sheetName + "_param", excelParamList);
+        excelParamService.deleteAll(sheetName + "_param");
+        excelParamService.insertAll(sheetName + "_param", excelParamList);
 
         // 保存脱敏后文件
         // 脱敏文件路径
@@ -468,7 +480,7 @@ public class FileServiceImpl implements FileService {
         // 数据类型
         List<Integer> dataType = new ArrayList<>();
         // 工具类
-        DpUtil dpUtil = new DpUtilImpl();
+        // 唯一一处使用DpUtil的位置
         // 数据行数
         int totalRowNum = sheet.getLastRowNum();
         // 字段名行
@@ -553,13 +565,10 @@ public class FileServiceImpl implements FileService {
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("添加差分隐私Laplace噪声,");
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
-                            datas = algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
-                                    .stream()
-                                    .map(item -> item != null ? (Double) item : null)
-                                    .collect(Collectors.toList());
+                            datas = getDsList(algorithmInfo, rawData, excelParam);
                             if (columnName.contains("年龄")) {
                                 datas = datas.stream()
-                                        .map(item -> item instanceof Double ? Math.floor(item) : null)
+                                        .map(item -> item != null ? Math.floor(item) : null)
                                         .collect(Collectors.toList());
                             }
                             // 写列数据
@@ -583,7 +592,7 @@ public class FileServiceImpl implements FileService {
                                     .collect(Collectors.toList());
                             if (columnName.contains("年龄")) {
                                 datas = datas.stream()
-                                        .map(item -> item instanceof Double ? Math.floor(item) : null)
+                                        .map(item -> item != null ? Math.floor(item) : null)
                                         .collect(Collectors.toList());
                             }
                             // 写列数据
@@ -607,7 +616,7 @@ public class FileServiceImpl implements FileService {
                                     .collect(Collectors.toList());
                             if (columnName.contains("年龄")) {
                                 datas = datas.stream()
-                                        .map(item -> item instanceof Double ? Math.floor(item) : null)
+                                        .map(item -> item != null ? Math.floor(item) : null)
                                         .collect(Collectors.toList());
                             }
                             // 写列数据
@@ -936,7 +945,6 @@ public class FileServiceImpl implements FileService {
                 sheetName, rawFileSuffix, desenCom);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode effectEvaContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReq));
         // 发送方法
         executorService.submit(() -> {
             sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
@@ -1199,13 +1207,13 @@ public class FileServiceImpl implements FileService {
             // 脱敏级别
             infoBuilders.desenLevel.append(4);
         } else {
-            int paramIndex = Integer.parseInt(desenParam);
+            int paramInteger = Integer.parseInt(desenParam);
             List<Object> param = algorithmInfo.getParams();
-            algorithmInfo.execute(desenObj, paramIndex);
+            algorithmInfo.execute(desenObj, paramInteger);
             // 脱敏参数
-            infoBuilders.desenAlgParam.append(param.get(paramIndex));
+            infoBuilders.desenAlgParam.append(param.get(paramInteger));
             // 脱敏级别
-            infoBuilders.desenLevel.append(paramIndex + 1);
+            infoBuilders.desenLevel.append(paramInteger + 1);
 
         }
         // 结束时间
@@ -1438,10 +1446,6 @@ public class FileServiceImpl implements FileService {
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();// 读取文件
         InputStream inputStream = file.getInputStream();
 
-        //脱敏参数处理,转为json
-        ObjectMapper objectMapper = new ObjectMapper();
-
-
         // 脱敏参数
         String privacyLevel = String.valueOf(params.charAt(params.length() - 1));
         int[] k_anonymity_param = new int[]{5, 10, 20};
@@ -1605,7 +1609,7 @@ public class FileServiceImpl implements FileService {
         // 数据类型
         List<Integer> dataType = new ArrayList<>();
         // 工具类
-        DpUtil dpUtil = new DpUtilImpl();
+//        DpUtil dpUtil = new DpUtilImpl();
         // 数据行数
         int totalRowNum = sheet.getLastRowNum();
         // 字段名行
@@ -1647,7 +1651,7 @@ public class FileServiceImpl implements FileService {
                     objs.add(cell);
                 }
             }
-            AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+            AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName.trim());
             DSObject dsObject = new DSObject(objs);
 
             switch (algName.trim()) {
@@ -1664,8 +1668,7 @@ public class FileServiceImpl implements FileService {
 
                     List<Date> dates = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Date)
-                            .map(obj -> (Date) obj)
+                            .map(obj -> obj == null ? null : (Date) obj)
                             .collect(Collectors.toList());
 
                     util.write2Excel(sheet, totalRowNum, colIndex, dates);
@@ -1684,8 +1687,8 @@ public class FileServiceImpl implements FileService {
 
                     List<String> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof String)
-                            .map(obj -> (String) obj)
+
+                            .map(obj -> obj == null ? null : (String) obj)
                             .collect(Collectors.toList());
 
 
@@ -1704,10 +1707,9 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("添加差分隐私Laplace噪声,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
                     // 脱敏
-                    List<Double> datas = algorithmInfo.execute(dsObject, 1, param).getList()
+                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+                            .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
                     if (colName.contains("年龄")) {
                         datas = datas.stream().map(Math::floor).collect(Collectors.toList());
@@ -1727,12 +1729,11 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenAlgParam.append(map.get(param));
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("添加差分隐私高斯噪声,");
-                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    infoBuilders.desenAlg.append(4);
 
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<Double> datas = dp.service(dsObject, 27, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+                            .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
                     if (colName.contains("年龄")) {
                         datas = datas.stream().map(Math::floor).collect(Collectors.toList());
@@ -1753,8 +1754,7 @@ public class FileServiceImpl implements FileService {
 
                     List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+                            .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
                     if (colName.contains("年龄")) {
                         datas = datas.stream().map(Math::floor).collect(Collectors.toList());
@@ -1775,8 +1775,8 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
                     List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+//                            .filter(obj -> obj instanceof Double)
+                            .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
                     if (colName.contains("年龄")) {
                         datas = datas.stream().map(Math::floor).collect(Collectors.toList());
@@ -1796,8 +1796,7 @@ public class FileServiceImpl implements FileService {
 
                     List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+                            .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
                     if (colName.contains("年龄")) {
                         datas = datas.stream().map(Math::floor).collect(Collectors.toList());
@@ -1818,8 +1817,7 @@ public class FileServiceImpl implements FileService {
 
                     List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+                            .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
                     util.write2Excel(sheet, totalRowNum, colIndex, datas);
@@ -1835,8 +1833,7 @@ public class FileServiceImpl implements FileService {
                     } else {
                         List<Integer> datas = algorithmInfo.execute(dsObject, param).getList()
                                 .stream()
-                                .filter(obj -> obj instanceof Integer)
-                                .map(obj -> (Integer) obj)
+                                .map(obj -> obj == null ? null : (Integer) obj)
                                 .collect(Collectors.toList());
                         util.write2Excel(sheet, totalRowNum, colIndex, datas);
                     }
@@ -1849,8 +1846,7 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
                     List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+                            .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
                     util.write2Excel(sheet, totalRowNum, colIndex, datas);
@@ -1861,10 +1857,9 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("截断,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<String> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof Double)
-                            .map(obj -> (Double) obj)
+                            .map(obj -> (String) obj)
                             .collect(Collectors.toList());
 
                     util.write2Excel(sheet, totalRowNum, colIndex, datas);
@@ -1885,8 +1880,8 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
                     List<String> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof String)
-                            .map(obj -> (String) obj)
+//                            .filter(obj -> obj instanceof String)
+                            .map(obj -> obj == null ? null : (String) obj)
                             .collect(Collectors.toList());
 
                     util.write2Excel(sheet, totalRowNum, colIndex, datas);
@@ -1903,8 +1898,8 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
                     List<String> datas = algorithmInfo.execute(dsObject, param).getList()
                             .stream()
-                            .filter(obj -> obj instanceof String)
-                            .map(obj -> (String) obj)
+//                            .filter(obj -> obj instanceof String)
+                            .map(obj -> obj == null ? null : (String) obj)
                             .collect(Collectors.toList());
 
                     util.write2Excel(sheet, totalRowNum, colIndex, datas);
@@ -2211,7 +2206,7 @@ public class FileServiceImpl implements FileService {
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         // 脱敏算法
-        infoBuilders.desenAlg.append(48);
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("image");
         // 脱敏后类型
@@ -2398,7 +2393,6 @@ public class FileServiceImpl implements FileService {
         SendRuleReq sendRuleReq = buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-        ObjectNode ruleCheckContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendRuleReq));
 
         executorService.submit(() -> {
             sendData.send2RuleCheck(sendRuleReq);
@@ -2451,8 +2445,6 @@ public class FileServiceImpl implements FileService {
                 break;
             }
 
-            case "laplaceToValue":
-            case "gaussianToValue":
             case "randomLaplaceToValue":
             case "randomUniformToValue":
             case "randomGaussianToValue":
@@ -2462,6 +2454,21 @@ public class FileServiceImpl implements FileService {
                 double val = Double.parseDouble(textInput);
                 DSObject rawVal = new DSObject(Collections.singletonList(val));
                 result = algorithmInfo.execute(rawVal, param).getList().get(0) + "";
+                break;
+            }
+
+            case "laplaceToValue":
+            case "gaussianToValue":{
+                List<Double> val = Arrays.stream(textInput.split(","))
+                        .map(x -> x == null ? null : Double.parseDouble(x))
+                        .collect(Collectors.toList());
+                DSObject rawVal = new DSObject(val);
+                StringBuilder builder = new StringBuilder();
+                List<?> temp = algorithmInfo.execute(rawVal, param).getList();
+                for (Object elem : temp) {
+                    builder.append(elem.toString()).append(",");
+                }
+                result = builder.substring(0, builder.length() - 1);
                 break;
             }
             case "dpDate":

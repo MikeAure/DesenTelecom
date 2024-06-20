@@ -1,4 +1,4 @@
-package com.lu.gademo.log;
+package com.lu.gademo.model;
 
 import lombok.Data;
 import org.springframework.stereotype.Service;

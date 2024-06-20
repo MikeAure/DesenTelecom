@@ -59,8 +59,8 @@
 <script>
 
     // 初始化map
-    var lnglat = new AMap.LngLat(116.326936, 40.003213);
-    var map = new AMap.Map("mapid", {
+    let lnglat = new AMap.LngLat(116.326936, 40.003213);
+    let map = new AMap.Map("mapid", {
         resizeEnable: true,  // 自适应地图容器变化
         center: lnglat,      // 地图中心点坐标
         key: "9017e2042639d8873323dcd7d7539611",
@@ -74,7 +74,7 @@
         zoom: 14
     });
     // 路径
-    var line = "B000A863SV,141300;B000A84SLI,120201;";
+    let line = "B000A863SV,141300;B000A84SLI,120201;";
 
     // 分割每个点
     let points = line.split(';');
@@ -112,7 +112,7 @@
                 // 判断是否已经获取到全部的经纬度信息
                 if (path.length === points.length) {
                     // 创建折线实例
-                    var polyline = new AMap.Polyline({
+                    let polyline = new AMap.Polyline({
                         path: path,
                         isOutline: true,
                         outlineColor: '#ffeeff',

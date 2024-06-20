@@ -1,4 +1,4 @@
-package com.lu.gademo.log;
+package com.lu.gademo.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -21,7 +21,7 @@ def selectR(n, l):
 def DPfun(x, n, l):
     u = selectU(n)
     r = selectR(n, 1 / l)
-    print("半径长度：", r)
+    print("半径长度 length: ", r)
     randx = x + u * r
     # randx=randx/np.linalg.norm(randx,keepdims=True)
     return randx

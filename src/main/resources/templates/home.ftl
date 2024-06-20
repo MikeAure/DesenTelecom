@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="${ctx!}/css/multiple-select.min.css">
     <link rel="stylesheet" type="text/css" href="${ctx!}/css/GA.css">
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
+    <link rel="shortcut icon" href="${ctx!}/favicon.ico">
 
 </head>
 <body>

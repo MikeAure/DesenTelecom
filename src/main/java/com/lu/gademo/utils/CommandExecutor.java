@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -29,10 +30,10 @@ public class CommandExecutor {
                 p = Runtime.getRuntime().exec(cmd, null, new java.io.File(context));
             }
             String line;
-            bufferReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            bufferReaderError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            bufferReader = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
+            bufferReaderError = new BufferedReader(new InputStreamReader(p.getErrorStream(), StandardCharsets.UTF_8));
             while ((line = bufferReader.readLine()) != null || (line = bufferReaderError.readLine()) != null) {
-                log.info("Process ouput: " + line);
+                log.info("Process output: " + line);
                 result.add(line);
                 if (line.contains("Error") || line.contains("Traceback")) {
                     return null;
@@ -91,7 +92,7 @@ public class CommandExecutor {
             Path fileParent = Paths.get(path).getParent();
             // System.out.println(fileParent.toString());
             // 设置Python working directory
-            System.out.println(fileParent.normalize().toFile().getAbsolutePath());
+//            System.out.println(fileParent.normalize().toFile().getAbsolutePath());
             return CommandExecutor.openExe(command.toString(), fileParent.toFile().getAbsolutePath());
 
         } catch (Exception e) {

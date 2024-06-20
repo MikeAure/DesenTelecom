@@ -5,6 +5,7 @@ import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.DpUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -19,11 +20,16 @@ import java.util.stream.Collectors;
 @Component
 public class DpImpl implements Dp {
 
+    private final DpUtil dpUtil;
+
+    @Autowired
+    public DpImpl(DpUtil dpUtil) {
+        this.dpUtil = dpUtil;
+    }
+
     public DSObject service(DSObject object, Integer alg, Number... params) {
 
         if (object == null) return null;
-
-        DpUtil dpUtil = new DpUtilImpl();
 
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
@@ -185,7 +191,7 @@ public class DpImpl implements Dp {
                 String s = results.get(0);
                 s = s.replace("[", "");
                 s = s.replace("]", "");
-                List<Integer> list = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                List<Double> list = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
                 return new DSObject(list);
             }
 
@@ -547,6 +553,7 @@ public class DpImpl implements Dp {
             }
             /*
                 基于高斯机制差分隐私的数值加噪算法
+                未使用
 
              */
 

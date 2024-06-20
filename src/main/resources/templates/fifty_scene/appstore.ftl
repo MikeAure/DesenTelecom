@@ -769,7 +769,6 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="ibox float-e-margins">
-
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
                     <button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
@@ -786,7 +785,6 @@
             <div id=fileInfo>
             </div>
             <div id="after">
-
             </div>
             <div class="ibox-content">
                 <div id=table_body></div>

@@ -1,11 +1,13 @@
 package com.lu.gademo.utils.impl;
 
+//import com.lu.gademo.service.WsAlgorithmLogService;
 import com.lu.gademo.utils.DpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -26,6 +28,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class DpUtilImpl implements DpUtil {
+
+//    private final WsAlgorithmLogService wsLogService;
+//
+//    @Autowired
+//    public DpUtilImpl(WsAlgorithmLogService logService) {
+//        this.wsLogService = logService;
+//    }
 
     private final List<SimpleDateFormat> dataFormats = Arrays.asList(
             new SimpleDateFormat("yyyy-MM-dd"),
@@ -226,13 +235,14 @@ public class DpUtilImpl implements DpUtil {
 
     //数值型处理
     private List<Double> NumberCode_s(List<Double> re_data, Integer privacyLevel) {
+
         List<Double> newData = new ArrayList<>();
-        double a, max;
+        double a, max, min;
 
         // 使用最大值计算敏感度
 
         max = Collections.max(re_data.stream().filter(Objects::nonNull).collect(Collectors.toList()));
-
+        min = Collections.min(re_data.stream().filter(Objects::nonNull).collect(Collectors.toList()));
 //        System.out.println("max " + max);
 //        if (max < 100){
 //            a = 1;
@@ -241,19 +251,22 @@ public class DpUtilImpl implements DpUtil {
 //        }
         // 使用均值计算敏感度
         double average = 0;
+        int nullNum = 0;
 
         for (int i = 0; i < re_data.size(); i++) {
             if (re_data.get(i) == null) {
+                nullNum ++;
                 average += 0;
             } else {
                 average += re_data.get(i);
             }
         }
-        average = average / re_data.size();
+        average = average / (re_data.size() - nullNum);
 
 
         //设置参数sensitivety和epsilon
         BigDecimal sensitivety = new BigDecimal(average);
+//        wsLogService.sendLog("laplaceToValue", "sensitivity is " + sensitivety);
 
         //BigDecimal sensitivety = new BigDecimal(50);
         BigDecimal epsilon = new BigDecimal("0.1");
@@ -265,6 +278,8 @@ public class DpUtilImpl implements DpUtil {
 
         //System.out.println("epsilon " + epsilon);
         BigDecimal beta = sensitivety.divide(epsilon, 6, RoundingMode.HALF_UP);
+//        wsLogService.sendLog("laplaceToValue", "beta is " + beta);
+
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
         // System.out.println("beta " + beta);
 
@@ -364,7 +379,7 @@ public class DpUtilImpl implements DpUtil {
                             re_data.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
-                            e.printStackTrace();
+                            log.error(e.getMessage());
                         }
                     }
                 } else {
@@ -403,7 +418,7 @@ public class DpUtilImpl implements DpUtil {
                             re_data.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
-                            e.printStackTrace();
+                            log.error(e.getMessage());
                         }
                     }
                 } else {
@@ -411,7 +426,8 @@ public class DpUtilImpl implements DpUtil {
                 }
             }
         }
-        System.out.println(re_data.get(0));
+//        System.out.println(re_data.get(0));
+        log.info("First element of reData List: {}", re_data.get(0));
         //privacyLevel直接返回
         if (privacyLevel == 0)
             return re_data;
@@ -1369,7 +1385,7 @@ public class DpUtilImpl implements DpUtil {
                             re_data.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
-                            e.printStackTrace();
+                            log.error(e.getMessage());
                         }
                     }
                 } else {
@@ -1380,7 +1396,7 @@ public class DpUtilImpl implements DpUtil {
         //privacyLevel直接返回
         if (privacyLevel == 0)
             return re_data;
-        //执行laplaces加噪
+        //执行均匀加噪
         double am = 2.0;
         if (privacyLevel == 2) {
             am = 10.0;

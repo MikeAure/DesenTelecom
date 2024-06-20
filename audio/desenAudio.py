@@ -49,7 +49,7 @@ def dpAudio(file_path, newFilePath, budget):
     save_syn(data1, data2, newFilePath)
     end_time = time.perf_counter()
     execution_time_ms = (end_time - start_time) * 1000
-    print("程序执行时间（毫秒）：", execution_time_ms)
+    print("Process execution time (ms): ", execution_time_ms)
 
 
 def replace_voice_print(file_path, template_file, newFilePath):
@@ -99,7 +99,7 @@ def replace_voice_print(file_path, template_file, newFilePath):
     save_syn(data1, data2, newFilePath)
     end_time = time.perf_counter()
     execution_time_ms = (end_time - start_time) * 1000
-    print("程序执行时间（毫秒）：", execution_time_ms)
+    print("Process execution time (ms): ", execution_time_ms)
     
 
 def replace_voice_print_fixed(file_path, newFilePath):
@@ -149,7 +149,7 @@ def replace_voice_print_fixed(file_path, newFilePath):
     save_syn(data1, data2, newFilePath)
     end_time = time.perf_counter()
     execution_time_ms = (end_time - start_time) * 1000
-    print("程序执行时间（毫秒）：", execution_time_ms)
+    print("Process execution time (ms): ", execution_time_ms)
     
     
 def add_beep(input_file, input_format, output_file, output_format, start_time_sec, duration_sec, beep_frequency=1000):

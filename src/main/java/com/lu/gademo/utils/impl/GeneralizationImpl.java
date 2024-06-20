@@ -1,6 +1,7 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -11,10 +12,15 @@ import java.util.List;
 
 @Component
 public class GeneralizationImpl implements Generalization {
+    private final DpUtil dpUtil;
+
+    @Autowired
+    public GeneralizationImpl(DpUtil dpUtil) {
+        this.dpUtil = dpUtil;
+    }
     public DSObject service(DSObject object, Integer alg, Number... params) {
 
         if (object == null) return null;
-        DpUtil dpUtil = new DpUtilImpl();
 
         File directory = new File("");
         Util util = new UtilImpl();

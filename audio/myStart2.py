@@ -49,7 +49,7 @@ def save_syn(lines, template, filesynHx):
     pred = pred.tolist()
     print(len(pred))
     text = template
-    print("Synthesizing 预测语音..."+":"+text)
+    print("Synthesizing predict voice..."+":"+text)
     specs = synthesizer.synthesize_spectrograms([text], [pred])     #文件: 嵌入向量   #合成器？
     generated_wav = vocoder.infer_waveform(specs[0])    #声码器？
     generated_wav = np.pad(generated_wav, (0, synthesizer.sample_rate), mode="constant")

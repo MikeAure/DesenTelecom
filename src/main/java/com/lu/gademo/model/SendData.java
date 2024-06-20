@@ -1,4 +1,4 @@
-package com.lu.gademo.log;
+package com.lu.gademo.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -521,18 +521,29 @@ public class SendData {
         try {
             // 中心存证
             ObjectNode reqData = objectMapper.createObjectNode();
+            // objectSize: 处置对象的大小
             reqData.put("objectSize", reqEvidenceSave.getObjectSize());
+            // objectMode: 处置对象的模态
             reqData.put("objectMode", reqEvidenceSave.getObjectMode());
             reqEvidenceSave.setDatasign(util.getSM3Hash(reqData.toString().getBytes()));
             ObjectNode reqEvidence = objectMapper.createObjectNode();
+            // systemID: 系统ID
             reqEvidence.put("systemID", reqEvidenceSave.getSystemID());
+            // systemIP: 上报系统的IP地址
             reqEvidence.put("systemIP", reqEvidenceSave.getSystemIP());
+            // mainCMD: 消息类型编码（主命令码）
             reqEvidence.put("mainCMD", reqEvidenceSave.getMainCMD());
+            // subCMD: 监管事项表
             reqEvidence.put("subCMD", reqEvidenceSave.getSubCMD());
+            // evidenceID: 上报证据内部业务的唯一ID
             reqEvidence.put("evidenceID", reqEvidenceSave.getEvidenceID());
+            // msgVersion: 消息类型编码
             reqEvidence.put("msgVersion", reqEvidenceSave.getMsgVersion());
+            // reqtime: 请求提交时间
             reqEvidence.put("reqtime", util.getTime());
             reqEvidence.set("data", reqData);
+
+            // dataSign: 对data字段的签名
             reqEvidence.put("datasign", reqEvidenceSave.getDatasign());
 
             System.out.println(reqEvidenceSave);
@@ -570,18 +581,29 @@ public class SendData {
             //String转json 存储响应信息
             System.out.println("读取校验");
             JsonNode responseJson = objectMapper.readTree(response);
+            // systemID: 系统ID
             evidenceResponse.setSystemID(responseJson.get("systemID").asInt());
+            // mainCMD: 消息类型编码（主命令码）
             evidenceResponse.setMainCMD(responseJson.get("mainCMD").asInt());
+            // subCMD: 监管事项表
             evidenceResponse.setSubCMD(responseJson.get("subCMD").asInt());
+            // evidenceID: 上报证据内部业务的唯一ID
             evidenceResponse.setEvidenceID(responseJson.get("evidenceID").asText());
+            // msgVersion: 消息类型编码
             evidenceResponse.setMsgVersion(responseJson.get("msgVersion").asInt());
+            // responsetime: 响应时间
             evidenceResponse.setResponsetime(responseJson.get("responsetime").asText());
+            // nonce: 随机内容
             evidenceResponse.setNonce(responseJson.get("data").get("nonce").asText());
+            // position: 随机内容添加位置
             evidenceResponse.setPosition(responseJson.get("data").get("optmodel").get("position").asText());
+            // dataSign: 对data字段的签名
             evidenceResponse.setDataSign(responseJson.get("datasign").asText());
+            // randomIdentification: 随机标识
             evidenceResponse.setRandomIdentification(responseJson.get("randomidentification").asText());
+
             // 保存到数据库
-            //evidenceResponseDao.save(evidenceResponse);
+            evidenceResponseDao.save(evidenceResponse);
             System.out.println(evidenceResponse.getRandomIdentification());
 
             remoteOutputStream.close();
@@ -616,27 +638,48 @@ public class SendData {
 
             // data
             ObjectNode localEvidenceData = objectMapper.createObjectNode();
+            // globalID: 文件全局ID
             localEvidenceData.put("globalID", submitEvidenceLocal.getGlobalID());
+            // status: 状态
             localEvidenceData.put("status", submitEvidenceLocal.getStatus());
-            localEvidenceData.put("optTime", util.getTime());
-            submitEvidenceLocal.setOptTime(localEvidenceData.get("optTime").asText());
+            // optTime: 提交日志时间
+            submitEvidenceLocal.setOptTime(util.getTime());
+            localEvidenceData.put("optTime", submitEvidenceLocal.getOptTime());
+            // fileTitle: 脱敏对象名称
             localEvidenceData.put("fileTitle", submitEvidenceLocal.getFileTitle());
+            // fileAbstract: 脱敏对象摘要
             localEvidenceData.put("fileAbstract", submitEvidenceLocal.getFileAbstract());
+            // fileKeyword: 脱敏对象检索关键词
             localEvidenceData.put("fileKeyword", submitEvidenceLocal.getFileKeyword());
+            // desenAlg: 采用的脱敏算法
             localEvidenceData.put("desenAlg", submitEvidenceLocal.getDesenAlg());
+            // fileSize: 脱敏对象大小
             localEvidenceData.put("fileSize", submitEvidenceLocal.getFileSize());
+            // fileHASH: 脱敏对象hash
             localEvidenceData.put("fileHASH", submitEvidenceLocal.getFileHASH());
+            // fileSig: 脱敏对象签名
             localEvidenceData.put("fileSig", submitEvidenceLocal.getFileSig());
+            // desenPerformer: 脱敏执行主体
             localEvidenceData.put("desenPerformer", submitEvidenceLocal.getDesenPerformer());
+            // desenCom: 脱敏操作完成情况
             localEvidenceData.put("desenCom", submitEvidenceLocal.getDesenCom() + "");
+            // desenInfoPreID: 脱敏前信息ID
             localEvidenceData.put("desenInfoPreID", submitEvidenceLocal.getDesenInfoPreID());
+            // desenInfoAfterID: 脱敏后信息ID
             localEvidenceData.put("desenInfoAfterID", submitEvidenceLocal.getDesenInfoAfterID());
+            // desenIntention: 脱敏意图
             localEvidenceData.put("desenIntention", submitEvidenceLocal.getDesenIntention());
+            // desenRequirements: 脱敏要求
             localEvidenceData.put("desenRequirements", submitEvidenceLocal.getDesenRequirements());
+            // desenControlSet: 脱敏控制集合（操作配置）
             localEvidenceData.put("desenControlSet", submitEvidenceLocal.getDesenControlSet());
+            // desenAlgParam: 脱敏算法参数
             localEvidenceData.put("desenAlgParam", submitEvidenceLocal.getDesenAlgParam());
+            // desenPerformStartTime: 脱敏执行开始时间
             localEvidenceData.put("desenPerformStartTime", submitEvidenceLocal.getDesenPerformStartTime());
+            // desenPerformEndTime: 脱敏执行结束时间
             localEvidenceData.put("desenPerformEndTime", submitEvidenceLocal.getDesenPerformEndTime());
+            // desenLevel: 脱敏级别
             localEvidenceData.put("desenLevel", submitEvidenceLocal.getDesenLevel());
             localEvidenceData.set("pathtree", pathTree);
             // 整个json
@@ -653,11 +696,13 @@ public class SendData {
             //localEvidenceJson.put("submittime", util.getTime());
             //localEvidenceJson.set("data", localEvidenceData);
             localEvidenceJson.set("data", localEvidenceData);
-
+            // dataHash: 对数据域部分进行hash
             localEvidenceJson.put("dataHash", util.getSM3Hash(localEvidenceData.toString().getBytes()));
             //localEvidenceJson.put("datasign", evidenceResponse.getDataSign());
             // 公私钥怎么同步的？
+            // datasign: 中心存证对随机防伪内容的签名
             localEvidenceJson.put("datasign", util.sm2Sign(localEvidenceData.toString().getBytes()));
+            // 密文字段（随机标识），确保存证上报前做过请求应答
             localEvidenceJson.put("randomidentification", evidenceResponse.getRandomIdentification());
             // 打印发送json
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(localEvidenceJson);
@@ -707,12 +752,13 @@ public class SendData {
             System.out.println(recjson);
             //  发生异常
             if (recJson.has("errCode")) {
+                // 系统ID
                 evidenceReceiptErr.setSystemID(recJson.get("systemID").asInt());
                 evidenceReceiptErr.setMainCMD(recJson.get("mainCMD").asInt());
                 evidenceReceiptErr.setSubCMD(recJson.get("subCMD").asInt());
+                // 上报证据内部业务的唯一ID
                 evidenceReceiptErr.setEvidenceID(recJson.get("evidenceID").asText());
                 evidenceReceiptErr.setMsgVersion(recJson.get("msgVersion").asInt());
-                // 这里是否应该变动
                 evidenceReceiptErr.setStatus("ok");
                 evidenceReceiptErr.setErrCode(recJson.get("errCode").asInt());
                 //存储
@@ -731,9 +777,13 @@ public class SendData {
                 evidenceReceiptNormal.setEvidenceID(recJson.get("evidenceID").asText());
                 evidenceReceiptNormal.setMsgVersion(recJson.get("msgVersion").asInt());
                 evidenceReceiptNormal.setStatus("ok");
+                // 上报信息在存证系统中存储的唯一ID
                 evidenceReceiptNormal.setCertificateID(recJson.get("data").get("certificateID").asText());
+                // 收条反馈时间
                 evidenceReceiptNormal.setCertificateTime(recJson.get("data").get("certificateTime").asText());
+                // 收条返回信息data字段的hash值
                 evidenceReceiptNormal.setCertificateHash(recJson.get("certificateHash").asText());
+                // 收条返回信息data字段的sign值
                 evidenceReceiptNormal.setCertificateSign(recJson.get("certificateSign").asText());
                 // 存储
                 evidenceReceiptNormalDao.save(evidenceReceiptNormal);

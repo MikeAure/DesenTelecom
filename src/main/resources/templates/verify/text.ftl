@@ -2,20 +2,24 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico">
+
+
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="${ctx!}/css/multiple-select.min.css">
     <link href="${ctx!}/css/plugins/chosen/chosen.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="${ctx!}/css/GA.css">
-    <link href="${ctx!}/css/style.css" rel="stylesheet">
+    <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
-    <#--    <link href="${ctx!}/css/GA.css" rel="stylesheet">-->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+
+    <link rel="stylesheet" type="text/css" href="${ctx!}/css/multiple-select.min.css">
+    <link rel="stylesheet" type="text/css" href="${ctx!}/css/GA.css">
+    <link rel="shortcut icon" href="${ctx!}/favicon.ico">
+
     <style>
         /*标题*/
         th {
@@ -218,12 +222,11 @@
     <script src="${ctx!}/js/plugins/peity/jquery.peity.min.js"></script>
 
     <!-- Map -->
-    <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
-    <script src="${ctx!}/js/multiple-select.min.js"></script>
-    <script src="https://webapi.amap.com/maps?v=2.0&key=8a74dc88024b50b5b4d94a407ab49b8d"></script>
+    <script src="${ctx!}/js/plugins/layer/layer.min.js" defer></script>
+    <script src="${ctx!}/js/multiple-select.min.js" defer></script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=8a74dc88024b50b5b4d94a407ab49b8d" defer></script>
     <!-- 自定义js -->
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
-    <#--    <script src="${ctx!}/js/trace.js" defer></script>-->
     <script type="text/javascript">
         window.onload = function () {
             // debugger
@@ -238,13 +241,7 @@
                     // voiceprint_module.style.visibility = "hidden";
                     trace_module.style.visibility = "visible";
                     default_module.style.visibility = "hidden";
-                }
-                    // else if (selection === "voice-print") {
-                    //     voiceprint_module.style.visibility = "visible";
-                    //     trace_module.style.visibility = "hidden";
-                    //     default_module.style.visibility = "hidden";
-                // }
-                else {
+                } else {
                     // voiceprint_module.style.visibility = "hidden";
                     trace_module.style.visibility = "hidden";
                     default_module.style.visibility = "visible";
@@ -283,7 +280,7 @@
                     distortion_alg_list.options.add(new Option("基于高斯机制差分隐私的数值加噪算法", "gaussianToValue"));
                     distortion_alg_list.options.add(new Option("基于拉普拉斯差分隐私的数值加噪算法", "laplaceToValue"));
                     distortion_alg_list.options.add(new Option("基于随机均匀噪声的数值加噪算法", "randomUniformToValue"));
-                    distortion_alg_list.options.add(new Option("基于随机拉普拉斯噪声的数值加噪算法", "randomLaplaceToValue "));
+                    distortion_alg_list.options.add(new Option("基于随机拉普拉斯噪声的数值加噪算法", "randomLaplaceToValue"));
                     distortion_alg_list.options.add(new Option("基于随机高斯噪声的数值加噪算法", "randomGaussianToValue"));
                     distortion_alg_list.options.add(new Option("数值偏移", "valueShift"));
                     distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
@@ -316,7 +313,7 @@
             };
         }
 
-        choose_file = function (event) {
+        let choose_file = function (event) {
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
 
@@ -550,28 +547,30 @@
 </head>
 
 <body>
-
 <div class="row">
     <div class="col-sm-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
             </div>
 
-            <#--是否失真-->
-            <div class="tabs-container">
-                <ul id="tab-type" class="nav nav-tabs" style="left: 50%; font-size: 20px">
-                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
-                    </li>
-                    <li class="">
-                        <a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div id="tab-1" class="tab-pane active" style="text-align: center;">
-                        <div class="midtile">
-                            <div class="col-sm-5 m-b-xs">
+            <div class="ibox-content">
+                <div class="tabs-container">
+                    <ul id="tab-type" class="nav nav-tabs" style="font-size: 20px">
+                        <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
+                        </li>
+                        <li class="">
+                            <a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="tab-1" class="tab-pane active" style="text-align: center;">
+                            <div class="form-group">
+
+                                <label class="control-label block" for="textType"
+                                       style="font-size: 20px">请选择文本类型</label>
+
                                 <select name="type" id="textType"
-                                        style=" display: inline-block; height: 40px; font-size: 20px; text-align: center">
+                                        style="font-size: 20px">
                                     <option value="111" selected>请选择文本类型</option>
                                     <option value="date">日期</option>
                                     <option value="time">时间</option>
@@ -582,218 +581,220 @@
                                     <option value="email">邮箱</option>
                                     <option value="code">编码</option>
                                 </select>
-                            </div>
-                        </div>
-                        <table style="margin: auto; font-size: 20px">
-                            <thead>
-                            <tr>
-                                <th>请选择文本失真脱敏算法</th>
-                            </tr>
-                            </thead>
-                            <tbody id="table1">
-                            <tr>
-                                <td>
-                                    <select id="distortionAlg">
-                                        <option value="default">请选择脱敏算法</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
 
-                        <div class="ibox-content" style="text-align: center;">
-                            <div id="privacyLevel">
+                            </div>
+
+                            <div class="form-group">
                                 <table style="margin: auto; font-size: 20px">
                                     <thead>
                                     <tr>
-                                        <th>请选择隐私保护等级</th>
+                                        <th>请选择文本失真脱敏算法</th>
                                     </tr>
                                     </thead>
-                                    <tbody id="table3">
+                                    <tbody id="table1">
                                     <tr>
                                         <td>
-                                            <select id="table3-selections">
-                                                <option value="1"> 低程度</option>
-                                                <option value="2" selected> 中程度</option>
-                                                <option value="3"> 高程度</option>
+                                            <select id="distortionAlg">
+                                                <option value="default">请选择脱敏算法</option>
                                             </select>
                                         </td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
 
-                        <div id="fileInfo"></div>
-                        <div class="midtile">
-                            <div class="col-sm-5 m-b-xs">
-                                <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                    <input type="file" id="fileUpload" style="display: none;">
-                                    <label for="fileUpload" class="btn btn-sm btn-primary upload-btn">
-                                        选择文件
-                                    </label>
-                                </form>
+                            <div class="form-group">
+                                <div id="privacyLevel">
+                                    <table style="margin: auto; font-size: 20px">
+                                        <thead>
+                                        <tr>
+                                            <th>请选择隐私保护等级</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="table3">
+                                        <tr>
+                                            <td>
+                                                <label for="table3-selections"></label>
+                                                <select id="table3-selections">
+                                                    <option value="1"> 低程度</option>
+                                                    <option value="2" selected> 中程度</option>
+                                                    <option value="3"> 高程度</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                        <div class="button1">
+
+                            <div id="fileInfo"></div>
+
+                            <div class="btn1">
+                                <input type="file" id="fileUpload" style="display: none;">
+                                <label for="fileUpload" class="btn btn-sm btn-primary upload-btn">
+                                    选择文件
+                                </label>
+                            </div>
+
                             <div class="btn2">
-                                <button type="button" class="btn btn-sm btn-primary" id="submitBtn">提交脱敏</button>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-                            <!-- 第一个表格 -->
-                            <div id="dataTableContainer" style="width: 50%; overflow-x: auto;">
-                                <table id="dataTable" class="table table-bordered">
-                                    <!-- 这里将用 JavaScript 动态创建表格内容 -->
-                                </table>
-                                <div id="paginationContainer" class="mt-3" style="display: none;">
-                                    <nav>
-                                        <div id="paginationInfo"
-                                             class="d-flex justify-content-between align-items-center">
-                                            <ul class="pagination mb-0" id="pagination"></ul>
-                                            <div class="form-group mb-0 text-center">
-                                                <span id="totalPages"></span>
-                                                <label for="pageInput">跳转至：</label>
-                                                <input type="number" class="form-control" id="pageInput" min="1">
-                                                <button class="btn btn-primary" id="goToPage">跳转</button>
-                                            </div>
-                                        </div>
-                                    </nav>
-                                </div>
+                                <button type="button" class="btn btn-sm btn-primary" id="submitBtn">提交脱敏
+                                </button>
                             </div>
 
-                            <!-- 第二个表格 -->
-                            <div id="dataTableContainer1" style="width: 50%; overflow-x: auto;">
-                                <table id="dataTable1" class="table table-bordered">
-                                    <!-- 这里将用 JavaScript 动态创建表格内容 -->
-                                </table>
-                                <div id="paginationContainer1" class="mt-3" style="display: none;">
-                                    <nav>
-                                        <div id="paginationInfo1"
-                                             class="d-flex justify-content-between align-items-center">
-                                            <ul class="pagination mb-0" id="pagination1"></ul>
-                                            <div class="form-group mb-0 text-center">
-                                                <span id="totalPages1"></span>
-                                                <label for="pageInput1">跳转至：</label>
-                                                <input type="number" class="form-control" id="pageInput1" min="1">
-                                                <button class="btn btn-primary" id="goToPage1">跳转</button>
-
+                            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                                <!-- 第一个表格 -->
+                                <div id="dataTableContainer" style="width: 50%; overflow-x: auto;">
+                                    <table id="dataTable" class="table table-bordered">
+                                        <!-- 这里将用 JavaScript 动态创建表格内容 -->
+                                    </table>
+                                    <div id="paginationContainer" class="mt-3" style="display: none;">
+                                        <nav>
+                                            <div id="paginationInfo"
+                                                 class="d-flex justify-content-between align-items-center">
+                                                <ul class="pagination mb-0" id="pagination"></ul>
+                                                <div class="form-group mb-0 text-center">
+                                                    <span id="totalPages"></span>
+                                                    <label for="pageInput">跳转至：</label>
+                                                    <input type="number" class="form-control" id="pageInput" min="1">
+                                                    <button class="btn btn-primary" id="goToPage">跳转</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="tab-2" class="tab-pane">
-                        <div id="selection-area">
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>请选择文本非失真脱敏算法</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table2">
-                                <tr>
-                                    <td>
-                                        <select id="nodistortionAlg">
-                                            <option value="default" selected>请选择脱敏算法</option>
-                                            <option value="trace">在线打车外包查询算法</option>
-                                            <#--                                            <option value="voice-print">TestItem</option>-->
-                                        </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div id="nondistortion-module-container" class="tab-pane">
-                            <div id="default-module" style="visibility: visible"></div>
-                            <#--                            <div id="voiceprint-module" class="tab-pane" style="visibility: hidden">Test div2</div>-->
-                            <div id="trace-module" style="visibility: hidden">
-                                <div class="map-container" id="driverMap1-container">
-                                    <div class="map-title">司机1</div> <!-- 标题元素 -->
-                                    <div class="map-content"> <!-- 新增的包裹容器 -->
-                                        <div class="map" id="driverMap1"></div>
-                                        <div class="map-info">
-                                            <span>当前经纬度: <div id="driver1Coord"></div></span>
-                                            <button type="button" class="btn btn-sm btn-primary" id="lockDriver1">确定
-                                            </button>
-                                            <div class="log-area" id="driver1Log">
-                                                <textarea id="driver1LogArea" rows="5" cols="33"></textarea>
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-primary" id="driver1Stop">停止
-                                            </button>
-
-                                        </div>
+                                        </nav>
                                     </div>
                                 </div>
 
-                                <div class="map-container" id="driverMap2-container">
-                                    <div class="map-title">司机2</div> <!-- 标题元素 -->
-                                    <div class="map-content"> <!-- 新增的包裹容器 -->
-                                        <div class="map" id="driverMap2"></div>
-                                        <div class="map-info">
-                                            <span>当前经纬度: <div id="driver2Coord"></div></span>
-                                            <button type="button" class="btn btn-sm btn-primary" id="lockDriver2">确定
-                                            </button>
-                                            <div class="log-area" id="driver2Log">
-                                                <textarea id="driver2LogArea" rows="5" cols="33"></textarea>
+                                <!-- 第二个表格 -->
+                                <div id="dataTableContainer1" style="width: 50%; overflow-x: auto;">
+                                    <table id="dataTable1" class="table table-bordered">
+                                        <!-- 这里将用 JavaScript 动态创建表格内容 -->
+                                    </table>
+                                    <div id="paginationContainer1" class="mt-3" style="display: none;">
+                                        <nav>
+                                            <div id="paginationInfo1"
+                                                 class="d-flex justify-content-between align-items-center">
+                                                <ul class="pagination mb-0" id="pagination1"></ul>
+                                                <div class="form-group mb-0 text-center">
+                                                    <span id="totalPages1"></span>
+                                                    <label for="pageInput1">跳转至：</label>
+                                                    <input type="number" class="form-control" id="pageInput1" min="1">
+                                                    <button class="btn btn-primary" id="goToPage1">跳转</button>
+
+                                                </div>
                                             </div>
-                                            <button type="button" class="btn btn-sm btn-primary" id="driver2Stop">停止
-                                            </button>
-                                        </div>
+                                        </nav>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="map-container" id="customerMap-container">
-                                    <div class="map-title">乘客</div> <!-- 标题元素 -->
-                                    <div class="map-content"> <!-- 新增的包裹容器 -->
-                                        <div class="map" id="customerMap"></div>
-                                        <div class="map-info">
-                                            <div class="coordinates">
-                                                <span>出发点经纬度: <div id="startCoord"></div></span>
-                                                <button type="button" class="btn btn-sm btn-primary" id="lockStart">
-                                                    确定
+                        <div id="tab-2" class="tab-pane">
+                            <div id="selection-area">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>请选择文本非失真脱敏算法</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="table2">
+                                    <tr>
+                                        <td>
+                                            <select id="nodistortionAlg">
+                                                <option value="default" selected>请选择脱敏算法</option>
+                                                <option value="trace">在线打车外包查询算法</option>
+                                                <#--                                            <option value="voice-print">TestItem</option>-->
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="nondistortion-module-container" class="tab-pane">
+                                <div id="default-module" style="visibility: visible"></div>
+                                <#--                            <div id="voiceprint-module" class="tab-pane" style="visibility: hidden">Test div2</div>-->
+                                <div id="trace-module" style="visibility: hidden">
+                                    <div class="map-container" id="driverMap1-container">
+                                        <div class="map-title">司机1</div> <!-- 标题元素 -->
+                                        <div class="map-content"> <!-- 新增的包裹容器 -->
+                                            <div class="map" id="driverMap1"></div>
+                                            <div class="map-info">
+                                                <span>当前经纬度: <div id="driver1Coord"></div></span>
+                                                <button type="button" class="btn btn-sm btn-primary" id="lockDriver1">确定
+                                                </button>
+                                                <div class="log-area" id="driver1Log">
+                                                    <textarea id="driver1LogArea" rows="5" cols="33"></textarea>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-primary" id="driver1Stop">停止
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="map-container" id="driverMap2-container">
+                                        <div class="map-title">司机2</div> <!-- 标题元素 -->
+                                        <div class="map-content"> <!-- 新增的包裹容器 -->
+                                            <div class="map" id="driverMap2"></div>
+                                            <div class="map-info">
+                                                <span>当前经纬度: <div id="driver2Coord"></div></span>
+                                                <button type="button" class="btn btn-sm btn-primary" id="lockDriver2">确定
+                                                </button>
+                                                <div class="log-area" id="driver2Log">
+                                                    <textarea id="driver2LogArea" rows="5" cols="33"></textarea>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-primary" id="driver2Stop">停止
                                                 </button>
                                             </div>
-                                            <div class="coordinates">
-                                                <span>目的地经纬度: <div id="endCoord"></div></span>
-                                                <button type="button" class="btn btn-sm btn-primary" id="lockEnd">确定
-                                                </button>
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-primary" id="sendRequest">
-                                                发送打车请求
-                                            </button>
-                                            <div class="log-area" id="customerLog">
-                                                <textarea id="customerLogArea" rows="5" cols="33"></textarea>
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-primary" id="customerStop">
-                                                停止
-                                            </button>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="server-container" id="serverInfo-container">
-                                    <div class="server-title">服务器</div>
-                                    <div class="server-content">
-                                        <div class="log-area" id="serverLog">
-                                            <textarea id="serverLogArea" rows="5" cols="33"></textarea>
+                                    <div class="map-container" id="customerMap-container">
+                                        <div class="map-title">乘客</div> <!-- 标题元素 -->
+                                        <div class="map-content"> <!-- 新增的包裹容器 -->
+                                            <div class="map" id="customerMap"></div>
+                                            <div class="map-info">
+                                                <div class="coordinates">
+                                                    <span>出发点经纬度: <div id="startCoord"></div></span>
+                                                    <button type="button" class="btn btn-sm btn-primary" id="lockStart">
+                                                        确定
+                                                    </button>
+                                                </div>
+                                                <div class="coordinates">
+                                                    <span>目的地经纬度: <div id="endCoord"></div></span>
+                                                    <button type="button" class="btn btn-sm btn-primary" id="lockEnd">确定
+                                                    </button>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-primary" id="sendRequest">
+                                                    发送打车请求
+                                                </button>
+                                                <div class="log-area" id="customerLog">
+                                                    <textarea id="customerLogArea" rows="5" cols="33"></textarea>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-primary" id="customerStop">
+                                                    停止
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="buttons-row">
-                                            <button type="button" class="btn btn-sm btn-primary" id="serverStart">启动
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-primary" id="serverStop">停止
-                                            </button>
+                                    </div>
+
+                                    <div class="server-container" id="serverInfo-container">
+                                        <div class="server-title">服务器</div>
+                                        <div class="server-content">
+                                            <div class="log-area" id="serverLog">
+                                                <textarea id="serverLogArea" rows="5" cols="33"></textarea>
+                                            </div>
+                                            <div class="buttons-row">
+                                                <button type="button" class="btn btn-sm btn-primary" id="serverStart">启动
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-primary" id="serverStop">停止
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
             </div>
@@ -825,6 +826,35 @@
 <#--</script>-->
 <!-- 全局js -->
 <script type="text/javascript">
+    let startMarker;
+    let driver1Marker;
+    let driver2Marker;
+    let endMarker;
+
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+        // 初始化乘客地图
+        let customerMap = initMap('customerMap', {center: [108.945, 34.285], zoom: 11});
+        customerMap.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]));
+        startMarker = addDraggableMarker(customerMap, [108.945, 34.285], 'startCoord', 'http://webapi.amap.com/theme/v1.3/markers/n/start.png');
+        endMarker = addDraggableMarker(customerMap, [108.946, 34.285], 'endCoord', 'http://webapi.amap.com/theme/v1.3/markers/n/end.png');
+        // 修改初始化Marker的调用
+        lockMarkerCustomer(startMarker, 'lockStart', 'start');
+        lockMarkerCustomer(endMarker, 'lockEnd', 'end');
+
+        // 初始化司机地图1
+        let driverMap1 = initMap('driverMap1', {center: [108.945, 34.285], zoom: 11});
+        driverMap1.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]))
+        driver1Marker = addDraggableMarker(driverMap1, [108.945, 34.285], 'driver1Coord', 'Default');
+        lockMarkerDriver1(driver1Marker, 'lockDriver1');
+
+        // 初始化司机地图2
+        let driverMap2 = initMap('driverMap2', {center: [108.945, 34.285], zoom: 11});
+        driverMap2.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]));
+        driver2Marker = addDraggableMarker(driverMap2, [108.945, 34.285], 'driver2Coord', 'Default');
+        lockMarkerDriver2(driver2Marker, 'lockDriver2');
+    })
+
     // 初始化地图
     function initMap(containerId, options) {
         return new AMap.Map(containerId, {
@@ -978,26 +1008,6 @@
             .catch(error => console.error('Error:', error));
     }
 
-    // 初始化乘客地图
-    let customerMap = initMap('customerMap', {center: [108.945, 34.285], zoom: 11});
-    customerMap.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]));
-    let startMarker = addDraggableMarker(customerMap, [108.945, 34.285], 'startCoord', 'http://webapi.amap.com/theme/v1.3/markers/n/start.png');
-    let endMarker = addDraggableMarker(customerMap, [108.946, 34.285], 'endCoord', 'http://webapi.amap.com/theme/v1.3/markers/n/end.png');
-    // 修改初始化Marker的调用
-    lockMarkerCustomer(startMarker, 'lockStart', 'start');
-    lockMarkerCustomer(endMarker, 'lockEnd', 'end');
-
-    // 初始化司机地图1
-    let driverMap1 = initMap('driverMap1', {center: [108.945, 34.285], zoom: 11});
-    driverMap1.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]))
-    let driver1Marker = addDraggableMarker(driverMap1, [108.945, 34.285], 'driver1Coord', 'Default');
-    lockMarkerDriver1(driver1Marker, 'lockDriver1');
-
-    // 初始化司机地图2
-    let driverMap2 = initMap('driverMap2', {center: [108.945, 34.285], zoom: 11});
-    driverMap2.setLimitBounds(new AMap.Bounds([108.77, 34.14], [109.12, 34.43]));
-    let driver2Marker = addDraggableMarker(driverMap2, [108.945, 34.285], 'driver2Coord', 'Default');
-    lockMarkerDriver2(driver2Marker, 'lockDriver2');
 
     const startButton = document.getElementById('serverStart');
     const stopButton = document.getElementById('serverStop');

@@ -35,7 +35,9 @@ class SparseVectorTechnique2(Mechanism):
         n_queries = a.shape[0]
 
         rho = np.random.laplace(scale=self.c / self.eps1, size=(n_samples,))
-        nu = np.random.laplace(scale=2*self.c / self.eps2, size=(n_samples, n_queries))
+        nu = np.random.laplace(
+            scale=2 * self.c / self.eps2, size=(n_samples, n_queries)
+        )
 
         m = nu + x  # broadcasts x vertically
 

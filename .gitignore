@@ -298,3 +298,6 @@ raw_files
 /Test Results - AlgorithmsFactoryTest.html
 src/test/resources/test_data
 *.gz
+*.7z
+*.bak
+*.bak2

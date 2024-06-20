@@ -56,30 +56,33 @@ public class FileControllerImageTest {
     @Test
     public void imageControllerDpImageTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(imageFile)
-                        .param("params", PARAMS)
-                        .param("algName", "dpImage")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "dpImage")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
     // 基于均值滤波器的图像加噪方法
     @Test
     public void imageControllerMeanValueImageTest() throws Exception {
-
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(imageFile)
-                        .param("params", PARAMS)
-                        .param("algName", "meanValueImage")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            // 模拟multipart/form-data请求
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "meanValueImage")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -88,30 +91,33 @@ public class FileControllerImageTest {
     @Test
     public void imageControllerPixelateImageTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(imageFile)
-                        .param("params", PARAMS)
-                        .param("algName", "pixelate")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "pixelate")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
     // 基于高斯滤波器的图像加噪方法
     @Test
     public void imageControllerGaussianBlurImageTest() throws Exception {
-
-        // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(imageFile)
-                        .param("params", PARAMS)
-                        .param("algName", "gaussian_blur")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            // 模拟multipart/form-data请求
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "gaussian_blur")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -133,14 +139,16 @@ public class FileControllerImageTest {
     // 基于像素块的图像区域替换方法
     @Test
     public void imageControllerReplaceRegionImageTest() throws Exception {
-        mvc.perform(multipart(URL)
-                        .file(imageFile)
-                        .param("params", PARAMS)
-                        .param("algName", "replace_region")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL)
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "replace_region")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -177,11 +185,11 @@ public class FileControllerImageTest {
     // 图像人脸替换算法
     @Test
     public void imageControllerImgFaceSubTest() throws Exception {
-        mvc.perform(multipart(URL)
+        mvc.perform(multipart("/File/replaceFace")
                         .file(imageFile)
                         .file(faceImageFile)
                         .param("params", PARAMS)
-                        .param("algName", "img_face_sub")
+                        .param("algName", "image_face_sub")
                         )
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())

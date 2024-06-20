@@ -10,6 +10,7 @@ class NumericalSVT(Mechanism):
         Proving differential privacy with shadow execution.
         PLDI 2019.
     """
+
     def __init__(self, eps: float = 0.1, c: int = 2, t: float = 1.0):
         self.eps = eps
         self.c = c
@@ -29,9 +30,13 @@ class NumericalSVT(Mechanism):
         # rows: samples
         x = np.atleast_2d(a)
 
-        rho1 = np.random.laplace(scale=3/self.eps, size=(n_samples, 1))
-        rho2 = np.random.laplace(scale=6*self.c/self.eps, size=(n_samples, a.shape[0]))
-        rho3 = np.random.laplace(scale=3*self.c/self.eps, size=(n_samples, a.shape[0]))
+        rho1 = np.random.laplace(scale=3 / self.eps, size=(n_samples, 1))
+        rho2 = np.random.laplace(
+            scale=6 * self.c / self.eps, size=(n_samples, a.shape[0])
+        )
+        rho3 = np.random.laplace(
+            scale=3 * self.c / self.eps, size=(n_samples, a.shape[0])
+        )
 
         m = rho2 + x  # broadcasts x vertically
         cmp = m >= (self.t + rho1)  # broadcasts rho1 horizontally
