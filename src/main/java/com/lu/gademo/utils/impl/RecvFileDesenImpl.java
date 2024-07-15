@@ -134,7 +134,9 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                 XWPFDocument document = new XWPFDocument(rawFileInputStream);
                 OutputStream outputStream = Files.newOutputStream(desenFilePath)) {
             XmlCursor cursor = document.getDocument().getBody().newCursor();
-            QName idQname = new javax.xml.namespace.QName("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "id");
+            QName idQname = new javax.xml.namespace.QName(
+                    "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
+                    "id");
             while (cursor.toNextToken() != XmlCursor.TokenType.NONE) {
                 // save the cursor
                 cursor.push();
@@ -214,7 +216,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
             // 遍历PPT全部批注
             for (XSLFSlide slide : ppt.getSlides()) {
                 Dimension slideSize = slide.getSlideShow().getPageSize();
-                System.out.println("Slide Width: " + slideSize.width + " Slide Height: " + slideSize.height);
+                // System.out.println("Slide Width: " + slideSize.width + " Slide Height: " + slideSize.height);
                 List<XSLFComment> comments = slide.getComments();
                 // 逐个文本框扫描分析批注位置是否在文本框内
                 for (XSLFComment comment : comments) {

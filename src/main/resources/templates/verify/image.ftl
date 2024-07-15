@@ -308,6 +308,10 @@
                     dealedImg.src = URL.createObjectURL(blob);
                     after.appendChild(dealedImg);
                     console.log("return")
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error)
                 });
 
         }
@@ -489,6 +493,7 @@
                                     <td><select id="algonames">
 
                                             <option value="dpImage" selected> DP-基于差分隐私的图像加噪方法</option>
+                                            <option value="im_coder2" selected> DP-基于差分隐私的图像加噪方法2</option>
                                             <option value="meanValueImage"> 泛化-基于均值滤波器的图像加噪方法</option>
                                             <option value="pixelate"> 泛化-基于像素化滤波器的图像加噪方法</option>
                                             <option value="gaussian_blur"> 泛化-基于高斯滤波器的图像加噪方法</option>

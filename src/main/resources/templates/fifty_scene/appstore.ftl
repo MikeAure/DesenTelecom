@@ -95,43 +95,6 @@
                                 break;
                         }
                         html += "</td>"
-                        /* html += "<td>"
-                         switch (s.k) {
-                             case 0:
-                                 if (s.dataType === 0 || s.dataType === 4) {
-                                     html += "差分隐私"
-                                 } else {
-                                     html += "默认处理"
-                                 }
-                                 break;
-                             case 1:
-                                 if (s.dataType === 0 || s.dataType === 4) {
-                                     html += "k-匿名"
-                                 } else {
-                                     html += "默认处理"
-                                 }
-                                 break;
-                         }
-                         html += "</td>"
-
-                         html += "<td>"
-                         switch (s.tmParam) {
-                             case 0:
-                                 html += "无隐私保护处理"
-                                 break;
-                             case 1:
-                                 html += "低程度"
-                                 break;
-                             case 2:
-                                 html += "中程度"
-                                 break;
-
-                             default:
-                                 html += "高程度"
-                                 break;
-                         }
-
-                         html += "</td>"*/
                         html += "</tr>";
                     }
                     document.getElementById("table_body").innerHTML = html
@@ -540,7 +503,7 @@
         })
         document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function (event) {
+    let choose_file = function (event) {
         //读取文件
         const file = event.target.files[0]
         // 文件名，扩展名

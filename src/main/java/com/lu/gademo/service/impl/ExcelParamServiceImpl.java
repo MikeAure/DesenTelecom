@@ -3,6 +3,7 @@ package com.lu.gademo.service.impl;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.mapper.ExcelParamDao;
 import com.lu.gademo.service.ExcelParamService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Service
 public class ExcelParamServiceImpl implements ExcelParamService {
-    @Resource
+    @Autowired
     private ExcelParamDao excelParamDao;
 
     public List<ExcelParam> getParams(String name) {

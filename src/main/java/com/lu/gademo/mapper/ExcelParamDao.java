@@ -7,7 +7,7 @@ import org.apache.ibatis.type.JdbcType;
 import java.util.List;
 
 @Mapper
-public interface ExcelParamDao {
+public interface  ExcelParamDao {
     // 查询所有数据
     @Select({"SELECT * FROM ${name} "})
     @Results({

@@ -1,6 +1,7 @@
 package com.lu.gademo.utils.impl;
 
-//import com.lu.gademo.service.WsAlgorithmLogService;
+import com.lu.gademo.service.WsAlgorithmLogService;
+
 import com.lu.gademo.utils.DpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
@@ -29,12 +30,12 @@ import java.util.stream.Collectors;
 @Component
 public class DpUtilImpl implements DpUtil {
 
-//    private final WsAlgorithmLogService wsLogService;
-//
-//    @Autowired
-//    public DpUtilImpl(WsAlgorithmLogService logService) {
-//        this.wsLogService = logService;
-//    }
+    private final WsAlgorithmLogService wsLogService;
+
+    @Autowired
+    public DpUtilImpl(WsAlgorithmLogService logService) {
+        this.wsLogService = logService;
+    }
 
     private final List<SimpleDateFormat> dataFormats = Arrays.asList(
             new SimpleDateFormat("yyyy-MM-dd"),
@@ -255,7 +256,7 @@ public class DpUtilImpl implements DpUtil {
 
         for (int i = 0; i < re_data.size(); i++) {
             if (re_data.get(i) == null) {
-                nullNum ++;
+                nullNum++;
                 average += 0;
             } else {
                 average += re_data.get(i);
@@ -265,8 +266,9 @@ public class DpUtilImpl implements DpUtil {
 
 
         //设置参数sensitivety和epsilon
-        BigDecimal sensitivety = new BigDecimal(average);
-//        wsLogService.sendLog("laplaceToValue", "sensitivity is " + sensitivety);
+        BigDecimal sensitivity = new BigDecimal(max - min);
+//        wsLogService.sendLog("laplaceToValue", "sensitivity is " + sensitivity);
+        System.out.println("sensitivity " + sensitivity);
 
         //BigDecimal sensitivety = new BigDecimal(50);
         BigDecimal epsilon = new BigDecimal("0.1");
@@ -276,12 +278,13 @@ public class DpUtilImpl implements DpUtil {
             epsilon = new BigDecimal(1);
         }
 
-        //System.out.println("epsilon " + epsilon);
-        BigDecimal beta = sensitivety.divide(epsilon, 6, RoundingMode.HALF_UP);
-//        wsLogService.sendLog("laplaceToValue", "beta is " + beta);
+        System.out.println("epsilon " + epsilon);
+        BigDecimal beta = sensitivity.divide(epsilon, 6, RoundingMode.HALF_UP);
+
 
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
-        // System.out.println("beta " + beta);
+//        wsLogService.sendLog("laplaceToValue", "beta is " + betad);
+        System.out.println("beta " + beta);
 
         //循环处理数据
         for (int i = 0; i < re_data.size(); i++) {
@@ -924,11 +927,11 @@ public class DpUtilImpl implements DpUtil {
 
         //获取参数k
         if (privacyLevel == 1) {
-            k = 10;
+            k = 1;
         } else if (privacyLevel == 2) {
-            k = 30;
+            k = 3;
         } else if (privacyLevel == 3) {
-            k = 50;
+            k = 5;
         }
         //执行k-匿名
         List<Double> newMilliseconds = k_num(milliseconds, k);
@@ -1032,10 +1035,82 @@ public class DpUtilImpl implements DpUtil {
         return result;
     }
 
+//    @Override
+//    public List<Integer> floor(List<Object> dataList, Integer privacyLevel) {
+//        List<Integer> result = new ArrayList<>();
+//        List<Double> re_data = new ArrayList<>();
+//        for (Object data : dataList) {
+//            if (data == null) {
+//                re_data.add(null);
+//            } else {
+//                if (data instanceof Cell) {
+//                    Cell currentCell = (Cell) data;
+//                    if (currentCell.getCellType() == CellType.NUMERIC) {
+//                        double numericValue = currentCell.getNumericCellValue();
+//                        re_data.add(numericValue);
+//                    } else if (currentCell.getCellType() == CellType.STRING) {
+//                        String stringValue = currentCell.getStringCellValue();
+//                        try {
+//                            double numericValue = Double.parseDouble(stringValue);
+//                            re_data.add(numericValue);
+//                        } catch (NumberFormatException e) {
+//                            // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                } else {
+//                    re_data.add((Double) data);
+//                }
+//            }
+//        }
+//
+////        if (privacyLevel == 0) {
+////            return re_data;
+////        }
+//        double max_data = Collections.max(re_data);
+//        for (Object item : re_data) {
+//            if (item == null) {
+//                result.add(null);
+//            } else {
+//                if (max_data <= 10) {
+//                    result.add(10);
+//                } else if (max_data <= 100) {
+//                    result.add((int) Math.floor((Double) item) / 10 * 10);
+//                } else if (max_data <= 1000) {
+//                    if (privacyLevel == 1) {
+//                        result.add((int) Math.floor((Double) item) / 10 * 10);
+//                    } else {
+//                        result.add((int) Math.floor((Double) item) / 100 * 100);
+//                    }
+//                } else if (max_data <= 10000) {
+//                    if (privacyLevel == 1) {
+//                        result.add((int) Math.floor((Double) item) / 10 * 10);
+//                    } else if (privacyLevel == 2) {
+//                        result.add((int) Math.floor((Double) item) / 100 * 100);
+//                    } else if (privacyLevel == 3) {
+//                        result.add((int) Math.floor((Double) item) / 1000 * 1000);
+//                    }
+//                } else if (max_data > 10000) {
+//                    if (privacyLevel == 1) {
+//                        result.add((int) Math.floor((Double) item) / 100 * 100);
+//                    } else if (privacyLevel == 2) {
+//                        result.add((int) Math.floor((Double) item) / 1000 * 1000);
+//                    } else if (privacyLevel == 3) {
+//                        result.add((int) Math.floor((Double) item) / 10000 * 10000);
+//                    }
+//                }
+//                //result.add((int) Math.floor((Double) item) / 10 *10);
+//            }
+//        }
+//
+//        return result;
+//    }
+
     @Override
-    public List<Integer> floor(List<Object> dataList, Integer privacyLevel) {
-        List<Integer> result = new ArrayList<>();
-        List<Double> re_data = new ArrayList<>();
+    public List<String> floor(List<Object> dataList, Integer privacyLevel) {
+        List<String> result = new ArrayList<>();
+        List<BigDecimal> re_data = new ArrayList<>();
+
         for (Object data : dataList) {
             if (data == null) {
                 re_data.add(null);
@@ -1043,12 +1118,12 @@ public class DpUtilImpl implements DpUtil {
                 if (data instanceof Cell) {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
-                        double numericValue = currentCell.getNumericCellValue();
+                        BigDecimal numericValue = BigDecimal.valueOf(currentCell.getNumericCellValue());
                         re_data.add(numericValue);
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
-                            double numericValue = Double.parseDouble(stringValue);
+                            BigDecimal numericValue = new BigDecimal(stringValue);
                             re_data.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
@@ -1056,51 +1131,52 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(new BigDecimal(data.toString()));
                 }
             }
         }
-//        if (privacyLevel == 0) {
-//            return re_data;
-//        }
-        double max_data = Collections.max(re_data);
-        for (Object item : re_data) {
+
+        BigDecimal max_data = Collections.max(re_data, Comparator.nullsFirst(Comparator.naturalOrder()));
+        for (BigDecimal item : re_data) {
             if (item == null) {
                 result.add(null);
             } else {
-                if (max_data <= 10) {
-                    result.add(10);
-                } else if (max_data <= 100) {
-                    result.add((int) Math.floor((Double) item) / 10 * 10);
-                } else if (max_data <= 1000) {
+                BigDecimal flooredValue = BigDecimal.ZERO;
+                if (max_data.compareTo(BigDecimal.valueOf(10)) <= 0) {
+                    flooredValue = BigDecimal.TEN;
+                } else if (max_data.compareTo(BigDecimal.valueOf(100)) <= 0) {
+                    flooredValue = item.divide(BigDecimal.TEN, 0, RoundingMode.FLOOR).multiply(BigDecimal.TEN);
+                } else if (max_data.compareTo(BigDecimal.valueOf(1000)) <= 0) {
                     if (privacyLevel == 1) {
-                        result.add((int) Math.floor((Double) item) / 10 * 10);
+                        flooredValue = item.divide(BigDecimal.TEN, 0, RoundingMode.FLOOR).multiply(BigDecimal.TEN);
                     } else {
-                        result.add((int) Math.floor((Double) item) / 100 * 100);
+                        flooredValue = item.divide(BigDecimal.valueOf(100), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(100));
                     }
-                } else if (max_data <= 10000) {
+                } else if (max_data.compareTo(BigDecimal.valueOf(10000)) <= 0) {
                     if (privacyLevel == 1) {
-                        result.add((int) Math.floor((Double) item) / 10 * 10);
+                        flooredValue = item.divide(BigDecimal.TEN, 0, RoundingMode.FLOOR).multiply(BigDecimal.TEN);
                     } else if (privacyLevel == 2) {
-                        result.add((int) Math.floor((Double) item) / 100 * 100);
+                        flooredValue = item.divide(BigDecimal.valueOf(100), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(100));
                     } else if (privacyLevel == 3) {
-                        result.add((int) Math.floor((Double) item) / 1000 * 1000);
+                        flooredValue = item.divide(BigDecimal.valueOf(1000), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(1000));
                     }
-                } else if (max_data > 10000) {
+                } else {
                     if (privacyLevel == 1) {
-                        result.add((int) Math.floor((Double) item) / 100 * 100);
+                        flooredValue = item.divide(BigDecimal.valueOf(100), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(100));
                     } else if (privacyLevel == 2) {
-                        result.add((int) Math.floor((Double) item) / 1000 * 1000);
+                        flooredValue = item.divide(BigDecimal.valueOf(1000), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(1000));
                     } else if (privacyLevel == 3) {
-                        result.add((int) Math.floor((Double) item) / 10000 * 10000);
+                        flooredValue = item.divide(BigDecimal.valueOf(10000), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(10000));
                     }
                 }
-                //result.add((int) Math.floor((Double) item) / 10 *10);
+                result.add(flooredValue.toString());
             }
         }
 
         return result;
     }
+
+
 
     @Override
     public List<String> floorTime(List<Object> dataList, Integer privacyLevel) {
@@ -1146,41 +1222,57 @@ public class DpUtilImpl implements DpUtil {
     @Override
     public List<Double> valueMapping(List<Object> dataList, Integer privacyLevel) {
         ArrayList<Double> result = new ArrayList<>();
-        List<Double> re_data = new ArrayList<>();
+        List<Double> reData = new ArrayList<>();
         //读取数据
         for (Object data : dataList) {
             if (data == null) {
-                re_data.add(null);
+                reData.add(null);
             } else {
                 if (data instanceof Cell) {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
                         double numericValue = currentCell.getNumericCellValue();
-                        re_data.add(numericValue);
+                        reData.add(numericValue);
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
                             double numericValue = Double.parseDouble(stringValue);
-                            re_data.add(numericValue);
+                            reData.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
                             e.printStackTrace();
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    reData.add((Double) data);
                 }
             }
         }
+        if (privacyLevel == 0) return reData;
 
-        for (Object data : re_data) {
+        int scale = 1;
+        switch (privacyLevel) {
+            case 1: {
+                scale = 20;
+                break;
+            }
+            case 2 : {
+                scale = 30;
+                break;
+            }
+            case 3: {
+                scale = 50;
+                break;
+            }
+        }
+
+        for (Object data : reData) {
             if (data == null) {
                 result.add(null);
             } else {
-                result.add((double) data * 50);
+                result.add((double) data * scale);
             }
         }
-        if (privacyLevel == 0) return re_data;
         return result;
     }
 

@@ -38,6 +38,10 @@
             justify-content: center;
         }
 
+        .showFile > * {
+            text-align: center;
+        }
+
         /*选择框居中*/
         .midtile {
             line-height: 30px;
@@ -62,7 +66,7 @@
             text-align: center;
         }
 
-        image, video {
+        img, video {
             display: inline-block;
             max-width: 50%;
             height: auto
@@ -467,8 +471,8 @@
     </script>
 </head>
 <body>
-<div class="ibox-title">
-</div>
+<#--<div class="ibox-title">-->
+<#--</div>-->
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">

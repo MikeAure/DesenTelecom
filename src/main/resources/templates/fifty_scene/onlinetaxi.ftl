@@ -540,7 +540,7 @@
         })
         document.getElementById("fileUpload").addEventListener("change", choose_file)
     }
-    choose_file = function (event) {
+    let choose_file = function (event) {
         //读取文件
         const file = event.target.files[0]
         // 文件名，扩展名
@@ -557,9 +557,9 @@
                 console.log(fileExtension)
                 //构建formData,发送给后端
                 var formData = new FormData();
-                formData.append("file", file);
-                formData.append("sheet", sheet);
-                formData.append("algName", "distortion");
+                formData.set("file", file);
+                formData.set("sheet", sheet);
+                formData.set("algName", "distortion");
                 console.log("sheet:" + sheet)
                 //提交脱敏参数，请求脱敏
                 document.getElementById("submit").onclick = function () {
@@ -580,7 +580,8 @@
                         dataArray.push(JSON.stringify(data));
                         //console.log(dataArray);
                     }
-                    formData.append("params", JSON.stringify(dataArray));
+                    console.log(JSON.stringify(dataArray))
+                    formData.set("params", JSON.stringify(dataArray));
                     console.log(dataArray.length);
                     fetch('/File/desenFile', {
                         method: 'POST',

@@ -2,7 +2,6 @@ package com.lu.gademo;
 
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Generalization;
-import com.lu.gademo.utils.impl.GeneralizationImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -89,7 +88,7 @@ public class GeneralizationTest {
     }
 
     @Test
-    public void testDateGroupPlace()  {
+    public void testDateGroupReplace()  {
         // Generalization generalization = new GeneralizationImpl();
         List<String> rawData = Arrays.asList("2024-3-18", "2024-6-1");
         DSObject dsObject = new DSObject(rawData);

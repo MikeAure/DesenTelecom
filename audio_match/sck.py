@@ -38,12 +38,6 @@ def formatPrint(C):
             print(C[i], end=",")
 
 def cli_main():
-    # 建立一个服务端
-    # server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # # server.bind(('localhost',19090)) #绑定要监听的端口
-    # server.bind(('0.0.0.0', 19090))
-    # server.listen(5)  # 开始监听 表示可以使用五个链接排队
-    # conn就是客户端链接过来而在服务端为期生成的一个链接实例
 
     file_save_location = "./voiceprinttxt/"
     if not os.path.exists(file_save_location):
@@ -53,30 +47,30 @@ def cli_main():
     secu = InnerProduct.InnerProduct()
 
     k1, k2, k3, k4, p, x = secu.getVariable()
-    print("参数为：")
-    print("k1:", k1, end=", ")
-    print("k2:", k2, end=", ")
-    print("k3:", k3, end=", ")
-    print("k4:", k4)
-    print("p:", p)
-    print("x:", x)
+    # print("参数为：")
+    # print("k1:", k1, end=", ")
+    # print("k2:", k2, end=", ")
+    # print("k3:", k3, end=", ")
+    # print("k4:", k4)
+    # print("p:", p)
+    # print("x:", x)
 
     stime = time.time()
-    print('当前时间：', str(stime) + '秒')
+    # print('当前时间：', str(stime) + '秒')
 
     tmp_data = args.name  # 接收id
-    print(tmp_data)
+    # print(tmp_data)
 
     tmp_list = tmp_data.split("@@")
-    print(tmp_list)
+    # print(tmp_list)
     title = tmp_list[0]
-    print(str(title))
+    # print(str(title))
 
     identifier = title.split("&&")
-    print(str(identifier))
+    # print(str(identifier))
 
     filename = str(title) + ".wav"
-    print("args.file: " + str(args.file))
+    # print("args.file: " + str(args.file))
     file_path = os.path.join(file_save_location, filename)
     with open(args.file, "rb") as f1:
         with open(file_path, "wb") as f:
@@ -90,80 +84,80 @@ def cli_main():
         try:
             query_exist(user_name)
         except IOError as e:
-            print(e)
+            # print(e)
             result1.status = "error"
             result1.message = str(e)
         else:
-            print('注册声纹模板提取...')
+            # print('注册声纹模板提取...')
             s2 = time.time()
             voiceprint_a = extraction.extract_voiceprint(file_path, sr=16000)
             e2 = time.time()
-            print('注册声纹模板提取结束，用时：', str(e2 - s2) + '秒')
+            # print('注册声纹模板提取结束，用时：', str(e2 - s2) + '秒')
 
             a = voiceprint_a.cpu().numpy().tolist()[0]
-            print("提取的原始声纹注册模板,模板长度为512:")
+            # print("提取的原始声纹注册模板,模板长度为512:")
             formatPrint(a[0:10])
 
             a = secu.float2int(a)
-            print("乘以放大倍数的原始声纹注册模板,模板长度为512:")
+            # print("乘以放大倍数的原始声纹注册模板,模板长度为512:")
             formatPrint(a[0:10])
 
             A = torch.norm(voiceprint_a).item()
-            print("提取的原始声纹注册模板向量的模: ", A)
+            # print("提取的原始声纹注册模板向量的模: ", A)
 
             s3 = time.time()
 
             s, C = secu.Step1(a)
             e3 = time.time()
-            print('认证声纹加密结束，用时：', str(e3 - s3) + '秒')
+            # print('认证声纹加密结束，用时：', str(e3 - s3) + '秒')
 
-            print("提取的加密后的声纹注册模板,模板长度为512:")
+            # print("提取的加密后的声纹注册模板,模板长度为512:")
             formatPrint(C[0:10])
 
             s3 = time.time()
-            print("将声纹模板密文存入数据库并将密钥写入文件")
+            # print("将声纹模板密文存入数据库并将密钥写入文件")
             try:
                 save(user_name, C, A)
             except IOError as e:
-                print(e)
+                # print(e)
                 result1.status = "error"
                 result1.message = str(e)
             else:
                 file_s = user_name + '.txt'
                 s = str(s)
-                print("该注册用户的密钥: ", s)
+                # print("该注册用户的密钥: ", s)
                 file_txt_path = os.path.join(file_save_location, file_s)
                 with open(file_txt_path, "w") as f:
                     f.write(s)
 
                 e3 = time.time()
-                print('存储结束，用时：', str(e3 - s3) + '秒')
+                # print('存储结束，用时：', str(e3 - s3) + '秒')
                 result1.status = 'ok'
     else:
-        print('登陆声纹模板提取...')
+        # print('登录声纹模板提取...')
         s2 = time.time()
         voice_print_b = extraction.extract_voiceprint(file_path, sr=16000)
         e2 = time.time()
-        print('登陆声纹模板提取结束，用时：', str(e2 - s2) + '秒')
+        # print('登录声纹模板提取结束，用时：', str(e2 - s2) + '秒')
 
         b = voice_print_b.cpu().numpy().tolist()[0]
 
-        print("提取的原始声纹登陆模板,模板长度为512:")
+        # print("提取的原始声纹登录模板,模板长度为512:")
         formatPrint(b[0:10])
 
         b = secu.float2int(b)
-        print("乘以放大倍数的原始声纹登陆模板,模板长度为512:")
+        # print("乘以放大倍数的原始声纹登录模板,模板长度为512:")
         formatPrint(b[0:10])
 
         B = torch.norm(voice_print_b).item()
-        print("提取的原始声纹登陆模板向量的模: ", B)
+        # print("提取的原始声纹登录模板向量的模: ", B)
 
         s3 = time.time()
         # 从数据库读取C,A
         try:
             C, A = findvoice(identifier[0])
         except Exception as e:
-            print(e)
+            # print(e)
             result1.status = "error"
             result1.message = str(e)
         else:
@@ -174,25 +168,25 @@ def cli_main():
             DSum, D = secu.Step2(b, C)
             e3 = time.time()
 
-            print("提取的加密后的声纹登陆模板向量的参数: ", DSum)
+            # print("提取的加密后的声纹登录模板向量的参数: ", DSum)
 
-            print("提取的加密后的声纹登陆模板,模板长度为512:")
+            # print("提取的加密后的声纹登录模板,模板长度为512:")
             formatPrint(D[0:10])
 
-            print('认证声纹加密结束，用时：', str(e3 - s3) + '秒')
+            # print('认证声纹加密结束，用时：', str(e3 - s3) + '秒')
 
             s1 = time.time()
             inner_product = secu.Step3(DSum, s)
-            print("乘以放大倍数的注册模板向量与认证模板向量之间的内积: ", inner_product)
+            # print("乘以放大倍数的注册模板向量与认证模板向量之间的内积: ", inner_product)
 
             inner_product = secu.correct(inner_product)
-            print("注册模板向量与认证模板向量之间的内积: ", inner_product)
+            # print("注册模板向量与认证模板向量之间的内积: ", inner_product)
 
             distance = A ** 2 + B ** 2 - 2 * inner_product
-            print("注册模板向量与认证模板向量之间的欧式距离: ", distance)
+            # print("注册模板向量与认证模板向量之间的欧式距离: ", distance)
 
             e1 = time.time()
-            print("计算注册模板向量与认证模板向量之间的欧式距离结束，用时：", str(e1 - s1) + '秒')
+            # print("计算注册模板向量与认证模板向量之间的欧式距离结束，用时：", str(e1 - s1) + '秒')
 
             if distance <= args.distance:
                 result1.status = "ok"
@@ -202,222 +196,8 @@ def cli_main():
                 result1.message = "distance too large"
             login_add(identifier[0], success)
 
-    print(json.dumps(result1.__dict__))
+    print(json.dumps(result1.__dict__)).encode('utf-8')
     return json.dumps(result1.__dict__).encode('utf-8')
-
-def main():
-    # 建立一个服务端
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # server.bind(('localhost',19090)) #绑定要监听的端口
-    server.bind(('0.0.0.0', 19090))
-    server.listen(5)  # 开始监听 表示可以使用五个链接排队
-    # conn就是客户端链接过来而在服务端为期生成的一个链接实例
-
-    secu = InnerProduct.InnerProduct()
-
-    k1, k2, k3, k4, p, x = secu.getVariable()
-    print("参数为：")
-    print("k1:", k1, end=", ")
-    print("k2:", k2, end=", ")
-    print("k3:", k3, end=", ")
-    print("k4:", k4)
-    print("p:", p)
-    print("x:", x)
-
-    file_save_location = "./voiceprinttxt/"
-
-    if not os.path.exists(file_save_location):
-        os.mkdir(file_save_location)
-    # argparser = add_args(argparse.ArgumentParser(description="Voiceprint Server"))
-    # args = argparser.parse_args()
-
-    while True:
-        print("waiting message")
-        conn, addr = server.accept()  # 等待链接,多个链接的时候就会出现问题,其实返回了两个值
-
-        print('Accept new connection from {0}'.format(addr))
-
-        stime = time.time()
-        print('当前服务器时间：', str(stime) + '秒')
-
-        tmpData = conn.recv(35)  # 接收id
-        print(tmpData)
-        shut_down = tmpData.decode("UTF-8")
-
-        if shut_down == "shutdown":
-            conn.close()
-            break
-        else:
-            tmpList = tmpData.split(b"@@")
-            print(tmpList)
-            title = tmpList[0].decode("UTF-8")
-            print(str(title))
-
-            identifier = title.split("&&")
-            print(str(identifier))
-
-        filename = str(title) + ".wav"
-        print('start receiving...')
-        # print('开始采集客户端发送过来的秘钥数据...')
-        s1 = time.time()
-        total_data = b''
-        total_data += tmpList[1]
-        data = conn.recv(1024)  # 接收数据
-
-        total_data += data
-        count = num = len(data)
-        # count = int(tmpList[1])
-        print(count)
-        stime = time.time()
-        print("开始接收文件的时间", stime)
-        while count > 0:
-            try:
-                data = conn.recv(1024)
-                total_data += data
-                count = len(data)
-                num += count
-            except:
-                break
-
-        num += len(tmpList[1])
-        etime = time.time()
-        print("接收完文件的时间", etime)
-
-        e1 = time.time()
-        print('receive done')
-        print('采集时间为：', str(e1 - s1) + '秒')
-        print('采集到的的数据为：', total_data[0:10])
-        print('采集到的的数据存储位置为：', filename)
-        file_path = os.path.join(file_save_location, filename)
-        with open(file_path, "wb") as f:
-            f.write(total_data)
-
-        result1 = ServerResponse()
-        success = False
-        user_name = identifier[0]
-        flag = identifier[1]
-        if (flag == '0'):
-            try:
-                query_exist(user_name)
-            except IOError as e:
-                print(e)
-                result1.status = "error"
-                result1.message = str(e)
-            else:
-                print('注册声纹模板提取...')
-                s2 = time.time()
-                voiceprint_a = extraction.extract_voiceprint(file_path, sr=16000)
-                e2 = time.time()
-                print('注册声纹模板提取结束，用时：', str(e2 - s2) + '秒')
-
-                a = voiceprint_a.cpu().numpy().tolist()[0]
-                print("提取的原始声纹注册模板,模板长度为512:")
-                formatPrint(a[0:10])
-
-                a = secu.float2int(a)
-                print("乘以放大倍数的原始声纹注册模板,模板长度为512:")
-                formatPrint(a[0:10])
-
-                A = torch.norm(voiceprint_a).item()
-                print("提取的原始声纹注册模板向量的模: ", A)
-
-                s3 = time.time()
-
-                s, C = secu.Step1(a)
-                e3 = time.time()
-                print('认证声纹加密结束，用时：', str(e3 - s3) + '秒')
-
-                print("提取的加密后的声纹注册模板,模板长度为512:")
-                formatPrint(C[0:10])
-
-                s3 = time.time()
-                print("将声纹模板密文存入数据库并将密钥写入文件")
-                try:
-                    save(user_name, C, A)
-                except IOError as e:
-                    print(e)
-                    result1.status = "error"
-                    result1.message = str(e)
-                else:
-                    file_s = user_name + '.txt'
-                    s = str(s)
-                    print("该注册用户的密钥: ", s)
-                    file_txt_path = os.path.join(file_save_location, file_s)
-                    with open(file_txt_path, "w") as f:
-                        f.write(s)
-
-                    e3 = time.time()
-                    print('存储结束，用时：', str(e3 - s3) + '秒')
-                    result1.status = 'ok'
-        else:
-            print('登陆声纹模板提取...')
-            s2 = time.time()
-            voice_print_b = extraction.extract_voiceprint(file_path, sr=16000)
-            e2 = time.time()
-            print('登陆声纹模板提取结束，用时：', str(e2 - s2) + '秒')
-
-            b = voice_print_b.cpu().numpy().tolist()[0]
-
-            print("提取的原始声纹登陆模板,模板长度为512:")
-            formatPrint(b[0:10])
-
-            b = secu.float2int(b)
-            print("乘以放大倍数的原始声纹登陆模板,模板长度为512:")
-            formatPrint(b[0:10])
-
-            B = torch.norm(voice_print_b).item()
-            print("提取的原始声纹登陆模板向量的模: ", B)
-
-            s3 = time.time()
-            # 从数据库读取C,A
-            try:
-                C, A = findvoice(identifier[0])
-            except Exception as e:
-                print(e)
-                result1.status = "error"
-                result1.message = str(e)
-            else:
-                # 从文件中读取s
-                file_txt_path = os.path.join(file_save_location, identifier[0] + ".txt")
-                with open(file_txt_path) as f:
-                    s = int(f.read())
-                DSum, D = secu.Step2(b, C)
-                e3 = time.time()
-
-                print("提取的加密后的声纹登陆模板向量的参数: ", DSum)
-
-                print("提取的加密后的声纹登陆模板,模板长度为512:")
-                formatPrint(D[0:10])
-
-                print('认证声纹加密结束，用时：', str(e3 - s3) + '秒')
-
-                s1 = time.time()
-                inner_product = secu.Step3(DSum, s)
-                print("乘以放大倍数的注册模板向量与认证模板向量之间的内积: ", inner_product)
-
-                inner_product = secu.correct(inner_product)
-                print("注册模板向量与认证模板向量之间的内积: ", inner_product)
-
-                distance = A ** 2 + B ** 2 - 2 * inner_product
-                print("注册模板向量与认证模板向量之间的欧式距离: ", distance)
-
-                e1 = time.time()
-                print("计算注册模板向量与认证模板向量之间的欧式距离结束，用时：", str(e1 - s1) + '秒')
-
-                if distance <= 0.43:
-                    result1.status = "ok"
-                    success = True
-                else:
-                    result1.status = "error"
-                    result1.message = "distance too large"
-                login_add(identifier[0], success)
-
-        print("返回的结果: ", result1)
-
-        conn.send(json.dumps(result1.__dict__).encode('utf-8'))
-        conn.close()
-        # os.remove(filename)
-
 
 if __name__ == "__main__" :
     cli_main()

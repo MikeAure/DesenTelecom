@@ -38,6 +38,11 @@
             justify-content: center;
         }
 
+
+        .showFile > * {
+            text-align: center;
+        }
+
         /*选择框居中*/
         .midtile {
             line-height: 30px;
@@ -62,280 +67,273 @@
             text-align: center;
         }
 
-        image, video {
+        img, video {
             display: inline-block;
             max-width: 50%;
             height: auto
         }
 
     </style>
-</head>
+    <!-- 全局js -->
+    <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
+    <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="${ctx!}/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="${ctx!}/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
 
-<body>
+    <!-- 自定义js -->
+    <script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
+    <script type="text/javascript" src="${ctx!}/js/index.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            // 图片通道随机打乱
+            document.getElementById("image_exchange_channel_fileupload").addEventListener("change", function (event) {
+                // 清空
+                document.getElementById("image_exchange_channel_pre").innerHTML = "";
+                document.getElementById("image_exchange_channel_after").innerHTML = "";
+                // 视频格式
+                const imageType = ['jpg', 'jpeg', 'png', 'gif'];
 
-<!-- 全局js -->
-<script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
-<script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
-<script src="${ctx!}/js/plugins/metisMenu/jquery.metisMenu.js"></script>
-<script src="${ctx!}/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-<script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
+                //读取文件
+                const file = event.target.files[0]
+                // 文件名，扩展名
+                if (file) {
+                    const fileName = file.name;
+                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                    console.log(fileExtension)
 
-<!-- 自定义js -->
-<script src="${ctx!}/js/hAdmin.js?v=4.1.0"></script>
-<script type="text/javascript" src="${ctx!}/js/index.js"></script>
-<script type="text/javascript">
-    window.onload = function () {
-        // 图片通道随机打乱
-        document.getElementById("image_exchange_channel_fileupload").addEventListener("change", function (event) {
-            // 清空
-            document.getElementById("image_exchange_channel_pre").innerHTML = "";
-            document.getElementById("image_exchange_channel_after").innerHTML = "";
-            // 视频格式
-            const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+                    if (imageType.includes(fileExtension)) {
+                        let pre = document.getElementById("image_exchange_channel_pre");
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let img = new Image();
+                            img.src = e.target.result;
 
-            //读取文件
-            const file = event.target.files[0]
-            // 文件名，扩展名
-            if (file) {
-                const fileName = file.name;
-                const fileExtension = fileName.split('.').pop().toLowerCase();
-                console.log(fileExtension)
+                            pre.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                        //提交脱敏参数，请求脱敏
+                        document.getElementById("image_exchange_channel_submit").onclick = function () {
+                            let after = document.getElementById("image_exchange_channel_after");
+                            after.innerHTML = "";
+                            // 获取保护级别
+                            let param = "1";
+                            let formData = new FormData();
+                            formData.set("file", file);
+                            formData.set("params", param);
+                            formData.set("algName", "image_exchange_channel");
+                            formData.set("sheet", "image_exchange_channel");
 
-                if (imageType.includes(fileExtension)) {
-                    let pre = document.getElementById("image_exchange_channel_pre");
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        let img = new Image();
-                        img.src = e.target.result;
+                            fetch('/File/desenFile', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => response.blob())
+                                .then(blob => {
+                                    let dealtImg = new Image();
+                                    dealtImg.src = URL.createObjectURL(blob);
+                                    dealtImg.style.height = 'auto';
+                                    after.appendChild(dealtImg);
+                                })
+                                .catch(error => console.error('Error:', error));
 
-                        pre.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                    //提交脱敏参数，请求脱敏
-                    document.getElementById("image_exchange_channel_submit").onclick = function () {
-                        let after = document.getElementById("image_exchange_channel_after");
+                        }
+                    } else {
+                        alert("请选择图像文件");
+                    }
+                }
+            })
+            // 图片逐通道添加颜色偏移
+            document.getElementById("image_add_color_offset_fileupload").addEventListener("change", function (event) {
+                // 清空
+                document.getElementById("image_add_color_offset_pre").innerHTML = "";
+                document.getElementById("image_add_color_offset_after").innerHTML = "";
+                // 视频格式
+                const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+
+                //读取文件
+                const file = event.target.files[0]
+                // 文件名，扩展名
+                if (file) {
+                    const fileName = file.name;
+                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                    console.log(fileExtension)
+
+                    if (imageType.includes(fileExtension)) {
+                        let pre = document.getElementById("image_add_color_offset_pre");
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let img = new Image();
+                            img.src = e.target.result;
+
+                            pre.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                        //提交脱敏参数，请求脱敏
+                        document.getElementById("image_add_color_offset_submit").onclick = function () {
+                            let after = document.getElementById("image_add_color_offset_after");
+                            after.innerHTML = "";
+                            // 获取保护级别
+                            let param = document.getElementById("image_add_color_offset_privacyLevel").value;
+
+                            let formData = new FormData();
+                            formData.set("file", file);
+                            formData.set("params", param);
+                            formData.set("algName", "image_add_color_offset");
+                            formData.set("sheet", "image_add_color_offset");
+
+                            fetch('/File/desenFile', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => response.blob())
+                                .then(blob => {
+                                    let dealedImg = new Image();
+                                    dealedImg.src = URL.createObjectURL(blob);
+                                    after.appendChild(dealedImg);
+                                })
+                                .catch(error => console.error('Error:', error));
+
+                        }
+                    } else {
+                        alert("请选择图像文件");
+                    }
+                }
+            })
+            // 图片人脸替换
+            document.getElementById("img_face_sub_src_fileupload").addEventListener("change", function (event) {
+                // 清空
+                document.getElementById("img_face_sub_pre").innerHTML = "";
+                // document.getElementById("video_remove_bg_img").innerHTML = "";
+                const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+                //读取文件
+                const imageFile = event.target.files[0]
+                // 文件名，扩展名
+                if (imageFile) {
+                    const fileName = imageFile.name;
+                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                    console.log(fileExtension)
+
+                    if (imageType.includes(fileExtension)) {
+                        let pre = document.getElementById("img_face_sub_pre");
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let img = new Image();
+                            img.src = e.target.result;
+                            img.style.height = 'auto';
+                            pre.appendChild(img);
+                        };
+                        reader.readAsDataURL(imageFile);
+                    }
+                }
+            })
+            document.getElementById("img_face_sub_target_fileupload").addEventListener("change", function (event) {
+
+                // 清空
+                document.getElementById("img_face_sub_target_img").innerHTML = "";
+                // 图片格式
+                const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+                //读取文件
+                const imageFile = event.target.files[0]
+                // 文件名，扩展名
+                if (imageFile) {
+                    const fileName = imageFile.name;
+                    const fileExtension = fileName.split('.').pop().toLowerCase();
+                    console.log(fileExtension)
+
+                    if (imageType.includes(fileExtension)) {
+                        let pre = document.getElementById("img_face_sub_target_img");
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let img = new Image();
+                            img.src = e.target.result;
+                            img.style.height = 'auto';
+                            pre.appendChild(img);
+                        };
+                        reader.readAsDataURL(imageFile);
+                    }
+                }
+            })
+            document.getElementById("img_face_sub_submit").addEventListener("click", function (event) {
+                document.getElementById("img_face_sub_after").innerHTML = "";
+                // debugger
+                // 清空
+                // 目标面孔
+                const imgSrcFile = document.getElementById("img_face_sub_src_fileupload").files[0];
+                // 被换脸的文件
+                const imgTargetFile = document.getElementById("img_face_sub_target_fileupload").files[0];
+
+                // document.getElementById("video_remove_bg_img").innerHTML = "";
+                // 图片格式
+                const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+                //读取文件
+                // const videoFile = event.target.files[0]
+                // const imageFile =
+                // 文件名，扩展名
+                if (imgSrcFile && imgTargetFile) {
+                    const imgSrcFileName = imgSrcFile.name;
+                    const imgSrcFileNameExtension = imgSrcFileName.split('.').pop().toLowerCase();
+                    const imgTargetFileName = imgTargetFile.name;
+                    const imgTargetFileNameExtension = imgTargetFileName.split('.').pop().toLowerCase();
+
+                    console.log(imgSrcFileNameExtension);
+                    console.log(imgTargetFileNameExtension);
+
+                    if (imageType.includes(imgSrcFileNameExtension) && imageType.includes(imgTargetFileNameExtension)) {
+                        // let pre = document.getElementById("video_remove_bg_pre");
+                        // let reader = new FileReader();
+                        // reader.onload = function (e) {
+                        //     let video = document.createElement("video");
+                        //     video.src = e.target.result;
+                        //     /*video.style.width = '300px';*/
+                        //     video.controls = true;
+                        //     pre.appendChild(video);
+                        // };
+                        // reader.readAsDataURL(videoFile);
+                        //提交脱敏参数，请求脱敏
+                        let after = document.getElementById("img_face_sub_after");
                         after.innerHTML = "";
                         // 获取保护级别
                         let param = "1";
-                        let formData = new FormData();
-                        formData.set("file", file);
-                        formData.set("params", param);
-                        formData.set("algName", "image_exchange_channel");
-                        formData.set("sheet", "image_exchange_channel");
 
-                        fetch('/File/desenFile', {
+                        let formData = new FormData();
+                        formData.set("file", imgTargetFile);
+                        formData.set("params", param);
+                        formData.set("algName", "image_face_sub");
+                        formData.set("sheet", imgSrcFile);
+
+                        fetch('/File/replaceFace', {
                             method: 'POST',
                             body: formData
                         })
-                            .then(response => response.blob())
+                            .then(response => {
+                                if (response.status === 200) {
+                                    return response.blob();
+                                } else {
+                                    throw new Error("Python script executes failed");
+                                }
+                            })
                             .then(blob => {
                                 let dealtImg = new Image();
                                 dealtImg.src = URL.createObjectURL(blob);
-                                dealtImg.style.maxWidth = '80%';
                                 dealtImg.style.height = 'auto';
                                 after.appendChild(dealtImg);
                             })
-                            .catch(error => console.error('Error:', error));
-
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert(error)
+                            });
+                    } else {
+                        alert("请选择图片文件");
                     }
-                } else {
-                    alert("请选择图像文件");
                 }
-            }
-        })
-        // 图片逐通道添加颜色偏移
-        document.getElementById("image_add_color_offset_fileupload").addEventListener("change", function (event) {
-            // 清空
-            document.getElementById("image_add_color_offset_pre").innerHTML = "";
-            document.getElementById("image_add_color_offset_after").innerHTML = "";
-            // 视频格式
-            const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+            })
+        }
 
-            //读取文件
-            const file = event.target.files[0]
-            // 文件名，扩展名
-            if (file) {
-                const fileName = file.name;
-                const fileExtension = fileName.split('.').pop().toLowerCase();
-                console.log(fileExtension)
+    </script>
+</head>
 
-                if (imageType.includes(fileExtension)) {
-                    let pre = document.getElementById("image_add_color_offset_pre");
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        let img = new Image();
-                        img.src = e.target.result;
-
-                        pre.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                    //提交脱敏参数，请求脱敏
-                    document.getElementById("image_add_color_offset_submit").onclick = function () {
-                        let after = document.getElementById("image_add_color_offset_after");
-                        after.innerHTML = "";
-                        // 获取保护级别
-                        let param = document.getElementById("image_add_color_offset_privacyLevel").value;
-
-                        let formData = new FormData();
-                        formData.set("file", file);
-                        formData.set("params", param);
-                        formData.set("algName", "image_add_color_offset");
-                        formData.set("sheet", "image_add_color_offset");
-
-                        fetch('/File/desenFile', {
-                            method: 'POST',
-                            body: formData
-                        })
-                            .then(response => response.blob())
-                            .then(blob => {
-                                let dealedImg = new Image();
-                                dealedImg.src = URL.createObjectURL(blob);
-                                after.appendChild(dealedImg);
-                            })
-                            .catch(error => console.error('Error:', error));
-
-                    }
-                } else {
-                    alert("请选择图像文件");
-                }
-            }
-        })
-        // 图片人脸替换
-        document.getElementById("img_face_sub_src_fileupload").addEventListener("change", function (event) {
-            // 清空
-            document.getElementById("img_face_sub_pre").innerHTML = "";
-            // document.getElementById("video_remove_bg_img").innerHTML = "";
-            const imageType = ['jpg', 'jpeg', 'png', 'gif'];
-            //读取文件
-            const imageFile = event.target.files[0]
-            // 文件名，扩展名
-            if (imageFile) {
-                const fileName = imageFile.name;
-                const fileExtension = fileName.split('.').pop().toLowerCase();
-                console.log(fileExtension)
-
-                if (imageType.includes(fileExtension)) {
-                    let pre = document.getElementById("img_face_sub_pre");
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        let img = new Image();
-                        img.src = e.target.result;
-                        img.style.maxWidth = '80%';
-                        img.style.height = 'auto';
-                        pre.appendChild(img);
-                    };
-                    reader.readAsDataURL(imageFile);
-                }
-            }
-        })
-        document.getElementById("img_face_sub_target_fileupload").addEventListener("change", function (event) {
-
-            // 清空
-            document.getElementById("img_face_sub_target_img").innerHTML = "";
-            // 图片格式
-            const imageType = ['jpg', 'jpeg', 'png', 'gif'];
-            //读取文件
-            const imageFile = event.target.files[0]
-            // 文件名，扩展名
-            if (imageFile) {
-                const fileName = imageFile.name;
-                const fileExtension = fileName.split('.').pop().toLowerCase();
-                console.log(fileExtension)
-
-                if (imageType.includes(fileExtension)) {
-                    let pre = document.getElementById("img_face_sub_target_img");
-                    let reader = new FileReader();
-                    reader.onload = function (e) {
-                        let img = new Image();
-                        img.src = e.target.result;
-                        img.style.maxWidth = '80%';
-                        img.style.height = 'auto';
-                        pre.appendChild(img);
-                    };
-                    reader.readAsDataURL(imageFile);
-                }
-            }
-        })
-        document.getElementById("img_face_sub_submit").addEventListener("click", function (event) {
-            document.getElementById("img_face_sub_after").innerHTML = "";
-            // debugger
-            // 清空
-            // 目标面孔
-            const imgSrcFile = document.getElementById("img_face_sub_src_fileupload").files[0];
-            // 被换脸的文件
-            const imgTargetFile = document.getElementById("img_face_sub_target_fileupload").files[0];
-
-            // document.getElementById("video_remove_bg_img").innerHTML = "";
-            // 图片格式
-            const imageType = ['jpg', 'jpeg', 'png', 'gif'];
-            //读取文件
-            // const videoFile = event.target.files[0]
-            // const imageFile =
-            // 文件名，扩展名
-            if (imgSrcFile && imgTargetFile) {
-                const imgSrcFileName = imgSrcFile.name;
-                const imgSrcFileNameExtension = imgSrcFileName.split('.').pop().toLowerCase();
-                const imgTargetFileName = imgTargetFile.name;
-                const imgTargetFileNameExtension = imgTargetFileName.split('.').pop().toLowerCase();
-
-                console.log(imgSrcFileNameExtension);
-                console.log(imgTargetFileNameExtension);
-
-                if (imageType.includes(imgSrcFileNameExtension) && imageType.includes(imgTargetFileNameExtension)) {
-                    // let pre = document.getElementById("video_remove_bg_pre");
-                    // let reader = new FileReader();
-                    // reader.onload = function (e) {
-                    //     let video = document.createElement("video");
-                    //     video.src = e.target.result;
-                    //     /*video.style.width = '300px';*/
-                    //     video.controls = true;
-                    //     pre.appendChild(video);
-                    // };
-                    // reader.readAsDataURL(videoFile);
-                    //提交脱敏参数，请求脱敏
-                    let after = document.getElementById("img_face_sub_after");
-                    after.innerHTML = "";
-                    // 获取保护级别
-                    let param = "1";
-
-                    let formData = new FormData();
-                    formData.set("file", imgTargetFile);
-                    formData.set("params", param);
-                    formData.set("algName", "image_face_sub");
-                    formData.set("sheet", imgSrcFile);
-
-                    fetch('/File/replaceFace', {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => {
-                            if (response.status === 200) {
-                                return response.blob();
-                            } else {
-                                throw new Error("Python script executes failed");
-                            }
-                        })
-                        .then(blob => {
-                            let dealtImg = new Image();
-                            dealtImg.src = URL.createObjectURL(blob);
-                            dealtImg.style.maxWidth = '80%';
-                            dealtImg.style.height = 'auto';
-                            after.appendChild(dealtImg);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert(error)
-                        });
-                } else {
-                    alert("请选择图片文件");
-                }
-            }
-        })
-    }
-
-</script>
-<div class="ibox-title">
-</div>
+<body>
 
 <div class="panel panel-default">
     <div class="panel-body">

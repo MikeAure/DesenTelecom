@@ -4,6 +4,7 @@ import com.lu.gademo.utils.impl.UtilImpl;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -29,18 +30,31 @@ public class CommandExecutor {
             } else {
                 p = Runtime.getRuntime().exec(cmd, null, new java.io.File(context));
             }
-            String line;
-            bufferReader = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
-            bufferReaderError = new BufferedReader(new InputStreamReader(p.getErrorStream(), StandardCharsets.UTF_8));
-            while ((line = bufferReader.readLine()) != null || (line = bufferReaderError.readLine()) != null) {
-                log.info("Process output: " + line);
-                result.add(line);
-                if (line.contains("Error") || line.contains("Traceback")) {
-                    return null;
-                }
-            }
+//            String line;
+//            bufferReader = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
+//            bufferReaderError = new BufferedReader(new InputStreamReader(p.getErrorStream(), StandardCharsets.UTF_8));
+//            while ((line = bufferReader.readLine()) != null || (line = bufferReaderError.readLine()) != null) {
+//                log.info("Process output: " + line);
+//                result.add(line);
+//                if (line.contains("Error") || line.contains("Traceback")) {
+//                    return null;
+//                }
+//            }
+
+            StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream(), result);
+            StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), result);
+
+            outputGobbler.start();
+            errorGobbler.start();
+
             // 等待脚本执行完毕，阻塞
-            p.waitFor();
+            int exitCode = p.waitFor();
+            outputGobbler.join();
+            errorGobbler.join();
+
+            if (exitCode != 0) {
+                log.error("Process exited with code: " + exitCode);
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {
@@ -55,6 +69,8 @@ public class CommandExecutor {
         return result;
     }
 
+
+
     /**
      * Execute a Python script with specified parameters.
      *
@@ -67,17 +83,10 @@ public class CommandExecutor {
 
     public static List<String> executePython(String rawData, String algName, String path, String... params) {
 
-        Util util = new UtilImpl();
+
 //        String python = util.isLinux() ? "python3" : "python";
         String python;
-        if (util.isCondaInstalled(util.isLinux())) {
-            python = "conda run -n torch_env python";
-        } else if (util.isLinux()) {
-            python = "python3";
-        } else {
-            python = "python";
-        }
-
+        python = getPythonCommand();
         try {
             // 指定Python脚本路径
             log.info("Python execution path: " + path);
@@ -99,5 +108,52 @@ public class CommandExecutor {
             log.error(e.getMessage());
         }
         return null;
+    }
+
+    public static String getPythonCommand() {
+        String python;
+        Util util = new UtilImpl();
+        if (util.isCondaInstalled(util.isLinux())) {
+            python = "conda run -n torch_env python";
+        } else if (util.isLinux()) {
+            python = "python3";
+        } else {
+            python = "python";
+        }
+        return python;
+    }
+
+    private static class StreamGobbler extends Thread {
+        private BufferedReader reader;
+        private List<String> outputList;
+
+        public StreamGobbler(InputStream stream, List<String> outputList) {
+            this.reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            this.outputList = outputList;
+        }
+
+        @Override
+        public void run() {
+            try {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    log.info("Process output: " + line);
+                    synchronized (outputList) {
+                        outputList.add(line);
+                    }
+                    if (line.contains("Error") || line.contains("Traceback")) {
+                        // You can set a flag or handle error output here if needed
+                    }
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            } finally {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
     }
 }

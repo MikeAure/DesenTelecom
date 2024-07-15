@@ -20,7 +20,7 @@ class SparseVectorTechnique1(Mechanism):
         self.c = c  # maximum number of queries answered with 1
         self.t = t
 
-    def m(self, a, n_samples: int = 3):
+    def m(self, a, n_samples: int = 1):
         """
         Args:
             a: 1d array of query results (sensitivity 1)

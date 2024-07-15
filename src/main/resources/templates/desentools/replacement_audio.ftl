@@ -113,10 +113,10 @@
                             let sheet = document.getElementById("audio_reshuffle_block_num").value;
 
                             let formData = new FormData();
-                            formData.append("file", file);
-                            formData.append("params", "0");
-                            formData.append("algName", "audio_reshuffle");
-                            formData.append("sheet", sheet);
+                            formData.set("file", file);
+                            formData.set("params", "0");
+                            formData.set("algName", "audio_reshuffle");
+                            formData.set("sheet", sheet);
 
                             fetch('/File/desenFile', {
                                 method: 'POST',
@@ -182,10 +182,10 @@
                             let param = "1";
 
                             let formData = new FormData();
-                            formData.append("file", file);
-                            formData.append("params", param);
-                            formData.append("algName", "voice_replace");
-                            formData.append("sheet", "voice_replace");
+                            formData.set("file", file);
+                            formData.set("params", param);
+                            formData.set("algName", "voice_replace");
+                            formData.set("sheet", "voice_replace");
 
                             fetch('/File/desenFile', {
                                 method: 'POST',
@@ -248,10 +248,10 @@
                             let param = document.getElementById("apply_audio_effects_privacyLevel").value;
 
                             let formData = new FormData();
-                            formData.append("file", file);
-                            formData.append("params", param);
-                            formData.append("algName", "apply_audio_effects");
-                            formData.append("sheet", "apply_audio_effects");
+                            formData.set("file", file);
+                            formData.set("params", param);
+                            formData.set("algName", "apply_audio_effects");
+                            formData.set("sheet", "apply_audio_effects");
 
                             fetch('/File/desenFile', {
                                 method: 'POST',
@@ -286,9 +286,8 @@
 </head>
 
 <body>
-<div class="ibox-title">
-</div>
-
+<#--<div class="ibox-title">-->
+<#--</div>-->
 <div class="panel panel-default">
 
     <div class="panel-body">
@@ -338,7 +337,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                12.音频变形</p>
+                2.音频变形</p>
             <div style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <#-- <p style="font-size: 1.5em;">2.基于像素块的图像像素替换方法</p>-->
                 <div>
@@ -392,7 +391,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                13.音频重排</p>
+                3.音频重排</p>
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">

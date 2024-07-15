@@ -329,6 +329,8 @@ public class UtilImpl implements Util {
                     //if (datas.get(j-1)!=null) {
                     if (element instanceof Double) {
                         cell.setCellValue((Double) element);
+                    } else if (element instanceof Integer) {
+                        cell.setCellValue((Integer) element);
                     } else if (element instanceof Date) {
                         //cell.setCellValue((Date) element);
                         cell.setCellValue(element + "");

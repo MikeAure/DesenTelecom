@@ -31,7 +31,6 @@ public class appstoreParam extends BaseEntity {
     //高中低 0,1,2,3
     private Integer tmParam;
 
-
     public appstoreParam(String json) throws IOException {
 //        System.out.println("json数据："+json);
         appstoreParam param = new ObjectMapper().readValue(json, appstoreParam.class);

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -419,6 +420,8 @@ public class FileServiceImpl implements FileService {
         } else {
             headers.setContentType(MediaType.IMAGE_JPEG);
         }
+        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+
         return ResponseEntity.ok().headers(headers).body(desenFileBytes);
 
     }
@@ -674,9 +677,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
 
-                            List<Integer> list = algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
+                            List<String> list = algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
                                     .stream()
-                                    .map(obj -> obj != null ? (Integer) obj : null)
+                                    .map(obj -> obj != null ? (String) obj : null)
                                     .collect(Collectors.toList());
                             // 写列数据
                             if (excelParam.getTmParam() == 0) {
@@ -883,8 +886,8 @@ public class FileServiceImpl implements FileService {
         // 脱敏结束时间
         String endTime = util.getTime();
 
-        log.info("Desensitization finished in" + (endTimePoint - startTimePoint) / 10e6 + "ms");
-        long oneTime = (endTimePoint - startTimePoint) / columnCount / (totalRowNum - 1);
+        log.info("Desensitization finished in " + (endTimePoint - startTimePoint) / 10e6 + "ms");
+        long oneTime = (endTimePoint - startTimePoint)  / (totalRowNum - 1);
         // 打印单条运行时间
         log.info("Single data running time：" + oneTime + " ns");
         // 一秒数据量
@@ -1150,6 +1153,8 @@ public class FileServiceImpl implements FileService {
         // 读取文件返回
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "video/mp4");
+        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes);
@@ -1987,10 +1992,12 @@ public class FileServiceImpl implements FileService {
         workbook.close();
         inputStream.close();
 
+        String encodedFileName = URLEncoder.encode(desenFileName, StandardCharsets.UTF_8.name());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+//        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName);
+        headers.setContentDispositionFormData("attachment", encodedFileName); // 设置文件名
 
         return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
     }
@@ -2131,6 +2138,8 @@ public class FileServiceImpl implements FileService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "video/mp4");
+        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes);
@@ -2269,6 +2278,8 @@ public class FileServiceImpl implements FileService {
         } else if (rawFileName.contains("png")) {
             headers.setContentType(MediaType.IMAGE_PNG);
         }
+        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+
         return ResponseEntity.ok()
                 .headers(headers).body(desenFileBytes);
     }
@@ -2408,7 +2419,7 @@ public class FileServiceImpl implements FileService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "video/mp4");
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + desenFileName);
+        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes);
@@ -2473,6 +2484,7 @@ public class FileServiceImpl implements FileService {
             }
             case "dpDate":
             case "dpCode":
+            case "date_group_replace":
                 String[] inputList = textInput.trim().split(",");
                 DSObject codes = new DSObject(Arrays.asList(inputList));
                 StringBuilder sb = new StringBuilder();

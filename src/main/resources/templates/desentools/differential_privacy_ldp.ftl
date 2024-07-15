@@ -8,13 +8,6 @@
     <meta name="referrer" content="no-referrer">
 
     <title>脱敏</title>
-
-    <meta name="keywords" content="">
-    <meta name="description" content="">
-
-    <!--[if lt IE 9]>
-    <meta http-equiv="refresh" content="0;ie.html"/>
-    <![endif]-->
     <link rel="shortcut icon" href="favicon.ico">
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
@@ -114,162 +107,280 @@
         })
     }
 </script>
-<div class="ibox-title">
-</div>
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                19.Rappor</p>
-            <div <#--class="col-sm-6"-->
-                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                <div>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        说明：基于随机响应统计用户某一特征的直方图（频次）信息
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输入：数值
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输出：一维二进制数组
-                    </p>
-                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+<div class="container wrapper wrapper-content">
+    <div class="rappor panel">
+        <div class="panel-body">
+            <div class="row">
+                <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
 
+                20.Rappor
+                </p>
+
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                    <div>
+                        <p style="font-size: 1.5em;text-align: justify;">
+                            说明：基于随机响应统计用户某一特征的直方图（频次）信息
+                        </p>
+                        <p style="font-size: 1.5em;text-align: justify;">
+                            输入：数值
+                        </p>
+                        <p style="font-size: 1.5em;text-align: justify;">
+                            输出：一维二进制数组
+                        </p>
+
+                    </div>
                 </div>
-                <div class="container">
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5">
-                            <div class="input-group">
-                                <input type="text" id="rappor_textInput" class="form-control"
-                                       placeholder="请输入数组，以,分隔数字" style="font-size: 20px">
-                                <span class="input-group-btn">
-                                                <button class="btn btn-default" id="rappor_submitBtn" type="button"
-                                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                                    提交脱敏
-                                                </button>
-                                            </span>
-                            </div>
-                            <div class="text-center">
-                                <label for="rappor_outputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="rappor_outputText" rows="4" cols="100" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
+            </div>
+
+            <div class="row">
+                <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <div class="input-group m-b">
+                            <input type="text" id="rappor_textInput" class="form-control"
+                                   placeholder="请输入数组，以,分隔数字"
+                                   style="font-size: 20px">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" id="rappor_submitBtn"
+                                        type="button"
+                                        style="
+                    font-size: 20px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;"
+                                >
+                                    提交脱敏
+                                </button>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <hr>
-    <div class="panel-body">
-        <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                20.One Time Rappor</p>
-            <div <#--class="col-sm-6"-->
-                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                <div>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        说明：基于随机响应统计用户某一特征的直方图（频次）信息
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输入：数值
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输出：一维二进制数组
-                    </p>
-                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
+            <div class="row">
+                <div class="text-center m-b">
+                    <label for="rappor_outputText"
+                           style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <textarea
+                                class="col-sm-8 m-t"
+                                id="rappor_outputText"
+                                rows="4" readonly>
+                        </textarea>
+                    </div>
                 </div>
-                <div class="container">
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5">
-                            <div class="input-group">
-                                <input type="text" id="onetimerappor_textInput" class="form-control"
-                                       placeholder="请输入数组，以,分隔数字" style="font-size: 20px">
-                                <span class="input-group-btn">
-                                                <button class="btn btn-default" id="onetimerappor_submitBtn"
-                                                        type="button"
-                                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                                    提交脱敏
-                                                </button>
-                                            </span>
-                            </div>
-                            <div class="text-center">
-                                <label for="onetimerappor_outputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="onetimerappor_outputText" rows="4" cols="100" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
-                        </div>
+
+                <div class="text-center m-b">
+                    <label for="rappor_logOutputText"
+                           style="display: block;
+                           font-size: 1.5em;
+                           justify-content: center;
+                           align-items: center; ">
+                        脱敏日志:
+                    </label>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                            <textarea
+                                    class="col-sm-8 m-t"
+                                    id="rappor_logOutputText"
+                                    rows="4" readonly>
+
+                            </textarea>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
-    <hr>
-    <div class="panel-body">
-        <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                21.编码型数据差分隐私脱敏算法</p>
-            <div <#--class="col-sm-6"-->
-                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                <#--<p style="font-size: 1.5em;">4.编码型数据差分隐私脱敏算法</p>-->
-                <div>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        说明：对编码型数据进行差分隐私扰动
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输入：编码型数据数组
-                    </p>
-                    <p style="font-size: 1.5em;text-align: justify;">
-                        输出：编码型数据数组
-                    </p>
-                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
-                    <div <#--class="ibox-content"--> style="text-align: center;">
-                        <div style="margin: auto; font-size: 20px">
-                            请选择隐私保护等级
-                            <select id="dpCode_privacyLevel">
-                                <option value="1"> 低程度</option>
-                                <option value="2" selected> 中程度</option>
-                                <option value="3"> 高程度</option>
-                            </select>
-                        </div>
+    <div class="panel">
+        <div class="panel-body">
+            <div class="row">
+                <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+
+                21.One Time Rappor
+                </p>
+
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                    <div>
+                        <p style="font-size: 1.5em;text-align: justify;">
+                            说明：基于随机响应统计用户某一特征的直方图（频次）信息
+                        </p>
+                        <p style="font-size: 1.5em;text-align: justify;">
+                            输入：数值
+                        </p>
+                        <p style="font-size: 1.5em;text-align: justify;">
+                            输出：一维二进制数组
+                        </p>
+
                     </div>
                 </div>
-                <div class="container">
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5">
-                            <div class="input-group">
-                                <input type="text" id="dpCode_textInput" class="form-control" placeholder="请输入文本"
-                                       style="font-size: 20px">
-                                <span class="input-group-btn">
-                                                <button class="btn btn-default" id="dpCode_submitBtn" type="button"
-                                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                                    提交脱敏
-                                                </button>
-                                            </span>
-                            </div>
-                            <div class="text-center">
-                                <label for="dpCode_outputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="dpCode_outputText" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
+            </div>
+
+            <div class="row">
+                <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <div class="input-group m-b">
+                            <input type="text" id="onetimerappor_textInput" class="form-control"
+                                   placeholder="请输入数组，以,分隔数字"
+                                   style="font-size: 20px">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" id="onetimerappor_submitBtn"
+                                        type="button"
+                                        style="
+                    font-size: 20px;
+                    height: 30px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;"
+                                >
+                                    提交脱敏
+                                </button>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="text-center m-b">
+                    <label for="onetimerappor_outputText"
+                           style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <textarea
+                                class="col-sm-8 m-t"
+                                id="onetimerappor_outputText"
+                                rows="4" readonly>
+                        </textarea>
+                    </div>
+                </div>
+
+                <div class="text-center m-b">
+                    <label for="onetimerappor_logOutputText"
+                           style="display: block;
+                           font-size: 1.5em;
+                           justify-content: center;
+                           align-items: center; ">
+                        脱敏日志:
+                    </label>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                            <textarea
+                                    class="col-sm-8 m-t"
+                                    id="onetimerappor_logOutputText"
+                                    rows="4" readonly>
+
+                            </textarea>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
-    <hr>
+    <div class="panel">
+        <div class="panel-body">
+            <div class="row">
+                <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+
+                22.编码型数据差分隐私脱敏算法
+                </p>
+                <div class="algo-description">
+                    <div class="description-item">
+                        <p>
+                            说明：对编码型数据进行差分隐私扰动
+                        </p>
+                        <p>
+                            输入：编码型数据数组
+                        </p>
+                        <p>
+                            输出：编码型数据数组
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="text-center">
+                    <label for="dpDate_privacyLevel"
+                           style="font-size: 1.5em;
+                    text-align: center;">算法测试</label>
+                </div>
+
+                <label for="dpCode_privacyLevel"
+                       class="col-sm-offset-4 col-sm-3"
+                       style="font-size: 1.5em;">
+                    请选择隐私保护等级
+                </label>
+
+                <div class="col-sm-5">
+                    <select class="text-center"
+                            id="dpCode_privacyLevel"
+                            style="font-size: 1.5em;">
+                        <option value="1">低程度</option>
+                        <option value="2" selected>中程度</option>
+                        <option value="3">高程度</option>
+                    </select>
+                </div>
+
+            </div>
+
+
+            <div class="row m-t">
+
+                <div class="col-sm-offset-2 col-sm-8 input-group">
+                    <input type="text" id="dpCode_textInput" class="form-control"
+                           placeholder="请输入文本" style="font-size: 20px"/>
+                    <span class="input-group-btn">
+                    <button class="btn btn-default"
+                            id="dpCode_submitBtn"
+                            type="button"
+                            style="
+                            font-size: 20px;
+                            height: 30px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;"
+                    >
+                        提交脱敏
+                    </button>
+                </span>
+                </div>
+            </div>
+            <hr class="hr-line-dashed">
+            <div class="row">
+                <div class="text-center m-b">
+                    <label for="dpCode_outputText"
+                           style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
+                        脱敏结果:
+                    </label>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                            <textarea
+                                    class="col-sm-8 m-t"
+                                    id="dpCode_outputText"
+                                    rows="4" readonly>
+                            </textarea>
+                    </div>
+                </div>
+
+                <div class="text-center m-b">
+                    <label for="dpCode_logOutputText"
+                           style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
+                        脱敏日志:
+                    </label>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                            <textarea
+                                    class="col-sm-8 m-t"
+                                    id="dpCode_logOutputText"
+                                    rows="4" readonly>
+
+                            </textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
 </div>
 
 </body>
@@ -326,6 +437,19 @@
         display: flex;
         flex-direction: row;
         justify-content: center;
+    }
+
+    .algo-description {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    .description-item > p {
+        font-size: 1.5em;
+        text-align: justify;
     }
 
 </style>

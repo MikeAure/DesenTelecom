@@ -27,8 +27,12 @@ def pixelate_region(
 
 
 def gaussian_blur(image: Image.Image, radius: int = 2):
+    # return cv2.GaussianBlur(image, (radius * 2 + 1, radius * 2 + 1), 0)
+    # image_np = np.array(image)
+    # blurred_image_np = cv2.GaussianBlur(image_np, (radius*2+1, radius*2+1), 0)
+    # blurred_image = Image.fromarray(blurred_image_np)
     return image.filter(ImageFilter.GaussianBlur(radius=radius))
-
+    # return blurred_image
 
 def gaussian_blur_region(
     image: Image.Image, region_x, region_y, region_w, region_h, radius: int = 2
@@ -178,14 +182,14 @@ if __name__ == "__main__":
     # param = int(sys.argv[4].split(",")[-1])
 
     # Choose parameters for each effect
-    pixelate_block_size = [5, 10, 15][args.param]
-    gaussian_blur_radius = [2, 4, 8][args.param]
-    box_blur_radius = [2, 4, 8][args.param]
+    pixelate_block_size = [15, 25, 35][args.param]
+    gaussian_blur_radius = [16, 32, 64][args.param]
+    box_blur_radius = [4, 8, 16][args.param]
     rectangle_range = [(100, 100, 200, 200), (50, 50, 300, 300), (25, 25, 400, 400)][
         args.param
     ]
     color_offset = [20, 50, 100][args.param]
-    mean_filter_kernel_size = [9, 15, 21][args.param]
+    mean_filter_kernel_size = [15, 21, 27][args.param]
     # Example rectangle range (x, y, width, height)
 
     # 执行算法,并保存

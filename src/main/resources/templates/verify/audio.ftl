@@ -263,7 +263,7 @@
                 after.innerHTML = "";
                 // 失真算法名
                 let distortionaudio_algName = document.getElementById("distortionaudio_algName").value;
-                if (distortionaudio_algName === "voice_replace") {
+                if (distortionaudio_algName === "voice_replace" || distortionaudio_algName === "audio_augmentation") {
                     document.getElementById("privacyLevel").style.display = "none";
                 } else {
                     document.getElementById("privacyLevel").style.display = "block";
@@ -292,7 +292,15 @@
             if (idx === 0) {
                 let distortionAudioAlgName = document.getElementById("distortionaudio_algName").value;
                 switch (distortionAudioAlgName) {
+
                     case "voice_replace":
+                        formData.set("sheet", distortionAudioAlgName);
+                        formData.set("params", "1");
+                        formData.set("algName", distortionAudioAlgName);
+                        privacyLevelTable.style.display = "none";
+                        break;
+
+                    case "audio_augmentation":
                         formData.set("sheet", distortionAudioAlgName);
                         formData.set("params", "1");
                         formData.set("algName", distortionAudioAlgName);
@@ -402,10 +410,15 @@
                                 <tbody id="table1">
                                 <tr>
                                     <td><select id="distortionaudio_algName">
-                                            <option value="dpAudio" selected> 基于差分隐私的声纹特征脱敏算法</option>
-                                            <option value="voice_replace">声纹替换算法</option>
-                                            <option value="apply_audio_effects">音频变形</option>
-                                            <option value="audio_reshuffle">音频重排</option>
+                                            <option value="dpAudio" selected>差分-基于差分隐私的声纹特征脱敏算法</option>
+                                            <option value="voice_replace">置换-声纹替换算法</option>
+                                            <option value="apply_audio_effects">置换-音频变形</option>
+                                            <option value="audio_reshuffle">置换-音频重排</option>
+                                            <option value="audio_floor">泛化-音频取整</option>
+                                            <option value="audio_spec">泛化-频域遮掩</option>
+                                            <option value="audio_augmentation">泛化-音频失真</option>
+                                            <option value="audio_median">泛化-基于均值的采样点替换</option>
+
                                             <#--                                           <option value="add_beep"> 基于正弦波的音频替换方法</option>-->
                                         </select></td>
                                 </tr>
@@ -570,7 +583,7 @@
     let signInMessage = document.getElementById("loginMessage");
 
 
-    choose_audio_file = function (e, fileElementId, nameElementId, backendInterface) {
+    let choose_audio_file = function (e, fileElementId, nameElementId, backendInterface) {
         // e.preventDefault(); // 阻止表单的默认提交行为
 
         const fileInput = document.getElementById(fileElementId);
@@ -578,12 +591,12 @@
         const name = document.getElementById(nameElementId);
         console.log("user name: " + name.value);
         const formData = new FormData();
-        formData.append('file', fileInput.files[0]); // 获取选择的文件
-        formData.append("name", name.value);
+        formData.set('file', fileInput.files[0]);
+        formData.set("name", name.value);
 
-        fetch(backendInterface, { // 假设你的后端接口是 '/upload'
-            method: 'POST',
-            body: formData, // 将FormData对象作为请求体发送
+        fetch(backendInterface, {
+        method: 'POST',
+            body: formData,
         })
             .then(response => response.json())
             .then(data => {

@@ -4,6 +4,7 @@ import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.user.Customer;
 import com.lu.gademo.trace.client.user.Driver;
 import com.lu.gademo.trace.server.gui.ServerMain;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+@Slf4j
 @Controller
 @RequestMapping("/Encrypt")
 public class EncryptController {
@@ -85,6 +87,8 @@ public class EncryptController {
     @ResponseBody
     @RequestMapping(value = "/traceDriver1Login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ServerResponse traceDriver1Login(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
+        System.out.println("Driver1: " + startLatitude + " " + startLongitude);
+
         driver0.setStartLatitude(Double.parseDouble(startLatitude));
         driver0.setStartLongitude(Double.parseDouble(startLongitude));
         try {
@@ -101,6 +105,7 @@ public class EncryptController {
     @ResponseBody
     @RequestMapping(value = "/traceDriver2Login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ServerResponse traceDriver2Login(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
+        System.out.println("Driver2: " + startLatitude + " " + startLongitude);
         driver1.setStartLatitude(Double.parseDouble(startLatitude));
         driver1.setStartLongitude(Double.parseDouble(startLongitude));
         try {
@@ -191,7 +196,8 @@ public class EncryptController {
     public ServerResponse orderResult() {
         if (customer.IS_ORDER_ACCEPTED) {
             String driverName = customer.driverList.get(0).getUserName();
-            if (driverName.equals("driver0")) {
+            log.info(driverName);
+            if (driverName.contains("driver0")) {
                 return new ServerResponse("ok", "司机：" + "driver1" + "接单了");
             } else if (driverName.equals("driver1")) {
                 return new ServerResponse("ok", "司机：" + "driver2" + "接单了");

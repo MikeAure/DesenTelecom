@@ -100,6 +100,21 @@ public class LocationControllerTest {
     }
 
     @Test
+    public void locationControllerMinZone3Test() throws Exception {
+        String url = "/Location/mixzone_3";
+        mvc.perform(MockMvcRequestBuilders.post(url)
+                        .param("position", "116.435842,39.941626")
+                        .param("id", "115")
+                        .param("time", "8.5")
+                        .param("points", "116.435842,39.941626;116.353714,39.939588;116.435806,39.908501;116.356866,39.907242")
+                        .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    @Test
     public void locationControllerCirDummyTest() throws Exception {
         String url = "/Location/CirDummy";
         mvc.perform(MockMvcRequestBuilders.post(url)

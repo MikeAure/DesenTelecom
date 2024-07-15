@@ -557,12 +557,23 @@ public class DpImpl implements Dp {
 
              */
 
+            /*
+             IM-Coder2
+            * */
             case 27: {
                 if (params.length != 1) return null;
-                List<?> list = object.getList();
-                List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.gaussianToValue(value, params[0].intValue()));
+                List<?> value = object.getList();
+                String path3 = Paths.get(currentPath, "image", "canny.py").toString();
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path3, params[0].toString());
+                return new DSObject(results);
             }
+
+//            case 27: {
+//                if (params.length != 1) return null;
+//                List<?> list = object.getList();
+//                List<Object> value = new ArrayList<>(list);
+//                return new DSObject(dpUtil.gaussianToValue(value, params[0].intValue()));
+//            }
 
             default:
                 return null;

@@ -36,7 +36,7 @@
             });
 
             document.getElementById("audio_spec_fileupload").addEventListener("change", function(event) {
-                chooseFile(event, "audio_spec", false)
+                chooseFile(event, "audio_spec", true)
             });
 
             document.getElementById("audio_augmentation_fileUpload").addEventListener("change", function(event) {
@@ -185,8 +185,6 @@
 
 <!-- 全局js -->
 
-<div class="ibox-title">
-</div>
 
 <div class="panel panel-default">
 
@@ -272,6 +270,17 @@
                         </div>
                     </div>
 
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            <label for="audio_spec_privacyLevel">请选择隐私保护程度：</label>
+                            <select id="audio_spec_privacyLevel">
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -286,6 +295,15 @@
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_spec_submit"> 提交脱敏
             </button>
+        </div>
+
+        <div class="text-center">
+            <label for="audio_spec_outputText"
+                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <textarea id="audio_spec_outputText" rows="4" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
+            </div>
         </div>
     </div>
     <hr>
@@ -330,6 +348,15 @@
             <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_augmentation_submit">提交脱敏
             </button>
         </div>
+
+        <div class="text-center">
+            <label for="audio_augmentation_outputText"
+                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <textarea id="audio_augmentation_outputText" rows="4" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
+            </div>
+        </div>
     </div>
     <hr>
     <div class="panel-body">
@@ -360,12 +387,12 @@
                     </div>
                     <div style="text-align: center;">
                         <div style=" font-size: 20px">
-                            <label for="audio_median_privacyLevel">音频分块数量:</label>
+                            <label for="audio_median_privacyLevel">请选择隐私保护等级:</label>
                             <#--                                    <input type="text" id="audio_reshuffle_block_num">-->
                             <select id="audio_median_privacyLevel">
-                                <option value="0"> 0</option>
-                                <option value="1" selected> 1</option>
-                                <option value="2"> 2</option>
+                                <option value="0">低程度</option>
+                                <option value="1" selected>中程度</option>
+                                <option value="2">高程度</option>
                             </select>
                         </div>
                     </div>
@@ -382,6 +409,15 @@
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_median_submit">提交脱敏
             </button>
+        </div>
+
+        <div class="text-center">
+            <label for="audio_median_outputText"
+                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <textarea id="audio_median_outputText" rows="4" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
+            </div>
         </div>
     </div>
 </div>

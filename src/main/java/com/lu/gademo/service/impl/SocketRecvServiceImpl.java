@@ -34,7 +34,7 @@ public class SocketRecvServiceImpl implements SocketRecvService {
                 log.info("New connection from {}", socket.getInetAddress());
                 counter++;
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
         }
     }

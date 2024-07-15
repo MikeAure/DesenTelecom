@@ -1,9 +1,6 @@
 package com.lu.gademo.utils.impl;
 
-import com.lu.gademo.utils.Anonymity;
-import com.lu.gademo.utils.CommandExecutor;
-import com.lu.gademo.utils.DSObject;
-import com.lu.gademo.utils.Util;
+import com.lu.gademo.utils.*;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -17,6 +14,7 @@ public class AnonymityImpl implements Anonymity {
 
         File directory = new File("");
         Util util = new UtilImpl();
+        KAnonymityUtil kAnonymityUtil = new KAnonymityUtil();
         String currentPath = directory.getAbsolutePath();
         String locationPrivacy = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
         String path = Paths.get(currentPath, locationPrivacy).toString();
@@ -125,6 +123,7 @@ public class AnonymityImpl implements Anonymity {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
                 String param = "9 " + s[0] + " " + s[1] + " " + params[0].toString();
+                System.out.println(param);
                 String cmd = path + " " + param;
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
@@ -158,6 +157,54 @@ public class AnonymityImpl implements Anonymity {
                 String path_l = Paths.get(currentPath, "generalization", "l_diversity.py").toString();
                 String param = Integer.toString(l_diversity_param[params[0].intValue()]);
                 return new DSObject(CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_l, param));
+            }
+
+            /*
+                Entropy-l-diversity
+                功能：在一个等价类中敏感数据分布熵的大小至少是log(L),返回处理后的csv文件
+                参数：k、l、泛化模板
+                输入：数值或标识符型csv文件
+                输出：数值或标识符型csv文件
+            */
+            case 8: {
+                if (params.length != 1) return null;
+//                int[] l_diversity_param = new int[]{2, 4, 6};
+                List<?> value = object.getList();
+                String param = Integer.toString(params[0].intValue());
+                String baseName = value.get(0).toString();
+                String dir = value.get(1).toString();
+                String attribute = value.get(2).toString();
+                String result;
+                try {
+                    result = kAnonymityUtil.lEntropyDiversity(baseName, dir, param, attribute);
+                } catch (Exception e) {
+                    return null;
+                }
+                return new DSObject(result);
+            }
+
+            /*
+                Recursive-C- l-diversity
+                功能：对 csv 文件进行 t-closeness 处理
+                参数：k、t
+                输入：数值或标识符型 csv 文件
+                输出：csv文件
+            */
+            case 9: {
+                if (params.length != 1) return null;
+//                int[] l_diversity_param = new int[]{2, 4, 6};
+                List<?> value = object.getList();
+                String param = Integer.toString(params[0].intValue());
+                String baseName = value.get(0).toString();
+                String dir = value.get(1).toString();
+                String attribute = value.get(2).toString();
+                String result;
+                try {
+                    result = kAnonymityUtil.lRecursiveCDiversity(baseName, dir, param, attribute);
+                } catch (Exception e) {
+                    return null;
+                }
+                return new DSObject(result);
             }
 
             /*

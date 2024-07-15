@@ -11,6 +11,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController
@@ -132,6 +134,7 @@ public class AudioMatchController {
 //                command = conda + command;
 //            }
             Process signUpProcess = Runtime.getRuntime().exec(command + " " + parameter);
+            System.out.println(command + " " + parameter);
             BufferedReader reader = new BufferedReader(new InputStreamReader(signUpProcess.getInputStream()));
             // 获得python脚本进程的输出
             String line;

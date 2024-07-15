@@ -40,6 +40,7 @@
         desenTextApi("floor");
         desenTextApi("truncation");
         desenTextApi("addressHide");
+        desenTextApi("date_group_replace");
     }
 
     let desenTextApi = (algoName) => {
@@ -48,8 +49,27 @@
         let outputArea = algoName + "_output";
         $("#" + buttonName).on("click", function () {
             let textInput = $("#" + inputName).val();
-            let privacyLevel = 1
-            let textType = "address"
+            let privacyLevel = algoName === "date_group_replace" ? $("#date_group_replace_privacyLevel").val() : 1;
+            console.log("privacy level" + privacyLevel);
+            let textType;
+            switch (algoName) {
+                case "floorTime":
+                    textType = "date";
+                    break;
+                case "floor":
+                    textType = "number";
+                    break;
+                case "truncation":
+                    textType = "text";
+                    break;
+                case "addressHide":
+                    textType = "address";
+                    break;
+                case "date_group_replace":
+                    textType = "date";
+                    break;
+            }
+
             let algName = algoName;
             if (textInput === "") {
                 alert("请输入文本");
@@ -68,15 +88,13 @@
             })
                 .then(response => response.text())
                 .then(data => {
-                    $("#"+ outputArea).val(data);
+                    $("#" + outputArea).val(data);
                 })
                 .catch(error => console.error('Error:', error));
         })
     };
 
 </script>
-<div class="ibox-title">
-</div>
 
 <div class="panel panel-default">
 
@@ -114,6 +132,14 @@
                             <div class="text-center">
                                 <label for="truncation_output"
                                        style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <textarea id="truncation_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <label for="truncation_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="truncation_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
@@ -165,6 +191,15 @@
                                               style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
+
+                            <div class="text-center">
+                                <label for="floor_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <textarea id="floor_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -210,6 +245,16 @@
                                     <textarea id="floorTime_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
                                 </div>
+
+                            </div>
+                            <div class="text-center">
+                                <label for="floorTime_output"
+                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <textarea id="floorTime_output" rows="2" cols="50" readonly
+                                              style="margin-top: 10px;"></textarea>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -265,6 +310,63 @@
         </div>
     </div>
     <hr>
+    <div class="panel-body">
+    <div class="row">
+        <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            5.日期分组算法</p>
+        <div <#--class="col-sm-6"-->
+                style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+            <#--<p style="font-size: 1.5em;">1.地址抑制算法</p>-->
+            <div>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    说明：将日期数据分组，将分组内日期替换为同一日期。日期格式：2024-3-18
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输入：日期数组
+                </p>
+                <p style="font-size: 1.5em;text-align: justify;">
+                    输出：日期数组
+                </p>
+                <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+            </div>
+        </div>
+        <div style="text-align: center;" class="m-b">
+            <div style="margin: auto; font-size: 20px">
+                请选择隐私保护等级
+                <select id="date_group_replace_privacyLevel">
+                    <option value="1"> 低程度</option>
+                    <option value="2" selected> 中程度</option>
+                    <option value="3"> 高程度</option>
+                </select>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row justify-content-center" style="display: grid; place-items: center;">
+                <div class="col-lg-5">
+                    <div class="input-group">
+                        <input type="text" id="date_group_replace_input" class="form-control" placeholder="请输入文本"
+                               style="font-size: 20px">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" id="date_group_replace_submitBtn" type="button"
+                                    style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
+                                提交脱敏
+                            </button>
+                        </span>
+                    </div>
+
+                    <div class="text-center">
+                        <label for="addressHide_output"
+                               style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                <textarea id="date_group_replace_output" rows="2" cols="50" readonly
+                                          style="margin-top: 10px;"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 

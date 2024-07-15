@@ -338,7 +338,7 @@ public class GeneralizationImpl implements Generalization {
             */
             case 20: {
                 List<?> value = object.getList();
-                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "spec", path6, "0");
+                List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "spec", path6, params[0].toString());
                 return new DSObject(results);
             }
 

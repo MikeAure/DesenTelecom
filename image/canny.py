@@ -239,14 +239,14 @@ def add_noise1(dx, dy, image_1):
     return image_noise
 
 
-def add_noise2(image_1):
-    ave_1 = image_detect(image_1, 7)  # 设置k值
+def add_noise2(image_1, k=7, epsilon=10):
+    ave_1 = image_detect(image_1, k)  # 设置k值
     W, H = ave_1.shape
     image_1 = image_1.astype(int)
     noise_x = np.zeros(W * H)
     eps = 10  # 隐私预算
     for i in range(W * H):  # 生成噪声
-        noise_x[i] = np.random.laplace(0, (image_1.max() - image_1.min()) / eps, 1)
+        noise_x[i] = np.random.laplace(0, (image_1.max() - image_1.min()) / epsilon, 1)
     ave_1_list = ave_1.flatten()
     ave_1_index = np.argsort(ave_1_list)
     noise_x_index = np.argsort(noise_x)
@@ -292,7 +292,7 @@ def to_rgb(img):
     return ret
 
 
-def noise_dataset(input_dir):
+def noise_dataset(input_dir, output_dir="./"):
     dataset = get_dataset(input_dir)
     dataset_list = []
     for sample in dataset:  # 数据集中的每个文件夹
@@ -300,20 +300,21 @@ def noise_dataset(input_dir):
         for image_path in sample.image_paths:
             image_path_list.append(image_path)
         dataset_list.append(
-            [sample.name, image_path_list]
+            [sample.name, image_path_list, output_dir]
         )  # cls是[姓名，[图片1路径，图片2路径。。。]]
     with Pool(10) as p:
-        muti_result = p.starmap(
-            mutiprocess, tqdm.tqdm(dataset_list, total=len(dataset_list))
-        )
+        # muti_result = p.starmap(
+        #     mutiprocess, tqdm.tqdm(dataset_list, total=len(dataset_list))
+        # )
+        muti_result = p.starmap(mutiprocess, dataset_list)
 
 
-def mutiprocess(name, path_list):
-    output_dir = "../"
+def mutiprocess(name, path_list, output_dir):
+
     nrof_images_total = 0  # 图片总数计数
     nrof_successfully_aligned = 0  # 成功处理的图片计数
-
     output_class_dir = os.path.join(output_dir, name)
+
     if not os.path.exists(output_class_dir):
         os.makedirs(output_class_dir)
     for image_path in path_list:  # 文件夹中的每张图片
@@ -326,6 +327,7 @@ def mutiprocess(name, path_list):
             except (IOError, ValueError, IndexError) as e:
                 errorMessage = "{}: {}".format(image_path, e)
                 print(errorMessage)
+                continue
             else:
                 if img.ndim < 2:
                     print('Unable to align "%s"' % image_path)
@@ -349,35 +351,37 @@ def mutiprocess(name, path_list):
 
 
 if __name__ == "__main__":
-    pd.set_option("display.max_rows", None)  # 显示全部行
-    pd.set_option("display.max_columns", None)  # 显示全部列
-    np.set_printoptions(threshold=np.inf)  # 打印矩阵数据不带省略号
-    # file1 = open("matrix.txt",'a') # 记录数值用。以下代码至file1.close都为单张图片测试用。
-    # file1.seek(0)	# 定位
-    # file1.truncate()  # 清空文件
-    # img_path = '3.png'
-    # image_color = cv2.imread(img_path,cv2.IMREAD_COLOR)
-    # image_color_noise = copy.copy(image_color)
-    # # edges = cv2.Canny(image_1, 138, 200)
-    # for i in range(3):
-    #     image_smooth = smooth(image_color[:,:,i])
-    #     dx,dy,M,theta = gradients(image_smooth)
-    #     NMS_1 = NMS(M,dx,dy)
-    #     edges = double_threshold(NMS_1)
-    #     #image_noise = add_noise1(dx,dy,image_smooth)
-    #     image_color_noise[:,:,i] = add_noise2(image_color[:,:,i])
-    #     #cv2.imshow('smooth', image_smooth)
-    #     cv2.imshow('edges', edges)
-    #     cv2.imshow('image_noise', image_color_noise[:,:,i]) #图片矩阵数据格式得是unit8才能show
+    
+    if len(sys.argv) != 4:
+        print("Usage: python your_script.py input_file out_file param")
+        sys.exit(1)
+    
+
+    img_path = sys.argv[1]
+    output_path = sys.argv[2]
+    param = sys.argv[3]
+    
+    epsilon = [10, 1, 0.1][int(param)]
+    image_color = cv2.imread(img_path,cv2.IMREAD_COLOR)
+    image_color_noise = copy.copy(image_color)
+    # edges = cv2.Canny(image_1, 138, 200)
+    for i in range(3):
+        image_smooth = smooth(image_color[:,:,i])
+        dx,dy,M,theta = gradients(image_smooth)
+        NMS_1 = NMS(M,dx,dy)
+        edges = double_threshold(NMS_1)
+        #image_noise = add_noise1(dx,dy,image_smooth)
+        image_color_noise[:,:,i] = add_noise2(image_color[:,:,i], epsilon=epsilon)
+        #cv2.imshow('smooth', image_smooth)
+        # cv2.imshow('edges', edges)
+        # cv2.imshow('image_noise', image_color_noise[:,:,i]) #图片矩阵数据格式得是unit8才能show
     # cv2.imshow('origin', image_color)
     # cv2.imshow('noise',image_color_noise)
     # cv2.waitKey()
-    # #np.savetxt("matrix.txt", image_color_noise,fmt ='%f')
-    # cv2.imwrite("cat2.png", image_color_noise)
-    # #file1.writelines(noise)
-    # #file1.close()
-    input_path = (
-        "../facenet/understand_facenet-master/understand_facenet/data/lfw_funneled_160"
-    )
-    output_path = "../facenet/understand_facenet-master/understand_facenet/data/lfw_lap"
-    noise_dataset(input_path)
+    #np.savetxt("matrix.txt", image_color_noise,fmt ='%f')
+    cv2.imwrite(output_path, image_color_noise)
+    #file1.writelines(noise)
+    #file1.close()
+    # input_path = "./test_images"
+    # output_path = "../facenet/understand_facenet-master/understand_facenet/data/lfw_lap"
+    # noise_dataset(input_path)

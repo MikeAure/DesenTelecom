@@ -1,0 +1,91 @@
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: 123456QWer!!
+        url: jdbc:mysql://localhost:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+        username: root
+    freemarker:
+        cache: false
+        charset: UTF-8
+        check-template-location: true
+        content-type: text/html
+        expose-request-attributes: true
+        expose-session-attributes: true
+        request-context-attribute: request
+        settings:
+            template_update_delay: 0
+        suffix: .ftl
+        template-loader-path: classpath:/templates/
+    jackson:
+        serialization:
+            indent_output: false
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            jadira:
+                usertype:
+                    autoRegisterUserTypes: true
+        show-sql: true
+
+    servlet:
+        multipart:
+            maxFileSize: 100MB
+            maxRequestSize: 100MB
+
+    thymeleaf:
+        cache: false
+        encoding: UTF-8
+        mode: ftl
+mybatis:
+    configuration:
+        log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+server:
+    port: 8352
+
+logging:
+    file:
+        path: .
+    level:
+        org:
+            hibernate: INFO
+            hibernate.SQL: DEBUG
+
+effectEva:
+    address: 127.0.0.1
+    port: 10005
+evidence:
+    localAddress: 127.0.0.1
+    localPort: 50004
+    remoteAddress: 127.0.0.1
+    remotePort: 50005
+evidenceSystem:
+    evidenceReceipt:
+        mainCommand: '0x0001'
+        msgVersion: '0x1000'
+        subCommand: '0x0020'
+    evidenceRequest:
+        mainCommand: '0x0001'
+        msgVersion: '0x1000'
+        subCommand: '0x0020'
+    evidenceResponse:
+        mainCommand: '0x0001'
+        msgVersion: '0x1000'
+        subCommand: '0x0020'
+    submitEvidence:
+        mainCommand: '0x0003'
+        msgVersion: '0x3110'
+        subCommand: '0x0031'
+
+ruleCheck:
+    address: 127.0.0.1
+    port: 30002
+
+socketrecv:
+    port: 10008
+
+systemId:
+    desenToolsetSystemId: '0x31000000'
+    evaluationSystemId: '0x32000000'
+    evidenceSystemId: '0x10000000'
+    ruleCheckSystemId: '0x33000000'

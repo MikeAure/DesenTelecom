@@ -35,9 +35,9 @@
         window.onload = function () {
             document.getElementById("passReplace_submitBtn").addEventListener("click", function () {
                 let textInput = $("#passReplace_textInput").val();
-                var textType = "name"
-                var algName = "passReplace"
-                var privacyLevel = 1
+                let textType = "name"
+                let algName = "passReplace"
+                let privacyLevel = 1
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -75,10 +75,10 @@
             //         console.log(fileExtension)
             //
             //         if (imageType.includes(fileExtension)) {
-            //             var pre = document.getElementById("replace_region_pre");
-            //             var reader = new FileReader();
+            //             let pre = document.getElementById("replace_region_pre");
+            //             let reader = new FileReader();
             //             reader.onload = function (e) {
-            //                 var img = new Image();
+            //                 let img = new Image();
             //                 img.src = e.target.result;
             //
             //                 pre.appendChild(img);
@@ -86,12 +86,12 @@
             //             reader.readAsDataURL(file);
             //             //提交脱敏参数，请求脱敏
             //             document.getElementById("replace_region_submit").onclick = function () {
-            //                 var after = document.getElementById("replace_region_after");
+            //                 let after = document.getElementById("replace_region_after");
             //                 after.innerHTML = "";
             //                 // 获取保护级别
-            //                 var param = document.getElementById("replace_region_privacyLevel").value;
+            //                 let param = document.getElementById("replace_region_privacyLevel").value;
             //
-            //                 var formData = new FormData();
+            //                 let formData = new FormData();
             //                 formData.append("file", file);
             //                 formData.append("params", param);
             //                 formData.append("algName", "replace_region");
@@ -103,7 +103,7 @@
             //                 })
             //                     .then(response => response.blob())
             //                     .then(blob => {
-            //                         var dealedImg = new Image();
+            //                         let dealedImg = new Image();
             //                         dealedImg.src = URL.createObjectURL(blob);
             //                         after.appendChild(dealedImg);
             //                     })
@@ -131,10 +131,10 @@
             //         console.log(fileExtension)
             //
             //         if (videoType.includes(fileExtension)) {
-            //             var pre = document.getElementById("replace_region_video_pre");
-            //             var reader = new FileReader();
+            //             let pre = document.getElementById("replace_region_video_pre");
+            //             let reader = new FileReader();
             //             reader.onload = function (e) {
-            //                 var video = document.createElement("video");
+            //                 let video = document.createElement("video");
             //                 video.src = e.target.result;
             //                 /*video.style.width = '300px';*/
             //                 video.controls = true;
@@ -143,12 +143,12 @@
             //             reader.readAsDataURL(file);
             //             //提交脱敏参数，请求脱敏
             //             document.getElementById("replace_region_video_submit").onclick = function () {
-            //                 var after = document.getElementById("replace_region_video_after");
+            //                 let after = document.getElementById("replace_region_video_after");
             //                 after.innerHTML = "";
             //                 // 获取保护级别
-            //                 var param = document.getElementById("replace_region_video_privacyLevel").value;
+            //                 let param = document.getElementById("replace_region_video_privacyLevel").value;
             //
-            //                 var formData = new FormData();
+            //                 let formData = new FormData();
             //                 formData.append("file", file);
             //                 formData.append("params", param);
             //                 formData.append("algName", "replace_region_video");
@@ -160,7 +160,7 @@
             //                 })
             //                     .then(response => response.blob())
             //                     .then(blob => {
-            //                         var video = document.createElement("video");
+            //                         let video = document.createElement("video");
             //                         //console.log(data)
             //                         video.src = URL.createObjectURL(blob);
             //                         video.type = "video/mp4";
@@ -193,7 +193,7 @@
                         let pre = document.getElementById("audio_reshuffle_pre");
                         let reader = new FileReader();
                         reader.onload = function (e) {
-                            var video = document.createElement("audio");
+                            let video = document.createElement("audio");
                             video.src = e.target.result;
                             video.controls = true;
                             pre.appendChild(video);
@@ -245,9 +245,9 @@
             })
             document.getElementById("SHA512_submitBtn").addEventListener("click", function () {
                 let textInput = $("#SHA512_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "SHA512"
+                let privacyLevel = 1
+                let textType = "address"
+                let algName = "SHA512"
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -271,9 +271,9 @@
             })
             document.getElementById("value_hide_submitBtn").addEventListener("click", function () {
                 let textInput = $("#value_hide_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "value_hide"
+                let privacyLevel = 1
+                let textType = "address"
+                let algName = "value_hide"
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -297,9 +297,9 @@
             })
             document.getElementById("valueMapping_submitBtn").addEventListener("click", function () {
                 let textInput = $("#valueMapping_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "valueMapping"
+                let privacyLevel = 1
+                let textType = "address"
+                let algName = "valueMapping"
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -338,10 +338,10 @@
                     console.log(fileExtension)
 
                     if (imageType.includes(fileExtension)) {
-                        var pre = document.getElementById("image_exchange_channel_pre");
-                        var reader = new FileReader();
+                        let pre = document.getElementById("image_exchange_channel_pre");
+                        let reader = new FileReader();
                         reader.onload = function (e) {
-                            var img = new Image();
+                            let img = new Image();
                             img.src = e.target.result;
 
                             pre.appendChild(img);
@@ -349,12 +349,12 @@
                         reader.readAsDataURL(file);
                         //提交脱敏参数，请求脱敏
                         document.getElementById("image_exchange_channel_submit").onclick = function () {
-                            var after = document.getElementById("image_exchange_channel_after");
+                            let after = document.getElementById("image_exchange_channel_after");
                             after.innerHTML = "";
                             // 获取保护级别
-                            var param = "1";
+                            let param = "1";
 
-                            var formData = new FormData();
+                            let formData = new FormData();
                             formData.append("file", file);
                             formData.append("params", param);
                             formData.append("algName", "image_exchange_channel");
@@ -366,7 +366,7 @@
                             })
                                 .then(response => response.blob())
                                 .then(blob => {
-                                    var dealedImg = new Image();
+                                    let dealedImg = new Image();
                                     dealedImg.src = URL.createObjectURL(blob);
                                     after.appendChild(dealedImg);
                                 })
@@ -395,10 +395,10 @@
                     console.log(fileExtension)
 
                     if (imageType.includes(fileExtension)) {
-                        var pre = document.getElementById("image_add_color_offset_pre");
-                        var reader = new FileReader();
+                        let pre = document.getElementById("image_add_color_offset_pre");
+                        let reader = new FileReader();
                         reader.onload = function (e) {
-                            var img = new Image();
+                            let img = new Image();
                             img.src = e.target.result;
 
                             pre.appendChild(img);
@@ -406,12 +406,12 @@
                         reader.readAsDataURL(file);
                         //提交脱敏参数，请求脱敏
                         document.getElementById("image_add_color_offset_submit").onclick = function () {
-                            var after = document.getElementById("image_add_color_offset_after");
+                            let after = document.getElementById("image_add_color_offset_after");
                             after.innerHTML = "";
                             // 获取保护级别
-                            var param = document.getElementById("image_add_color_offset_privacyLevel").value;
+                            let param = document.getElementById("image_add_color_offset_privacyLevel").value;
 
-                            var formData = new FormData();
+                            let formData = new FormData();
                             formData.append("file", file);
                             formData.append("params", param);
                             formData.append("algName", "image_add_color_offset");
@@ -423,7 +423,7 @@
                             })
                                 .then(response => response.blob())
                                 .then(blob => {
-                                    var dealedImg = new Image();
+                                    let dealedImg = new Image();
                                     dealedImg.src = URL.createObjectURL(blob);
                                     after.appendChild(dealedImg);
                                 })
@@ -452,10 +452,10 @@
                     console.log(fileExtension)
 
                     if (videoType.includes(fileExtension)) {
-                        var pre = document.getElementById("video_add_color_offset_pre");
-                        var reader = new FileReader();
+                        let pre = document.getElementById("video_add_color_offset_pre");
+                        let reader = new FileReader();
                         reader.onload = function (e) {
-                            var video = document.createElement("video");
+                            let video = document.createElement("video");
                             video.src = e.target.result;
                             /*video.style.width = '300px';*/
                             video.controls = true;
@@ -464,12 +464,12 @@
                         reader.readAsDataURL(file);
                         //提交脱敏参数，请求脱敏
                         document.getElementById("video_add_color_offset_submit").onclick = function () {
-                            var after = document.getElementById("video_add_color_offset_after");
+                            let after = document.getElementById("video_add_color_offset_after");
                             after.innerHTML = "";
                             // 获取保护级别
-                            var param = document.getElementById("video_add_color_offset_privacyLevel").value;
+                            let param = document.getElementById("video_add_color_offset_privacyLevel").value;
 
-                            var formData = new FormData();
+                            let formData = new FormData();
                             formData.append("file", file);
                             formData.append("params", param);
                             formData.append("algName", "video_add_color_offset");
@@ -481,7 +481,7 @@
                             })
                                 .then(response => response.blob())
                                 .then(blob => {
-                                    var video = document.createElement("video");
+                                    let video = document.createElement("video");
                                     //console.log(data)
                                     video.src = URL.createObjectURL(blob);
                                     video.type = "video/mp4";
@@ -512,10 +512,10 @@
                     console.log(fileExtension)
 
                     if (videoType.includes(fileExtension)) {
-                        var pre = document.getElementById("video_remove_bg_pre");
-                        var reader = new FileReader();
+                        let pre = document.getElementById("video_remove_bg_pre");
+                        let reader = new FileReader();
                         reader.onload = function (e) {
-                            var video = document.createElement("video");
+                            let video = document.createElement("video");
                             video.src = e.target.result;
                             /*video.style.width = '300px';*/
                             video.controls = true;
@@ -524,12 +524,12 @@
                         reader.readAsDataURL(videoFile);
                         //提交脱敏参数，请求脱敏
                         // document.getElementById("video_remove_bg_submit").onclick = function () {
-                        //     var after = document.getElementById("video_remove_bg_after");
+                        //     let after = document.getElementById("video_remove_bg_after");
                         //     after.innerHTML = "";
                         //     // 获取保护级别
-                        //     var param = document.getElementById("video_remove_bg_privacyLevel").value;
+                        //     let param = document.getElementById("video_remove_bg_privacyLevel").value;
                         //
-                        //     var formData = new FormData();
+                        //     let formData = new FormData();
                         //     formData.append("file", videoFile);
                         //     formData.append("params", param);
                         //     formData.append("algName", "video_remove_bg");
@@ -541,7 +541,7 @@
                         //     })
                         //         .then(response => response.blob())
                         //         .then(blob => {
-                        //             var video = document.createElement("video");
+                        //             let video = document.createElement("video");
                         //             //console.log(data)
                         //             video.src = URL.createObjectURL(blob);
                         //             video.type = "video/mp4";
@@ -570,10 +570,10 @@
                     console.log(fileExtension)
 
                     if (imageType.includes(fileExtension)) {
-                        var pre = document.getElementById("video_remove_bg_img");
-                        var reader = new FileReader();
+                        let pre = document.getElementById("video_remove_bg_img");
+                        let reader = new FileReader();
                         reader.onload = function (e) {
-                            var img = new Image();
+                            let img = new Image();
                             img.src = e.target.result;
                             img.setAttribute("width", "500px");
                             img.setAttribute("height", "300px");
@@ -582,12 +582,12 @@
                         reader.readAsDataURL(imageFile);
                         //提交脱敏参数，请求脱敏
                         // document.getElementById("video_remove_bg_submit").onclick = function () {
-                        //     var after = document.getElementById("video_remove_bg_after");
+                        //     let after = document.getElementById("video_remove_bg_after");
                         //     after.innerHTML = "";
                         //     // 获取保护级别
-                        //     var param = document.getElementById("video_remove_bg_privacyLevel").value;
+                        //     let param = document.getElementById("video_remove_bg_privacyLevel").value;
                         //
-                        //     var formData = new FormData();
+                        //     let formData = new FormData();
                         //     formData.append("file", imageFile);
                         //     formData.append("params", param);
                         //     formData.append("algName", "video_remove_bg");
@@ -599,7 +599,7 @@
                         //     })
                         //         .then(response => response.blob())
                         //         .then(blob => {
-                        //             var video = document.createElement("video");
+                        //             let video = document.createElement("video");
                         //             //console.log(data)
                         //             video.src = URL.createObjectURL(blob);
                         //             video.type = "video/mp4";
@@ -635,10 +635,10 @@
                     console.log(imageFileExtension);
 
                     if (videoType.includes(videoFileExtension) && imageType.includes(imageFileExtension)) {
-                        // var pre = document.getElementById("video_remove_bg_pre");
-                        // var reader = new FileReader();
+                        // let pre = document.getElementById("video_remove_bg_pre");
+                        // let reader = new FileReader();
                         // reader.onload = function (e) {
-                        //     var video = document.createElement("video");
+                        //     let video = document.createElement("video");
                         //     video.src = e.target.result;
                         //     /*video.style.width = '300px';*/
                         //     video.controls = true;
@@ -646,12 +646,12 @@
                         // };
                         // reader.readAsDataURL(videoFile);
                         //提交脱敏参数，请求脱敏
-                        var after = document.getElementById("video_remove_bg_after");
+                        let after = document.getElementById("video_remove_bg_after");
                         after.innerHTML = "";
                         // 获取保护级别
-                        var param = document.getElementById("video_remove_bg_privacyLevel").value;
+                        let param = document.getElementById("video_remove_bg_privacyLevel").value;
 
-                        var formData = new FormData();
+                        let formData = new FormData();
                         formData.append("file", videoFile);
                         formData.append("params", param);
                         formData.append("algName", "video_remove_bg");
@@ -690,10 +690,10 @@
                     console.log(fileExtension)
 
                     if (imageType.includes(fileExtension)) {
-                        var pre = document.getElementById("img_face_sub_pre");
-                        var reader = new FileReader();
+                        let pre = document.getElementById("img_face_sub_pre");
+                        let reader = new FileReader();
                         reader.onload = function (e) {
-                            var img = new Image();
+                            let img = new Image();
                             img.src = e.target.result;
                             img.style.maxWidth = '80%';
                             img.style.height = 'auto';
@@ -757,10 +757,10 @@
                     console.log(imgTargetFileNameExtension);
 
                     if (imageType.includes(imgSrcFileNameExtension) && imageType.includes(imgTargetFileNameExtension)) {
-                        // var pre = document.getElementById("video_remove_bg_pre");
-                        // var reader = new FileReader();
+                        // let pre = document.getElementById("video_remove_bg_pre");
+                        // let reader = new FileReader();
                         // reader.onload = function (e) {
-                        //     var video = document.createElement("video");
+                        //     let video = document.createElement("video");
                         //     video.src = e.target.result;
                         //     /*video.style.width = '300px';*/
                         //     video.controls = true;
@@ -774,10 +774,10 @@
                         let param = "1";
 
                         let formData = new FormData();
-                        formData.append("file", imgSrcFile);
-                        formData.append("params", param);
-                        formData.append("algName", "video_remove_bg");
-                        formData.append("sheet", imgTargetFile);
+                        formData.set("file", imgSrcFile);
+                        formData.set("params", param);
+                        formData.set("algName", "video_remove_bg");
+                        formData.set("sheet", imgTargetFile);
 
                         fetch('/File/replaceFace', {
                             method: 'POST',
@@ -821,10 +821,10 @@
                     console.log(fileExtension)
 
                     if (imageType.includes(fileExtension)) {
-                        var pre = document.getElementById("video_face_sub_pre");
-                        var reader = new FileReader();
+                        let pre = document.getElementById("video_face_sub_pre");
+                        let reader = new FileReader();
                         reader.onload = function (e) {
-                            var img = new Image();
+                            let img = new Image();
                             img.src = e.target.result;
                             img.style.maxWidth = '80%';
                             img.style.height = 'auto';
@@ -893,10 +893,10 @@
                     console.log(videoTargetFileNameExtension);
 
                     if (imageType.includes(imgSrcFileNameExtension) && videoType.includes(videoTargetFileNameExtension)) {
-                        // var pre = document.getElementById("video_remove_bg_pre");
-                        // var reader = new FileReader();
+                        // let pre = document.getElementById("video_remove_bg_pre");
+                        // let reader = new FileReader();
                         // reader.onload = function (e) {
-                        //     var video = document.createElement("video");
+                        //     let video = document.createElement("video");
                         //     video.src = e.target.result;
                         //     /*video.style.width = '300px';*/
                         //     video.controls = true;

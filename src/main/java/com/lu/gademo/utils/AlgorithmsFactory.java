@@ -30,7 +30,6 @@ public class AlgorithmsFactory {
 
     @PostConstruct
     public void init() {
-
         algorithmInfoMap.put("dpDate", new AlgorithmInfo("dpDate", 1, AlgorithmType.DP, 26, Arrays.asList(0.1, 0.01, 0.001), this.dp));
         algorithmInfoMap.put("dpCode", new AlgorithmInfo("dpCode", 2, AlgorithmType.DP, 20, Arrays.asList(3.6, 2, 0.7), this.dp));
         algorithmInfoMap.put("laplaceToValue", new AlgorithmInfo("laplaceToValue", 3, AlgorithmType.DP, 1, Arrays.asList(10, 1, 0.1), this.dp));
@@ -79,10 +78,12 @@ public class AlgorithmsFactory {
         algorithmInfoMap.put("apply_audio_effects", new AlgorithmInfo("apply_audio_effects", 73, AlgorithmType.REPLACEMENT, 18, Arrays.asList(
                 Arrays.asList(-3, 0.7, -5, 5), Arrays.asList(2, 0.8, -10, 10), Arrays.asList(5, 0.9, -20, 20)), this.replacement));
         algorithmInfoMap.put("audio_reshuffle", new AlgorithmInfo("audio_reshuffle", 74, AlgorithmType.REPLACEMENT, 17, Arrays.asList(5, 10, 15), this.replacement));
-        algorithmInfoMap.put("audio_floor", new AlgorithmInfo("audio_floor", 75, AlgorithmType.GENERALIZATION, 19, Arrays.asList(0, 1, 2), this.generalization));
-        algorithmInfoMap.put("audio_spec", new AlgorithmInfo("audio_spec", 76, AlgorithmType.GENERALIZATION, 20, null, this.generalization));
+        algorithmInfoMap.put("audio_floor", new AlgorithmInfo("audio_floor", 75, AlgorithmType.GENERALIZATION, 19, Arrays.asList(3, 2, 1), this.generalization));
+        algorithmInfoMap.put("audio_spec", new AlgorithmInfo("audio_spec", 76, AlgorithmType.GENERALIZATION, 20,
+                Arrays.asList(Arrays.asList(0.1, 0.3), Arrays.asList(0.3, 0.5), Arrays.asList(0.5, 0.7)), this.generalization));
         algorithmInfoMap.put("audio_augmentation", new AlgorithmInfo("audio_augmentation", 76, AlgorithmType.GENERALIZATION, 21, null, this.generalization));
         algorithmInfoMap.put("audio_median", new AlgorithmInfo("audio_median", 77, AlgorithmType.GENERALIZATION, 22, Arrays.asList(0, 1, 2), this.generalization));
+        algorithmInfoMap.put("im_coder2", new AlgorithmInfo("im_coder2", 27, AlgorithmType.DP, 27, Arrays.asList(10, 1, 0.1), this.dp));
     }
 
 

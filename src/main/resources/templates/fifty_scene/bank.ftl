@@ -245,7 +245,6 @@
                                         break;
                                     case 4:
                                         html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
-                                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
                                         html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
                                         html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
                                         html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"

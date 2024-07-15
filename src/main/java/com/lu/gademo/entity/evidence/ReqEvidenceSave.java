@@ -1,15 +1,17 @@
 package com.lu.gademo.entity.evidence;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "req_evidence_save")
 // 存证请求格式
@@ -21,7 +23,7 @@ public class ReqEvidenceSave {
     @Column(name = "system_ip")
     private String systemIP;
     @Basic
-    @Value("system_port")
+    @Column(name = "main_cmd")
     private Integer mainCMD;
     @Basic
     @Column(name = "sub_cmd")
@@ -52,5 +54,19 @@ public class ReqEvidenceSave {
         this.objectMode = objectMode;
     }
 
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        ReqEvidenceSave that = (ReqEvidenceSave) o;
+        return getEvidenceID() != null && Objects.equals(getEvidenceID(), that.getEvidenceID());
+    }
 
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

@@ -42,6 +42,7 @@ import java.util.*;
  */
 @Slf4j
 @Controller
+@CrossOrigin("*")
 @RequestMapping("/File")
 public class FileController extends BaseController {
     AlgorithmsFactory algorithmsFactory;

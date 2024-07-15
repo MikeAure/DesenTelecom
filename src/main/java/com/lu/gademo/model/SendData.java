@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -27,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -621,7 +623,6 @@ public class SendData {
             // pathTree
             ObjectNode pathTree = objectMapper.createObjectNode();
             ObjectNode parent = objectMapper.createObjectNode();
-            // TODO: 这里的父节点子节点是什么意思？
             parent.put("systemID", submitEvidenceLocal.getSystemID());
             parent.put("globalID", submitEvidenceLocal.getGlobalID());
             ObjectNode self = objectMapper.createObjectNode();
