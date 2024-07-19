@@ -17,7 +17,7 @@ public class AlgorithmInfo {
     private int originalId;
     // 参数
     private List<Object> params;
-    //
+    // 四种类型的算法接口的基接口
     private BaseDesenAlgorithm executor;
 
     public AlgorithmInfo(String name, int id, AlgorithmType type, int originalId, List<Object> params, BaseDesenAlgorithm executor) {

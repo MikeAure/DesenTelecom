@@ -1,7 +1,6 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.service.WsAlgorithmLogService;
-
 import com.lu.gademo.utils.DpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
@@ -485,40 +484,59 @@ public class DpUtilImpl implements DpUtil {
     @Override
     //电话号码或编号的处理，136****1203
     public List<String> numberHide(List<Object> telephones, Integer privacyLevel) {
-        List<String> re_data = new ArrayList<>();
+        List<String> reData = new ArrayList<>();
         //提取数据
         for (Object name : telephones) {
             if (name == null)
-                re_data.add(null);
+                reData.add(null);
             else {
                 if (name instanceof Cell) {
                     Cell currentCell = (Cell) name;
                     DataFormatter dataFormatter = new DataFormatter();
                     String cellValue = dataFormatter.formatCellValue(currentCell);
-                    re_data.add(name + "");
+                    reData.add(name + "");
                 } else {
-                    re_data.add((String) name);
+                    reData.add((String) name);
                 }
             }
         }
-        System.out.println(re_data.get(0));
+//        System.out.println(reData.get(0));
         //privacyLevel为0，直接返回
         if (privacyLevel == 0)
-            return re_data;
+            return reData;
         List<String> num = new ArrayList<>();
-        //循环护理数据  方式是加*
-        for (int i = 0; i < re_data.size(); i++) {
-            if (re_data.get(i) == null) {
+
+        int denominator = 3;
+        switch (privacyLevel) {
+            case 1: {
+                denominator = 3;
+                break;
+            }
+            case 2: {
+                denominator = 4;
+                break;
+            }
+            case 3: {
+                denominator = 5;
+                break;
+            }
+        }
+
+        //循环处理数据  方式是加*
+        for (String reDatum : reData) {
+            if (reDatum == null) {
                 num.add(null);
             } else {
-                int l = re_data.get(i).length();
-                int index = l / 3;
-                int index2 = (l - index) / 2;
-                String substr2 = "";
-                for (int j = 0; j < index2; j++) {
-                    substr2 = substr2 + "*";
+                int l = reDatum.length();
+                int index = l / denominator;
+                int index2 = reDatum.length() - index;
+
+
+                StringBuilder substr2 = new StringBuilder();
+                for (int j = 0; j < index2 - index; j++) {
+                    substr2.append("*");
                 }
-                String str = re_data.get(i).substring(0, index) + substr2 + re_data.get(i).substring(index + index2, l);
+                String str = reDatum.substring(0, index) + substr2 + reDatum.substring(index2, l);
                 num.add(str);
             }
         }
@@ -545,15 +563,33 @@ public class DpUtilImpl implements DpUtil {
             return re_data;
         List<String> nameC = new ArrayList<>();
 
-        for (int i = 0; i < re_data.size(); i++) {
-            if (re_data.get(i) == null || re_data.get(i).isEmpty()) {
+        for (String reDatum : re_data) {
+
+            if (reDatum == null || reDatum.isEmpty()) {
                 nameC.add(null);
             } else {
-                String str = re_data.get(i).substring(0, 1);
-                for (int j = 0; j < re_data.get(i).length(); j++) {
-                    str = str + "*";
+                StringBuilder str = new StringBuilder(reDatum.substring(0, 1));
+                if (privacyLevel == 1) {
+                    for (int j = 0; j < reDatum.length() - 2; j++) {
+                        str.append("*");
+                    }
+                    str.append(reDatum.substring(reDatum.length() - 1));
+                    nameC.add(str.toString());
                 }
-                nameC.add(str);
+                if (privacyLevel == 2) {
+                    for (int j = 0; j < reDatum.length() - 1; j++) {
+                        str.append("*");
+                    }
+                    nameC.add(str.toString());
+                }
+                if (privacyLevel == 3){
+                    str.delete(0, str.length());
+                    for (int j = 0; j < reDatum.length(); j++) {
+
+                        str.append("*");
+                    }
+                    nameC.add(str.toString());
+                }
             }
         }
 
@@ -985,8 +1021,22 @@ public class DpUtilImpl implements DpUtil {
         Random random = new Random();
         // 生成5到20之间的随机数
         int min = 5;
-        int max = 20;
-        //循环护理数据  方式是加*
+        int max = 15;
+        switch (privacyLevel) {
+            case 1: {
+                max = 15;
+                break;
+            }
+            case 2: {
+                max = 20;
+                break;
+            }
+            case 3: {
+                max = 25;
+                break;
+            }
+        }
+        //循环处理数据  方式是加*
         for (int i = 0; i < re_data.size(); i++) {
             if (re_data.get(i) == null) {
                 new_passwords.add(null);
@@ -1018,20 +1068,39 @@ public class DpUtilImpl implements DpUtil {
 
         reBoxedData = dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
 
+        int remains = 3;
+        switch (privacyLevel) {
+            case 1: {
+                remains = 3;
+                break;
+            }
+            case 2: {
+                remains = 2;
+                break;
+            }
+
+            case 3: {
+                remains = 1;
+                break;
+            }
+        }
+
+        if (privacyLevel == 0) return reBoxedData;
+
+
         for (String reBoxedDatum : reBoxedData) {
             if (reBoxedDatum == null) {
                 result.add(null);
             } else {
 
-                if (reBoxedDatum.length() >= 3) {
-                    result.add(reBoxedDatum.substring(0, 3));
+                if (reBoxedDatum.length() >= remains) {
+                    result.add(reBoxedDatum.substring(0, remains));
                 } else {
                     result.add(reBoxedDatum);
                 }
 
             }
         }
-        if (privacyLevel == 0) return reBoxedData;
         return result;
     }
 
@@ -1177,7 +1246,6 @@ public class DpUtilImpl implements DpUtil {
     }
 
 
-
     @Override
     public List<String> floorTime(List<Object> dataList, Integer privacyLevel) {
         List<String> result = new ArrayList<>();
@@ -1206,16 +1274,29 @@ public class DpUtilImpl implements DpUtil {
     public List<String> value_hide(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
 
+        if (privacyLevel == 0)
+            return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
+
         for (Object data : dataList) {
             if (data == null) {
                 result.add(null);
             } else {
                 String tmp = data + "";
-                result.add(tmp.replaceAll("\\d", "0"));
+                switch (privacyLevel) {
+
+                    case 1:
+                        result.add(tmp.replaceAll("\\d", "0")); // 将数字替换为0
+                        break;
+                    case 2:
+                        result.add(tmp.replaceAll("\\d", "x")); // 将数字替换为X
+                        break;
+                    case 3:
+                        result.add(tmp.replaceAll("[a-zA-Z0-9]", "x")); // 将字母和数字替换为X
+                        break;
+                }
             }
         }
-        if (privacyLevel == 0)
-            return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
+
         return result;
     }
 
@@ -1256,7 +1337,7 @@ public class DpUtilImpl implements DpUtil {
                 scale = 20;
                 break;
             }
-            case 2 : {
+            case 2: {
                 scale = 30;
                 break;
             }
@@ -1279,13 +1360,28 @@ public class DpUtilImpl implements DpUtil {
     @Override
     public List<String> SHA512(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
+        String hashName = "SHA-512";
+        switch (privacyLevel) {
+            case 1: {
+                hashName = "MD5";
+                break;
+            }
+            case 2: {
+                hashName = "SHA-1";
+                break;
+            }
+            case 3: {
+                hashName = "SHA-256";
+                break;
+            }
+        }
 
         for (Object data : dataList) {
             if (data == null) {
                 result.add(null);
             } else {
                 String tmp = data + "";
-                result.add(hashing("SHA-512", tmp));
+                result.add(hashing(hashName, tmp));
             }
         }
         if (privacyLevel == 0)
@@ -1312,6 +1408,7 @@ public class DpUtilImpl implements DpUtil {
     @Override
     public List<String> suppressEmail(List<Object> dataList, Integer privacyLevel) {
         String pat = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+        Pattern pattern = Pattern.compile(pat);
         ArrayList<String> result = new ArrayList<>();
 
         for (Object data : dataList) {
@@ -1319,12 +1416,43 @@ public class DpUtilImpl implements DpUtil {
                 result.add(null);
             } else {
                 String tmp = data + "";
-                result.add(tmp.replaceAll(pat, "***@***"));
+                switch (privacyLevel) {
+                    case 0:
+                        result.add(tmp);
+                        break;
+                    case 1:
+                        result.add(partialMaskEmail(tmp));
+                        break;
+                    case 2:
+                        result.add(domainOnlyMaskEmail(tmp));
+                        break;
+
+                    case 3:
+                        result.add(tmp.replaceAll(pat, "***@***"));
+                        break;
+                    default:
+                        return null;
+                }
             }
         }
-        if (privacyLevel == 0)
-            return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
+
         return result;
+    }
+
+    private String partialMaskEmail(String input) {
+        String maskedEmail;
+        String[] parts = input.split("@");
+        if (parts[0].length() >= 2) {
+            maskedEmail = parts[0].substring(0, 2) + "***@" + parts[1];
+        } else {
+            maskedEmail = "***@" + parts[1];
+        }
+        return maskedEmail;
+    }
+
+    private String domainOnlyMaskEmail(String input) {
+        String[] parts = input.split("@");
+        return "***@" + parts[1];
     }
 
     // 基于随机高斯噪声的数值加噪算法
@@ -1496,9 +1624,9 @@ public class DpUtilImpl implements DpUtil {
             am = 20.0;
         }
 
-        Random random = new Random();
+        SecureRandom secureRandom = new SecureRandom();
         for (int i = 0; i < re_data.size(); i++) {
-            double noise = (random.nextDouble() * 2 * am) - am; // 生成均匀分布的噪声
+            double noise = (secureRandom.nextDouble() * 2 * am) - am; // 生成均匀分布的噪声
             if (re_data.get(i) == null) {
                 newData.add(null);
             } else {
@@ -1542,7 +1670,6 @@ public class DpUtilImpl implements DpUtil {
         if (privacyLevel == 0)
             return re_data;
         double shift = 2.3;
-
         if (privacyLevel == 2) {
             shift = 11.3;
         } else if (privacyLevel == 3) {
@@ -1565,16 +1692,76 @@ public class DpUtilImpl implements DpUtil {
         ArrayList<String> result = new ArrayList<>();
         String pat = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
         String[] ip = {"$1", "$2", "$3", "$4"};
+        if (privacyLevel == 0)
+            return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
+        List<Integer> randomList = new ArrayList<>();
+        for (int i = 0; i < dataList.size(); i++) {
+            randomList.add(ThreadLocalRandom.current().nextInt(4));
+        }
+
+
+        for (int i = 0; i < dataList.size(); i++) {
+            ArrayList<String> patTemp = new ArrayList<>(Arrays.asList(ip));
+            int random = randomList.get(i);
+
+            switch (privacyLevel) {
+                case 1: {
+                    patTemp.set(random, "*");
+                    break;
+                }
+                case 2: {
+                    patTemp.set(random, "*");
+                    patTemp.set((random + 1) % 4, "*");
+                    break;
+                }
+                case 3: {
+                    patTemp.set(random, "*");
+                    patTemp.set((random + 1) % 4, "*");
+                    patTemp.set((random + 2) % 4, "*");
+                    break;
+                }
+            }
+
+            result.add(getString(dataList.get(i), pat, patTemp));
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public List<String> suppressAllIp(List<Object> dataList, Integer privacyLevel) {
+        ArrayList<String> result = new ArrayList<>();
+        String pat = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
+        String[] ip = {"$1", "$2", "$3", "$4"};
 
         for (Object data : dataList) {
             ArrayList<String> patTemp = new ArrayList<>(Arrays.asList(ip));
-            int random = ThreadLocalRandom.current().nextInt(1, 5);
-            patTemp.set(random - 1, "*");
-            result.add(getString(data, pat, patTemp));
+            switch (privacyLevel) {
+                case 0:
+                    result.add(data == null ? null : data.toString()); // 不进行脱敏处理
+                    break;
+                case 1:
+                    patTemp.set(0, "*");
+                    result.add(getString(data, pat, patTemp)); // 第一部分脱敏
+                    break;
+                case 2:
+                    patTemp.set(0, "*");
+                    patTemp.set(1, "*");
+                    result.add(getString(data, pat, patTemp)); // 第一和第二部分脱敏
+                    break;
+
+                default:
+                    patTemp.set(0, "*");
+                    patTemp.set(1, "*");
+                    patTemp.set(2, "*");
+                    patTemp.set(3, "*");
+                    result.add(getString(data, pat, patTemp)); // 前三部分脱敏
+                    break;
+            }
         }
-        if (privacyLevel == 0)
-            return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
         return result;
+
     }
 
     // 取字符串
@@ -1588,19 +1775,6 @@ public class DpUtilImpl implements DpUtil {
             String tmp = data + "";
             return tmp.replaceAll(pat, keepPatStr);
         }
-    }
-
-    @Override
-    public List<String> suppressAllIp(List<Object> dataList, Integer privacyLevel) {
-        ArrayList<String> result = new ArrayList<>();
-
-        for (Object data : dataList) {
-            result.add("*.*.*.*");
-        }
-
-        if (privacyLevel == 0)
-            return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
-        return result;
     }
 }
 

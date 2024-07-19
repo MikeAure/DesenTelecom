@@ -29,13 +29,6 @@
         </div>
         <div class="sidebar-collapse">
             <ul class="nav" id="side-menu">
-
-                <#--  <li>
-                      <a class="J_menuItem" href="${ctx!}/maptest" style="font-size: 20px;">
-                          <i class="fa fa-home"></i>
-                          <span class="nav-label" style="font-size: 20px;">地图测试</span>
-                      </a>
-                  </li>-->
                 <#--脱敏算法验证-->
                 <li>
                     <a href="#" style="font-size: 20px;">
@@ -283,9 +276,9 @@
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinevoting" style="font-size: 15px;">网上投票类场景</a>
                         </li>
 
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi2" style="font-size: 15px;">网上打车场景（接收数据）</a>
-                        </li>
+<#--                        <li>-->
+<#--                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi2" style="font-size: 15px;">网上打车场景（接收数据）</a>-->
+<#--                        </li>-->
 
                     </ul>
                 </li>
@@ -426,8 +419,14 @@
                                 </li>
                             </ul>
                         </li>
-
                     </ul>
+                </li>
+                <li>
+                    <a class="J_menuItem" href="${ctx!}/templateManagement" style="font-size: 20px;">
+                        <i class="fa fa fa-cog"></i>
+                        <span class="nav-label">应用场景模板管理</span>
+
+                    </a>
                 </li>
             </ul>
         </div>

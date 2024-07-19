@@ -26,15 +26,15 @@
             text-align: center;
         }
 
-        .ibox-title {
-            height: 200px;
-            border-color: #edf1f2;
-            background-color: #dbeafe;
-            color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /*.ibox-title {*/
+        /*    height: 200px;*/
+        /*    border-color: #edf1f2;*/
+        /*    background-color: #dbeafe;*/
+        /*    color: black;*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*    justify-content: center;*/
+        /*}*/
 
         /*选择框居中*/
         .midtile {
@@ -96,6 +96,8 @@
             justify-content: center;
         }
 
+        .performance-test button,
+        .performance-test label,
         .map-info button,
         .server-content button {
             background-color: #347aa9;
@@ -307,6 +309,106 @@
 
             });
             document.getElementById("fileUpload").addEventListener("change", choose_file);
+
+            document.getElementById('generateTestData').addEventListener('click', function () {
+                fetch('/Encrypt/generateTestData')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'ok') {
+                            const message = data.message;
+                            downloadTestFile(message, 'testData.txt', 'text/plain');
+                        } else {
+                            console.error('Failed to generate test data:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            function downloadTestFile(content, fileName, contentType) {
+                const blob = new Blob([content], {type: contentType});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 0);
+            }
+
+            document.getElementById('selectTestData').addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file && file.type === 'text/plain') {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const textArea = document.getElementById('testData');
+                        textArea.value = e.target.result;
+                        document.getElementById('fileName').textContent = file.name + '已选择';
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert('请选择一个txt格式的文件。');
+                }
+            });
+
+            document.getElementById('startPerformanceTest').addEventListener('click', function() {
+                const fileInput = document.getElementById('selectTestData');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert('请先选择一个测试文件。');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result.trim();
+                    const points = content.split('\n').map(line => line.split(' ').map(Number));
+
+                    fetch('/Encrypt/performenceTest', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json;charset=UTF-8'
+                        },
+                        body: JSON.stringify(points)
+                    })
+                        .then(response => response.blob())
+                        .then(blob => {
+                            // 使用 FileReader 读取 blob 内容
+                            const fileReader = new FileReader();
+                            fileReader.onload = function(event) {
+                                // 显示文件内容在 textarea 中
+                                document.getElementById('desenTestData').value = event.target.result;
+
+                                // 保存blob用于下载
+                                window.downloadBlob = blob;
+                            };
+                            fileReader.readAsText(blob);
+                        })
+                        .catch(error => console.error('Error:', error));
+                };
+                reader.readAsText(file);
+            });
+
+            document.getElementById('downloadTestResult').addEventListener('click', function() {
+                if (window.downloadBlob) {
+                    const url = window.URL.createObjectURL(window.downloadBlob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'result.txt';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 0);
+                } else {
+                    alert('请先进行性能测试以生成结果文件。');
+                }
+            });
 
             window._AMapSecurityConfig = {
                 securityJsCode: "dd8ae1e880d8bcf447281c3bed5f3c91",
@@ -630,7 +732,7 @@
                             <div id="fileInfo"></div>
 
                             <div class="btn1">
-                                <input type="file" id="fileUpload" style="display: none;">
+                                <input type="file" accept=".xlsx" id="fileUpload" style="display: none;">
                                 <label for="fileUpload" class="btn btn-sm btn-primary upload-btn">
                                     选择文件
                                 </label>
@@ -791,6 +893,59 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="performance-test">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+
+                                                <div class="ibox">
+                                                    <div class="ibox-title float-e-margins">
+                                                        <h5>待测试数据</h5>
+                                                    </div>
+
+                                                </div>
+                                                <div class="ibox-content">
+                                                    <textarea id="testData" rows="18" class="col-sm-12"
+                                                              readonly></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-6">
+
+                                                <div class="ibox">
+                                                    <div class="ibox-title float-e-margins">
+                                                        <h5>脱敏后的数据</h5>
+                                                    </div>
+
+                                                </div>
+                                                <div class="ibox-content">
+                                                <textarea id="desenTestData" rows="18" class="col-sm-12"
+                                                          readonly></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row m-t">
+                                            <p>
+                                                <button type="button" id="generateTestData"
+                                                        class="btn btn-sm btn-primary">
+                                                    生成测试文件
+                                                </button>
+                                                <input type="file" accept=".txt" id="selectTestData"
+                                                       style="display: none;">
+                                                <label for="selectTestData" class="btn btn-sm btn-primary">
+                                                    选择测试文件
+                                                </label>
+                                                <button type="button" id="startPerformanceTest"
+                                                        class="btn btn-sm btn-primary"> 进行性能测试
+                                                </button>
+                                                <button type="button" id="downloadTestResult"
+                                                        class="btn btn-sm btn-primary"> 下载测试结果
+                                                </button>
+
+                                            </p>
+                                            <p id="fileName" class="text-success"></p>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 

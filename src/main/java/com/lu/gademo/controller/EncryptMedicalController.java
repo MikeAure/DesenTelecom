@@ -43,7 +43,7 @@ public class EncryptMedicalController {
 
         String desenFileName = "desen_" + rawFileName;
 //        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
-        Path desenFilePath = desenFileDirectory.resolve("result.csv");
+        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
 
         log.info(desenFilePath.toAbsolutePath().toString());
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();

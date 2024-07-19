@@ -33,15 +33,15 @@
             border-radius: 3px;
         }
         /*标题*/
-        .ibox-title {
-            height: 200px;
-            border-color: #edf1f2;
-            background-color: #dbeafe;
-            color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /*.ibox-title {*/
+        /*    height: 200px;*/
+        /*    border-color: #edf1f2;*/
+        /*    background-color: #dbeafe;*/
+        /*    color: black;*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*    justify-content: center;*/
+        /*}*/
 
         .ibox-title span {
             font-size: 50px;
@@ -488,6 +488,8 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div id="mapid" style="height: 1000px;"></div>
+
                         </div>
                     </div>
                     <div id="tab-2" class="tab-pane fade">
@@ -513,7 +515,6 @@
     </div>
 
 </div>
-<div id="mapid" style="height: 1000px;"></div>
 
 </body>
 </html>

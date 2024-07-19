@@ -17,15 +17,15 @@
         }
 
         /*标题*/
-        .ibox-title {
-            height: 200px;
-            border-color: #edf1f2;
-            background-color: #dbeafe;
-            color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /*.ibox-title {*/
+        /*    height: 200px;*/
+        /*    border-color: #edf1f2;*/
+        /*    background-color: #dbeafe;*/
+        /*    color: black;*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*    justify-content: center;*/
+        /*}*/
 
         .ibox-title span {
             font-size: 50px;

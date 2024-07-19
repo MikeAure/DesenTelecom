@@ -12,6 +12,7 @@ public class Gademo4Application {
     public static void main(String[] args) {
 
         ConfigurableApplicationContext context = SpringApplication.run(Gademo4Application.class, args);
+
         //CertStoReqDao certStoReqDao = context.getBean(CertStoReqDao.class);
 		/*IndDesenDao indDesenDao = context.getBean(IndDesenDao.class);
 

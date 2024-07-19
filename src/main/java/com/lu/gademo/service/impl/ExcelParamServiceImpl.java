@@ -6,7 +6,6 @@ import com.lu.gademo.service.ExcelParamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @Service
@@ -15,7 +14,7 @@ public class ExcelParamServiceImpl implements ExcelParamService {
     private ExcelParamDao excelParamDao;
 
     public List<ExcelParam> getParams(String name) {
-        return excelParamDao.getParams(name);
+        return excelParamDao.getTableParamsByName(name);
     }
 
     public void deleteAll(String name) {
@@ -23,7 +22,7 @@ public class ExcelParamServiceImpl implements ExcelParamService {
     }
 
     public void insertAll(String name, List<ExcelParam> dataList) {
-        excelParamDao.insertAll(name, dataList);
+        excelParamDao.saveTableParams(name, dataList);
     }
 
 

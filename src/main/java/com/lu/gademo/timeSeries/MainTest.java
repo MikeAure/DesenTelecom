@@ -21,7 +21,6 @@ public class MainTest {
         HashMap<Integer, ArrayList<Double>> doubleDataList = Data.ReadFixNumData(filename, split, n, d);
         HashMap<Integer, ArrayList<Integer>> intDataList = Data.TransformDoubleToInt(doubleDataList, 100);
 
-
         double time = 0.0;
         for (int i = 0; i < cycle; i++) {
 

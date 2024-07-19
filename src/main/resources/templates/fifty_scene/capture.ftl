@@ -43,20 +43,46 @@
 <script type="text/javascript">
     let sheet = "capture";
     window.onload = function () {
+        let selectedFile; // 全局变量，用于存储选择的文件
+        let currentSceneValue = document.getElementById("choose_transfer_scene").value;
+        let suffix = "";
+        let sceneName = sheet;
+        document.getElementById("choose_transfer_scene").addEventListener("change", function () {
+            currentSceneValue = this.value;
+            console.log("Selected value:", currentSceneValue);
+
+            switch (currentSceneValue) {
+                case "1":
+                    suffix = "_low";
+                    break;
+                case "2":
+                    suffix = "_medium";
+                    break;
+                case "3":
+                    suffix = "_high"
+                    break;
+                default:
+                    suffix = "";
+                    break;
+            }
+            sceneName = sheet + suffix;
+            console.log(suffix);
+            console.log("Current scene name: " + sceneName);
+
+        });
         document.getElementById("showTemplate").addEventListener("click", function () {
             // 清空
-            document.getElementById("fileInfo").innerHTML = "";
+            // document.getElementById("fileInfo").innerHTML = "";
             document.getElementById("table_list").innerHTML = ""
             document.getElementById("table_list2").innerHTML = ""
             document.getElementById("table_body").innerHTML = ""
             // 拼接html
             let html = "";
-            console.log("sheet:" + sheet)
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
                 if (xhr.status === 200 && xhr.readyState === 4) {
-                    var data_str = xhr.responseText;
-                    var data = JSON.parse(data_str);
+                    let data_str = xhr.responseText;
+                    let data = JSON.parse(data_str);
                     console.log(data.length)
 
                     html += "<div class=\"table-responsive\">" +
@@ -72,7 +98,7 @@
                         "</tr>" +
                         "</thead>" +
                         "<tbody id=\"table2\">";
-                    for (var i = 0; i < data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         s = data[i];
                         //console.log(s)
                         html += "<tr id = " + "row_" + i + ">";
@@ -95,67 +121,32 @@
                                 break;
                         }
                         html += "</td>"
-                        /* html += "<td>"
-                         switch (s.k) {
-                             case 0:
-                                 if (s.dataType === 0 || s.dataType === 4) {
-                                     html += "差分隐私"
-                                 } else {
-                                     html += "默认处理"
-                                 }
-                                 break;
-                             case 1:
-                                 if (s.dataType === 0 || s.dataType === 4) {
-                                     html += "k-匿名"
-                                 } else {
-                                     html += "默认处理"
-                                 }
-                                 break;
-                         }
-                         html += "</td>"
-
-                         html += "<td>"
-                         switch (s.tmParam) {
-                             case 0:
-                                 html += "无隐私保护处理"
-                                 break;
-                             case 1:
-                                 html += "低程度"
-                                 break;
-                             case 2:
-                                 html += "中程度"
-                                 break;
-
-                             default:
-                                 html += "高程度"
-                                 break;
-                         }
-
-                         html += "</td>"*/
                         html += "</tr>";
                     }
                     document.getElementById("table_body").innerHTML = html
                 }
             }
 
-            xhr.open("get", "/" + sheet + "param/list", false);
+            console.log("Set template: " + sceneName);
+
+            xhr.open("get", "/" + sceneName + "param/list", false);
             xhr.send();
             document.getElementById("table_body").innerHTML = html;
         })
         document.getElementById("setTemplate").addEventListener("click", function () {
             // 清空
-            document.getElementById("fileInfo").innerHTML = "";
+            // document.getElementById("fileInfo").innerHTML = "";
             document.getElementById("table_list").innerHTML = "";
             document.getElementById("table_list2").innerHTML = "";
             document.getElementById("table_body").innerHTML = "";
             // 拼接html
             let html = "";
             console.log("sheet:" + sheet)
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
                 if (xhr.status === 200 && xhr.readyState === 4) {
-                    var data_str = xhr.responseText;
-                    var data = JSON.parse(data_str);
+                    let data_str = xhr.responseText;
+                    let data = JSON.parse(data_str);
                     console.log(data.length)
 
 
@@ -172,7 +163,7 @@
                         "</tr>" +
                         "</thead>" +
                         "<tbody id=\"table2\">";
-                    for (var i = 0; i < data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         s = data[i];
                         console.log(s)
                         html += "<tr id = " + "row_" + i + ">";
@@ -532,233 +523,257 @@
                 }
             }
 
-            xhr.open("get", "/" + sheet + "param/list", false);
+            xhr.open("get", "/" + sceneName + "param/list", false);
             xhr.send();
             document.getElementById("table_body").innerHTML = html;
 
             //document.getElementById("fileUpload").addEventListener("change", choose_file)
-        })
-        document.getElementById("fileUpload").addEventListener("change", choose_file)
-    }
-    choose_file = function (event) {
-        //读取文件
-        const file = event.target.files[0]
-        // 文件名，扩展名
-        const fileName = file.name;
-        const fileExtension = fileName.split('.').pop().toLowerCase();
+        });
+        document.getElementById("fileUpload").addEventListener("change", (event) => {
+            choose_file(event)
+        });
 
-        if (file) {
-            if ("xlsx" === fileExtension) {
-                var fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                    "<strong>" + fileName + "文件</strong>已选择"
-                "</span>" +
-                "</div>";
-                document.getElementById("fileInfo").innerHTML = fileLoad
-                console.log(fileExtension)
-                //构建formData,发送给后端
-                var formData = new FormData();
-                formData.append("file", file);
-                formData.append("sheet", sheet);
-                formData.append("algName", "distortion");
-                console.log("sheet:" + sheet)
-                //提交脱敏参数，请求脱敏
-                document.getElementById("submit").onclick = function () {
-                    var tr;
-                    var dataArray = [];
-                    var table_body = document.getElementById("table2")
-                    for (var i = 0; i < table_body.rows.length; i++) {
-                        data = {};
-                        tr = table_body.rows[i];
-                        //console.log(tr);
-                        data.id = tr.childNodes[0].innerHTML;
-                        data.fieldName = tr.childNodes[1].innerHTML;
-                        data.columnName = tr.childNodes[2].innerHTML;
-                        data.dataType = tr.childNodes[3].firstChild.value;
+        document.getElementById("submit").onclick = function () {
+            let tr;
+            let dataArray = [];
+            let table_body = document.getElementById("table2")
+            if (!table_body) {
+                alert("请先设置模板参数")
+                return;
+            }
+            for (let i = 0; i < table_body.rows.length; i++) {
+                data = {};
+                tr = table_body.rows[i];
+                //console.log(tr);
+                data.id = tr.childNodes[0].innerHTML;
+                data.fieldName = tr.childNodes[1].innerHTML;
+                data.columnName = tr.childNodes[2].innerHTML;
+                data.dataType = tr.childNodes[3].firstChild.value;
 
-                        data.k = tr.childNodes[4].firstChild.value;
-                        data.tmParam = tr.childNodes[5].firstChild.value;
-                        dataArray.push(JSON.stringify(data));
-                        //console.log(dataArray);
-                    }
-                    formData.append("params", JSON.stringify(dataArray));
-                    console.log(dataArray.length);
-                    fetch('/File/desenFile', {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => response.blob())
-                        .then(blob => {
-                            // 脱敏前
-                            document.getElementById("preData").innerHTML = "脱敏前数据"
-                            var reader = new FileReader();
-                            reader.onload = function (e) {
-                                var data = new Uint8Array(e.target.result);
-                                var workbook = XLSX.read(data, {type: 'array'});
+                data.k = tr.childNodes[4].firstChild.value;
+                data.tmParam = tr.childNodes[5].firstChild.value;
+                dataArray.push(JSON.stringify(data));
+                //console.log(dataArray);
+            }
 
-                                var sheetName = workbook.SheetNames[0];
-                                var sheet = workbook.Sheets[sheetName];
+            if (!selectedFile) {
+                alert("请选择文件");
+                return;
+            }
 
-                                var jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+            let formData = new FormData();
+            formData.set("file", selectedFile);
+            formData.set("sheet", sceneName);
+            formData.set("algName", "distortion");
+            formData.set("params", JSON.stringify(dataArray));
+            console.log("Scenename in formData: " + sceneName);
 
-                                var pageSize = 10;
-                                var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                                var currentPage = 1;
+            console.log(dataArray.length);
 
-                                function displayTable(page) {
-                                    var startIndex = (page - 1) * pageSize + 1; // 跳过表头
-                                    var endIndex = Math.min(startIndex + pageSize, jsonData.length);
+            //构建formData,发送给后端
 
-                                    var tableContent = '<thead><tr>';
-                                    var headers = jsonData[0];
-                                    headers.forEach(function (header) {
-                                        tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
-                                    });
-                                    tableContent += '</tr></thead><tbody>';
+            fetch('/File/desenFile', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    // 脱敏后
+                    document.getElementById("afterData").innerHTML = "脱敏后数据"
+                    const reader1 = new FileReader();
+                    reader1.onload = function (event) {
+                        const data = event.target.result;
+                        const workbook = XLSX.read(data, {type: 'binary'});
+                        const sheetName = workbook.SheetNames[0];
+                        const sheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                        let pageSize = 10;
+                        let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                        let currentPage1 = 1;
 
-                                    for (var i = startIndex; i < endIndex; i++) {
-                                        tableContent += '<tr>';
-                                        for (var j = 0; j < headers.length; j++) {
-                                            var cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
-                                            tableContent += '<td>' + cellValue + '</td>';
-                                        }
-                                        tableContent += '</tr>';
-                                    }
+                        function displayTable1(page1) {
+                            let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
+                            let endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
 
-                                    tableContent += '</tbody>';
+                            let tableContent1 = '<thead><tr>';
+                            let headers1 = jsonData[0];
+                            headers1.forEach(function (header1) {
+                                tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
+                            });
+                            tableContent1 += '</tr></thead><tbody>';
 
-                                    $('#dataTable').html(tableContent);
+                            for (let i = startIndex1; i < endIndex; i++) {
+                                tableContent1 += '<tr>';
+                                for (let j = 0; j < headers1.length; j++) {
+                                    let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                    tableContent1 += '<td>' + cellValue + '</td>';
                                 }
+                                tableContent1 += '</tr>';
+                            }
 
-                                displayTable(currentPage);
+                            tableContent1 += '</tbody>';
 
-                                function renderPagination() {
-                                    var pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
-                                    pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
+                            $('#dataTable1').html(tableContent1);
+                        }
 
-                                    $('#pagination').html(pagination);
+                        displayTable1(currentPage1);
 
-                                    $('#pagination a').click(function (e) {
-                                        e.preventDefault();
-                                        var page = $(this).data('page');
-                                        console.log(page)
-                                        if (page === 'prev') {
-                                            currentPage = Math.max(1, currentPage - 1);
-                                        } else if (page === 'next') {
-                                            currentPage = Math.min(pageCount, currentPage + 1);
-                                        }
-                                        displayTable(currentPage);
-                                        renderPagination();
-                                    });
+                        function renderPagination1() {
+                            let pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
+                            pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
 
-                                    $('#totalPages').text(pageCount);
+                            $('#pagination1').html(pagination1);
+
+                            $('#pagination1 a').off('click').on('click', function (e) {
+                                e.preventDefault();
+                                let page = $(this).data('page');
+                                console.log(page)
+                                if (page === 'prev1') {
+                                    currentPage1 = Math.max(1, currentPage1 - 1);
+                                } else if (page === 'next1') {
+                                    currentPage1 = Math.min(pageCount, currentPage1 + 1);
                                 }
-
-                                $('#paginationContainer').show();
-                                renderPagination();
-
-                                $('#goToPage').click(function () {
-                                    var pageNumber = parseInt($('#pageInput').val());
-                                    if (pageNumber >= 1 && pageNumber <= pageCount) {
-                                        currentPage = pageNumber;
-                                        displayTable(currentPage);
-                                        renderPagination();
-                                    } else {
-                                        alert('请输入有效页数！');
-                                    }
-                                });
-                            };
-                            reader.readAsArrayBuffer(file);
-
-                            // 脱敏后
-                            document.getElementById("afterData").innerHTML = "脱敏后数据"
-                            const reader1 = new FileReader();
-                            reader1.onload = function (event) {
-                                const data = event.target.result;
-                                const workbook = XLSX.read(data, {type: 'binary'});
-                                const sheetName = workbook.SheetNames[0];
-                                const sheet = workbook.Sheets[sheetName];
-                                const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-                                var pageSize = 10;
-                                var pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                                var currentPage1 = 1;
-
-                                function displayTable1(page1) {
-                                    var startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
-                                    var endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
-
-                                    var tableContent1 = '<thead><tr>';
-                                    var headers1 = jsonData[0];
-                                    headers1.forEach(function (header1) {
-                                        tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
-                                    });
-                                    tableContent1 += '</tr></thead><tbody>';
-
-                                    for (var i = startIndex1; i < endIndex; i++) {
-                                        tableContent1 += '<tr>';
-                                        for (var j = 0; j < headers1.length; j++) {
-                                            var cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
-                                            tableContent1 += '<td>' + cellValue + '</td>';
-                                        }
-                                        tableContent1 += '</tr>';
-                                    }
-
-                                    tableContent1 += '</tbody>';
-
-                                    $('#dataTable1').html(tableContent1);
-                                }
-
                                 displayTable1(currentPage1);
+                                $('#totalPages1').text(currentPage1 + "/" + pageCount);
+                                // renderPagination1();
+                            });
 
-                                function renderPagination1() {
-                                    var pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
-                                    pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
+                            $('#totalPages1').text(currentPage1 + "/" + pageCount);
+                        }
 
-                                    $('#pagination1').html(pagination1);
+                        $('#paginationContainer1').show();
+                        renderPagination1();
 
-                                    $('#pagination1 a').click(function (e) {
-                                        e.preventDefault();
-                                        var page = $(this).data('page');
-                                        console.log(page)
-                                        if (page === 'prev1') {
-                                            currentPage1 = Math.max(1, currentPage1 - 1);
-                                        } else if (page === 'next1') {
-                                            currentPage1 = Math.min(pageCount, currentPage1 + 1);
-                                        }
-                                        displayTable1(currentPage1);
-                                        renderPagination1();
-                                    });
-
-                                    $('#totalPages1').text(pageCount);
-                                }
-
-                                $('#paginationContainer1').show();
+                        $('#goToPage1').off("click").on('click', function () {
+                            let pageNumber1 = parseInt($('#pageInput1').val());
+                            if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
+                                console.log(pageCount);
+                                currentPage1 = pageNumber1;
+                                displayTable1(currentPage1);
                                 renderPagination1();
+                            } else {
+                                alert('请输入有效页数！');
+                            }
+                        });
+                    };
 
-                                $('#goToPage1').click(function () {
-                                    var pageNumber1 = parseInt($('#pageInput1').val());
-                                    if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
-                                        currentPage1 = pageNumber1;
-                                        displayTable1(currentPage1);
-                                        renderPagination1();
-                                    } else {
-                                        alert('请输入有效页数！');
-                                    }
-                                });
-                            };
+                    reader1.readAsBinaryString(blob);
 
-                            reader1.readAsBinaryString(blob);
+                    // 创建一个下载链接
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
+                    downloadLink.click();
+                    // after.appendChild(downloadLink);
+                })
+                .catch(error => console.error('Error:', error));
+        }
 
-                            // 创建一个下载链接
-                            const downloadLink = document.createElement('a');
-                            downloadLink.href = URL.createObjectURL(blob);
-                            downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
-                            downloadLink.click();
-                            after.appendChild(downloadLink);
-                        })
-                        .catch(error => console.error('Error:', error));
+        function choose_file(event) {
+            //读取文件
+            selectedFile = event.target.files[0]
+            // 文件名，扩展名
+            const fileName = selectedFile.name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            if (selectedFile) {
+
+                if ("xlsx" === fileExtension) {
+
+                    console.log('Selected file:', selectedFile);
+                    console.log(fileExtension)
+                    // 这里可以执行其他操作，例如显示文件名或预览文件
+
+                    document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                        "<strong>" + fileName + "文件</strong>已选择" + "</span>" + "</div>";
+                    // 脱敏前
+                    document.getElementById("preData").innerHTML = "脱敏前数据"
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        let data = new Uint8Array(e.target.result);
+                        let workbook = XLSX.read(data, {type: 'array'});
+
+                        let sheetName = workbook.SheetNames[0];
+                        let sheet = workbook.Sheets[sheetName];
+
+                        let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+
+                        let pageSize = 10;
+                        let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                        let currentPage = 1;
+
+                        function displayTable(page) {
+                            let startIndex = (page - 1) * pageSize + 1; // 跳过表头
+                            let endIndex = Math.min(startIndex + pageSize, jsonData.length);
+
+                            let tableContent = '<thead><tr>';
+                            let headers = jsonData[0];
+                            headers.forEach(function (header) {
+                                tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
+                            });
+                            tableContent += '</tr></thead><tbody>';
+
+                            for (let i = startIndex; i < endIndex; i++) {
+                                tableContent += '<tr>';
+                                for (let j = 0; j < headers.length; j++) {
+                                    let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                    tableContent += '<td>' + cellValue + '</td>';
+                                }
+                                tableContent += '</tr>';
+                            }
+
+                            tableContent += '</tbody>';
+
+                            $('#dataTable').html(tableContent);
+                        }
+
+                        displayTable(currentPage);
+
+                        function renderPagination() {
+                            let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
+                            pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
+
+                            $('#pagination').html(pagination);
+
+                            $('#pagination a').off('click').on('click', function (e) {
+                                e.preventDefault();
+                                let page = $(this).data('page');
+                                console.log(page)
+                                if (page === 'prev') {
+                                    currentPage = Math.max(1, currentPage - 1);
+                                } else if (page === 'next') {
+                                    currentPage = Math.min(pageCount, currentPage + 1);
+                                }
+                                displayTable(currentPage);
+                                $('#totalPages').text(currentPage + '/' + pageCount);
+                                // renderPagination();
+                            });
+
+                            $('#totalPages').text(currentPage + '/' + pageCount);
+                        }
+
+                        $('#paginationContainer').show();
+                        renderPagination();
+
+                        $('#goToPage').off("click").on("click", function () {
+                            let pageNumber = parseInt($('#pageInput').val());
+                            if (pageNumber >= 1 && pageNumber <= pageCount) {
+                                console.log(pageCount);
+                                currentPage = pageNumber;
+                                displayTable(currentPage);
+                                renderPagination();
+                            } else {
+                                alert('请输入有效页数！');
+                            }
+                        });
+                    };
+                    reader.readAsArrayBuffer(selectedFile);
+                } else {
+                    alert("请提交excel文件")
                 }
+
             } else {
-                alert("请提交excel文件")
+                document.getElementById("fileInfo").innerHTML = "";
             }
         }
 
@@ -769,7 +784,16 @@
 <div class="row">
     <div class="col-sm-12">
         <div class="ibox float-e-margins">
-
+            <div class="midtile form-group m-t">
+                <label for="choose_transfer_scene" style="font-size: 20px">选择流转场景</label>
+                <select name="transfer_scene" id="choose_transfer_scene"
+                        style="font-size: 20px; text-align: center">
+                    <option value="111" selected>请选择流转场景</option>
+                    <option value="1">用户本地</option>
+                    <option value="2">同机构不同系统</option>
+                    <option value="3">不同机构不同系统</option>
+                </select>
+            </div>
             <div class="midtile">
                 <div class="col-sm-5 m-b-xs">
                     <button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
@@ -780,6 +804,9 @@
                             选择文件
                         </label>
                     </form>
+                    <div class="btn2">
+                        <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                    </div>
                 </div>
             </div>
             <!--文件上传信息-->
@@ -792,11 +819,6 @@
                 <div id=table_body></div>
             </div>
             <div class="button1">
-                <div class="btn2">
-                    <#--<button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
-                    <button type="button" class="btn btn-sm btn-primary" id="setTemplate"> 设置需求模板</button>-->
-                    <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
-                </div>
             </div>
             <div id="showTable">
             </div>

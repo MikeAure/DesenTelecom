@@ -31,6 +31,10 @@ public class GeneralizationTest {
         for (Object string : result1.getList()) {
             System.out.println(string);
         }
+        DSObject result2 = generalization.service(dsObject, 1, 2);
+        DSObject result3 = generalization.service(dsObject, 1, 3);
+        result2.getList().forEach(System.out::println);
+        result3.getList().forEach(System.out::println);
     }
 
     @Test
@@ -75,16 +79,25 @@ public class GeneralizationTest {
     @Test
     public void testAddressHide()  {
         // Generalization generalization = new GeneralizationImpl();
-        List<String> rawData = Arrays.asList("陕西省西安市长安区西安电子科技大学南校区", "北京市海淀区北京大学");
+        List<String> rawData = Arrays.asList("陕西省西安市长安区西安电子科技大学南校区", "北京市海淀区北京大学",
+                "广西壮族自治区玉林市北流市塘岸收费站入口(北海方向)", "广西壮族自治区桂林市七星区施家园路75号附近停车场",
+                "海南省儋州市国营八一总场xxx地址", "海南省三沙市西沙群岛xxx村");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 4, 1);
-        for (Object string : result.getList()) {
+        DSObject result0 = generalization.service(dsObject, 4, 0);
+        DSObject result1 = generalization.service(dsObject, 4, 1);
+        DSObject result2 = generalization.service(dsObject, 4, 2);
+        DSObject result3 = generalization.service(dsObject, 4, 3);
+
+        for (Object string : result1.getList()) {
             System.out.println(string);
         }
-        DSObject result0 = generalization.service(dsObject, 4, 0);
+
         for (Object string : result0.getList()) {
             System.out.println(string);
         }
+        result2.getList().forEach(System.out::println);
+        result3.getList().forEach(System.out::println);
+
     }
 
     @Test

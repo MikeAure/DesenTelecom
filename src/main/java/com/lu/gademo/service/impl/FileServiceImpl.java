@@ -40,8 +40,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.collections4.CollectionUtils.collect;
-
 @Slf4j
 @Service
 @Data
@@ -89,8 +87,9 @@ public class FileServiceImpl implements FileService {
     private Path rawFileDirectory;
     private Path desenFileDirectory;
 
+    // 从DSObject获取脱敏结果
     private <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
-        return  algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
+        return algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
                 .stream()
                 .map(item -> item != null ? (T) item : null)
                 .collect(Collectors.toList());
@@ -241,7 +240,6 @@ public class FileServiceImpl implements FileService {
         sendEvaReq.setFileSuffix(rawFileSuffix);
         sendEvaReq.setStatus("数据已脱敏");
         return sendEvaReq;
-
     }
 
     private List<ExcelParam> jsonStringToParams(String params) throws IOException {
@@ -250,7 +248,6 @@ public class FileServiceImpl implements FileService {
         });
 
     }
-
 
     private SendRuleReq buildSendRuleReq(String evidenceID, byte[] rawFileBytes, byte[] desenFileBytes,
                                          StringBuilder desenInfoAfterIden, StringBuilder desenIntention,
@@ -671,7 +668,12 @@ public class FileServiceImpl implements FileService {
 
                         }
                         case 9: {
-                            infoBuilders.desenAlgParam.append("无参,");
+                            Map<Integer, String> map = new HashMap<>();
+                            map.put(0, "没有脱敏,");
+                            map.put(1, "1,");
+                            map.put(2, "2,");
+                            map.put(3, "3,");
+                            infoBuilders.desenAlgParam.append(map.get(excelParam.getTmParam()));
                             // 脱敏要求
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("数值取整,");
                             // 脱敏
@@ -690,7 +692,12 @@ public class FileServiceImpl implements FileService {
                             break;
                         }
                         case 10: {
-                            infoBuilders.desenAlgParam.append("无参,");
+                            Map<Integer, String> map = new HashMap<>();
+                            map.put(0, "没有脱敏,");
+                            map.put(1, "20,");
+                            map.put(2, "30,");
+                            map.put(3, "50,");
+                            infoBuilders.desenAlgParam.append(map.get(excelParam.getTmParam()));
                             // 脱敏要求
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("数值映射,");
                             // 脱敏
@@ -751,7 +758,8 @@ public class FileServiceImpl implements FileService {
                     if (excelParam.getTmParam() == 0) {
                         infoBuilders.desenAlgParam.append("没有脱敏,");
                     } else {
-                        infoBuilders.desenAlgParam.append("无参,");
+                        infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参，"
+                                : algorithmInfo.getParams().get(excelParam.getTmParam()).toString() + ",");
                     }
 
                     switch (algNum) {
@@ -887,7 +895,7 @@ public class FileServiceImpl implements FileService {
         String endTime = util.getTime();
 
         log.info("Desensitization finished in " + (endTimePoint - startTimePoint) / 10e6 + "ms");
-        long oneTime = (endTimePoint - startTimePoint)  / (totalRowNum - 1);
+        long oneTime = (endTimePoint - startTimePoint) / (totalRowNum - 1) / columnCount;
         // 打印单条运行时间
         log.info("Single data running time：" + oneTime + " ns");
         // 一秒数据量
@@ -2469,7 +2477,7 @@ public class FileServiceImpl implements FileService {
             }
 
             case "laplaceToValue":
-            case "gaussianToValue":{
+            case "gaussianToValue": {
                 List<Double> val = Arrays.stream(textInput.split(","))
                         .map(x -> x == null ? null : Double.parseDouble(x))
                         .collect(Collectors.toList());

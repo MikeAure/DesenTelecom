@@ -1,12 +1,13 @@
 package com.lu.gademo.trace.client.common;
 
 import com.lu.gademo.trace.client.util.SMUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Random;
 
-
+@Slf4j
 public class QU_AGRQ_P {
 
     private static final int thresholdValue = 20000;//时延门限值
@@ -18,7 +19,7 @@ public class QU_AGRQ_P {
     private BigInteger s, s_Inverse, p, alpha;//参数s，s的逆，p,α
     private BigInteger r_i;//数组r
     private String key_QU;//会话密钥
-    private String QUID;//用户表示
+    private String QUID;//用户标识
 
 
     public QU_AGRQ_P() {
@@ -126,6 +127,7 @@ public class QU_AGRQ_P {
             BigInteger q_y = BigInteger.valueOf(q.getY());
             BigInteger qNext_x = BigInteger.valueOf(qNext.getX());
             BigInteger qNext_y = BigInteger.valueOf(qNext.getY());
+            // 对空间四叉树的两个顶点进行加密操作
             C_i[0] = q_x.multiply(alpha).add(c_in[0]).multiply(s).mod(p);
             C_i[1] = q_y.multiply(alpha).add(c_in[1]).multiply(s).mod(p);
             C_i[2] = qNext_x.multiply(alpha).add(c_in[2]).multiply(s).mod(p);
@@ -175,14 +177,18 @@ public class QU_AGRQ_P {
             String[] messages = message.trim().split(symbol2);//以symbol2分开
             BigInteger alpha_QU = new BigInteger(messages[0]);
             BigInteger p_QU = new BigInteger(messages[1]);
+            // EN
             String C_QUStr = messages[2];
+            // EN_i1 - EN_i4
             String[] C_iStr = C_QUStr.trim().split(symbol3);
             String[] C_inStr = null;
             BigInteger[] D_in = new BigInteger[2];
             StringBuilder DSb = new StringBuilder();
             String D = null;
             String D_i = null;
+
             for (int i = 0; i < C_iStr.length; i++) {
+                // EN_ij1-EN_ij6
                 C_inStr = C_iStr[i].trim().split(symbol1);
                 if (C_inStr.length != 6) {
                     System.out.println("UF_AGRQ_P_RDC_Error C_in的长度不为6");
@@ -210,7 +216,7 @@ public class QU_AGRQ_P {
             String H = SMUtils.encryptBySm3(H_pre);
             String H_UF = SMUtils.encryptBySm4(H, key_QU);
             String sendMessage = D + symbol2 + QUID + symbol2 + nowTime + symbol2 + H_UF;//同字符类型之间以symbol2隔开
-//            System.out.println("UF_AGRQ_P_RDC发送数据生成成功：" + sendMessage);
+            log.info("UF_AGRQ_P_RDC发送数据生成成功：" + sendMessage);
             return sendMessage;
         }
         return null;

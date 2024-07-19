@@ -152,11 +152,18 @@ public class AnonymityImpl implements Anonymity {
             */
             case 7: {
                 if (params.length != 1) return null;
-                int[] l_diversity_param = new int[]{2, 4, 6};
                 List<?> value = object.getList();
-                String path_l = Paths.get(currentPath, "generalization", "l_diversity.py").toString();
-                String param = Integer.toString(l_diversity_param[params[0].intValue()]);
-                return new DSObject(CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_l, param));
+                String param = Integer.toString(params[0].intValue());
+                String baseName = value.get(0).toString();
+                String dir = value.get(1).toString();
+                String attribute = value.get(2).toString();
+                String result;
+                try {
+                    result = kAnonymityUtil.lDistinctDiversity(baseName, dir, param, attribute);
+                } catch (Exception e) {
+                    return null;
+                }
+                return new DSObject(result);
             }
 
             /*
@@ -253,10 +260,10 @@ public class AnonymityImpl implements Anonymity {
             case 12: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
-                String param = "7 " + s[0] + " " + s[1] + " " + params[0].toString();
+                StringBuilder param = new StringBuilder("7 " + s[0] + " " + s[1] + " " + params[0].toString());
                 for (Object point : object.getList()) {
                     String[] temp = point.toString().split(",");
-                    param += " " + temp[0] + " " + temp[1];
+                    param.append(" ").append(temp[0]).append(" ").append(temp[1]);
                 }
                 String cmd = path + " " + param;
                 return new DSObject(CommandExecutor.openExe(cmd));

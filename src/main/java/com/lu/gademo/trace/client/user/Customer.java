@@ -317,7 +317,7 @@ public class Customer {
                 stringBuffer.append(qu_agrq_p.UF_AGRQ_P_RDC(str, vertex) + ";");
             } catch (Exception e) {
                 logger.info("EncryptedCaledData: ", "数据处理出错！");
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
 

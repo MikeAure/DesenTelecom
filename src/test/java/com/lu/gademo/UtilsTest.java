@@ -161,4 +161,12 @@ public class UtilsTest {
         }
 
     }
+
+    @Test
+    void test2DArrayString() {
+        List<List<Double>> testArray = Arrays.asList(Arrays.asList(0.1, 0.3), Arrays.asList(0.3, 0.5), Arrays.asList(0.5, 0.7));
+        for (Object item : testArray) {
+            System.out.println(item);
+        }
+    }
 }

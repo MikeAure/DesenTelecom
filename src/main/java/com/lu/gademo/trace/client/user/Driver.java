@@ -190,10 +190,10 @@ public class Driver {
 
         for (String str : mapDatum) {
             try {
-                stringBuffer.append(qu_agrq_p.UF_AGRQ_P_RDC(str, vertex) + ";");
+                stringBuffer.append(qu_agrq_p.UF_AGRQ_P_RDC(str, vertex)).append(";");
             } catch (Exception e) {
-                logger.info("EncryptedCaledData: ", "数据处理出错！");
-                e.printStackTrace();
+                logger.info("EncryptedCaledData: {} ", "数据处理出错！");
+                logger.error(e.getMessage());
             }
         }
 
@@ -213,7 +213,7 @@ public class Driver {
             queryMessage = new StringBuffer(qu_agrq_c.UF_AGRQ_C_RDC(stringBuffer.toString(), vertex));
         } catch (Exception e) {
             logger.info("OnReceivedCircleData: DriverActivity中数据处理出错！");
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         sendEncryptedData(queryMessage, 4);
         logger.info("与圆进行计算:计算数据发送完毕！");
