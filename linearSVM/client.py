@@ -76,7 +76,7 @@ if __name__ == "__main__":
         exit(-1)
         
     test_path = sys.argv[1]
-    csv_output_path =  sys.argv[2]
+    csv_output_path = sys.argv[2]
     test_features, test_labels = load_csv_data(test_path)
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

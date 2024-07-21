@@ -54,7 +54,7 @@
 
 
         window.onload = function () {
-            connect();
+            // connect();
             document.getElementById("laplaceToValue_submitBtn").addEventListener("click", function () {
                 let textInput = $("#laplaceToValue_textInput").val();
                 let privacyLevel = document.getElementById("laplaceToValue_privacyLevel").value

@@ -349,7 +349,7 @@
                     };
                     reader.readAsText(file);
                 } else {
-                    alert('请选择一个txt格式的文件。');
+                    alert('请选择一个txt格式的文件');
                 }
             });
 
@@ -427,9 +427,7 @@
             if (file) {
                 if ("xlsx" === fileExtension) {
                     let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                        "<strong>" + fileName + "文件</strong>上传成功"
-                    "</span>" +
-                    "</div>";
+                        "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
                     document.getElementById("fileInfo").innerHTML = fileLoad
                     //console.log(fileExtension)
                     //构建formData,发送给后端
@@ -801,8 +799,7 @@
                                     <tr>
                                         <td>
                                             <select id="nodistortionAlg">
-                                                <option value="default" selected>请选择脱敏算法</option>
-                                                <option value="trace">在线打车外包查询算法</option>
+                                                <option value="trace" selected>在线打车外包查询算法</option>
                                                 <#--                                            <option value="voice-print">TestItem</option>-->
                                             </select>
                                         </td>
@@ -812,9 +809,9 @@
                             </div>
 
                             <div id="nondistortion-module-container" class="tab-pane">
-                                <div id="default-module" style="visibility: visible"></div>
+<#--                                <div id="default-module" style="visibility: visible"></div>-->
                                 <#--                            <div id="voiceprint-module" class="tab-pane" style="visibility: hidden">Test div2</div>-->
-                                <div id="trace-module" style="visibility: hidden">
+                                <div id="trace-module" style="visibility: visible">
                                     <div class="map-container" id="driverMap1-container">
                                         <div class="map-title">司机1</div> <!-- 标题元素 -->
                                         <div class="map-content"> <!-- 新增的包裹容器 -->

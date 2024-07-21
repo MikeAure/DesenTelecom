@@ -1,13 +1,11 @@
 package com.lu.gademo.utils.impl;
 
-import com.lu.gademo.service.WsAlgorithmLogService;
 import com.lu.gademo.utils.DpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -29,12 +27,12 @@ import java.util.stream.Collectors;
 @Component
 public class DpUtilImpl implements DpUtil {
 
-    private final WsAlgorithmLogService wsLogService;
-
-    @Autowired
-    public DpUtilImpl(WsAlgorithmLogService logService) {
-        this.wsLogService = logService;
-    }
+//    private final WsAlgorithmLogService wsLogService;
+//
+//    @Autowired
+//    public DpUtilImpl(WsAlgorithmLogService logService) {
+//        this.wsLogService = logService;
+//    }
 
     private final List<SimpleDateFormat> dataFormats = Arrays.asList(
             new SimpleDateFormat("yyyy-MM-dd"),
@@ -45,8 +43,6 @@ public class DpUtilImpl implements DpUtil {
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
             new SimpleDateFormat("yyyyMMddHHmmss"),
             new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
-
-
     );
 
     //k-匿名算法
@@ -200,6 +196,7 @@ public class DpUtilImpl implements DpUtil {
     @Override
     //数值型数据处理()
     public List<Double> laplaceToValue(List<Object> datas, Integer privacyLevel) {
+        log.info("LaplaceToValue Algorithm Start");
         List<Double> re_data = new ArrayList<>();
         //读取数据
         for (Object data : datas) {
@@ -218,7 +215,7 @@ public class DpUtilImpl implements DpUtil {
                             re_data.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
-                            e.printStackTrace();
+                            log.error("LaplaceToValue error: {}", e.getMessage());
                         }
                     }
                 } else {
@@ -234,42 +231,18 @@ public class DpUtilImpl implements DpUtil {
     }
 
     //数值型处理
-    private List<Double> NumberCode_s(List<Double> re_data, Integer privacyLevel) {
+    private List<Double> NumberCode_s(List<Double> reData, Integer privacyLevel) {
 
         List<Double> newData = new ArrayList<>();
-        double a, max, min;
+        double max, min;
 
-        // 使用最大值计算敏感度
+        // 使用max - min作为敏感度
+        max = Collections.max(reData.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+        min = Collections.min(reData.stream().filter(Objects::nonNull).collect(Collectors.toList()));
 
-        max = Collections.max(re_data.stream().filter(Objects::nonNull).collect(Collectors.toList()));
-        min = Collections.min(re_data.stream().filter(Objects::nonNull).collect(Collectors.toList()));
-//        System.out.println("max " + max);
-//        if (max < 100){
-//            a = 1;
-//        } else {
-//            a = max / 50;
-//        }
-        // 使用均值计算敏感度
-        double average = 0;
-        int nullNum = 0;
-
-        for (int i = 0; i < re_data.size(); i++) {
-            if (re_data.get(i) == null) {
-                nullNum++;
-                average += 0;
-            } else {
-                average += re_data.get(i);
-            }
-        }
-        average = average / (re_data.size() - nullNum);
-
-
-        //设置参数sensitivety和epsilon
         BigDecimal sensitivity = new BigDecimal(max - min);
-//        wsLogService.sendLog("laplaceToValue", "sensitivity is " + sensitivity);
-        System.out.println("sensitivity " + sensitivity);
+        log.info("Sensitivity: " + sensitivity);
 
-        //BigDecimal sensitivety = new BigDecimal(50);
         BigDecimal epsilon = new BigDecimal("0.1");
         if (privacyLevel == 1) {
             epsilon = new BigDecimal(10);
@@ -277,24 +250,24 @@ public class DpUtilImpl implements DpUtil {
             epsilon = new BigDecimal(1);
         }
 
-        System.out.println("epsilon " + epsilon);
+        log.info("Epsilon: " + epsilon);
         BigDecimal beta = sensitivity.divide(epsilon, 6, RoundingMode.HALF_UP);
-
-
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
-//        wsLogService.sendLog("laplaceToValue", "beta is " + betad);
-        System.out.println("beta " + beta);
+        log.info("Beta: " + beta);
 
         //循环处理数据
-        for (int i = 0; i < re_data.size(); i++) {
+        for (int i = 0; i < reData.size(); i++) {
             LaplaceDistribution ld = new LaplaceDistribution(0, betad);
             double noise = ld.sample();//随机采样一个拉普拉斯分布值
+            if (i < 10) {
+                log.info("Element {} Noise: {}", i, noise);
+            }
             double d;
             //null值不处理
-            if (re_data.get(i) == null) {
+            if (reData.get(i) == null) {
                 newData.add(null);
             } else {
-                d = noise + re_data.get(i);
+                d = noise + reData.get(i);
                 BigDecimal b = new BigDecimal(d);
                 d = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
 

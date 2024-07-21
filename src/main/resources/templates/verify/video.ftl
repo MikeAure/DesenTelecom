@@ -59,6 +59,9 @@
         }
 
         /*上传按钮*/
+        #videoAesEncrypt button,
+        #selectRawVideo,
+        #selectEncryptedVideo,
         .upload-btn {
             background-color: #347aa9;
             color: white;
@@ -70,20 +73,26 @@
             margin: 30px;
         }
 
-        #pre {
-            text-align: center;
-        }
+        /*#pre {*/
+        /*    text-align: center;*/
+        /*}*/
 
-        #pre video {
-            display: inline-block;
-            max-width: 50%;
-            height: auto
-        }
+        /*#pre video {*/
+        /*    display: inline-block;*/
+        /*    max-width: 50%;*/
+        /*    height: auto*/
+        /*}*/
 
+        #pre,
+        #showRawVideo,
+        #showDecryptedVideo,
         #after {
             text-align: center;
         }
 
+        #pre video,
+        #showRawVideo video,
+        #showDecryptedVideo video,
         #after video {
             display: inline-block;
             max-width: 50%;
@@ -123,6 +132,23 @@
     <script type="text/javascript">
 
         window.onload = function () {
+            document.getElementById("nodistortionAlg").addEventListener("change", function () {
+                let selection = document.getElementById("nodistortionAlg").value;
+
+                const videoAesEncryptModule = document.getElementById("videoAesEncrypt");
+                const defaultModule = document.getElementById("default-module");
+                // const voiceprint_module = document.getElementById("voiceprint-module");
+
+                if (selection === "trace") {
+                    // voiceprint_module.style.visibility = "hidden";
+                    videoAesEncryptModule.style.visibility = "visible";
+                    defaultModule.style.visibility = "hidden";
+                } else {
+                    // voiceprint_module.style.visibility = "hidden";
+                    videoAesEncryptModule.style.visibility = "hidden";
+                    defaultModule.style.visibility = "visible";
+                }
+            });
             let submitButton = document.getElementById("submit");
             let fileUpload = document.getElementById("fileUpload");
             let distortionTypes = document.getElementById("distortion-types");
@@ -139,6 +165,12 @@
             fileUpload.addEventListener("change", chooseFile);
             submitButton.addEventListener("click", originalSubmit)
             document.getElementById("fileUpload").addEventListener("change", chooseFile);
+
+
+            // 非失真脱敏，为选择代价密视频文件绑定事件
+            // document.getElementById("selectEncryptedVideo").addEventListener("change", (event) => {
+            //     nonDistortionVideoShowFile(event, "selectEncryptedVideo", "showDecryptedVideo")
+            // });
 
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 preArea.innerHTML = "";
@@ -274,6 +306,100 @@
                     }
                 }
             });
+
+            // 非失真脱敏，为选择代价密视频文件绑定事件
+            document.getElementById("selectRawVideo").addEventListener("change", (event) => {
+                // 清空
+                document.getElementById("aesRawVideoInfo").innerHTML = "";
+                //读取文件
+                const file = event.target.files[0]
+                // 文件名，扩展名
+                const fileName = file.name;
+                document.getElementById("aesRawVideoInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                    "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
+
+                nonDistortionVideoShowFile(event, "selectRawVideo", "showRawVideo")
+            });
+
+            document.getElementById("encryptVideo").onclick = function() {
+                let encryptKey = document.getElementById("encryptKey").value;
+                let file = document.getElementById("selectRawVideo").files[0];
+                if (!file) {
+                    alert("未选择待加密文件");
+                    return;
+                }
+                if (!encryptKey) {
+                    alert("未指定加密密钥");
+                    return;
+                }
+                let formData = new FormData();
+                formData.set("file", file);
+                formData.set("password", encryptKey);
+
+                fetch('/Encrypt/aesVideoEnc', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.blob())
+                    .then(data => {
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = URL.createObjectURL(data);
+                        downloadLink.download = Date.now().toString() + ".mp4"; // 下载的文件名
+                        downloadLink.click();
+                    })
+                    .catch(error => {
+                        console.log("Error:", error);
+                    })
+            }
+
+            document.getElementById("selectEncryptedVideo").addEventListener("change", (event) => {
+                // 清空
+                document.getElementById("aesDecryptedVideoInfo").innerHTML = "";
+                //读取文件
+                const file = event.target.files[0]
+                // 文件名，扩展名
+                const fileName = file.name;
+                document.getElementById("aesDecryptedVideoInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                    "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
+
+            });
+
+            document.getElementById("decryptVideo").onclick = function() {
+                let showDecryptedVideo = document.getElementById("showDecryptedVideo");
+                showDecryptedVideo.innerHTML = "";
+                let decryptKey = document.getElementById("decryptKey").value;
+                let file = document.getElementById("selectEncryptedVideo").files[0];
+
+                if (!file) {
+                    alert("未选择待解密文件");
+                    return;
+                }
+                if (!decryptKey) {
+                    alert("未指定解密密钥");
+                    return;
+                }
+                let formData = new FormData();
+                formData.set("file", file);
+                formData.set("password", decryptKey);
+
+                fetch('/Encrypt/aesVideoDec', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.blob())
+                    .then(data => {
+                        const video = document.createElement("video");
+                        //console.log(data)
+                        video.src = URL.createObjectURL(data);
+                        video.type = "video/mp4";
+                        video.controls = true;
+                        showDecryptedVideo.appendChild(video);
+
+                    })
+                    .catch(error => {
+                        console.log("Error:", error);
+                    })
+            }
         }
 
         function faceSubSubmit() {
@@ -415,7 +541,31 @@
                 console.log(fileExtension)
 
                 if (videoType.includes(fileExtension)) {
-                    displayVideo()
+                    displayVideo("fileUpload", "pre")
+
+                } else {
+                    alert("请选择视频文件");
+                }
+            }
+        }
+
+        function nonDistortionVideoShowFile(event, inputElement, showVideoArea) {
+            // 清空
+
+            document.getElementById(showVideoArea).innerHTML = "";
+
+            // 视频格式
+            const videoType = ['mp4', 'avi']
+            //读取文件
+            const file = event.target.files[0]
+            // 文件名，扩展名
+            if (file) {
+                const fileName = file.name;
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+                console.log(fileExtension)
+
+                if (videoType.includes(fileExtension)) {
+                    displayVideo(inputElement, showVideoArea)
                 } else {
                     alert("请选择视频文件");
                 }
@@ -466,9 +616,12 @@
 
         }
 
-        function displayVideo() {
-            let input = document.getElementById("fileUpload");
-            let pre = document.getElementById("pre");
+        // 展示视频，从元素中获取输入的原视频文件，展示在指定区域
+        function displayVideo(inputElement, showArea) {
+            // let input = document.getElementById("fileUpload");
+            // let pre = document.getElementById("pre");
+            let input = document.getElementById(inputElement);
+            let pre = document.getElementById(showArea);
             let file = input.files[0];
             let reader = new FileReader();
             reader.readAsDataURL(file);
@@ -481,6 +634,7 @@
             };
         }
 
+        // 用于使用图片参数的算法的提交
         function originalSubmit() {
             let after = document.getElementById("after");
             after.innerHTML = "";
@@ -537,59 +691,6 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
             </div>
-            <div id="default-choosefile-btn" class="midtile">
-                <div class="col-sm-5 m-b-xs">
-                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload" style="display: none;">
-                        <label for="fileUpload" class="upload-btn">
-                            选择文件
-                        </label>
-                    </form>
-                </div>
-            </div>
-            <#--用于视频背景替换文件上传的按钮组 -->
-            <div id="video-bg-sub-btns" class="midtile" style="display: none">
-                <div class="align-items-center">
-                    <form id="uploadForm" enctype="multipart/form-data">
-                        <input type="file" id="video_remove_bg_fileupload" style="display: none;">
-                        <label for="video_remove_bg_fileupload" class="upload-btn">
-                            选择视频文件
-                        </label>
-                        <input type="file" id="video_remove_bg_img_fileupload" style="display: none;">
-                        <label for="video_remove_bg_img_fileupload" class="upload-btn">
-                            选择背景图片
-                        </label>
-                    </form>
-                </div>
-            </div>
-            <#--            用于视频人脸替换算法文件上传的按钮组-->
-            <div id="video-face-sub-btns" class="midtile" style="display: none">
-                <div class="align-items-center">
-                    <form id="uploadForm" enctype="multipart/form-data">
-                        <input type="file" id="video_face_sub_src_fileupload" style="display: none;">
-                        <label for="video_face_sub_src_fileupload" class="upload-btn">
-                            选择换脸源文件（图片）
-                        </label>
-                        <input type="file" id="video_face_sub_target_fileupload" style="display: none;">
-                        <label for="video_face_sub_target_fileupload" class="upload-btn">
-                            选择目标视频
-                        </label>
-                    </form>
-                </div>
-            </div>
-            <!--文件上传信息-->
-            <div id=fileInfo>
-            </div>
-
-            <div class="showFile">
-                <!--前后文件-->
-                <div id=pre>
-                </div>
-                <div id=mid-image>
-                </div>
-                <div id=after>
-                </div>
-            </div>
 
             <div class="tabs-container">
                 <ul id="tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
@@ -633,6 +734,84 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <div id="privacyLevel">
+                            <table style="margin: auto; font-size: 20px">
+                                <thead>
+                                <tr>
+                                    <th>请选择隐私保护等级</th>
+                                </tr>
+                                </thead>
+                                <tbody id="table3">
+                                <tr>
+                                    <td><select id="privacy-levels">
+                                            <option value="0"> 低程度</option>
+                                            <option value="1" selected> 中程度</option>
+                                            <option value="2"> 高程度</option>
+                                        </select></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="default-choosefile-btn" class="midtile">
+                            <div class="col-sm-5 m-b-xs">
+                                <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                    <input type="file" id="fileUpload" style="display: none;">
+                                    <label for="fileUpload" class="upload-btn">
+                                        选择文件
+                                    </label>
+                                </form>
+                            </div>
+                        </div>
+                        <#--用于视频背景替换文件上传的按钮组 -->
+                        <div id="video-bg-sub-btns" class="midtile" style="display: none">
+                            <div class="align-items-center">
+                                <form id="uploadForm" enctype="multipart/form-data">
+                                    <input type="file" id="video_remove_bg_fileupload" style="display: none;">
+                                    <label for="video_remove_bg_fileupload" class="upload-btn">
+                                        选择视频文件
+                                    </label>
+                                    <input type="file" id="video_remove_bg_img_fileupload" style="display: none;">
+                                    <label for="video_remove_bg_img_fileupload" class="upload-btn">
+                                        选择背景图片
+                                    </label>
+                                </form>
+                            </div>
+                        </div>
+                        <#--            用于视频人脸替换算法文件上传的按钮组-->
+                        <div id="video-face-sub-btns" class="midtile" style="display: none">
+                            <div class="align-items-center">
+                                <form id="uploadForm" enctype="multipart/form-data">
+                                    <input type="file" id="video_face_sub_src_fileupload" style="display: none;">
+                                    <label for="video_face_sub_src_fileupload" class="upload-btn">
+                                        选择换脸源文件（图片）
+                                    </label>
+                                    <input type="file" id="video_face_sub_target_fileupload" style="display: none;">
+                                    <label for="video_face_sub_target_fileupload" class="upload-btn">
+                                        选择目标视频
+                                    </label>
+                                </form>
+                            </div>
+                        </div>
+                        <div id=fileInfo>
+                        </div>
+
+                        <div class="btn2">
+                            <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                        </div>
+                        <!--文件上传信息-->
+
+                        <div class="showFile">
+                            <!--前后文件-->
+                            <div id=pre>
+                            </div>
+                            <div id=mid-image>
+                            </div>
+                            <div id=after>
+                            </div>
+                        </div>
+
                     </div>
                     <div id="tab-2" class="tab-pane" style="text-align: center;">
                         <div>
@@ -645,45 +824,110 @@
                                 <tbody id="table2">
                                 <tr>
                                     <td>
-                                        <select id="nondistortion-types">
-                                            <option value="test3"> 视频非失真脱敏算法A</option>
-                                            <option value="test4" selected> 视频非失真脱敏算法B</option>
+                                        <select id="nodistortionAlg">
+
+                                            <option value="videoAesEncrypt" selected> AES视频加密</option>
                                         </select>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
+                        <div id="default-module" style="visibility: visible"></div>
+
+                        <div class="m-t" id="videoAesEncrypt">
+                            <div class="ibox">
+                                <div class="ibox-title">
+                                    <h5>视频加密</h5>
+                                </div>
+                                <div class="ibox-content">
+
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">请输入加密密钥</label>
+
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" id="encryptKey"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row m-t">
+                                        <p>
+
+                                            <input type="file" accept=".mp4" id="selectRawVideo"
+                                                   style="display: none;">
+                                            <label for="selectRawVideo" class="btn-primary upload-btn">
+                                                选择待加密视频文件
+                                            </label>
+                                            <button type="button" id="encryptVideo"
+                                                    class="btn btn-sm btn-primary">加密视频
+                                            </button>
+
+                                        </p>
+
+                                    </div>
+                                    <div class="row m-t">
+                                        <div id="aesRawVideoInfo">
+
+                                        </div>
+                                    </div>
+                                    <div class="row m-t">
+                                        <div id="showRawVideo">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ibox ">
+                                <div class="ibox-title">
+                                    <h5>视频解密</h5>
+                                </div>
+                                <div class="ibox-content">
+
+                                    <div class="form-group m-b">
+                                        <label class="col-sm-2 control-label">请输入解密密钥</label>
+
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" id="decryptKey"/>
+                                        </div>
+                                    </div>
+                                    <div class="row m-t">
+                                        <p>
+
+                                            <input type="file" accept=".mp4" id="selectEncryptedVideo"
+                                                   style="display: none;">
+                                            <label for="selectEncryptedVideo" class="btn-primary upload-btn">
+                                                选择待解密视频文件
+                                            </label>
+                                            <button type="button" id="decryptVideo"
+                                                    class="btn btn-sm btn-primary">解密视频
+                                            </button>
+
+                                        </p>
+                                    </div>
+
+                                    <div class="row m-t">
+                                        <div id="aesDecryptedVideoInfo">
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row m-t">
+                                        <div id="showDecryptedVideo">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="ibox-content" style="text-align: center;">
-                <div id="privacyLevel">
-                    <table style="margin: auto; font-size: 20px">
-                        <thead>
-                        <tr>
-                            <th>请选择隐私保护等级</th>
-                        </tr>
-                        </thead>
-                        <tbody id="table3">
-                        <tr>
-                            <td><select id="privacy-levels">
-                                    <option value="0"> 低程度</option>
-                                    <option value="1" selected> 中程度</option>
-                                    <option value="2"> 高程度</option>
-                                </select></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="btn2">
-                <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
-            </div>
         </div>
+
     </div>
+</div>
 
 </div>
 </body>

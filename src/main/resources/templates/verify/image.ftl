@@ -439,38 +439,6 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
             </div>
-            <div class="midtile">
-                <div class="col-sm-5 m-b-xs">
-                    <div id="uploadForm">
-                        <input type="file" id="fileUpload" style="display: none;">
-                        <label for="fileUpload" class="upload-btn">
-                            选择文件
-                        </label>
-                    </div>
-                    <div id="facesub-upload" style="display: none">
-                        <input type="file" id="img_face_sub_src_fileupload" accept=".jpg, .jpeg, .png, .gif"
-                               style="display: none;">
-                        <label for="img_face_sub_src_fileupload" class="upload-btn">
-                            选择目标面孔
-                        </label>
-                        <input type="file" id="img_face_sub_target_fileupload" accept=".jpg, .jpeg, .png, .gif"
-                               style="display: none;">
-                        <label for="img_face_sub_target_fileupload" class="upload-btn">
-                            选择源文件
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="showFile">
-                <!--前后文件-->
-                <div id="pre">
-                </div>
-                <div id="after">
-                </div>
-                <div id="replace-result">
-                </div>
-            </div>
 
             <div class="tabs-container">
                 <ul id="tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
@@ -549,11 +517,42 @@
                         </div>
                     </div>
                 </div>
+
             </div>
-
-
+            <div class="midtile">
+                <div class="col-sm-5 m-b-xs">
+                    <div id="uploadForm">
+                        <input type="file" id="fileUpload" style="display: none;">
+                        <label for="fileUpload" class="upload-btn">
+                            选择文件
+                        </label>
+                    </div>
+                    <div id="facesub-upload" style="display: none">
+                        <input type="file" id="img_face_sub_src_fileupload" accept=".jpg, .jpeg, .png, .gif"
+                               style="display: none;">
+                        <label for="img_face_sub_src_fileupload" class="upload-btn">
+                            选择目标面孔
+                        </label>
+                        <input type="file" id="img_face_sub_target_fileupload" accept=".jpg, .jpeg, .png, .gif"
+                               style="display: none;">
+                        <label for="img_face_sub_target_fileupload" class="upload-btn">
+                            选择源文件
+                        </label>
+                    </div>
+                </div>
+            </div>
             <div class="btn2">
                 <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+            </div>
+
+            <div class="showFile">
+                <!--前后文件-->
+                <div id="pre">
+                </div>
+                <div id="after">
+                </div>
+                <div id="replace-result">
+                </div>
             </div>
 
         </div>

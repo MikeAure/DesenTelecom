@@ -45,7 +45,7 @@
             let sheet = document.getElementById("choose_template_sheet").value;
             let suffix = "";
             let sceneName = "";
-            document.getElementById("choose_transfer_scene").addEventListener("change", function() {
+            document.getElementById("choose_transfer_scene").addEventListener("change", function () {
                 currentSceneValue = this.value;
                 console.log("Selected value:", currentSceneValue);
 
@@ -69,7 +69,7 @@
 
             });
 
-            document.getElementById("choose_template_sheet").addEventListener("change", function() {
+            document.getElementById("choose_template_sheet").addEventListener("change", function () {
                 sheet = this.value;
                 sceneName = sheet + suffix;
                 console.log("Selected template:", sheet);
@@ -81,6 +81,11 @@
                 // document.getElementById("fileInfo").innerHTML = "";
                 // document.getElementById("table_list").innerHTML = ""
                 // document.getElementById("table_list2").innerHTML = ""
+
+                if (sheet === "111") {
+                    alert("请选择有效的场景");
+                    return;
+                }
                 document.getElementById("table_body").innerHTML = ""
                 // 拼接html
                 let html = "";
@@ -825,6 +830,7 @@
                     document.getElementById("fileInfo").innerHTML = "";
                 }
             }
+
             // 非失真脱敏相关
             let nondistortionPreviewFile = document.getElementById("preview-btn");
             let nondistortionUploadFile = document.getElementById("submit-btn");
@@ -913,14 +919,18 @@
                             downloadButton.addEventListener("click", () => downloadCsv(csvContent, "processed_file.csv"));
                         }
                     })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert(error)
-                });
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert(error)
+                    });
             }
 
-            nondistortionPreviewFile.addEventListener("click", () => {previewCsv(nonDistortionFile)});
-            nondistortionUploadFile.addEventListener("click", () => {uploadCsvFile(nonDistortionFile)});
+            nondistortionPreviewFile.addEventListener("click", () => {
+                previewCsv(nonDistortionFile)
+            });
+            nondistortionUploadFile.addEventListener("click", () => {
+                uploadCsvFile(nonDistortionFile)
+            });
 
             function displayLastColumn(data, pageSize = 10) {
                 let resultContainer = document.querySelector(".result-csv");
@@ -938,54 +948,48 @@
                     }
                     document.getElementById("desen-csv-tbody").innerHTML = rows;
                     resultContainer.style.display = 'block';
+                    updatePaginationInfo();
+                }
+
+                function updatePaginationInfo() {
+                    document.getElementById("desenFilePaginationInfo").textContent = "Page " + currentPage + " of " + totalPages;
                 }
 
                 function renderPaginationNonDistortion() {
-                    document.getElementById("desenFilePrevPage").addEventListener("click", function(event) {
+                    document.getElementById("desenFilePrevPage").onclick = function (event) {
                         event.preventDefault();
                         if (currentPage > 1) {
                             currentPage--;
                             renderTable(currentPage);
                             document.getElementById("desenFilePageInput").value = currentPage;
                         }
-                    });
+                    };
 
-                    document.getElementById("desenFileNextPage").addEventListener("click", function(event) {
+                    document.getElementById("desenFileNextPage").onclick = function (event) {
                         event.preventDefault();
                         if (currentPage < totalPages) {
                             currentPage++;
                             renderTable(currentPage);
                             document.getElementById("desenFilePageInput").value = currentPage;
                         }
-                    });
+                    };
 
-                    document.getElementById("desenFilePageInput").addEventListener("change", function() {
+                    document.getElementById("desenFilePageInput").onchange = function () {
                         let page = parseInt(this.value);
                         if (page >= 1 && page <= totalPages) {
                             currentPage = page;
                             renderTable(currentPage);
+                        } else {
+                            alert("请输入有效页数！");
                         }
-                    });
+                    };
 
                     document.getElementById("desenFilePageInput").value = currentPage;
-                    paginationContainer.style.display = 'block';
+                    paginationContainer.style.display = 'flex';
                 }
 
                 renderTable(currentPage);
                 renderPaginationNonDistortion();
-            }
-
-            function downloadCsv(content, fileName) {
-                let blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-                let link = document.createElement("a");
-                let url = URL.createObjectURL(blob);
-
-                link.setAttribute("href", url);
-                link.setAttribute("download", fileName);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
             }
 
             function displayTable(data, page, pageSize = 10) {
@@ -1012,49 +1016,72 @@
                 document.getElementById("csv-thead").innerHTML = thead;
                 document.getElementById("csv-tbody").innerHTML = tbody;
                 document.querySelector('.raw-csv').style.display = 'block';
+
             }
 
             function setupPagination(data, pageSize = 10) {
-                const totalPages = Math.ceil(data.length / pageSize);
+                let totalPages = Math.ceil(data.length / pageSize);
+                let currentPage = 1;
                 const paginationContainer = document.getElementById("nonDistortionPagination");
 
-                let currentPage = 1;
+                function updatePaginationInfo() {
+                    document.getElementById("nonDistortionPaginationInfo").textContent = "Page " + currentPage + " of " + totalPages;
+                }
 
-                document.getElementById("nonDistortionPrevPage").addEventListener("click", function(event) {
+                document.getElementById("nonDistortionPrevPage").onclick = function (event) {
                     event.preventDefault();
                     if (currentPage > 1) {
                         currentPage--;
                         displayTable(data, currentPage, pageSize);
                         document.getElementById("nonDistortionPageInput").value = currentPage;
+                        updatePaginationInfo();
                     }
-                });
+                };
 
-                document.getElementById("nonDistortionNextPage").addEventListener("click", function(event) {
+                document.getElementById("nonDistortionNextPage").onclick = function (event) {
                     event.preventDefault();
                     if (currentPage < totalPages) {
                         currentPage++;
                         displayTable(data, currentPage, pageSize);
                         document.getElementById("nonDistortionPageInput").value = currentPage;
+                        updatePaginationInfo();
                     }
-                });
+                };
 
-                document.getElementById("nonDistortionPageInput").addEventListener("change", function() {
+                document.getElementById("nonDistortionPageInput").onchange = function () {
                     let page = parseInt(this.value);
                     if (page >= 1 && page <= totalPages) {
                         currentPage = page;
                         displayTable(data, currentPage, pageSize);
+                        updatePaginationInfo();
+                    } else {
+                        alert("请输入有效页数！");
                     }
-                });
+                };
 
                 document.getElementById("nonDistortionPageInput").value = currentPage;
                 displayTable(data, currentPage, pageSize);
-                paginationContainer.style.display = 'block';
+                updatePaginationInfo();
+                paginationContainer.style.display = 'flex';
             }
 
 
-            document.getElementById("nonDistortionFileUpload").addEventListener("change", (event) => {
+            function downloadCsv(content, fileName) {
+                let blob = new Blob([content], {type: 'text/csv;charset=utf-8;'});
+                let link = document.createElement("a");
+                let url = URL.createObjectURL(blob);
+
+                link.setAttribute("href", url);
+                link.setAttribute("download", fileName);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            document.getElementById("nonDistortionFileUpload").onchange = (event) => {
                 nondistortion_choose_file(event)
-            });
+            };
 
         }
     </script>
@@ -1078,15 +1105,43 @@
             margin: 0 auto;
         }
 
+        #paginationInfo1,
+        #paginationInfo2,
+        #paginationInfo3,
         #paginationInfo {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        #paginationInfo1 input,
+        #paginationInfo2 input,
+        #paginationInfo3 input,
         #paginationInfo input {
             width: 5em;
             text-align: center;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+        }
+
+        .pagination-container ul {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        #desenFilePagination {
+            margin-right: auto; /* 推动至左端 */
+        }
+
+        #desenFilePaginationInfo {
+            margin-left: auto; /* 推动至右端 */
         }
 
         /* 设置表格样式 */
@@ -1098,17 +1153,6 @@
         #dataTable1 {
             width: 100%;
             margin: 0 auto;
-        }
-
-        #paginationInfo1 {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #paginationInfo1 input {
-            width: 5em;
-            text-align: center;
         }
 
         /*标题*/
@@ -1159,11 +1203,12 @@
             display: inline-block;
             margin: 30px;
         }
+
         .fixed-width {
             width: 200px;
         }
 
-        th {
+        .table_body th {
             text-align: center;
         }
     </style>
@@ -1255,8 +1300,12 @@
                                     <option value="onlinevoting">网上投票类场景</option>
                                 </select>
                             </div>
-                            <button type="button" class="btn btn-sm btn-primary upload-btn" id="showTemplate"> 场景模板展示</button>
-                            <button type="button" class="btn btn-sm btn-primary upload-btn" id="setTemplate"> 设置需求模板</button>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn" id="showTemplate">
+                                场景模板展示
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary upload-btn" id="setTemplate">
+                                设置需求模板
+                            </button>
                             <div class="form-group" id="uploadForm">
                                 <input type="file" id="fileUpload" style="display: none;">
                                 <label for="fileUpload" class="upload-btn">
@@ -1382,37 +1431,37 @@
                             </div>
 
                             <#--                        显示原始医疗数据-->
-<#--                            <div class="row raw-csv" style="display: none;">-->
-<#--                                <div class="col-md-12">-->
-<#--                                    <h3>原始医疗数据</h3>-->
-<#--                                    <div id="preview-container" class="table-bordered">-->
-<#--                                        <table id="csv-table" class="table table-striped">-->
-<#--                                            <thead id="csv-thead"></thead>-->
-<#--                                            <tbody id="csv-tbody"></tbody>-->
-<#--                                        </table>-->
-<#--                                        <nav aria-label="Page navigation">-->
-<#--                                            <ul class="pagination" id="nonDistortionPagination"></ul>-->
-<#--                                        </nav>-->
-<#--                                    </div>-->
-<#--                                </div>-->
-<#--                            </div>-->
+                            <#--                            <div class="row raw-csv" style="display: none;">-->
+                            <#--                                <div class="col-md-12">-->
+                            <#--                                    <h3>原始医疗数据</h3>-->
+                            <#--                                    <div id="preview-container" class="table-bordered">-->
+                            <#--                                        <table id="csv-table" class="table table-striped">-->
+                            <#--                                            <thead id="csv-thead"></thead>-->
+                            <#--                                            <tbody id="csv-tbody"></tbody>-->
+                            <#--                                        </table>-->
+                            <#--                                        <nav aria-label="Page navigation">-->
+                            <#--                                            <ul class="pagination" id="nonDistortionPagination"></ul>-->
+                            <#--                                        </nav>-->
+                            <#--                                    </div>-->
+                            <#--                                </div>-->
+                            <#--                            </div>-->
 
-<#--                            <div class="row result-csv" style="display: none;">-->
-<#--                                <div class="col-sm6">-->
-<#--                                    <h3>脱敏后的医疗数据</h3>-->
-<#--                                    <div id="result-container" class="table-bordered">-->
-<#--                                        <table id="csv-table" class="table table-striped">-->
-<#--                                            <thead id="desen-csv-thead" class="fixed-width"><th>查询结果</th></thead>-->
-<#--                                            <tbody id="desen-csv-tbody" class="fixed-width"></tbody>-->
-<#--                                        </table>-->
-<#--                                    </div>-->
-<#--                                    <nav aria-label="Page navigation" id="desenFilePaginationContainer"-->
-<#--                                         style="display: none;">-->
-<#--                                        <ul class="pagination" id="desenFilePagination"></ul>-->
-<#--                                    </nav>-->
-<#--                                </div>-->
+                            <#--                            <div class="row result-csv" style="display: none;">-->
+                            <#--                                <div class="col-sm6">-->
+                            <#--                                    <h3>脱敏后的医疗数据</h3>-->
+                            <#--                                    <div id="result-container" class="table-bordered">-->
+                            <#--                                        <table id="csv-table" class="table table-striped">-->
+                            <#--                                            <thead id="desen-csv-thead" class="fixed-width"><th>查询结果</th></thead>-->
+                            <#--                                            <tbody id="desen-csv-tbody" class="fixed-width"></tbody>-->
+                            <#--                                        </table>-->
+                            <#--                                    </div>-->
+                            <#--                                    <nav aria-label="Page navigation" id="desenFilePaginationContainer"-->
+                            <#--                                         style="display: none;">-->
+                            <#--                                        <ul class="pagination" id="desenFilePagination"></ul>-->
+                            <#--                                    </nav>-->
+                            <#--                                </div>-->
 
-<#--                            </div>-->
+                            <#--                            </div>-->
 
                             <div class="row raw-csv" style="display: none;">
                                 <div class="col-md-12">
@@ -1422,35 +1471,44 @@
                                             <thead id="csv-thead"></thead>
                                             <tbody id="csv-tbody"></tbody>
                                         </table>
-                                        <div class="pagination-container">
-                                            <nav aria-label="Page navigation">
-                                                <ul class="pagination" id="nonDistortionPagination">
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="#" aria-label="Previous" id="nonDistortionPrevPage">
-                                                            <span aria-hidden="true">&laquo;</span>
-                                                        </a>
-                                                    </li>
-                                                    <li class="page-item">
-                                                        <input type="number" id="nonDistortionPageInput" class="form-control" style="width: 70px; display: inline-block;" min="1">
-                                                    </li>
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="#" aria-label="Next" id="nonDistortionNextPage">
-                                                            <span aria-hidden="true">&raquo;</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </nav>
-                                        </div>
                                     </div>
+                                    <div class="pagination-container">
+                                        <nav aria-label="Page navigation">
+                                            <ul class="pagination" id="nonDistortionPagination" style="display: flex">
+                                                <li class="page-item">
+                                                    <a class="page-link" href="#" aria-label="Previous"
+                                                       id="nonDistortionPrevPage">
+                                                        <span aria-hidden="true">&laquo;</span>
+                                                    </a>
+                                                </li>
+                                                <li class="page-item">
+                                                    <input type="number" id="nonDistortionPageInput"
+                                                           class="form-control"
+                                                           style="width: 70px;" min="1">
+                                                </li>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="#" aria-label="Next"
+                                                       id="nonDistortionNextPage">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+
+                                        </nav>
+                                        <div id="nonDistortionPaginationInfo"></div>
+                                    </div>
+
                                 </div>
                             </div>
 
                             <div class="row result-csv" style="display: none;">
-                                <div class="col-sm-offset-3 col-sm-6">
+                                <div class="col-sm-12">
                                     <h3>脱敏后的医疗数据</h3>
                                     <div id="result-container" class="table-bordered">
                                         <table id="csv-table" class="table table-striped">
-                                            <thead id="desen-csv-thead" class="fixed-width"><th>查询结果</th></thead>
+                                            <thead id="desen-csv-thead" class="fixed-width">
+                                            <th>查询结果</th>
+                                            </thead>
                                             <tbody id="desen-csv-tbody" class="fixed-width"></tbody>
                                         </table>
                                     </div>
@@ -1458,27 +1516,31 @@
                                         <nav aria-label="Page navigation">
                                             <ul class="pagination" id="desenFilePagination">
                                                 <li class="page-item">
-                                                    <a class="page-link" href="#" aria-label="Previous" id="desenFilePrevPage">
+                                                    <a class="page-link" href="#" aria-label="Previous"
+                                                       id="desenFilePrevPage">
                                                         <span aria-hidden="true">&laquo;</span>
                                                     </a>
                                                 </li>
                                                 <li class="page-item">
-                                                    <input type="number" id="desenFilePageInput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                                    <input type="number" id="desenFilePageInput" class="form-control"
+                                                           style="width: 70px;" min="1">
                                                 </li>
                                                 <li class="page-item">
-                                                    <a class="page-link" href="#" aria-label="Next" id="desenFileNextPage">
+                                                    <a class="page-link" href="#" aria-label="Next"
+                                                       id="desenFileNextPage">
                                                         <span aria-hidden="true">&raquo;</span>
                                                     </a>
                                                 </li>
                                             </ul>
+
                                         </nav>
+                                        <div id="desenFilePaginationInfo"></div>
                                     </div>
                                 </div>
                             </div>
 
 
                         </div>
-
 
 
                     </div>

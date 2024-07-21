@@ -58,9 +58,10 @@ public class EncryptMedicalController {
             return ResponseEntity.ok().body(result);
         }
 
-        Path desenAppPath = currentDirectory.resolve("linearSVM");
+        Path desenAppPath = currentDirectory.resolve("nonlinearSVM");
         Map<String, Object> result = new HashMap<>();
-        String command = CommandExecutor.getPythonCommand() + " " + this.currentDirectory.resolve("linearSVM").resolve("server.py").toAbsolutePath();
+        Path desenAppServer = desenAppPath.resolve("server.py");
+        String command = CommandExecutor.getPythonCommand() + " " + desenAppServer.toAbsolutePath();
         // 在这里启动服务器
         try {
             log.info("Nondistortion excel start");
@@ -74,9 +75,10 @@ public class EncryptMedicalController {
             return ResponseEntity.ok().body(result);
         }
 
-        Path desenApp = desenAppPath.resolve("client.py");
-        List<String> commandResult = CommandExecutor.executePython(rawFilePathString + " " + desenFilePathString, "",
-                desenApp.toAbsolutePath().toString());
+        Path desenAppClient = desenAppPath.resolve("client.py");
+        List<String> commandResult = CommandExecutor.executePython(
+                rawFilePathString + " " + desenFilePathString, "",
+                desenAppClient.toAbsolutePath().toString());
         if (commandResult == null || !desenFilePath.toFile().exists()) {
             result.put("status", "error");
             result.put("data", "Execute Python script failed");

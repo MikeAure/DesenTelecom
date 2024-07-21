@@ -18,13 +18,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.Cipher;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
+
+import static com.lu.gademo.utils.VideoUtil.videoAESEncOrDec;
 
 @Slf4j
 @Controller
@@ -377,5 +382,80 @@ public class EncryptController {
         };
     }
 
+    @PostMapping(value = "/aesVideoEnc")
+    public ResponseEntity<byte[]> aesVideoEnc(@RequestPart("file") MultipartFile file,
+                                            @RequestParam("password") String password
+    ) {
+        try {
+            Path currentDirectory = Paths.get("");
+            Path rawFileDirectory = Paths.get("raw_files");
+            Path desenFileDirectory = Paths.get("desen_files");
+            // 设置文件时间戳
+            String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+            // 设置原文件保存路径
+            String rawFileName = fileTimeStamp + file.getOriginalFilename();
+            Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+            String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+
+            // 保存源文件
+            file.transferTo(rawFilePath.toAbsolutePath());
+            // 设置脱敏后文件路径信息
+            String desenFileName = "desen_" + rawFileName;
+            Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+            String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+            // 调用视频加密方法
+
+            videoAESEncOrDec(rawFilePathString, desenFilePathString, password, Cipher.ENCRYPT_MODE);
+            // 准备返回文件
+            File tempFile = desenFilePath.toFile();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + desenFileName);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(tempFile.length())
+                    .body(Files.readAllBytes(tempFile.toPath()));
+        } catch(Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
+        }
+
+
+    }
+
+    @PostMapping(value = "/aesVideoDec")
+    public ResponseEntity<byte[]> aesVideoDec(@RequestPart("file") MultipartFile file,
+                                              @RequestParam("password") String password
+    ) {
+        try {
+
+            Path rawFileDirectory = Paths.get("raw_files");
+            Path desenFileDirectory = Paths.get("desen_files");
+            // 设置文件时间戳
+            String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+            // 设置原文件保存路径
+            String rawFileName = fileTimeStamp + file.getOriginalFilename();
+            Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+            String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+
+            // 保存源文件
+            file.transferTo(rawFilePath.toAbsolutePath());
+            // 设置脱敏后文件路径信息
+            String desenFileName = "desen_" + rawFileName;
+            Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+            String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+            // 调用视频加密方法
+
+            videoAESEncOrDec(rawFilePathString, desenFilePathString, password, Cipher.DECRYPT_MODE);
+            // 准备返回文件
+            File tempFile = desenFilePath.toFile();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + desenFileName);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(tempFile.length())
+                    .body(Files.readAllBytes(tempFile.toPath()));
+        } catch(Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
+        }
+    }
 
 }
