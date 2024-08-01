@@ -231,18 +231,6 @@
 
             </div>
 
-            <div class="row">
-                <p class="text-center" style="font-size: 1.5em">
-                    <strong>日志显示</strong>
-                </p>
-                <textarea
-                        class="col-sm-offset-2 col-sm-8"
-                        id="exponential_logText"
-                        rows="7"
-                        cols="50"
-                        readonly
-                ></textarea>
-            </div>
         </div>
     </div>
 
@@ -306,19 +294,6 @@
                 ></textarea>
             </div>
 
-
-            <div class="row">
-                <p class="text-center" style="font-size: 1.5em">
-                    <strong>日志显示</strong>
-                </p>
-                <textarea
-                        class="col-sm-offset-2 col-sm-8"
-                        id="report_noisy_max2_logText"
-                        rows="7"
-                        cols="50"
-                        readonly
-                ></textarea>
-            </div>
         </div>
     </div>
 
@@ -421,18 +396,6 @@
                 ></textarea>
             </div>
 
-            <div class="row">
-                <p class="text-center" style="font-size: 1.5em">
-                    <strong>日志显示</strong>
-                </p>
-                <textarea
-                        class="col-sm-offset-2 col-sm-8"
-                        id="report_noisy_max4_logText"
-                        rows="7"
-                        cols="50"
-                        readonly
-                ></textarea>
-            </div>
         </div>
     </div>
 <#--</div>-->

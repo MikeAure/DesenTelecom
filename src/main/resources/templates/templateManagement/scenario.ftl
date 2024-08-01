@@ -129,11 +129,13 @@
             console.log("Selected template:", sheet);
             console.log("Current scene name: " + sceneName);
             console.log(document.getElementById("choose_sheet").value);
+        });
+
+        document.getElementById("show-template").onclick = () => {
             document.getElementById('tabletitle').style.display = 'block';
             document.getElementById('button').style.display = 'block';
             choose_sheet();
-        });
-
+        }
 
         // 添加一行到表格
         document.getElementById("add_row").onclick = function () {
@@ -404,10 +406,10 @@
         // 发送请求的代码
         let selectedSheet = document.getElementById("choose_sheet").value;
         // xhr.open('GET', '/Param/' + selectedSheet + 'list', true); // 根据选择的场景动态设置请求路径
-    
-    
+
         // 构建请求路径
-        let requestUrl = '/Param/tablelist?tableName=' + sceneName+'_param';
+        let requestUrl = '/Param/tablelist?tableName=' + sceneName +'_param';
+         console.log("Request URL: " + requestUrl)
         fetch(requestUrl, {
             method: 'GET',
             headers: {
@@ -580,6 +582,9 @@
                                 <option value="webcast">网络直播类场景</option>
                                 <option value="woman">女性健康类场景</option>
                             </select>
+                        </div>
+                        <div class="form-group m-b">
+                            <button type="button" id="show-template">展示场景</button>
                         </div>
                     </form>
                 </div>

@@ -23,7 +23,6 @@ public class MainTest {
 
         double time = 0.0;
         for (int i = 0; i < cycle; i++) {
-
             double t1 = System.currentTimeMillis();
             HashMap<Integer, ArrayList<Integer>> pivotsList = PreCompute.ChoosePivots(intDataList, k);
             HashMap<Integer, int[]> distanceList = PreCompute.PreComputeDistance(intDataList, pivotsList, lamda);
@@ -39,7 +38,6 @@ public class MainTest {
     }
 
     public static double[] TWEDComputationEach(String filename, String split, SHSParamters filterParam, SHSParamters verifyParam, Matrix A, int n, int d, int k, int delta, int cycle, BigInteger FilterCipherOne, BigInteger FilterCipherZero, BigInteger VerifyCipherOne, BigInteger VerifyCipherZero, BigInteger VerifycipherMiunsOne) throws Exception {
-
         HashMap<Integer, ArrayList<Double>> doubleDataList = Data.ReadFixNumData(filename, split, n, d);
         HashMap<Integer, ArrayList<Integer>> intDataList = Data.TransformDoubleToInt(doubleDataList, 100);
 
@@ -127,15 +125,13 @@ public class MainTest {
         System.out.println(index);
 //        operationTime = operationTime / cycle / 20;
         operationTime = operationTime / cycle;
-
+        System.out.println(doubleDataList.get(index).toString());
         System.out.println(intDataList.get(index).toString());
 
         //System.out.println("current parameter: n = " + n + ", d = " + d + ", k = " + k + ", delta = " + delta + ", cycle = " + cycle + ", operation time: " + operationTime);
 
         //return operationTime;
-
-        return index;
-
+        return index + 1;
     }
 
 

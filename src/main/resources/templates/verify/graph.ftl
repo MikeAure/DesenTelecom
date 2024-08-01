@@ -333,7 +333,6 @@
             //读取文件
             const file = event.target.files[0]
 
-
             // 文件名，扩展名
             if (file) {
                 const fileName = file.name;
@@ -428,19 +427,7 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
             </div>
-            <div class="midtile">
-                <div class="col-sm-5 m-b-xs">
-                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload" style="display: none;">
-                        <label for="fileUpload" class="upload-btn">
-                            选择文件
-                        </label>
-                    </form>
-                </div>
-            </div>
-            <!--文件上传信息-->
-            <div id="fileInfo">
-            </div>
+
 
 
             <div class="tabs-container">
@@ -488,8 +475,26 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="mapid" style="height: 1000px;"></div>
 
+                            <div class="midtile">
+                                <div class="col-sm-5 m-b-xs">
+                                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                        <input type="file" id="fileUpload" style="display: none;">
+                                        <label for="fileUpload" class="upload-btn">
+                                            选择文件
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                            <!--文件上传信息-->
+                            <div id="fileInfo">
+                            </div>
+
+                            <div class="btn2">
+                                <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                            </div>
+
+                            <div id="mapid" style="height: 1000px;"></div>
                         </div>
                     </div>
                     <div id="tab-2" class="tab-pane fade">
@@ -502,11 +507,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-            <div class="btn2">
-                <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
             </div>
 
             <div id="result">

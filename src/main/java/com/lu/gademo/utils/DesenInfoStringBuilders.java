@@ -1,11 +1,29 @@
 package com.lu.gademo.utils;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
+
 @Slf4j
+@Data
 public class DesenInfoStringBuilders {
     // 脱敏前信息类型标识
     public StringBuilder desenInfoPreIden;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DesenInfoStringBuilders)) return false;
+        DesenInfoStringBuilders that = (DesenInfoStringBuilders) o;
+        return Objects.equals(desenInfoPreIden, that.desenInfoPreIden) && Objects.equals(desenInfoAfterIden, that.desenInfoAfterIden) && Objects.equals(desenIntention, that.desenIntention) && Objects.equals(desenRequirements, that.desenRequirements) && Objects.equals(desenControlSet, that.desenControlSet) && Objects.equals(desenAlgParam, that.desenAlgParam) && Objects.equals(desenLevel, that.desenLevel) && Objects.equals(desenAlg, that.desenAlg) && Objects.equals(dataType, that.dataType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(desenInfoPreIden, desenInfoAfterIden, desenIntention, desenRequirements, desenControlSet, desenAlgParam, desenLevel, desenAlg, dataType);
+    }
+
     // 脱敏后信息类型标识
     public StringBuilder desenInfoAfterIden;
     // 脱敏意图
@@ -21,6 +39,9 @@ public class DesenInfoStringBuilders {
     // 脱敏算法
     public StringBuilder desenAlg;
 
+    // 表格脱敏每列数据类型
+    public StringBuilder dataType;
+
     public DesenInfoStringBuilders() {
         this.desenInfoPreIden = new StringBuilder();
         this.desenInfoAfterIden = new StringBuilder();
@@ -30,5 +51,6 @@ public class DesenInfoStringBuilders {
         this.desenAlgParam = new StringBuilder();
         this.desenLevel = new StringBuilder();
         this.desenAlg = new StringBuilder();
+        this.dataType = new StringBuilder();
     }
 }

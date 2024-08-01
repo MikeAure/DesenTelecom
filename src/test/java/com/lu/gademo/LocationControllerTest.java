@@ -91,7 +91,8 @@ public class LocationControllerTest {
                         .param("position", "116.435842,39.941626")
                         .param("id", "115")
                         .param("time", "8.5")
-                        .param("points", "116.435842,39.941626;116.353714,39.939588;116.435806,39.908501;116.356866,39.907242")
+                        .param("points", "116.435842,39.941626;116.353714,39.939588;" +
+                                "116.435806,39.908501;116.356866,39.907242")
                         .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -106,7 +107,8 @@ public class LocationControllerTest {
                         .param("position", "116.435842,39.941626")
                         .param("id", "115")
                         .param("time", "8.5")
-                        .param("points", "116.435842,39.941626;116.353714,39.939588;116.435806,39.908501;116.356866,39.907242")
+                        .param("points", "116.435842,39.941626;116.353714,39.939588;" +
+                                "116.435806,39.908501;116.356866,39.907242")
                         .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())

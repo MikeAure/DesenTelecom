@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "rec_eva_bg")
+// 抗大数据分析脱敏效果测评结果无效异常消息
 public class RecEvaBg {
     @Id
     @Column(name = "evaresultid")

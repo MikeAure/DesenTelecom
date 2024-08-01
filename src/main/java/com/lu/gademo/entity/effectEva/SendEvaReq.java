@@ -1,15 +1,17 @@
 package com.lu.gademo.entity.effectEva;
 
 import com.lu.gademo.entity.support.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "send_eva_req")
 public class SendEvaReq extends BaseEntity {
@@ -77,11 +79,9 @@ public class SendEvaReq extends BaseEntity {
     @Basic
     @Column(name = "desencom")
     private Boolean desenCom;
-
     @Basic
     @Column(name = "rawfilesize")
     private Long rawFileSize;
-
     @Basic
     @Column(name = "desenfilesize")
     private Long desenFileSize;
@@ -98,4 +98,19 @@ public class SendEvaReq extends BaseEntity {
     @Column(name = "status")
     private String status;
 
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        SendEvaReq that = (SendEvaReq) o;
+        return getEvaRequestId() != null && Objects.equals(getEvaRequestId(), that.getEvaRequestId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }

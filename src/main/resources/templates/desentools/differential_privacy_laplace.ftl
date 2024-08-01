@@ -522,21 +522,6 @@
                             </textarea>
                 </div>
             </div>
-            <div class="text-center">
-                <label for="laplaceToValue_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="laplaceToValue_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
-
 
         </div>
     </div>
@@ -600,21 +585,6 @@
                                     class="col-sm-8 m-t"
                                     id="report_noisy_max1_outputText"
                                     rows="4" readonly>
-                            </textarea>
-                </div>
-            </div>
-
-            <div class="text-center">
-                <label for="report_noisy_max1_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="report_noisy_max1_logOutputText"
-                                    rows="4" readonly>
-
                             </textarea>
                 </div>
             </div>
@@ -682,20 +652,6 @@
                             </textarea>
                 </div>
             </div>
-            <div class="text-center">
-                <label for="report_noisy_max3_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="report_noisy_max3_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
         </div>
     </div>
     <hr>
@@ -760,20 +716,7 @@
                             </textarea>
                 </div>
             </div>
-            <div class="text-center">
-                <label for="snapping_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="snapping_logOutputText"
-                                    rows="4" readonly>
 
-                            </textarea>
-                </div>
-            </div>
         </div>
     </div>
     <hr>
@@ -837,20 +780,6 @@
                 </div>
             </div>
 
-            <div class="text-center">
-                <label for="dpImage_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="dpImage_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
         </div>
 
     </div>
@@ -916,20 +845,6 @@
                 </div>
             </div>
 
-            <div class="text-center">
-                <label for="imCoder2_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="imCoder2_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
         </div>
 
     </div>
@@ -990,20 +905,6 @@
                 </div>
             </div>
 
-            <div class="text-center">
-                <label for="dpAudio_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="dpAudio_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
         </div>
     </div>
     <hr>
@@ -1065,20 +966,7 @@
                 <div id="dpGraph_after">
                 </div>
             </div>
-            <div class="text-center">
-                <label for="dpGraph_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="dpGraph_logOutputText"
-                                    rows="4" readonly>
 
-                            </textarea>
-                </div>
-            </div>
         </div>
     </div>
     <hr>
@@ -1164,22 +1052,6 @@
                             </textarea>
                 </div>
             </div>
-            <div class="text-center m-b">
-                <label for="dpDate_logOutputText"
-                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="dpDate_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
-
-
         </div>
     </div>
 </div>

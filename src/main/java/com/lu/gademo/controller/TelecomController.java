@@ -26,7 +26,7 @@ public class TelecomController {
     public TelecomController(FileService fileService) {
         this.fileService = fileService;
         this.imageType = Arrays.asList("jpg", "jpeg", "png");
-        this.videoType = Arrays.asList("mp4", "avi", "mkv");
+        this.videoType = Arrays.asList("mp4", "avi");
         this.audioType = Arrays.asList("mp3", "wav");
     }
 
@@ -60,7 +60,7 @@ public class TelecomController {
         // 判断数据模态
         try {
             if ("xlsx".equals(fileType)) {
-                responseData = fileService.dealExcel(file, params, sheet).getBody();
+                responseData = fileService.dealExcel(file, params, sheet, false).getBody();
             } else if (imageType.contains(fileType)) {
                 responseData = fileService.dealImage(file, params, algName).getBody();
             } else if (videoType.contains(fileType)) {

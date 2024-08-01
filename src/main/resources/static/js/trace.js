@@ -58,9 +58,9 @@ function lockMarkerCustomer(marker, buttonId, startOrEnd) {
         marker.setDraggable(false); // 设置Marker不可拖动
 
         // 获取Marker的当前位置
-        var position = marker.getPosition();
-        var latitude = position.lat; // 纬度
-        var longitude = position.lng; // 经度
+        let position = marker.getPosition();
+        let latitude = position.lat; // 纬度
+        let longitude = position.lng; // 经度
 
         // // 根据是起点还是终点，准备发送请求
         // if (startOrEnd === 'start') {

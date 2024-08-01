@@ -6,13 +6,15 @@ import os
 import InnerProduct
 import extraction
 from funcs import *
+
 # import os
 from model import *
 from server_message import ServerResponse
 import argparse
 import json
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
+
 
 def interceptString(s, r):
     ret = ""
@@ -21,21 +23,27 @@ def interceptString(s, r):
             return ret
         ret += i
 
+
 def add_args(parser: argparse.ArgumentParser):
     parser.add_argument("name", type=str)
     parser.add_argument("file", type=str)
-    parser.add_argument("-d", "--distance", type=float, default=0.43)
-    parser.add_argument("-m", "--mode", choices=["register", "login"], default="register")
+    parser.add_argument("-d", "--distance", type=float, default=0.3)
+    parser.add_argument(
+        "-m", "--mode", choices=["register", "login"], default="register"
+    )
     return parser
+
+
 def formatPrint(C):
     print("[", end="")
     for i in range(len(C)):
-        if (i == len(C) / 2):
+        if i == len(C) / 2:
             print()
-        if (i == len(C) - 1):
+        if i == len(C) - 1:
             print(C[i], end="]\n")
         else:
             print(C[i], end=",")
+
 
 def cli_main():
 
@@ -80,7 +88,7 @@ def cli_main():
     success = False
     user_name = identifier[0]
     flag = identifier[1]
-    if (flag == '0'):
+    if flag == "0":
         try:
             query_exist(user_name)
         except IOError as e:
@@ -123,7 +131,7 @@ def cli_main():
                 result1.status = "error"
                 result1.message = str(e)
             else:
-                file_s = user_name + '.txt'
+                file_s = user_name + ".txt"
                 s = str(s)
                 # print("该注册用户的密钥: ", s)
                 file_txt_path = os.path.join(file_save_location, file_s)
@@ -132,7 +140,7 @@ def cli_main():
 
                 e3 = time.time()
                 # print('存储结束，用时：', str(e3 - s3) + '秒')
-                result1.status = 'ok'
+                result1.status = "ok"
     else:
         # print('登录声纹模板提取...')
         s2 = time.time()
@@ -182,7 +190,7 @@ def cli_main():
             inner_product = secu.correct(inner_product)
             # print("注册模板向量与认证模板向量之间的内积: ", inner_product)
 
-            distance = A ** 2 + B ** 2 - 2 * inner_product
+            distance = A**2 + B**2 - 2 * inner_product
             # print("注册模板向量与认证模板向量之间的欧式距离: ", distance)
 
             e1 = time.time()
@@ -196,8 +204,9 @@ def cli_main():
                 result1.message = "distance too large"
             login_add(identifier[0], success)
 
-    print(json.dumps(result1.__dict__)).encode('utf-8')
-    return json.dumps(result1.__dict__).encode('utf-8')
+    print(json.dumps(result1.__dict__)).encode("utf-8")
+    return json.dumps(result1.__dict__).encode("utf-8")
 
-if __name__ == "__main__" :
+
+if __name__ == "__main__":
     cli_main()

@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository;
 }*/
 public interface SendEvaReqDao extends IBaseDao<SendEvaReq, String> {
 
+    SendEvaReq findByDesenInfoAfterIden(String desenInfoAfterIden);
+
+    SendEvaReq findByDesenInfoAfterId(String desenInfoAfterId);
 }

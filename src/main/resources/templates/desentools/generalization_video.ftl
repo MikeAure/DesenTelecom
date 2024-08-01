@@ -395,15 +395,6 @@
             <button type="button" class="btn btn-sm btn-primary" id="pixelate_video_submit"> 提交脱敏</button>
         </div>
 
-        <div class="text-center">
-            <label for="pixelate_video_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="pixelate_video_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
-        </div>
-
     </div>
     <hr>
     <div class="panel-body">
@@ -458,15 +449,6 @@
 
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary" id="gaussian_blur_video_submit"> 提交脱敏</button>
-        </div>
-
-        <div class="text-center">
-            <label for="gaussian_blur_video_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="gaussian_blur_video_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
         </div>
 
     </div>
@@ -524,15 +506,6 @@
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary" id="box_blur_video_submit"> 提交脱敏</button>
         </div>
-        <div class="text-center">
-            <label for="box_blur_video_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="box_blur_video_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
-        </div>
-
     </div>
     <hr>
     <div class="panel-body">
@@ -587,14 +560,6 @@
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary" id="meanValueVideo_submit"> 提交脱敏</button>
         </div>
-        <div class="text-center">
-            <label for="meanValueVideo_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="meanValueVideo_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
-        </div>
     </div>
     <hr>
     <div class="panel-body">
@@ -648,15 +613,6 @@
 
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary" id="replace_region_video_submit"> 提交脱敏</button>
-        </div>
-
-        <div class="text-center">
-            <label for="replace_region_video_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="replace_region_video_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
         </div>
 
     </div>

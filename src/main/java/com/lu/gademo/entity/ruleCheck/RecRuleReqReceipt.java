@@ -9,28 +9,28 @@ public class RecRuleReqReceipt {
 
     @Id
     @Column(name = "certificateid")
-    private String certificateId;
+    private String certificateID;
     @Basic
     @Column(name = "logid")
-    private String logId;
+    private String logID;
     @Basic
     @Column(name = "hash")
     private String hash;
 
-    public String getCertificateId() {
-        return certificateId;
+    public String getCertificateID() {
+        return certificateID;
     }
 
-    public void setCertificateId(String certificateId) {
-        this.certificateId = certificateId;
+    public void setCertificateID(String certificateID) {
+        this.certificateID = certificateID;
     }
 
-    public String getLogId() {
-        return logId;
+    public String getLogID() {
+        return logID;
     }
 
-    public void setLogId(String logId) {
-        this.logId = logId;
+    public void setLogID(String logID) {
+        this.logID = logID;
     }
 
     public String getHash() {
@@ -50,11 +50,11 @@ public class RecRuleReqReceipt {
             return false;
         }
         RecRuleReqReceipt that = (RecRuleReqReceipt) o;
-        return Objects.equals(certificateId, that.certificateId) && Objects.equals(logId, that.logId) && Objects.equals(hash, that.hash);
+        return Objects.equals(certificateID, that.certificateID) && Objects.equals(logID, that.logID) && Objects.equals(hash, that.hash);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(certificateId, logId, hash);
+        return Objects.hash(certificateID, logID, hash);
     }
 }

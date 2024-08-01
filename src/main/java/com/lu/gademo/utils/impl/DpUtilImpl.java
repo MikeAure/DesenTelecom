@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import com.lu.gademo.utils.DateParseUtil;
 
 @Slf4j
 @Component
@@ -34,16 +35,18 @@ public class DpUtilImpl implements DpUtil {
 //        this.wsLogService = logService;
 //    }
 
-    private final List<SimpleDateFormat> dataFormats = Arrays.asList(
-            new SimpleDateFormat("yyyy-MM-dd"),
-            new SimpleDateFormat("yyyyMMdd"),
-            new SimpleDateFormat("MM/dd/yyyy"),
-            new SimpleDateFormat("dd-MM-yyyy"),
-            new SimpleDateFormat("yyyy/MM/dd"),
-            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
-            new SimpleDateFormat("yyyyMMddHHmmss"),
-            new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
-    );
+//    private final List<SimpleDateFormat> dataFormats = Arrays.asList(
+//            new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"),
+//            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
+//            new SimpleDateFormat("yyyyMMddHHmmss"),
+//            new SimpleDateFormat("yyyy.MM.dd HH:mm:ss"),
+//            new SimpleDateFormat("yyyy-MM-dd"),
+//            new SimpleDateFormat("yyyyMMdd"),
+//            new SimpleDateFormat("MM/dd/yyyy"),
+//            new SimpleDateFormat("dd-MM-yyyy"),
+//            new SimpleDateFormat("dd/MM/yyyy"),
+//            new SimpleDateFormat("yyyy/MM/dd")
+//    );
 
     //k-匿名算法
     public static List<Double> k_num(List<Double> array, int k) {
@@ -219,7 +222,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -286,7 +289,7 @@ public class DpUtilImpl implements DpUtil {
                 if (data == null) {
                     re_data.add(null);
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
             return re_data;
@@ -312,7 +315,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -358,7 +361,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -397,7 +400,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -469,7 +472,7 @@ public class DpUtilImpl implements DpUtil {
                     String cellValue = dataFormatter.formatCellValue(currentCell);
                     reData.add(name + "");
                 } else {
-                    reData.add((String) name);
+                    reData.add(String.valueOf(name));
                 }
             }
         }
@@ -814,17 +817,19 @@ public class DpUtilImpl implements DpUtil {
     }
 
     //日期处理
-
-    private java.util.Date parseDate(Object data) {
-        for (SimpleDateFormat format : dataFormats) {
-            try {
-                return format.parse(data.toString());
-            } catch (ParseException e) {
-                e.getStackTrace();
-            }
-        }
-        return null;
-    }
+//    private java.util.Date parseDate(Object data) {
+//        for (SimpleDateFormat format : dataFormats) {
+//            try {
+//                System.out.println("Trying format: " + format.toPattern());
+//                java.util.Date date = format.parse(data.toString());
+//                System.out.println("Parsed date: " + date);
+//                return format.parse(data.toString());
+//            } catch (ParseException e) {
+//                e.getStackTrace();
+//            }
+//        }
+//        return null;
+//    }
 
     @Override
     public List<Date> dpDate(List<Object> datas, Integer privacyLevel) throws ParseException {
@@ -836,7 +841,7 @@ public class DpUtilImpl implements DpUtil {
             if (data == null) {
                 re_data.add(null);
             } else {
-                tempDate = parseDate(data);
+                tempDate = DateParseUtil.parseDate(data);
                 if (tempDate == null) {
                     // TODO: 应有更好的处理方法
 //                    throw new ParseException("Parse date error : " + data, 0);
@@ -915,9 +920,15 @@ public class DpUtilImpl implements DpUtil {
                 milliseconds.add(0.0);
             else {
                 //java.util.Date utilDate = dateFormat.parse(data + "");
-                java.util.Date date = dateFormat.parse(data + "");
+                java.util.Date date = DateParseUtil.parseDate(data.toString());
+
                 //Date sqlDate = new Date(utilDate.getTime());
-                milliseconds.add((double) date.getTime());
+                // 日期解析可能失败,如果失败则添加0
+                if (date == null) {
+                    milliseconds.add(0.0);
+                } else {
+                    milliseconds.add((double) date.getTime());
+                }
             }
         }
         //判断匿名组k大小
@@ -928,7 +939,14 @@ public class DpUtilImpl implements DpUtil {
                 if (data == null) {
                     reData.add(null);
                 } else {
-                    reData.add(new Date(dateFormat.parse(data + "").getTime()));
+                    java.util.Date date = DateParseUtil.parseDate(data.toString());
+                    // 如果解析失败则添加null
+                    if (date == null) {
+                        reData.add(null);
+                    } else {
+                        reData.add(new Date(date.getTime()));
+                    }
+//                    reData.add(new Date(dateFormat.parse(data + "").getTime()));
                 }
             }
             return reData;
@@ -1220,20 +1238,36 @@ public class DpUtilImpl implements DpUtil {
 
 
     @Override
+    // 时间取整算法
     public List<String> floorTime(List<Object> dataList, Integer privacyLevel) {
         List<String> result = new ArrayList<>();
-
         Pattern timePattern = Pattern.compile("^(?:(?:([01]?\\d|2[0-3]):)?([0-5]?\\d):)?([0-5]?\\d)$");
-
         for (Object o : dataList) {
             if (o == null) {
                 result.add(null);
-
             } else {
                 Matcher m = timePattern.matcher(o + "");
                 if (m.matches()) {
                     String hour = m.group(1);
-                    result.add(hour + ":00:00");
+                    String minutes = m.group(2);
+
+                    switch (privacyLevel) {
+                        case 1: {
+                            result.add(hour + ":" + minutes + ":" + "00");
+                            break;
+                        }
+                        case 2: {
+                            result.add(hour + ":00:00");
+                            break;
+                        }
+                        case 3: {
+                            result.add("00:00:00");
+                            break;
+                        }
+                        default: {
+                            result.add(hour + ":00:00");
+                        }
+                    }
                 }
             }
         }
@@ -1264,7 +1298,7 @@ public class DpUtilImpl implements DpUtil {
                         result.add(tmp.replaceAll("\\d", "x")); // 将数字替换为X
                         break;
                     case 3:
-                        result.add(tmp.replaceAll("[a-zA-Z0-9]", "x")); // 将字母和数字替换为X
+                        result.add(tmp.replaceAll("[a-zA-Z0-9]", "*")); // 将字母和数字替换为*
                         break;
                 }
             }
@@ -1298,7 +1332,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    reData.add((Double) data);
+                    reData.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -1454,7 +1488,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -1523,7 +1557,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -1582,7 +1616,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }
@@ -1635,7 +1669,7 @@ public class DpUtilImpl implements DpUtil {
                         }
                     }
                 } else {
-                    re_data.add((Double) data);
+                    re_data.add(Double.valueOf(data.toString()));
                 }
             }
         }

@@ -177,15 +177,6 @@
                                               style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
-
-                            <div class="text-center">
-                                <label for="mixzone_1_outputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="mixzone_1_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -247,15 +238,6 @@
                                               style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
-
-                            <div class="text-center">
-                                <label for="mixzone_3_outputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="mixzone_3_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -300,15 +282,6 @@
                             <div class="text-center">
                                 <label for="Accuracy_reduction_outputText"
                                        style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="Accuracy_reduction_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="text-center">
-                                <label for="Accuracy_reduction_outputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="Accuracy_reduction_outputText" rows="4" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>

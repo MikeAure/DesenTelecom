@@ -83,9 +83,8 @@ public class AlgorithmsFactory {
                 Arrays.asList(Arrays.asList("0.1", "0.3"), Arrays.asList("0.3", "0.5"), Arrays.asList("0.5", "0.7")), this.generalization));
         algorithmInfoMap.put("audio_augmentation", new AlgorithmInfo("audio_augmentation", 76, AlgorithmType.GENERALIZATION, 21, null, this.generalization));
         algorithmInfoMap.put("audio_median", new AlgorithmInfo("audio_median", 77, AlgorithmType.GENERALIZATION, 22, Arrays.asList("0", "1", "2"), this.generalization));
-        algorithmInfoMap.put("im_coder2", new AlgorithmInfo("im_coder2", 27, AlgorithmType.DP, 27, Arrays.asList("10", "1", "0.1"), this.dp));
+        algorithmInfoMap.put("im_coder2", new AlgorithmInfo("im_coder2", 45, AlgorithmType.DP, 27, Arrays.asList("10", "1", "0.1"), this.dp));
     }
-
 
     public AlgorithmInfo getAlgorithmInfoFromName(String name) {
         return algorithmInfoMap.get(name);

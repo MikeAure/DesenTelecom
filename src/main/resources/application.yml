@@ -1,7 +1,7 @@
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        password: 123456QWer!!
+        password: BRysj0725HhRhL##
         url: jdbc:mysql://localhost:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
         username: root
     freemarker:
@@ -55,10 +55,17 @@ effectEva:
     address: 127.0.0.1
     port: 10005
 evidence:
-    localAddress: 127.0.0.1
+    localAddress: 172.28.72.214
     localPort: 50004
-    remoteAddress: 127.0.0.1
+    remoteAddress: 172.28.72.214
     remotePort: 50005
+ruleCheck:
+    address: 172.28.72.224
+    port: 30002
+splitReconstruct:
+    address: 172.28.72.225
+    port: 40011
+
 evidenceSystem:
     evidenceReceipt:
         mainCommand: '0x0001'
@@ -76,10 +83,6 @@ evidenceSystem:
         mainCommand: '0x0003'
         msgVersion: '0x3110'
         subCommand: '0x0031'
-
-ruleCheck:
-    address: 127.0.0.1
-    port: 30002
 
 socketrecv:
     port: 10008

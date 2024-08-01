@@ -52,7 +52,6 @@ public class AlgorithmInfo {
         return executor.service(rawData, originalId, params);
     }
 
-
     // 获取分类表中的算法ID
     public String getOriginalIdInfo() {
         return String.valueOf(type.getValue()) + originalId;

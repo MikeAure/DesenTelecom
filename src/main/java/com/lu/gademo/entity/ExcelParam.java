@@ -35,6 +35,15 @@ public class ExcelParam extends BaseEntity {
     public ExcelParam() {
     }
 
+    public ExcelParam(Integer id, String fieldName, String columnName, Integer dataType, Integer k, Integer tmParam) {
+        this.id = id;
+        this.fieldName = fieldName;
+        this.columnName = columnName;
+        this.dataType = dataType;
+        this.k = k;
+        this.tmParam = tmParam;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -20,6 +20,9 @@ public class SendRuleReq {
     @Column(name = "deseninfoafteriden")
     private String desenInfoAfterIden;
     @Basic
+    @Column(name = "dataType")
+    private String dataType;
+    @Basic
     @Column(name = "deseninfopre")
     private String desenInfoPre;
     @Basic

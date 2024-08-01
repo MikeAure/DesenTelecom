@@ -214,22 +214,6 @@
                                 </div>
                             </div>
 
-                            <div class="text-center m-b">
-                                <label for="randomUniformToValue_logOutputText"
-                                       style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                                    脱敏日志:
-                                </label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                        <textarea
-
-                                                id="randomUniformToValue_logOutputText"
-                                                cols="50"
-                                                rows="4" readonly>
-
-                                        </textarea>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
                 </div>
@@ -288,23 +272,6 @@
                                               style="margin-top: 10px;"></textarea>
                                     </div>
                                 </div>
-
-                                <div class="text-center m-b">
-                                    <label for="randomGaussianToValue_logOutputText"
-                                           style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                                        脱敏日志:
-                                    </label>
-                                    <div style="display: flex; flex-direction: column; align-items: center;">
-                                        <textarea
-
-                                                id="randomGaussianToValue_logOutputText"
-                                                cols="50"
-                                                rows="4" readonly>
-
-                                        </textarea>
-                                    </div>
-                                </div>
-
                         </div>
                     </div>
                 </div>
@@ -364,14 +331,6 @@
                                     </div>
                                 </div>
 
-                                <div class="text-center">
-                                    <label for="randomLaplaceToValue_logOutputText"
-                                           style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                    <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="randomLaplaceToValue_logOutputText" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -417,15 +376,6 @@
                                 <div class="text-center">
                                     <label for="noisy_hist1_outputText"
                                            style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                    <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="noisy_hist1_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                    </div>
-                                </div>
-
-                                <div class="text-center">
-                                    <label for="noisy_hist1_logOutputText"
-                                           style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
                                     <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="noisy_hist1_outputText" rows="4" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
@@ -479,15 +429,6 @@
                                        style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="noisy_hist2_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="text-center">
-                                <label for="noisy_hist2_logOutputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="noisy_hist2_logOutputText" rows="4" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>

@@ -131,7 +131,6 @@ def EuDis(q, dataset):
     EuDis = list()
     for xi in dataset:
         EuDis.append(np.linalg.norm(q - xi))
-
     return EuDis
 
 def CosDis(x, dataset):

@@ -103,10 +103,10 @@ def spec_augmentation_audio(input_audio, output_audio_spec, param=1):
     sf.write(output_audio_spec, inverse_mel_signal, sr)
 
 
-def audio_augmentation_audio(input_audio, output_audio):
+def audio_augmentation_audio(input_audio, output_audio, param_chosen=2):
     # 使用librosa库加载音频文件，并返回音频信号和采样率
     signal, sample_rate = librosa.load(input_audio)
-    augmented_signal = audio_augmentation(signal, sample_rate)
+    augmented_signal = audio_augmentation(signal, sample_rate, param_chosen)
     sf.write(output_audio, augmented_signal, sample_rate)
 
 
@@ -143,6 +143,6 @@ if __name__ == '__main__':
         block_num = [5, 10, 15][int(param)]
         audio_median(input_video, block_num, output_video)
     elif algName == "augmentation":
-        audio_augmentation_audio(input_video, output_video)
+        audio_augmentation_audio(input_video, output_video, int(param))
     elif algName == "spec":
         spec_augmentation_audio(input_video, output_video, int(param))

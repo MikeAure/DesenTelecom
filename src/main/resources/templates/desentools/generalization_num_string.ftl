@@ -137,14 +137,6 @@
                                               style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
-                            <div class="text-center">
-                                <label for="truncation_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="truncation_output" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -186,15 +178,6 @@
                             <div class="text-center">
                                 <label for="floor_output"
                                        style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="floor_output" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="text-center">
-                                <label for="floor_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="floor_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
@@ -245,16 +228,6 @@
                                     <textarea id="floorTime_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
                                 </div>
-
-                            </div>
-                            <div class="text-center">
-                                <label for="floorTime_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="floorTime_output" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-
                             </div>
                         </div>
                     </div>

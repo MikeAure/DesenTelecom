@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 医疗诊断数据加密
+
+ */
 @Slf4j
 @RestController
 @RequestMapping("/encryptMedical")
@@ -30,10 +34,15 @@ public class EncryptMedicalController {
 
     }
 
-    // 启动医疗诊断服务器
+    /**
+     *
+     * @param file 上传的文件
+     * @return 返回加密后的文件
+     * @throws InterruptedException
+     */
     @ResponseBody
     @RequestMapping(value = "/receiveMedicalCsv", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Map<String, Object>> receiveMedicalCsv(@RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<Map<String, Object>> receiveMedicalCsv(@RequestPart("file") MultipartFile file) throws InterruptedException {
         Process process;
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
         String rawFileName = fileTimeStamp + file.getOriginalFilename();
@@ -62,18 +71,19 @@ public class EncryptMedicalController {
         Map<String, Object> result = new HashMap<>();
         Path desenAppServer = desenAppPath.resolve("server.py");
         String command = CommandExecutor.getPythonCommand() + " " + desenAppServer.toAbsolutePath();
-        // 在这里启动服务器
+
+        // 启动对应的服务器
         try {
             log.info("Nondistortion excel start");
             log.info("Server execute command: {}", command);
             process = Runtime.getRuntime().exec(command, null, desenAppPath.toFile());
-//            Thread.sleep(2000);
         } catch (IOException e) {
             log.error(e.getMessage());
             result.put("status", "error");
             result.put("data", "Start server failed");
             return ResponseEntity.ok().body(result);
         }
+        Thread.sleep(2000);
 
         Path desenAppClient = desenAppPath.resolve("client.py");
         List<String> commandResult = CommandExecutor.executePython(

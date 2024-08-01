@@ -296,15 +296,6 @@
             <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_spec_submit"> 提交脱敏
             </button>
         </div>
-
-        <div class="text-center">
-            <label for="audio_spec_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="audio_spec_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
-        </div>
     </div>
     <hr>
     <div class="panel-body">
@@ -347,15 +338,6 @@
         <div class="btn2" style="text-align: center;">
             <button type="button" class="btn btn-sm btn-primary submit-btn" id="audio_augmentation_submit">提交脱敏
             </button>
-        </div>
-
-        <div class="text-center">
-            <label for="audio_augmentation_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="audio_augmentation_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
         </div>
     </div>
     <hr>
@@ -411,14 +393,6 @@
             </button>
         </div>
 
-        <div class="text-center">
-            <label for="audio_median_outputText"
-                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="audio_median_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-            </div>
-        </div>
     </div>
 </div>
 

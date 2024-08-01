@@ -5,6 +5,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "rec_eva_result")
+// 脱敏效果评测结果
 public class RecEvaResult {
     @Id
     @Column(name = "evaresultid")

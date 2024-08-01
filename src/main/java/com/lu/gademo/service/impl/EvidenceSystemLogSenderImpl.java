@@ -1,10 +1,11 @@
-package com.lu.gademo.model;
+package com.lu.gademo.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.evidence.*;
 import com.lu.gademo.entity.evidence.*;
+import com.lu.gademo.model.TcpPacket;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ import java.security.spec.InvalidKeySpecException;
 @Slf4j
 @Data
 @Service
-public class EvidenceSystemLogSender {
+public class EvidenceSystemLogSenderImpl {
     // 存证系统id
     @Value("${systemId.evidenceSystemId}")
     int evidenceSystemId;
@@ -69,7 +70,6 @@ public class EvidenceSystemLogSender {
 
     @Autowired
     Util util;
-
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -185,7 +185,7 @@ public class EvidenceSystemLogSender {
             localEvidenceData.put("fileKeyword", submitEvidenceLocal.getFileKeyword());
             localEvidenceData.put("desenAlg", submitEvidenceLocal.getDesenAlg());
             localEvidenceData.put("fileSize", submitEvidenceLocal.getFileSize());
-            localEvidenceData.put("fileHASH", submitEvidenceLocal.getFileHASH());
+            localEvidenceData.put("fileHASH", submitEvidenceLocal.getFileHash());
             localEvidenceData.put("fileSig", submitEvidenceLocal.getFileSig());
             localEvidenceData.put("desenPerformer", submitEvidenceLocal.getDesenPerformer());
             localEvidenceData.put("desenCom", submitEvidenceLocal.getDesenCom() + "");
@@ -217,7 +217,7 @@ public class EvidenceSystemLogSender {
             localEvidenceJson.put("dataHash", util.getSM3Hash(localEvidenceData.toString().getBytes()));
             //localEvidenceJson.put("datasign", evidenceResponse.getDataSign());
             // 公私钥怎么同步的？
-            localEvidenceJson.put("datasign", util.sm2Sign(localEvidenceData.toString().getBytes()));
+            localEvidenceJson.put("datasign", util.getSM2Sign(localEvidenceData.toString().getBytes()));
             localEvidenceJson.put("randomidentification", evidenceResponse.getRandomIdentification());
             // 打印发送json
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(localEvidenceJson);

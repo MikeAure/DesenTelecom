@@ -110,7 +110,7 @@ public class UtilImpl implements Util {
     }
 
     @Override
-    public String sm2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException {
+    public String getSM2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException {
         // 添加Bouncy Castle作为安全提供程序
         Security.addProvider(new BouncyCastleProvider());
         // 私钥字符串

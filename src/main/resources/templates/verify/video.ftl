@@ -109,6 +109,12 @@
             flex-direction: row;
             justify-content: center;
         }
+
+        #mid-image img {
+            display: inline-block;
+            max-width: 50%;
+            height: auto;
+        }
     </style>
     <!-- 全局js -->
     <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -163,9 +169,7 @@
             distortionTypes.addEventListener("change", displacePart)
 
             fileUpload.addEventListener("change", chooseFile);
-            submitButton.addEventListener("click", originalSubmit)
-            document.getElementById("fileUpload").addEventListener("change", chooseFile);
-
+            $("#submit").on("click", originalSubmit);
 
             // 非失真脱敏，为选择代价密视频文件绑定事件
             // document.getElementById("selectEncryptedVideo").addEventListener("change", (event) => {
@@ -191,7 +195,7 @@
                 document.getElementById("after").innerHTML = "";
                 // document.getElementById("video_remove_bg_img").innerHTML = "";
                 // 视频格式
-                const videoType = ['mp4', 'avi']
+                const videoType = ['mp4']
                 // const imageType = ['jpg', 'jpeg', 'png', 'gif'];
                 //读取文件
                 const videoFile = event.target.files[0]
@@ -221,7 +225,7 @@
                 // 清空
                 document.getElementById("mid-image").innerHTML = "";
                 // 图片格式
-                const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+                const imageType = ['jpg', 'jpeg', 'png'];
                 //读取文件
                 const imageFile = event.target.files[0]
                 // 文件名，扩展名
@@ -236,12 +240,12 @@
                         reader.onload = function (e) {
                             let img = new Image();
                             img.src = e.target.result;
-                            img.setAttribute("width", "500px");
-                            img.setAttribute("height", "300px");
                             midImage.appendChild(img);
                         };
                         reader.readAsDataURL(imageFile);
                         //提交脱敏参数，请求脱敏
+                    } else {
+                        alert("请选择图片文件")
                     }
                 }
             });
@@ -250,7 +254,7 @@
                 // 清空
                 document.getElementById("mid-image").innerHTML = "";
                 // document.getElementById("video_remove_bg_img").innerHTML = "";
-                const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+                const imageType = ['jpg', 'jpeg', 'png'];
                 //读取文件
                 const imageFile = event.target.files[0]
                 // 文件名，扩展名
@@ -265,8 +269,6 @@
                         reader.onload = function (e) {
                             let img = new Image();
                             img.src = e.target.result;
-                            img.style.maxWidth = '80%';
-                            img.style.height = 'auto';
                             pre.appendChild(img);
                         };
                         reader.readAsDataURL(imageFile);
@@ -277,7 +279,7 @@
                 // 清空
                 document.getElementById("pre").innerHTML = "";
                 // 图片格式
-                const videoType = ['mp4', 'avi']
+                const videoType = ['mp4']
                 //读取文件
                 const videoFile = event.target.files[0]
                 // 文件名，扩展名
@@ -294,7 +296,7 @@
                             //console.log(data)
                             video.src = e.target.result;
                             video.type = "video/mp4";
-                            video.style.maxWidth = "80%";
+                            video.style.maxWidth = "50%";
                             video.style.height = "auto";
                             video.controls = true;
 
@@ -307,7 +309,7 @@
                 }
             });
 
-            // 非失真脱敏，为选择代价密视频文件绑定事件
+            // 非失真脱敏，为选择待加密视频文件绑定事件
             document.getElementById("selectRawVideo").addEventListener("change", (event) => {
                 // 清空
                 document.getElementById("aesRawVideoInfo").innerHTML = "";
@@ -321,7 +323,7 @@
                 nonDistortionVideoShowFile(event, "selectRawVideo", "showRawVideo")
             });
 
-            document.getElementById("encryptVideo").onclick = function() {
+            document.getElementById("encryptVideo").onclick = function () {
                 let encryptKey = document.getElementById("encryptKey").value;
                 let file = document.getElementById("selectRawVideo").files[0];
                 if (!file) {
@@ -364,7 +366,7 @@
 
             });
 
-            document.getElementById("decryptVideo").onclick = function() {
+            document.getElementById("decryptVideo").onclick = function () {
                 let showDecryptedVideo = document.getElementById("showDecryptedVideo");
                 showDecryptedVideo.innerHTML = "";
                 let decryptKey = document.getElementById("decryptKey").value;
@@ -411,8 +413,8 @@
 
             // document.getElementById("video_remove_bg_img").innerHTML = "";
             // 视频格式
-            const videoType = ['mp4', 'avi']
-            const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+            const videoType = ['mp4']
+            const imageType = ['jpg', 'jpeg', 'png'];
             //读取文件
             // const videoFile = event.target.files[0]
             // const imageFile =
@@ -455,7 +457,7 @@
                             //console.log(data)
                             video.src = URL.createObjectURL(blob);
                             video.type = "video/mp4";
-                            video.style.maxWidth = "80%";
+                            video.style.maxWidth = "50%";
                             video.style.height = "auto";
                             video.controls = true;
                             after.appendChild(video);
@@ -477,7 +479,7 @@
             // document.getElementById("video_remove_bg_img").innerHTML = "";
             // 视频格式
             const videoType = ['mp4', 'avi']
-            const imageType = ['jpg', 'jpeg', 'png', 'gif'];
+            const imageType = ['jpg', 'jpeg', 'png'];
             //读取文件
             // const videoFile = event.target.files[0]
             // const imageFile =
@@ -579,7 +581,7 @@
             let videoBgBtns = document.getElementById("video-bg-sub-btns");
             let videoFaceSubBtns = document.getElementById("video-face-sub-btns");
             let privacyLevel = document.getElementById("privacyLevel");
-            let submitBtn = document.getElementById("submit")
+            let submitBtn = $('#submit');
 
             switch (algoName) {
                 case "video_remove_bg":
@@ -587,9 +589,9 @@
                     videoBgBtns.style.display = "flex";
                     videoFaceSubBtns.style.display = "none"
                     privacyLevel.style.display = "block";
-                    submitBtn.removeEventListener("click", originalSubmit);
-                    submitBtn.removeEventListener("click", faceSubSubmit);
-                    submitBtn.addEventListener("click", removeBgSubmit);
+                    // submitBtn.removeEventListener("click", originalSubmit);
+                    // submitBtn.removeEventListener("click", faceSubSubmit);
+                    submitBtn.off('click').on("click", removeBgSubmit);
 
                     break;
 
@@ -598,9 +600,9 @@
                     videoBgBtns.style.display = "none";
                     videoFaceSubBtns.style.display = "flex"
                     privacyLevel.style.display = "none";
-                    submitBtn.removeEventListener("click", originalSubmit);
-                    submitBtn.removeEventListener("click", removeBgSubmit);
-                    submitBtn.addEventListener("click", faceSubSubmit);
+                    // submitBtn.removeEventListener("click", originalSubmit);
+                    // submitBtn.removeEventListener("click", removeBgSubmit);
+                    submitBtn.off('click').on("click", faceSubSubmit);
                     break;
 
                 default:
@@ -608,9 +610,9 @@
                     videoBgBtns.style.display = "none";
                     videoFaceSubBtns.style.display = "none"
                     privacyLevel.style.display = "block";
-                    submitBtn.addEventListener("click", originalSubmit);
-                    submitBtn.removeEventListener("click", removeBgSubmit);
-                    submitBtn.removeEventListener("click", faceSubSubmit);
+                    // submitBtn.addEventListener("click", originalSubmit);
+                    // submitBtn.removeEventListener("click", removeBgSubmit);
+                    submitBtn.off('click').on("click", originalSubmit);
                     break;
             }
 
@@ -757,7 +759,7 @@
                         <div id="default-choosefile-btn" class="midtile">
                             <div class="col-sm-5 m-b-xs">
                                 <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                    <input type="file" id="fileUpload" style="display: none;">
+                                    <input type="file" id="fileUpload" style="display: none;" accept=".mp4">
                                     <label for="fileUpload" class="upload-btn">
                                         选择文件
                                     </label>
@@ -768,11 +770,13 @@
                         <div id="video-bg-sub-btns" class="midtile" style="display: none">
                             <div class="align-items-center">
                                 <form id="uploadForm" enctype="multipart/form-data">
-                                    <input type="file" id="video_remove_bg_fileupload" style="display: none;">
+                                    <input type="file" id="video_remove_bg_fileupload" style="display: none;"
+                                           accept=".mp4">
                                     <label for="video_remove_bg_fileupload" class="upload-btn">
                                         选择视频文件
                                     </label>
-                                    <input type="file" id="video_remove_bg_img_fileupload" style="display: none;">
+                                    <input type="file" id="video_remove_bg_img_fileupload" style="display: none;"
+                                           accept=".jpg, .jpeg, .png">
                                     <label for="video_remove_bg_img_fileupload" class="upload-btn">
                                         选择背景图片
                                     </label>

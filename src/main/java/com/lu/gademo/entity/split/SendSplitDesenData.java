@@ -8,14 +8,14 @@ import java.util.Objects;
 public class SendSplitDesenData {
 
     @Id
-    @Column(name = "deseninfoafter")
-    private String desenInfoAfter;
+    @Column(name = "deseninfoafterid")
+    private String desenInfoAfterID;
     @Basic
     @Column(name = "deseninfoafteriden")
     private String desenInfoAfterIden;
     @Basic
-    @Column(name = "deseninfopre")
-    private String desenInfoPre;
+    @Column(name = "deseninfopreid")
+    private String desenInfoPreID;
     @Basic
     @Column(name = "desenintention")
     private String desenIntention;
@@ -27,7 +27,7 @@ public class SendSplitDesenData {
     private String desenControlSet;
     @Basic
     @Column(name = "desenalg")
-    private Integer desenAlg;
+    private String desenAlg;
     @Basic
     @Column(name = "desenalgparam")
     private String desenAlgParam;
@@ -39,20 +39,20 @@ public class SendSplitDesenData {
     private String desenPerformEndTime;
     @Basic
     @Column(name = "desenlevel")
-    private Integer desenLevel;
+    private String desenLevel;
     @Basic
     @Column(name = "desenperformer")
     private String desenPerformer;
     @Basic
     @Column(name = "desencom")
-    private Integer desenCom;
+    private Boolean desenCom;
 
-    public String getDesenInfoAfter() {
-        return desenInfoAfter;
+    public String getDesenInfoAfterID() {
+        return desenInfoAfterID;
     }
 
-    public void setDesenInfoAfter(String desenInfoAfter) {
-        this.desenInfoAfter = desenInfoAfter;
+    public void setDesenInfoAfterID(String desenInfoAfterID) {
+        this.desenInfoAfterID = desenInfoAfterID;
     }
 
     public String getDesenInfoAfterIden() {
@@ -63,12 +63,12 @@ public class SendSplitDesenData {
         this.desenInfoAfterIden = desenInfoAfterIden;
     }
 
-    public String getDesenInfoPre() {
-        return desenInfoPre;
+    public String getDesenInfoPreID() {
+        return desenInfoPreID;
     }
 
-    public void setDesenInfoPre(String desenInfoPre) {
-        this.desenInfoPre = desenInfoPre;
+    public void setDesenInfoPreID(String desenInfoPreID) {
+        this.desenInfoPreID = desenInfoPreID;
     }
 
     public String getDesenIntention() {
@@ -95,11 +95,11 @@ public class SendSplitDesenData {
         this.desenControlSet = desenControlSet;
     }
 
-    public Integer getDesenAlg() {
+    public String getDesenAlg() {
         return desenAlg;
     }
 
-    public void setDesenAlg(Integer desenAlg) {
+    public void setDesenAlg(String desenAlg) {
         this.desenAlg = desenAlg;
     }
 
@@ -127,11 +127,11 @@ public class SendSplitDesenData {
         this.desenPerformEndTime = desenPerformEndTime;
     }
 
-    public Integer getDesenLevel() {
+    public String getDesenLevel() {
         return desenLevel;
     }
 
-    public void setDesenLevel(Integer desenLevel) {
+    public void setDesenLevel(String desenLevel) {
         this.desenLevel = desenLevel;
     }
 
@@ -143,11 +143,11 @@ public class SendSplitDesenData {
         this.desenPerformer = desenPerformer;
     }
 
-    public Integer getDesenCom() {
+    public Boolean getDesenCom() {
         return desenCom;
     }
 
-    public void setDesenCom(Integer desenCom) {
+    public void setDesenCom(Boolean desenCom) {
         this.desenCom = desenCom;
     }
 
@@ -160,11 +160,11 @@ public class SendSplitDesenData {
             return false;
         }
         SendSplitDesenData that = (SendSplitDesenData) o;
-        return Objects.equals(desenInfoAfter, that.desenInfoAfter) && Objects.equals(desenInfoAfterIden, that.desenInfoAfterIden) && Objects.equals(desenInfoPre, that.desenInfoPre) && Objects.equals(desenIntention, that.desenIntention) && Objects.equals(desenRequirements, that.desenRequirements) && Objects.equals(desenControlSet, that.desenControlSet) && Objects.equals(desenAlg, that.desenAlg) && Objects.equals(desenAlgParam, that.desenAlgParam) && Objects.equals(desenPerformStartTime, that.desenPerformStartTime) && Objects.equals(desenPerformEndTime, that.desenPerformEndTime) && Objects.equals(desenLevel, that.desenLevel) && Objects.equals(desenPerformer, that.desenPerformer) && Objects.equals(desenCom, that.desenCom);
+        return Objects.equals(desenInfoAfterID, that.desenInfoAfterID) && Objects.equals(desenInfoAfterIden, that.desenInfoAfterIden) && Objects.equals(desenInfoPreID, that.desenInfoPreID) && Objects.equals(desenIntention, that.desenIntention) && Objects.equals(desenRequirements, that.desenRequirements) && Objects.equals(desenControlSet, that.desenControlSet) && Objects.equals(desenAlg, that.desenAlg) && Objects.equals(desenAlgParam, that.desenAlgParam) && Objects.equals(desenPerformStartTime, that.desenPerformStartTime) && Objects.equals(desenPerformEndTime, that.desenPerformEndTime) && Objects.equals(desenLevel, that.desenLevel) && Objects.equals(desenPerformer, that.desenPerformer) && Objects.equals(desenCom, that.desenCom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(desenInfoAfter, desenInfoAfterIden, desenInfoPre, desenIntention, desenRequirements, desenControlSet, desenAlg, desenAlgParam, desenPerformStartTime, desenPerformEndTime, desenLevel, desenPerformer, desenCom);
+        return Objects.hash(desenInfoAfterID, desenInfoAfterIden, desenInfoPreID, desenIntention, desenRequirements, desenControlSet, desenAlg, desenAlgParam, desenPerformStartTime, desenPerformEndTime, desenLevel, desenPerformer, desenCom);
     }
 }

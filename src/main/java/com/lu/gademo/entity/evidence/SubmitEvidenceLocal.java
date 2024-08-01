@@ -56,7 +56,7 @@ public class SubmitEvidenceLocal {
     private Long fileSize;
     @Basic
     @Column(name = "file_hash")
-    private String fileHASH;
+    private String fileHash;
     @Basic
     @Column(name = "file_sig")
     private String fileSig;

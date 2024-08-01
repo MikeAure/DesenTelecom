@@ -18,6 +18,15 @@ k1, k2, k3, k4 = 512, 200, 128, 128
 test_features_path = 'test_features_part_2.csv'
 # test_labels_path = 'test_labels_part_2.csv'
 
+def recv_all(sock, length):
+    data = b''
+    while len(data) < length:
+        more = sock.recv(length - len(data))
+        if not more:
+            raise EOFError('Socket closed before receiving all data')
+        data += more
+    return data
+
 
 def load_csv_data(path: str) -> Tuple[list, list]:
     data = pd.read_csv(path)
@@ -40,7 +49,6 @@ def encrypt_query(query: list, modulus: int, s: int) -> Tuple[int, int, list]:
             enc_query[i] = (s * c) % modulus
         else:
             enc_query[i] = (s * (query[i] * alpha + c)) % modulus
-
     return A, alpha, enc_query
 
 
@@ -61,7 +69,7 @@ def send_ciphertext_query(sock: socket, A: int, alpha: int, modulus: int, enc_qu
 def first_round_receive(sock: socket, modulus: int, s: int, inv_s: int, alpha: int) -> Tuple[list, list, list, list, int]:
     response_length_bytes = sock.recv(16)
     response_length = int.from_bytes(response_length_bytes, 'big')
-    response_bytes = sock.recv(response_length)
+    response_bytes = recv_all(sock, response_length)
     response = json.loads(response_bytes.decode('utf-8'))
 
     paraB = response['paraB']
@@ -106,7 +114,7 @@ def send_intermediate_data(sock: socket, paraK: list, paraU: list):
 def get_result(sock: socket, modulus: int, inv_s: int, alpha: int) -> Tuple[int, float, float, int, int, float]:
     result_length_bytes = sock.recv(16)
     result_length = int.from_bytes(result_length_bytes, 'big')
-    result_bytes = sock.recv(result_length)
+    result_bytes = recv_all(sock, result_length)
     result = json.loads(result_bytes.decode('utf-8'))
 
     posN, negN, posM, negM = (result[k] for k in ['posN', 'negN', 'posM', 'negM'])

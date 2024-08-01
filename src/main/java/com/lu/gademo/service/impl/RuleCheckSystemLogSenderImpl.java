@@ -1,10 +1,11 @@
-package com.lu.gademo.model;
+package com.lu.gademo.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.ruleCheck.*;
 import com.lu.gademo.entity.ruleCheck.*;
+import com.lu.gademo.model.TcpPacket;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Data
 @Service
-public class RuleCheckSystemLogSender {
+public class RuleCheckSystemLogSenderImpl {
     @Value("${systemId.ruleCheckSystemId}")
     int ruleCheckSystemId;
     @Value("${ruleCheck.address}")

@@ -1,8 +1,10 @@
 package com.lu.gademo.model;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-
+@Slf4j
 public class TcpPacket {
     //
     private static final short VERSION = 0x0001;
@@ -18,6 +20,10 @@ public class TcpPacket {
 
     /**
      * 构造函数，传入数据
+     * @param jsonData 字符串形式的json数据
+     * @param MAIN_CMD 主命令码
+     *
+     *
      */
     public TcpPacket(String jsonData, short MAIN_CMD, short SUB_CMD, short MESSAGE_VERSION) {
         this.MAIN_CMD = MAIN_CMD;
@@ -66,9 +72,9 @@ public class TcpPacket {
         packet[17] = (byte) (packetLength & 0xFF);
 
 
-        System.out.println("数据包长度");
-        System.out.println(packetLength);
-        System.out.println(jsonDataBytes.length);
+        log.info("数据包长度: {}", packetLength);
+
+        log.info("Json数据字节数: {}", jsonDataBytes.length);
         System.arraycopy(jsonDataBytes, 0, packet, 18, jsonDataBytes.length);
 
         // 认证与校验

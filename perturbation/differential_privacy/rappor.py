@@ -1,11 +1,6 @@
-"""
-MIT License, Copyright (c) 2021 SRI Lab, ETH Zurich
-"""
 import numpy as np
 from abstract import Mechanism
-
 import mmh3     # murmur hash 3, used for Bloom filter
-
 from utils.zero import ZeroNoisePrng
 
 

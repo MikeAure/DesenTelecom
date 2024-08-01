@@ -21,11 +21,21 @@ train_path = 'train_data.csv'
 # test_features_path = 'test_features_part_1.csv'
 # test_labels_path = 'test_labels_part_1.csv'
 
+def recv_all(sock, length):
+    data = b''
+    while len(data) < length:
+        more = sock.recv(length - len(data))
+        if not more:
+            raise EOFError('Socket closed before receiving all data')
+        data += more
+    return data
+
+
 
 def receive_and_parse(sock: socket) -> Tuple[list, int, int, int]:
     ciphertexts_length_bytes = sock.recv(16)
     ciphertexts_length = int.from_bytes(ciphertexts_length_bytes, 'big')
-    ciphertexts_bytes = sock.recv(ciphertexts_length)
+    ciphertexts_bytes = recv_all(sock, ciphertexts_length)
 
     queries = []
     step = key.size_in_bytes()
@@ -132,6 +142,7 @@ def first_round_process(query: list, support_vectors: np.ndarray, modulus: int, 
 def first_round_respond(sock: socket, paraB: list, paraD: list, epsilon: int) -> None:
     data = {'paraB': paraB, 'paraD': paraD, 'epsilon': epsilon}
     json_data = json.dumps(data)
+    # print(json_data)
     response_bytes = json_data.encode('utf-8')
     response_length = len(response_bytes)
     sock.sendall(response_length.to_bytes(16, 'big'))
@@ -141,7 +152,7 @@ def first_round_respond(sock: socket, paraB: list, paraD: list, epsilon: int) ->
 def receive_intermediate_data(sock: socket) -> Tuple[list, list]:
     response_length_bytes = sock.recv(16)
     response_length = int.from_bytes(response_length_bytes, 'big')
-    response_bytes = sock.recv(response_length)
+    response_bytes = recv_all(sock, response_length)
     response = json.loads(response_bytes.decode('utf-8'))
 
     paraK = response['paraK']

@@ -309,23 +309,6 @@
                 </div>
             </div>
 
-            <div class="text-center m-b">
-                <label for="sparse_vector_technique1_logOutputText"
-                       style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="sparse_vector_technique1_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -395,24 +378,6 @@
                         </textarea>
                 </div>
             </div>
-
-            <div class="text-center m-b">
-                <label for="sparse_vector_technique2_logOutputText"
-                       style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="sparse_vector_technique2_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -480,24 +445,6 @@
                                 id="sparse_vector_technique3_outputText"
                                 rows="4" readonly>
                         </textarea>
-                </div>
-            </div>
-
-            <div class="text-center m-b">
-                <label for="sparse_vector_technique3_logOutputText"
-                       style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="sparse_vector_technique3_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
                 </div>
             </div>
         </div>
@@ -573,23 +520,6 @@
                 </div>
             </div>
 
-            <div class="text-center m-b">
-                <label for="sparse_vector_technique4_logOutputText"
-                       style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                        <textarea
-                                class="col-sm-8 m-t"
-                                id="sparse_vector_technique4_logOutputText"
-                                rows="4" readonly>
-
-                        </textarea>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -659,24 +589,6 @@
                                 class="col-sm-8 m-t"
                                 id="sparse_vector_technique5_outputText"
                                 rows="4" readonly>
-                        </textarea>
-                </div>
-            </div>
-
-            <div class="text-center m-b">
-                <label for="sparse_vector_technique5_logOutputText"
-                       style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                        <textarea
-                                class="col-sm-8 m-t"
-                                id="sparse_vector_technique5_logOutputText"
-                                rows="4" readonly>
-
                         </textarea>
                 </div>
             </div>
@@ -752,24 +664,6 @@
                         </textarea>
                 </div>
             </div>
-
-            <div class="text-center m-b">
-                <label for="sparse_vector_technique6_logOutputText"
-                       style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                        <textarea
-                                class="col-sm-8 m-t"
-                                id="sparse_vector_technique6_logOutputText"
-                                rows="4" readonly>
-
-                        </textarea>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -792,8 +686,6 @@
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：数值一维数组
                     </p>
-
-
                 </div>
             </div>
         </div>
@@ -842,23 +734,6 @@
                 </div>
             </div>
 
-            <div class="text-center m-b">
-                <label for="sparse_vector_technique_numerical_logOutputText"
-                       style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                    脱敏日志:
-                </label>
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                        <textarea
-                                class="col-sm-8 m-t"
-                                id="sparse_vector_technique_numerical_logOutputText"
-                                rows="4" readonly>
-
-                        </textarea>
-                </div>
-            </div>
         </div>
     </div>
 </div>

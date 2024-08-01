@@ -1,6 +1,5 @@
 package com.lu.gademo.controller;
 
-import cn.hutool.core.io.resource.InputStreamResource;
 import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.common.Vertex;
 import com.lu.gademo.trace.client.user.Customer;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.Cipher;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -39,7 +35,6 @@ public class EncryptController {
     private Customer customer;
     @Autowired
     private Driver driver0;
-
     @Autowired
     @Qualifier("driver1")
     private Driver driver1;
@@ -59,6 +54,7 @@ public class EncryptController {
 
     private double[][] randomPoints = new double[numberOfPoints][2];
 
+    // graph的非失真算法
     @ResponseBody
     @RequestMapping(value = "/desenGraph", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenGraph(@RequestParam String rawData) throws Exception {

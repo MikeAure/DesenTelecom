@@ -171,24 +171,6 @@
                         </textarea>
                     </div>
                 </div>
-
-                <div class="text-center m-b">
-                    <label for="rappor_logOutputText"
-                           style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                        脱敏日志:
-                    </label>
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="rappor_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -256,23 +238,6 @@
                     </div>
                 </div>
 
-                <div class="text-center m-b">
-                    <label for="onetimerappor_logOutputText"
-                           style="display: block;
-                           font-size: 1.5em;
-                           justify-content: center;
-                           align-items: center; ">
-                        脱敏日志:
-                    </label>
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="onetimerappor_logOutputText"
-                                    rows="4" readonly>
-
-                            </textarea>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -358,21 +323,6 @@
                                     class="col-sm-8 m-t"
                                     id="dpCode_outputText"
                                     rows="4" readonly>
-                            </textarea>
-                    </div>
-                </div>
-
-                <div class="text-center m-b">
-                    <label for="dpCode_logOutputText"
-                           style="display: block; font-size: 1.5em;justify-content: center; align-items: center; ">
-                        脱敏日志:
-                    </label>
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                            <textarea
-                                    class="col-sm-8 m-t"
-                                    id="dpCode_logOutputText"
-                                    rows="4" readonly>
-
                             </textarea>
                     </div>
                 </div>

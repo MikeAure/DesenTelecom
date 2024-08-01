@@ -5,6 +5,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "rec_eva_result_inv")
+// 脱敏效果测评结果无效异常消息
 public class RecEvaResultInv {
 
     @Id
@@ -30,7 +31,7 @@ public class RecEvaResultInv {
     private String desenControlSet;
     @Basic
     @Column(name = "desenalg")
-    private Integer desenAlg;
+    private String desenAlg;
     @Basic
     @Column(name = "desenalgparam")
     private String desenAlgParam;
@@ -42,16 +43,16 @@ public class RecEvaResultInv {
     private String desenPerformEndTime;
     @Basic
     @Column(name = "desenlevel")
-    private Integer desenLevel;
+    private String desenLevel;
     @Basic
     @Column(name = "desenperformer")
     private String desenPerformer;
     @Basic
     @Column(name = "desencom")
-    private Integer desenCom;
-    @Basic
-    @Column(name = "desentestperformtime")
-    private String desenTestPerformTime;
+    private Boolean desenCom;
+//    @Basic
+//    @Column(name = "desentestperformtime")
+//    private String desenTestPerformTime;
     @Basic
     @Column(name = "desendeviation")
     private Integer desenDeviation;
@@ -62,21 +63,21 @@ public class RecEvaResultInv {
     @Column(name = "deseninformationloss")
     private Integer desenInformationloss;
     @Basic
-    @Column(name = "desenreversibility")
-    private Integer desenReversibility;
+    @Column(name = "desenusability")
+    private Integer desenUsability;
     @Basic
     @Column(name = "desencomplexity")
     private Integer desenComplexity;
     @Basic
     @Column(name = "deseneffectevaret")
-    private Integer desenEffectEvaRet;
+    private Boolean desenEffectEvaRet;
 
-    public String getEvaResultID() {
-        return evaResultID;
-    }
-
-    public void setEvaResultID(String evaResultId) {
-        this.evaResultID = evaResultId;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecEvaResultInv)) return false;
+        RecEvaResultInv that = (RecEvaResultInv) o;
+        return Objects.equals(evaResultID, that.evaResultID) && Objects.equals(evaPerformer, that.evaPerformer) && Objects.equals(desenInfoPreID, that.desenInfoPreID) && Objects.equals(desenInfoAfterID, that.desenInfoAfterID) && Objects.equals(desenIntention, that.desenIntention) && Objects.equals(desenRequirements, that.desenRequirements) && Objects.equals(desenControlSet, that.desenControlSet) && Objects.equals(desenAlg, that.desenAlg) && Objects.equals(desenAlgParam, that.desenAlgParam) && Objects.equals(desenPerformStartTime, that.desenPerformStartTime) && Objects.equals(desenPerformEndTime, that.desenPerformEndTime) && Objects.equals(desenLevel, that.desenLevel) && Objects.equals(desenPerformer, that.desenPerformer) && Objects.equals(desenCom, that.desenCom) && Objects.equals(desenDeviation, that.desenDeviation) && Objects.equals(desenExtendedcontrol, that.desenExtendedcontrol) && Objects.equals(desenInformationloss, that.desenInformationloss) && Objects.equals(desenUsability, that.desenUsability) && Objects.equals(desenComplexity, that.desenComplexity) && Objects.equals(desenEffectEvaRet, that.desenEffectEvaRet);
     }
 
     public String getEvaPerformer() {
@@ -91,16 +92,16 @@ public class RecEvaResultInv {
         return desenInfoPreID;
     }
 
-    public void setDesenInfoPreID(String desenInfoPre) {
-        this.desenInfoPreID = desenInfoPre;
+    public void setDesenInfoPreID(String desenInfoPreID) {
+        this.desenInfoPreID = desenInfoPreID;
     }
 
     public String getDesenInfoAfterID() {
         return desenInfoAfterID;
     }
 
-    public void setDesenInfoAfterID(String desenInfoAfter) {
-        this.desenInfoAfterID = desenInfoAfter;
+    public void setDesenInfoAfterID(String desenInfoAfterID) {
+        this.desenInfoAfterID = desenInfoAfterID;
     }
 
     public String getDesenIntention() {
@@ -127,11 +128,11 @@ public class RecEvaResultInv {
         this.desenControlSet = desenControlSet;
     }
 
-    public Integer getDesenAlg() {
+    public String getDesenAlg() {
         return desenAlg;
     }
 
-    public void setDesenAlg(Integer desenAlg) {
+    public void setDesenAlg(String desenAlg) {
         this.desenAlg = desenAlg;
     }
 
@@ -159,11 +160,11 @@ public class RecEvaResultInv {
         this.desenPerformEndTime = desenPerformEndTime;
     }
 
-    public Integer getDesenLevel() {
+    public String getDesenLevel() {
         return desenLevel;
     }
 
-    public void setDesenLevel(Integer desenLevel) {
+    public void setDesenLevel(String desenLevel) {
         this.desenLevel = desenLevel;
     }
 
@@ -175,20 +176,12 @@ public class RecEvaResultInv {
         this.desenPerformer = desenPerformer;
     }
 
-    public Integer getDesenCom() {
+    public Boolean getDesenCom() {
         return desenCom;
     }
 
-    public void setDesenCom(Integer desenCom) {
+    public void setDesenCom(Boolean desenCom) {
         this.desenCom = desenCom;
-    }
-
-    public String getDesenTestPerformTime() {
-        return desenTestPerformTime;
-    }
-
-    public void setDesenTestPerformTime(String desenTestPerformTime) {
-        this.desenTestPerformTime = desenTestPerformTime;
     }
 
     public Integer getDesenDeviation() {
@@ -215,12 +208,12 @@ public class RecEvaResultInv {
         this.desenInformationloss = desenInformationloss;
     }
 
-    public Integer getDesenReversibility() {
-        return desenReversibility;
+    public Integer getDesenUsability() {
+        return desenUsability;
     }
 
-    public void setDesenReversibility(Integer desenUsability) {
-        this.desenReversibility = desenUsability;
+    public void setDesenUsability(Integer desenUsability) {
+        this.desenUsability = desenUsability;
     }
 
     public Integer getDesenComplexity() {
@@ -231,55 +224,24 @@ public class RecEvaResultInv {
         this.desenComplexity = desenComplexity;
     }
 
-    public Integer getDesenEffectEvaRet() {
+    public Boolean getDesenEffectEvaRet() {
         return desenEffectEvaRet;
     }
 
-    public void setDesenEffectEvaRet(Integer desenEffectEvaRet) {
+    public void setDesenEffectEvaRet(Boolean desenEffectEvaRet) {
         this.desenEffectEvaRet = desenEffectEvaRet;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        RecEvaResultInv that = (RecEvaResultInv) o;
-        return Objects.equals(evaResultID, that.evaResultID) && Objects.equals(evaPerformer, that.evaPerformer) && Objects.equals(desenInfoPreID, that.desenInfoPreID) && Objects.equals(desenInfoAfterID, that.desenInfoAfterID) && Objects.equals(desenIntention, that.desenIntention) && Objects.equals(desenRequirements, that.desenRequirements) && Objects.equals(desenControlSet, that.desenControlSet) && Objects.equals(desenAlg, that.desenAlg) && Objects.equals(desenAlgParam, that.desenAlgParam) && Objects.equals(desenPerformStartTime, that.desenPerformStartTime) && Objects.equals(desenPerformEndTime, that.desenPerformEndTime) && Objects.equals(desenLevel, that.desenLevel) && Objects.equals(desenPerformer, that.desenPerformer) && Objects.equals(desenCom, that.desenCom) && Objects.equals(desenTestPerformTime, that.desenTestPerformTime) && Objects.equals(desenDeviation, that.desenDeviation) && Objects.equals(desenExtendedcontrol, that.desenExtendedcontrol) && Objects.equals(desenInformationloss, that.desenInformationloss) && Objects.equals(desenReversibility, that.desenReversibility) && Objects.equals(desenComplexity, that.desenComplexity) && Objects.equals(desenEffectEvaRet, that.desenEffectEvaRet);
+    public String getEvaResultID() {
+        return evaResultID;
+    }
+
+    public void setEvaResultID(String evaResultID) {
+        this.evaResultID = evaResultID;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(evaResultID, evaPerformer, desenInfoPreID, desenInfoAfterID, desenIntention, desenRequirements, desenControlSet, desenAlg, desenAlgParam, desenPerformStartTime, desenPerformEndTime, desenLevel, desenPerformer, desenCom, desenTestPerformTime, desenDeviation, desenExtendedcontrol, desenInformationloss, desenReversibility, desenComplexity, desenEffectEvaRet);
-    }
-
-    @Override
-    public String toString() {
-        return "RecEvaResultInv{" +
-                "evaResultID='" + evaResultID + '\'' +
-                ", evaPerformer='" + evaPerformer + '\'' +
-                ", desenInfoPre='" + desenInfoPreID + '\'' +
-                ", desenInfoAfter='" + desenInfoAfterID + '\'' +
-                ", desenIntention='" + desenIntention + '\'' +
-                ", desenRequirements='" + desenRequirements + '\'' +
-                ", desenControlSet='" + desenControlSet + '\'' +
-                ", desenAlg=" + desenAlg +
-                ", desenAlgParam='" + desenAlgParam + '\'' +
-                ", desenPerformStartTime='" + desenPerformStartTime + '\'' +
-                ", desenPerformEndTime='" + desenPerformEndTime + '\'' +
-                ", desenLevel=" + desenLevel +
-                ", desenPerformer='" + desenPerformer + '\'' +
-                ", desenCom=" + desenCom +
-                ", desenTestPerformTime='" + desenTestPerformTime + '\'' +
-                ", desenDeviation=" + desenDeviation +
-                ", desenExtendedcontrol=" + desenExtendedcontrol +
-                ", desenInformationloss=" + desenInformationloss +
-                ", desenUsability=" + desenReversibility +
-                ", desenComplexity=" + desenComplexity +
-                ", desenEffectEvaRet=" + desenEffectEvaRet +
-                '}';
+        return Objects.hash(evaResultID, evaPerformer, desenInfoPreID, desenInfoAfterID, desenIntention, desenRequirements, desenControlSet, desenAlg, desenAlgParam, desenPerformStartTime, desenPerformEndTime, desenLevel, desenPerformer, desenCom, desenDeviation, desenExtendedcontrol, desenInformationloss, desenUsability, desenComplexity, desenEffectEvaRet);
     }
 }

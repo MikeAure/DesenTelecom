@@ -31,7 +31,7 @@ public interface Util {
     void createDB(Sheet sheet, List<Integer> dataType, String tableName) throws IOException, SQLException;
 
     // SM2签名
-    String sm2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException;
+    String getSM2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException;
 
     // 系统类型
     boolean isLinux();
@@ -68,7 +68,6 @@ public interface Util {
     void mySqlDump(String tableName);
 
 //    public void excelToMysql(String tableName, String excelFilePath);
-
     // 检测本机是否安装Conda
     Boolean isCondaInstalled(boolean isLinux);
 }

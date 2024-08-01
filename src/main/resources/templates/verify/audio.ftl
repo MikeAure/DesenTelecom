@@ -263,7 +263,7 @@
                 after.innerHTML = "";
                 // 失真算法名
                 let distortionaudio_algName = document.getElementById("distortionaudio_algName").value;
-                if (distortionaudio_algName === "voice_replace" || distortionaudio_algName === "audio_augmentation") {
+                if (distortionaudio_algName === "voice_replace") {
                     document.getElementById("privacyLevel").style.display = "none";
                 } else {
                     document.getElementById("privacyLevel").style.display = "block";
@@ -294,13 +294,6 @@
                 switch (distortionAudioAlgName) {
 
                     case "voice_replace":
-                        formData.set("sheet", distortionAudioAlgName);
-                        formData.set("params", "1");
-                        formData.set("algName", distortionAudioAlgName);
-                        privacyLevelTable.style.display = "none";
-                        break;
-
-                    case "audio_augmentation":
                         formData.set("sheet", distortionAudioAlgName);
                         formData.set("params", "1");
                         formData.set("algName", distortionAudioAlgName);
@@ -351,8 +344,6 @@
 
                 if (audioType.includes(fileExtension)) {
                     displayAudio()
-                    //提交脱敏参数，请求脱敏
-
                 } else {
                     alert("请选择音频文件");
                 }
@@ -369,7 +360,6 @@
                 let audioElement = document.createElement("audio");
                 audioElement.src = e.target.result; // 设置audio的源为FileReader的结果
                 audioElement.controls = true; // 显示音频控制器
-
                 // 检查`pre`元素是否已定义
                 if (pre) {
                     pre.appendChild(audioElement); // 将audio元素添加到`pre`元素中
@@ -410,7 +400,8 @@
                                 <tbody id="table1">
                                 <tr>
                                     <td><select id="distortionaudio_algName">
-                                            <option value="dpAudio" selected>差分-基于差分隐私的声纹特征脱敏算法</option>
+                                            <option value="dpAudio" selected>差分-基于差分隐私的声纹特征脱敏算法
+                                            </option>
                                             <option value="voice_replace">置换-声纹替换算法</option>
                                             <option value="apply_audio_effects">置换-音频变形</option>
                                             <option value="audio_reshuffle">置换-音频重排</option>
@@ -418,7 +409,6 @@
                                             <option value="audio_spec">泛化-频域遮掩</option>
                                             <option value="audio_augmentation">泛化-音频失真</option>
                                             <option value="audio_median">泛化-基于均值的采样点替换</option>
-
                                             <#--                                           <option value="add_beep"> 基于正弦波的音频替换方法</option>-->
                                         </select></td>
                                 </tr>
@@ -459,7 +449,7 @@
                         <div class="midtile">
                             <div class="col-sm-5 m-b-xs">
                                 <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                    <input type="file" id="fileUpload" style="display: none;">
+                                    <input type="file" id="fileUpload" accept=".mp3, .wav" style="display: none;">
                                     <label for="fileUpload" class="upload-btn">
                                         选择文件
                                     </label>
@@ -506,7 +496,8 @@
                                     <input type="text" id="registerUsername" name="username">
                                     <label for="fileUpload">选择文件:</label>
                                     <input type="text" id="registerFilePath" placeholder="文件路径" readonly>
-                                    <input type="file" id="registerFileSelector" style="display:none"
+                                    <input type="file" id="registerFileSelector" accept=".mp3, .wav"
+                                           style="display:none"
                                            onchange="document.getElementById('registerFilePath').value = this.value">
                                     <label for="registrationMessage">消息:</label>
                                     <textarea id="registrationMessage" rows="4" readonly></textarea>
@@ -526,7 +517,7 @@
                                     <input type="text" id="loginUsername" name="loginUsername">
                                     <label for="loginFilePath">选择文件:</label>
                                     <input type="text" id="loginFilePath" placeholder="文件路径" readonly>
-                                    <input type="file" id="loginFileSelector" style="display:none"
+                                    <input type="file" id="loginFileSelector" accept=".mp3, .wav" style="display:none"
                                            onchange="document.getElementById('loginFilePath').value = this.value">
                                     <label for="loginMessage">消息:</label>
                                     <textarea id="loginMessage" rows="4" readonly></textarea>
@@ -595,7 +586,7 @@
         formData.set("name", name.value);
 
         fetch(backendInterface, {
-        method: 'POST',
+            method: 'POST',
             body: formData,
         })
             .then(response => response.json())

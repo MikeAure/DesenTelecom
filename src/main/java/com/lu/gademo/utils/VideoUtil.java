@@ -18,6 +18,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
 
+/**
+ * 非失真视频脱敏工具
+ */
 public class VideoUtil {
 
     static SecretKey genAESKey(String password) throws NoSuchAlgorithmException {

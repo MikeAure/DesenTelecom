@@ -15,7 +15,6 @@ public class EvidenceResponse {
     @Basic
     @Column(name = "sub_cmd")
     private Integer subCMD;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "evidence_id")
     private String evidenceID;

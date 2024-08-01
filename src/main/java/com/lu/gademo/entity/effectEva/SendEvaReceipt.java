@@ -6,7 +6,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "send_eva_receipt")
 public class SendEvaReceipt {
-
     @Id
     @Column(name = "certificateid")
     private String certificateID;

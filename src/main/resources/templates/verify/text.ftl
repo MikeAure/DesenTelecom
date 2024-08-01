@@ -279,7 +279,7 @@
                     distortion_alg_list.options.add(new Option("随机置换", "passReplace"));
 
                 } else if (text_type === "value") {
-                    distortion_alg_list.options.add(new Option("基于高斯机制差分隐私的数值加噪算法", "gaussianToValue"));
+                    // distortion_alg_list.options.add(new Option("基于高斯机制差分隐私的数值加噪算法", "gaussianToValue"));
                     distortion_alg_list.options.add(new Option("基于拉普拉斯差分隐私的数值加噪算法", "laplaceToValue"));
                     distortion_alg_list.options.add(new Option("基于随机均匀噪声的数值加噪算法", "randomUniformToValue"));
                     distortion_alg_list.options.add(new Option("基于随机拉普拉斯噪声的数值加噪算法", "randomLaplaceToValue"));
@@ -353,7 +353,7 @@
                 }
             });
 
-            document.getElementById('startPerformanceTest').addEventListener('click', function() {
+            document.getElementById('startPerformanceTest').addEventListener('click', function () {
                 const fileInput = document.getElementById('selectTestData');
                 const file = fileInput.files[0];
 
@@ -363,7 +363,7 @@
                 }
 
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const content = e.target.result.trim();
                     const points = content.split('\n').map(line => line.split(' ').map(Number));
 
@@ -378,7 +378,7 @@
                         .then(blob => {
                             // 使用 FileReader 读取 blob 内容
                             const fileReader = new FileReader();
-                            fileReader.onload = function(event) {
+                            fileReader.onload = function (event) {
                                 // 显示文件内容在 textarea 中
                                 document.getElementById('desenTestData').value = event.target.result;
 
@@ -392,7 +392,7 @@
                 reader.readAsText(file);
             });
 
-            document.getElementById('downloadTestResult').addEventListener('click', function() {
+            document.getElementById('downloadTestResult').addEventListener('click', function () {
                 if (window.downloadBlob) {
                     const url = window.URL.createObjectURL(window.downloadBlob);
                     const a = document.createElement('a');
@@ -514,7 +514,7 @@
 
                                         $('#pagination').html(pagination);
 
-                                        $('#pagination a').click(function (e) {
+                                        $('#pagination a').off("click").on("click", function (e) {
                                             e.preventDefault();
                                             let page = $(this).data('page');
                                             console.log(page)
@@ -524,18 +524,18 @@
                                                 currentPage = Math.min(pageCount, currentPage + 1);
                                             }
                                             displayTable(currentPage);
-                                            renderPagination();
+                                            $("#totalPages").text(currentPage + "/" + pageCount);
                                         });
 
                                         let info = "共" + pageCount + "页"
                                         console.log(info)
-                                        $('#totalPages').text(info);
+                                        $("#totalPages").text(currentPage + "/" + pageCount);
                                     }
 
                                     $('#paginationContainer').show();
                                     renderPagination();
 
-                                    $('#goToPage').click(function () {
+                                    $('#goToPage').off("click").on("click", function () {
                                         let pageNumber = parseInt($('#pageInput').val());
                                         if (pageNumber >= 1 && pageNumber <= pageCount) {
                                             currentPage = pageNumber;
@@ -594,7 +594,7 @@
 
                                         $('#pagination1').html(pagination1);
 
-                                        $('#pagination1 a').click(function (e) {
+                                        $('#pagination1 a').off("click").on("click", function (e) {
                                             e.preventDefault();
                                             let page = $(this).data('page');
                                             console.log(page)
@@ -604,18 +604,18 @@
                                                 currentPage1 = Math.min(pageCount, currentPage1 + 1);
                                             }
                                             displayTable1(currentPage1);
-                                            renderPagination1();
+                                            $("#totalPages1").text(currentPage1 + "/" + pageCount);
                                         });
 
                                         let info = "共" + pageCount + "页"
                                         console.log(info)
-                                        $('#totalPages1').text(info);
+                                        $("#totalPages1").text(currentPage1 + "/" + pageCount);
                                     }
 
                                     $('#paginationContainer1').show();
                                     renderPagination1();
 
-                                    $('#goToPage1').click(function () {
+                                    $('#goToPage1').off("click").on("click", function () {
                                         let pageNumber1 = parseInt($('#pageInput1').val());
                                         if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
                                             currentPage1 = pageNumber1;
@@ -809,7 +809,7 @@
                             </div>
 
                             <div id="nondistortion-module-container" class="tab-pane">
-<#--                                <div id="default-module" style="visibility: visible"></div>-->
+                                <#--                                <div id="default-module" style="visibility: visible"></div>-->
                                 <#--                            <div id="voiceprint-module" class="tab-pane" style="visibility: hidden">Test div2</div>-->
                                 <div id="trace-module" style="visibility: visible">
                                     <div class="map-container" id="driverMap1-container">

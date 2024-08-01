@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RecEvaResultInvDao extends JpaRepository<RecEvaResultInv, String> {
+    RecEvaResultInv findByDesenInfoAfterID(String desenInfoAfterID);
 }

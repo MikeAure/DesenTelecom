@@ -104,7 +104,7 @@ public class FileController extends BaseController {
 
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
-            return fileService.dealExcel(file, params, sheet);
+            return fileService.dealExcel(file, params, sheet, true);
         } else if (imageType.contains(fileType)) {
             return fileService.dealImage(file, params, algName);
         } else if (videoType.contains(fileType)) {
