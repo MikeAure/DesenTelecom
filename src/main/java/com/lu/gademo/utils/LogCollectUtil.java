@@ -141,7 +141,7 @@ public class LogCollectUtil {
                                       StringBuilder desenLevel, String fileType, String rawFileSuffix,
                                       Boolean desenCom) {
         SendEvaReq sendEvaReq = new SendEvaReq();
-        sendEvaReq.setEvaRequestId(util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes()));
+        sendEvaReq.setEvaRequestId(util.getSM3Hash(desenFileBytes));
         sendEvaReq.setSystemID(systemID);
         sendEvaReq.setEvidenceID(evidenceID);
         sendEvaReq.setGlobalID(globalID);

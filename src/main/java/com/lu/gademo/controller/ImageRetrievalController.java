@@ -5,7 +5,7 @@ import com.lu.gademo.entity.effectEva.SendEvaReq;
 import com.lu.gademo.entity.evidence.ReqEvidenceSave;
 import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
 import com.lu.gademo.entity.ruleCheck.SendRuleReq;
-import com.lu.gademo.model.SendData;
+import com.lu.gademo.model.LogSenderManager;
 import com.lu.gademo.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
 public class ImageRetrievalController {
 
     private LogCollectUtil logCollectUtil;
-    private SendData sendData;
+    private LogSenderManager logSenderManager;
     private Util util;
     private Random randomNum;
     private Path currentDirectory;
@@ -51,10 +51,10 @@ public class ImageRetrievalController {
     private Path desenFileDirectory;
 
     @Autowired
-    public ImageRetrievalController(SendData sendData, Util util, LogCollectUtil logCollectUtil) throws IOException {
+    public ImageRetrievalController(LogSenderManager logSenderManager, Util util, LogCollectUtil logCollectUtil) throws IOException {
 //        this.desenCom = false;
         this.randomNum = new Random();
-        this.sendData = sendData;
+        this.logSenderManager = logSenderManager;
         this.util = util;
         this.logCollectUtil = logCollectUtil;
         this.currentDirectory = Paths.get("");
@@ -151,7 +151,7 @@ public class ImageRetrievalController {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对图像非失真脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
         // 脱敏算法信息
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -170,7 +170,7 @@ public class ImageRetrievalController {
                 infoBuilders.desenLevel, desenCom);
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -180,7 +180,7 @@ public class ImageRetrievalController {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes,
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes,
                     desenFileBytes);
         });
 
@@ -189,10 +189,10 @@ public class ImageRetrievalController {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
         // 关闭线程池
         executorService.shutdown();
@@ -288,7 +288,7 @@ public class ImageRetrievalController {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对图像非失真脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
         // 脱敏算法信息
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -307,7 +307,7 @@ public class ImageRetrievalController {
                 infoBuilders.desenLevel, desenCom);
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -317,7 +317,7 @@ public class ImageRetrievalController {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes,
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes,
                     desenFileBytes);
         });
 
@@ -326,10 +326,10 @@ public class ImageRetrievalController {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
         // 关闭线程池
         executorService.shutdown();

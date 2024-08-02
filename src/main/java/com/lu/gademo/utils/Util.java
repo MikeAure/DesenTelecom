@@ -1,5 +1,7 @@
 package com.lu.gademo.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.io.IOException;
@@ -70,4 +72,6 @@ public interface Util {
 //    public void excelToMysql(String tableName, String excelFilePath);
     // 检测本机是否安装Conda
     Boolean isCondaInstalled(boolean isLinux);
+
+    ArrayNode trimCommaAndReturnArrayNode(String rawString, ObjectMapper objectMapper);
 }

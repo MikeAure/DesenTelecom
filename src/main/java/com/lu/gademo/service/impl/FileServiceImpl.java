@@ -10,7 +10,7 @@ import com.lu.gademo.entity.evidence.ReqEvidenceSave;
 import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
 import com.lu.gademo.entity.ruleCheck.SendRuleReq;
 import com.lu.gademo.event.ReDesensitizeEvent;
-import com.lu.gademo.model.SendData;
+import com.lu.gademo.model.LogSenderManager;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.utils.*;
@@ -64,14 +64,14 @@ public class FileServiceImpl implements FileService {
 
     private Anonymity anonymity;
     // 发送类
-    private SendData sendData;
+    private LogSenderManager logSenderManager;
 
     private ExcelParamService excelParamService;
 
     private final DpUtil dpUtil;
     // 工具类
     private Util util;
-
+    // 构造各类请求
     private LogCollectUtil logCollectUtil;
 
     private Random randomNum;
@@ -102,9 +102,7 @@ public class FileServiceImpl implements FileService {
         } else {
             originalExcelParam.setTmParam(desenLevelNum);
         }
-
         return originalExcelParam;
-
     }
 
     @Override
@@ -152,7 +150,7 @@ public class FileServiceImpl implements FileService {
     @Autowired
     public FileServiceImpl(AlgorithmsFactory algorithmsFactory, Dp dp,
                            Replace replacement, Generalization generalization, Anonymity anonymity,
-                           SendData sendData, Util util, ExcelParamService excelParamService,
+                           LogSenderManager logSenderManager, Util util, ExcelParamService excelParamService,
                            DpUtil dpUtil, LogCollectUtil logCollectUtil,
                            SendEvaReqDao sendEvaReqDao) throws IOException {
         this.algorithmsFactory = algorithmsFactory;
@@ -160,7 +158,7 @@ public class FileServiceImpl implements FileService {
         this.replacement = replacement;
         this.generalization = generalization;
         this.anonymity = anonymity;
-        this.sendData = sendData;
+        this.logSenderManager = logSenderManager;
         this.util = util;
         this.excelParamService = excelParamService;
         this.dpUtil = dpUtil;
@@ -410,7 +408,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对图像脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
         // 脱敏算法信息
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -429,7 +427,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenLevel, desenCom);
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -439,7 +437,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes,
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes,
                     desenFileBytes);
         });
 
@@ -448,10 +446,10 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
         // 关闭线程池
         executorService.shutdown();
@@ -567,7 +565,7 @@ public class FileServiceImpl implements FileService {
             log.info("Excel Param: {}", excelParam);
             dataType.add(excelParam.getDataType());
             // 添加数据类型
-            infoBuilders.dataType.append(excelParam.getDataType()).append(",");
+            infoBuilders.fileDataType.append(excelParam.getDataType()).append(",");
 
             // 脱敏前信息类型标识
             infoBuilders.desenInfoPreIden.append(columnName).append(",");
@@ -954,50 +952,50 @@ public class FileServiceImpl implements FileService {
         String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
-
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
         // 存证系统
         String evidenceID = util.getSM3Hash((new String(newExcelData, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-//        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-        // 发送方法
-        executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
-                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
-                sheetTemplate, rawFileSuffix, desenCom);
-
-        // 发送方法
-        executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
-                infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
-        // 发送
-        executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
-        });
-        executorService.shutdown();
-
+//
+//        // 线程池
+//        ExecutorService executorService = Executors.newFixedThreadPool(4);
+////        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+//        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+//        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
+//
+//        // 上报本地存证内容
+//        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
+//                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
+//                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+//                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+//        // 发送方法
+//        executorService.submit(() -> {
+//            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+//        });
+//
+//        // 效果评测系统
+//        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
+//                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
+//                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+//                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
+//                sheetTemplate, rawFileSuffix, desenCom);
+//
+//        // 发送方法
+//        executorService.submit(() -> {
+//            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+//        });
+//
+//        // 拆分重构系统
+//
+//        // 合规检查系统
+//        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
+//                infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
+//                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
+//                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
+//        // 发送
+//        executorService.submit(() -> {
+//            logSenderManager.send2RuleCheck(sendRuleReq);
+//        });
+//        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, sheetTemplate, rawFileSuffix, startTime, endTime);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -1131,7 +1129,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对视频脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
 
         // 线程池
         ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -1151,7 +1149,7 @@ public class FileServiceImpl implements FileService {
 
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -1162,7 +1160,7 @@ public class FileServiceImpl implements FileService {
                 startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // 拆分重构系统
@@ -1172,10 +1170,10 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlg, infoBuilders.desenAlgParam,
-                startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         // 关闭线程池
@@ -1273,7 +1271,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对声纹脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
         ObjectMapper objectMapper = new ObjectMapper();
 
         // 线程池
@@ -1294,7 +1292,7 @@ public class FileServiceImpl implements FileService {
        /* Thread evidenceThread = new Thread(() -> sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal));
         evidenceThread.start();*/
         Future<?> future_evidence = executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -1306,7 +1304,7 @@ public class FileServiceImpl implements FileService {
         ObjectNode effectEvaContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReq));
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // TODO: 拆分重构系统
@@ -1314,10 +1312,10 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         // 关闭线程池
@@ -1402,7 +1400,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对图形脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
 
         // 脱敏文件流
         // 线程池
@@ -1421,7 +1419,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -1431,7 +1429,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // TODO: 拆分重构系统
@@ -1439,10 +1437,10 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         // 关闭线程池
@@ -1545,7 +1543,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对csv文件脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
 
         // 线程池
         ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -1564,7 +1562,7 @@ public class FileServiceImpl implements FileService {
 
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -1573,7 +1571,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // TODO: 拆分重构系统
@@ -1581,9 +1579,9 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         // 关闭线程池
@@ -1667,7 +1665,7 @@ public class FileServiceImpl implements FileService {
             // 脱敏意图
             infoBuilders.desenIntention.append(colName).append("脱敏,");
             // 脱敏数据类型
-            infoBuilders.dataType.append(rawFileSuffix);
+            infoBuilders.fileDataType.append(rawFileSuffix);
             // 取列数据
             List<Object> objs = new ArrayList<>();
             for (int j = 1; j <= totalRowNum; j++) {
@@ -1906,7 +1904,7 @@ public class FileServiceImpl implements FileService {
 
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -1916,7 +1914,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // TODO: 拆分重构系统
@@ -1924,10 +1922,10 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         executorService.shutdown();
@@ -2031,7 +2029,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对视频脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -2040,7 +2038,7 @@ public class FileServiceImpl implements FileService {
 
         // 存证系统
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        String evidenceID = util.getSM3Hash((new String(rawFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
         ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
 
@@ -2052,7 +2050,7 @@ public class FileServiceImpl implements FileService {
 
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -2062,7 +2060,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // TODO: 拆分重构系统
@@ -2070,10 +2068,10 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
         // 关闭线程池
         executorService.shutdown();
@@ -2164,7 +2162,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对图像脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
         // 脱敏后文件大小
         ObjectMapper objectMapper = new ObjectMapper();
         // 线程池
@@ -2184,7 +2182,7 @@ public class FileServiceImpl implements FileService {
 
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -2194,7 +2192,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // TODO: 拆分重构系统
@@ -2202,11 +2200,11 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         ObjectNode ruleCheckContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendRuleReq));
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         // 关闭线程池
@@ -2300,9 +2298,9 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对视频脱敏");
         // 脱敏数据类型
-        infoBuilders.dataType.append("video");
+        infoBuilders.fileDataType.append("video");
         // 脱敏数据类型
-        infoBuilders.dataType.append(rawFileSuffix);
+        infoBuilders.fileDataType.append(rawFileSuffix);
         // 线程池
         ExecutorService executorService = Executors.newFixedThreadPool(4);
 
@@ -2320,7 +2318,7 @@ public class FileServiceImpl implements FileService {
 
         // 发送方法
         executorService.submit(() -> {
-            sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
 
         // 效果评测系统
@@ -2330,7 +2328,7 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
         executorService.submit(() -> {
-            sendData.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
 
         // TODO: 拆分重构系统
@@ -2338,14 +2336,14 @@ public class FileServiceImpl implements FileService {
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.dataType);
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         executorService.submit(() -> {
-            sendData.send2RuleCheck(sendRuleReq);
+            logSenderManager.send2RuleCheck(sendRuleReq);
         });
 
         // 关闭线程池

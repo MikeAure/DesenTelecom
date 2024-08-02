@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 // 用于构建向拆分重构系统发送的Tcp数据包
 public class TcpPacketSplit {
     // 版本号
-    private static final short VERSION = 0x0001;
+    private static final short VERSION = 0x0002;
     private static final byte ENCRYPTION_MODE = 0x00;
     // 认证校验模式
     private static final byte AUTHENTICATION_MODE = 0x00;

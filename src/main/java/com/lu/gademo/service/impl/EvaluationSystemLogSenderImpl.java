@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.effectEva.*;
 import com.lu.gademo.entity.effectEva.*;
 import com.lu.gademo.event.ReDesensitizeEvent;
-import com.lu.gademo.model.SendData;
 import com.lu.gademo.model.TcpPacket;
+import com.lu.gademo.service.EvaluationSystemLogSender;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Data
 @Service
-public class EvaluationSystemLogSenderImpl {
+public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender {
     @Value("${systemId.evaluationSystemId}")
     int evaluationSystemId;
     @Value("${effectEva.address}")
@@ -54,32 +54,14 @@ public class EvaluationSystemLogSenderImpl {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-
-    private ArrayNode getArrayNode(String[] rawList) {
-        ArrayNode desenIntentionArrayNode = objectMapper.createArrayNode();
-        for (String singleDesenIntention : rawList) {
-            desenIntentionArrayNode.add(singleDesenIntention);
-        }
-        return desenIntentionArrayNode;
-    }
-
-    private ArrayNode trimCommaAndReturnArrayNode(String rawString) {
-        String[] desenIntentionList = new String[0];
-        if (rawString.endsWith(",")) {
-            desenIntentionList = rawString.substring(0, rawString.length() - 1).split(",");
-        } else {
-            desenIntentionList = rawString.split(",");
-        }
-//        System.out.println(Arrays.toString(desenIntentionList));
-        return getArrayNode(desenIntentionList);
-    }
     /**
      * 向评测系统发送日志
      *
      * @param sendEvaReq 评测请求
      */
+    @Override
     public void send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
-                               byte[] desenFileData) {
+                               byte[] desenFileData ) {
         try {
             // 本地保存请求
             sendEvaReqDao.save(sendEvaReq);
@@ -88,8 +70,8 @@ public class EvaluationSystemLogSenderImpl {
             String evaRequestDesenIntention = content.get("desenIntention").asText();
             String evaRequestDesenRequirements = content.get("desenRequirements").asText();
 
-            ArrayNode evaRequestDesenIntentionArrayNode = trimCommaAndReturnArrayNode(evaRequestDesenIntention);
-            ArrayNode evaRequestDesenRequirementsArrayNode = trimCommaAndReturnArrayNode(evaRequestDesenRequirements);
+            ArrayNode evaRequestDesenIntentionArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenIntention, objectMapper);
+            ArrayNode evaRequestDesenRequirementsArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenRequirements, objectMapper);
 
             content.remove("desenIntention");
             content.remove("desenRequirements");
@@ -136,6 +118,8 @@ public class EvaluationSystemLogSenderImpl {
             outputStream.flush();
 
             log.info("已发送脱敏效果评测系统请求");
+
+            // TODO: 增加发送文件的开关
             // 发送原始文件
             outputStream.write(rawFileData);
             // 发送脱敏后的文件
@@ -257,7 +241,7 @@ public class EvaluationSystemLogSenderImpl {
                     if (recEvaResultInvDao.existsById(recEvaResultInv.getEvaResultID())) {
                         recEvaResultInvDao.deleteById(recEvaResultInv.getEvaResultID());
                     }
-                    eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv));
+//                    eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv));
                     // 插入数据库
                     recEvaResultInvDao.save(recEvaResultInv);
                     log.info("已接收脱敏效果测评结果无效异常消息");

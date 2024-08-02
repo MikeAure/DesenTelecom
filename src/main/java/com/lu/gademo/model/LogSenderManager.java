@@ -13,7 +13,9 @@ import com.lu.gademo.entity.evidence.*;
 import com.lu.gademo.entity.ruleCheck.*;
 import com.lu.gademo.entity.split.SendSplitDesenData;
 import com.lu.gademo.event.ReDesensitizeEvent;
-import com.lu.gademo.service.ExcelParamService;
+import com.lu.gademo.service.*;
+import com.lu.gademo.utils.DesenInfoStringBuilders;
+import com.lu.gademo.utils.LogCollectUtil;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +32,13 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
 @Data
-public class SendData {
+public class LogSenderManager {
     // 本地存证系统ip和端口
     @Value("${evidence.localAddress}")
     String evidenceLocalAddress;
@@ -94,6 +98,7 @@ public class SendData {
     @Autowired
     Util util;
     ObjectMapper objectMapper = new ObjectMapper();
+
     // 效果评测Dao
     @Autowired
     private SendEvaReqDao sendEvaReqDao;
@@ -131,28 +136,41 @@ public class SendData {
 
     @Autowired
     private ExcelParamService excelParamService;
-
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    private ArrayNode getArrayNode(String[] rawList) {
-        ArrayNode desenIntentionArrayNode = objectMapper.createArrayNode();
-        for (String singleDesenIntention : rawList) {
-            desenIntentionArrayNode.add(singleDesenIntention);
-        }
-        return desenIntentionArrayNode;
-    }
+    @Autowired
+    private EvidenceSystemLogSender evidenceSystemLogSender;
+    @Autowired
+    private EvaluationSystemLogSender evaluationSystemLogSender;
+    @Autowired
+    private SplitSystemLogSender splitSystemLogSender;
+    @Autowired
+    private RuleCheckSystemLogSender ruleCheckSystemLogSender;
 
-    private ArrayNode trimCommaAndReturnArrayNode(String rawString) {
-        String[] desenIntentionList = new String[0];
-        if (rawString.endsWith(",")) {
-            desenIntentionList = rawString.substring(0, rawString.length() - 1).split(",");
-        } else {
-            desenIntentionList = rawString.split(",");
-        }
-//        System.out.println(Arrays.toString(desenIntentionList));
-        return getArrayNode(desenIntentionList);
-    }
+    @Autowired
+    private LogCollectUtil logCollectUtil;
+
+//    private ArrayNode getArrayNode(String[] rawList) {
+//        ArrayNode desenIntentionArrayNode = objectMapper.createArrayNode();
+//        for (String singleDesenIntention : rawList) {
+//            desenIntentionArrayNode.add(singleDesenIntention);
+//        }
+//        return desenIntentionArrayNode;
+//    }
+//
+//    private ArrayNode trimCommaAndReturnArrayNode(String rawString) {
+//        String[] desenIntentionList = new String[0];
+//        if (rawString.endsWith(",")) {
+//            desenIntentionList = rawString.substring(0, rawString.length() - 1).split(",");
+//        } else {
+//            desenIntentionList = rawString.split(",");
+//        }
+////        System.out.println(Arrays.toString(desenIntentionList));
+//        return getArrayNode(desenIntentionList);
+//    }
+
+    
 
     /**
      * 向评测系统发送日志
@@ -169,8 +187,8 @@ public class SendData {
             String evaRequestDesenIntention = content.get("desenIntention").asText();
             String evaRequestDesenRequirements = content.get("desenRequirements").asText();
 
-            ArrayNode evaRequestDesenIntentionArrayNode = trimCommaAndReturnArrayNode(evaRequestDesenIntention);
-            ArrayNode evaRequestDesenRequirementsArrayNode = trimCommaAndReturnArrayNode(evaRequestDesenRequirements);
+            ArrayNode evaRequestDesenIntentionArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenIntention, objectMapper);
+            ArrayNode evaRequestDesenRequirementsArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenRequirements, objectMapper);
 
             content.remove("desenIntention");
             content.remove("desenRequirements");
@@ -338,7 +356,7 @@ public class SendData {
                     if (recEvaResultInvDao.existsById(recEvaResultInv.getEvaResultID())) {
                         recEvaResultInvDao.deleteById(recEvaResultInv.getEvaResultID());
                     }
-                    eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv));
+//                    eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv));
                     // 插入数据库
                     recEvaResultInvDao.save(recEvaResultInv);
                     log.info("已接收脱敏效果测评结果无效异常消息");
@@ -582,7 +600,6 @@ public class SendData {
         }
     }
 
-
     public void send2Split(SendSplitDesenData sendSplitDesenData, byte[] rawFileData) {
         // 保存sendSplitDesenData
         if (sendSplitDesenDataDao.existsById(sendSplitDesenData.getDesenInfoAfterID())) {
@@ -779,11 +796,11 @@ public class SendData {
         localEvidenceData.put("desenInfoAfterID", submitEvidenceLocal.getDesenInfoAfterID());
         // desenIntention: 脱敏意图
         String tempDesenIntentionString = submitEvidenceLocal.getDesenIntention();
-        ArrayNode desenIntentionArrayNode = trimCommaAndReturnArrayNode(tempDesenIntentionString);
+        ArrayNode desenIntentionArrayNode = util.trimCommaAndReturnArrayNode(tempDesenIntentionString, objectMapper);
         localEvidenceData.set("desenIntention", desenIntentionArrayNode);
         // desenRequirements: 脱敏要求
         String tempDesenRequirementsString = submitEvidenceLocal.getDesenRequirements();
-        ArrayNode desenDesenRequirementsArrayNode = trimCommaAndReturnArrayNode(tempDesenRequirementsString);
+        ArrayNode desenDesenRequirementsArrayNode = util.trimCommaAndReturnArrayNode(tempDesenRequirementsString, objectMapper);
         localEvidenceData.set("desenRequirements", desenDesenRequirementsArrayNode);
         // desenControlSet: 脱敏控制集合（操作配置）
         localEvidenceData.put("desenControlSet", submitEvidenceLocal.getDesenControlSet());
@@ -912,5 +929,70 @@ public class SendData {
             log.error(e.getMessage());
         }
 
+    }
+
+    /**
+     *
+     * @param globalID
+     * @param desenCom
+     * @param objectMode
+     * @param infoBuilders
+     * @param rawFileName
+     * @param rawFileBytes
+     * @param rawFileSize
+     * @param desenFileName
+     * @param desenFileBytes
+     * @param desenFileSize
+     * @param fileType
+     * @param rawFileSuffix
+     * @param startTime
+     * @param endTime
+     */
+    public void submitToFourSystems(String globalID, String evidenceID, Boolean desenCom, String objectMode,
+                                    DesenInfoStringBuilders infoBuilders,
+                                    String rawFileName, byte[] rawFileBytes, long rawFileSize,
+                                    String desenFileName, byte[] desenFileBytes, long desenFileSize,
+                                    String fileType, String rawFileSuffix,
+                                    String startTime, String endTime) {
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
+
+        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
+                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
+                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+
+        executorService.submit(() -> {
+            send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+        });
+
+        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
+                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
+                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
+                fileType, rawFileSuffix, desenCom);
+
+        executorService.submit(() -> {
+            send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
+        });
+
+        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
+                infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
+                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
+
+        executorService.submit(() -> {
+            send2RuleCheck(sendRuleReq);
+        });
+
+        SendSplitDesenData sendSplitDesenData = logCollectUtil.buildSendSplitReq(infoBuilders.desenInfoAfterIden, infoBuilders.desenAlg,
+                rawFileBytes, desenFileBytes, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+        executorService.submit(() -> {
+            send2Split(sendSplitDesenData, rawFileBytes);
+        });
+
+        executorService.shutdown();
     }
 }

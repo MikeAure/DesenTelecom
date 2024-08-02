@@ -1,16 +1,16 @@
 package com.lu.gademo;
 
 import com.lu.gademo.entity.split.SendSplitDesenData;
-import com.lu.gademo.model.SendData;
+import com.lu.gademo.model.LogSenderManager;
 import com.lu.gademo.utils.LogCollectUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class SendDataTest {
+public class LogSenderManagerTest {
     @Autowired
-    private SendData sendData;
+    private LogSenderManager logSenderManager;
     @Autowired
     private LogCollectUtil logCollectUtil;
 
@@ -31,6 +31,6 @@ public class SendDataTest {
         SendSplitDesenData dataResult = logCollectUtil
                 .buildSendSplitReq(desenInfoAfterIden, desenAlg, rawFileBytes, desenFileBytes, desenIntention,
                         desenRequirements, controlSet, desenAlgParam, startTime, endTime, desenLevel, true);
-        sendData.send2Split(dataResult, rawFileBytes);
+        logSenderManager.send2Split(dataResult, rawFileBytes);
     }
 }

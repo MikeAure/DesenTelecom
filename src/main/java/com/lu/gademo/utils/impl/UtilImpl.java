@@ -1,5 +1,7 @@
 package com.lu.gademo.utils.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.lu.gademo.utils.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -493,5 +495,25 @@ public class UtilImpl implements Util {
             return false;
         }
         return false;
+    }
+
+    private ArrayNode getArrayNode(String[] rawList, ObjectMapper objectMapper) {
+        ArrayNode desenIntentionArrayNode = objectMapper.createArrayNode();
+        for (String singleDesenIntention : rawList) {
+            desenIntentionArrayNode.add(singleDesenIntention);
+        }
+        return desenIntentionArrayNode;
+    }
+
+    @Override
+    public ArrayNode trimCommaAndReturnArrayNode(String rawString, ObjectMapper objectMapper) {
+        String[] desenIntentionList = new String[0];
+        if (rawString.endsWith(",")) {
+            desenIntentionList = rawString.substring(0, rawString.length() - 1).split(",");
+        } else {
+            desenIntentionList = rawString.split(",");
+        }
+//        System.out.println(Arrays.toString(desenIntentionList));
+        return getArrayNode(desenIntentionList, objectMapper);
     }
 }
