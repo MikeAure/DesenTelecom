@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.split.SendSplitDesenDataDao;
 import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.event.ThreeSystemsEvent;
 import com.lu.gademo.model.TcpPacketSplit;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.DataInputStream;
@@ -38,8 +41,16 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
     Util util;
     ObjectMapper objectMapper = new ObjectMapper();
 
+    @EventListener
+    @Async
     @Override
-    public void send2Split(SendSplitDesenData sendSplitDesenData, byte[] rawFileData) {
+    public void splitHandleThreeSystemEvent(ThreeSystemsEvent logManagerEvent) {
+        // 发送给拆分重构系统
+        send2Split(logManagerEvent.getSendSplitDesenData(), logManagerEvent.getDesenFileData());
+    }
+
+    @Override
+    public void send2Split(SendSplitDesenData sendSplitDesenData, byte[] desenFileData) {
         // 保存sendSplitDesenData
         if (sendSplitDesenDataDao.existsById(sendSplitDesenData.getDesenInfoAfterID())) {
             sendSplitDesenDataDao.deleteById(sendSplitDesenData.getDesenInfoAfterID());
@@ -53,10 +64,10 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
         allSplitJsonData.set("content", splitJsonData);
         ObjectNode dataJson = objectMapper.createObjectNode();
         dataJson.set("data", allSplitJsonData);
-
+        log.info("拆分重构请求数据: {}", dataJson.toPrettyString());
         TcpPacketSplit tcpPacketSplit = new TcpPacketSplit(dataJson.toPrettyString());
 //        System.out.println(dataJson.toPrettyString());
-        byte[] tcpBytePacket = tcpPacketSplit.buildPacket(rawFileData);
+        byte[] tcpBytePacket = tcpPacketSplit.buildPacket(desenFileData);
 
         try (
                 Socket socket = new Socket(splitReconstructAddress, splitReconstructPort);

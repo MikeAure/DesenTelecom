@@ -8,6 +8,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -15,9 +16,9 @@ import java.util.Objects;
 @Table(name = "rec_eva_req_receipt")
 // 脱敏效果评测请求收据
 public class RecEvaReqReceipt {
-
     @Id
     @Column(name = "certificateid")
+    @NonNull
     private String certificateID;
     @Basic
     @Column(name = "evarequestid")

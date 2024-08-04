@@ -141,6 +141,15 @@ public class LogCollectUtil {
                                       StringBuilder desenLevel, String fileType, String rawFileSuffix,
                                       Boolean desenCom) {
         SendEvaReq sendEvaReq = new SendEvaReq();
+//        byte[] rawFileNameBytes = rawFileName.getBytes(StandardCharsets.UTF_8);
+//        byte[] desenFileNameBytes = desenFileName.getBytes(StandardCharsets.UTF_8);
+//        byte[] combined = new byte[rawFileBytes.length + rawFileNameBytes.length];
+//        byte[] desenCombined = new byte[desenFileNameBytes.length + desenFileBytes.length];
+//        System.arraycopy(rawFileNameBytes, 0, combined, 0, rawFileNameBytes.length);
+//        System.arraycopy(rawFileBytes, 0, combined, rawFileNameBytes.length, rawFileBytes.length);
+//        System.arraycopy(desenFileNameBytes, 0, desenCombined, 0, desenFileNameBytes.length);
+//        System.arraycopy(desenFileBytes, 0, desenCombined, desenFileNameBytes.length, desenFileBytes.length);
+
         sendEvaReq.setEvaRequestId(util.getSM3Hash(desenFileBytes));
         sendEvaReq.setSystemID(systemID);
         sendEvaReq.setEvidenceID(evidenceID);

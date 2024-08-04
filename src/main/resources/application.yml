@@ -92,3 +92,6 @@ systemId:
     evaluationSystemId: '0x32000000'
     evidenceSystemId: '0x10000000'
     ruleCheckSystemId: '0x33000000'
+
+logSenderManager:
+    ifSendToEvaFirst: false

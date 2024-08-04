@@ -29,22 +29,61 @@ public class MockEva {
     }
 
     public static void main(String[] args) throws IOException {
-        String evaReceipt = "{\"content\":{\"certificateID\":\"1722316999761\",\"evaRequestID\":\"262190e0c2bd5153571413884f8ac6d7a1df7c4441f236bbc6474fb48ab0b75e\",\"hash\":\"-153222702\"},\"dataType\":12593}";
-        String evaResult = "{\"content\":{\"evaResultID\":\"89fd77ab0db98098be1526410377c344363a8eed2ed9d3df466448148e99705d\",\"evaPerformer\":\"脱敏工具集\",\"desenInfoPreID\":\"267b6811a737fc5631f5f69be1e5f8ae19e8cc2a3393b0a757b4837bdab219f6\",\"desenInfoAfterID\":\"89fd77ab0db98098be1526410377c344363a8eed2ed9d3df466448148e99705d\",\"desenIntention\":\"用户名脱敏,用户ID脱敏,密码脱敏,姓名脱敏,手机号码脱敏,邮箱脱敏,微信号脱敏,GPS地理位置脱敏,设备品牌脱敏,设备型号脱敏,设备版本脱敏,设备SIM卡号脱敏,IP地址脱敏,MAC地址脱敏,运营商脱敏,学校脱敏,院系脱敏,班级脱敏,年级脱敏,学号脱敏,校园卡消费密码脱敏,消费金额脱敏,消费时间脱敏\",\"desenRequirements\":\"用户名抑制,用户ID抑制,密码置换,姓名抑制,手机号码抑制,邮箱抑制,微信号抑制,GPS地理位置抑制,设备品牌随机扰动,设备型号随机扰动,设备版本随机扰动,设备SIM卡号抑制,IP地址抑制,MAC地址抑制,运营商随机扰动,学校随机扰动,院系随机扰动,班级随机扰动,年级随机扰动,学号抑制,校园卡消费密码置换,消费金额添加差分隐私Laplace噪声,消费时间日期添加Laplace噪声\",\"desenControlSet\":\"desencontrolset\",\"desenAlg\":\"15,16,19,15,16,13,16,14,2,2,2,16,22,16,2,2,2,2,2,16,19,3,1,\",\"desenAlgParam\":\"没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,\",\"desenPerformStartTime\":\"2024-07-31 10:31:01\",\"desenPerformEndTime\":\"2024-07-31 10:31:05\",\"desenLevel\":\"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\",\"desenPerformer\":\"脱敏工具集\",\"desenCom\":true,\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
-        String evaResultInv = "{\"content\":{\"evaResultID\":\"89fd77ab0db98098be1526410377c344363a8eed2ed9d3df466448148e99705d\",\"evaPerformer\":\"脱敏工具集\",\"desenInfoPreID\":\"267b6811a737fc5631f5f69be1e5f8ae19e8cc2a3393b0a757b4837bdab219f6\",\"desenInfoAfterID\":\"89fd77ab0db98098be1526410377c344363a8eed2ed9d3df466448148e99705d\",\"desenIntention\":\"用户名脱敏,用户ID脱敏,密码脱敏,姓名脱敏,手机号码脱敏,邮箱脱敏,微信号脱敏,GPS地理位置脱敏,设备品牌脱敏,设备型号脱敏,设备版本脱敏,设备SIM卡号脱敏,IP地址脱敏,MAC地址脱敏,运营商脱敏,学校脱敏,院系脱敏,班级脱敏,年级脱敏,学号脱敏,校园卡消费密码脱敏,消费金额脱敏,消费时间脱敏\",\"desenRequirements\":\"用户名抑制,用户ID抑制,密码置换,姓名抑制,手机号码抑制,邮箱抑制,微信号抑制,GPS地理位置抑制,设备品牌随机扰动,设备型号随机扰动,设备版本随机扰动,设备SIM卡号抑制,IP地址抑制,MAC地址抑制,运营商随机扰动,学校随机扰动,院系随机扰动,班级随机扰动,年级随机扰动,学号抑制,校园卡消费密码置换,消费金额添加差分隐私Laplace噪声,消费时间日期添加Laplace噪声\",\"desenControlSet\":\"desencontrolset\",\"desenAlg\":\"15,16,19,15,16,13,16,14,2,2,2,16,22,16,2,2,2,2,2,16,19,3,1,\",\"desenAlgParam\":\"没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,没有脱敏,\",\"desenPerformStartTime\":\"2024-07-31 10:31:01\",\"desenPerformEndTime\":\"2024-07-31 10:31:05\",\"desenLevel\":\"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,\",\"desenPerformer\":\"脱敏工具集\",\"desenCom\":true,\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false},\"dataType\":13313}";
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(evaReceipt);
+        String evaReceipt = "{\"content\":{\"certificateID\":\"1722316999761\"," +
+                "\"evaRequestID\":\"b753b81ca4af980e1540b34f5ac25cde903248009b664d801cc911ad3c900f48\"," +
+                "\"hash\":\"-153222702\"}," +
+                "\"dataType\":12593}";
 
-        System.out.println(jsonNode.toPrettyString());
+        String evaResult = "{\"content\":" +
+                "{\"evaResultID\":\"b753b81ca4af980e1540b34f5ac25cde903248009b664d801cc911ad3c900f48\"," +
+                "\"evaPerformer\":\"脱敏工具集\"," +
+                "\"desenInfoPreID\":\"cce8307aac7570835b840ad304d015427bf20de6778051a5d0a1fa385dc90c5d\"," +
+                "\"desenInfoAfterID\":\"b753b81ca4af980e1540b34f5ac25cde903248009b664d801cc911ad3c900f48\"," +
+                "\"desenIntention\":\"注册手机号码脱敏, 用户名脱敏, 密码脱敏, 姓名脱敏, 证件号码脱敏, 性别脱敏, 邮箱脱敏, 设备标识符脱敏, 订单号脱敏, 订单金额（元）脱敏, 乘车人姓名脱敏, 乘车人证件号码脱敏, 乘车人电话号码脱敏, 车次脱敏, 座位号脱敏, 定位地址脱敏, 发车时间脱敏, 下单时间脱敏,\"," +
+                "\"desenRequirements\": \"注册手机号码抑制, 用户名抑制, 密码置换, 姓名抑制, 证件号码抑制, 性别随机扰动, 邮箱抑制, 设备标识符抑制, 订单号抑制, 订单金额（元）添加差分隐私Laplace噪声, 乘车人姓名抑制, 乘车人证件号码抑制, 乘车人电话号码抑制, 车次随机扰动, 座位号随机扰动, 定位地址抑制, 发车时间日期添加Laplace噪声, 下单时间日期添加Laplace噪声\"," +
+                "\"desenControlSet\":\"desencontrolset\"," +
+                "\"desenAlg\":\"16,15,19,15,16,2,13,16,16,3,15,16,16,2,2,14,1,1,\"," +
+                "\"desenAlgParam\" : \"4,first,20,first,4,2,2,4,4,1,first,4,4,2,2,city,0.01,0.01,\","+
+                "\"desenPerformStartTime\" : \"2024-08-04 10:40:19\"," +
+                "\"desenPerformEndTime\" : \"2024-08-04 10:40:27\"," +
+                "\"desenLevel\" : \"2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,\"," +
+                "\"desenPerformer\":\"脱敏工具集\"," +
+                "\"desenCom\":true," +
+                "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
+                "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+
+        String evaResultInv = "{\"content\":{\"evaResultID\":\"ee6cfdf56bd74bda0652d430fc0f2f9e0dd07cd5c9e3aaa5d33bdc0517c440d6\"," +
+                "\"evaPerformer\":\"脱敏工具集\",\"desenInfoPreID\":\"cce8307aac7570835b840ad304d015427bf20de6778051a5d0a1fa385dc90c5d\"," +
+                "\"desenInfoAfterID\":\"ee6cfdf56bd74bda0652d430fc0f2f9e0dd07cd5c9e3aaa5d33bdc0517c440d6\"," +
+                "\"desenIntention\":\"注册手机号码脱敏, 用户名脱敏, 密码脱敏, 姓名脱敏, 证件号码脱敏, 性别脱敏, 邮箱脱敏, 设备标识符脱敏, 订单号脱敏, 订单金额（元）脱敏, 乘车人姓名脱敏, 乘车人证件号码脱敏, 乘车人电话号码脱敏, 车次脱敏, 座位号脱敏, 定位地址脱敏, 发车时间脱敏, 下单时间脱敏,\"," +
+                "\"desenRequirements\": \"注册手机号码抑制, 用户名抑制, 密码置换, 姓名抑制, 证件号码抑制, 性别随机扰动, 邮箱抑制, 设备标识符抑制, 订单号抑制, 订单金额（元）添加差分隐私Laplace噪声, 乘车人姓名抑制, 乘车人证件号码抑制, 乘车人电话号码抑制, 车次随机扰动, 座位号随机扰动, 定位地址抑制, 发车时间日期添加Laplace噪声, 下单时间日期添加Laplace噪声\"," +
+                "\"desenControlSet\":\"desencontrolset\"," +
+                "\"desenAlg\":\"16,15,19,15,16,2,13,16,16,3,15,16,16,2,2,14,1,1,\"," +
+                "\"desenAlgParam\" : \"4,first,20,first,4,2,2,4,4,1,first,4,4,2,2,city,0.01,0.01,\","+
+                "\"desenPerformStartTime\":\"2024-07-31 10:31:01\"," +
+                "\"desenPerformEndTime\":\"2024-07-31 10:31:05\"," +
+                "\"desenLevel\" : \"2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,\"," +
+                "\"desenPerformer\":\"脱敏工具集\"," +
+                "\"desenCom\":true," +
+                "\"desenFailedColName\" :\"用户名,密码,\" ," +
+                "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
+                "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
+                "\"dataType\":13313}";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode evaReceiptJson = objectMapper.readTree(evaReceipt);
+        System.out.println(evaReceiptJson.toPrettyString());
+        JsonNode evaResultJson = objectMapper.readTree(evaResult);
+        System.out.println(evaResultJson.toPrettyString());
         JsonNode evaResultInvJson = objectMapper.readTree(evaResultInv);
         System.out.println(evaResultInvJson.toPrettyString());
         byte[] evaReceiptBytes = new TcpPacket(evaReceipt).buildPacket();
-
-        byte[] evaResultBytes = new TcpPacket(jsonNode.toPrettyString()).buildPacket();
+        byte[] evaResultBytes = new TcpPacket(evaResultJson.toPrettyString()).buildPacket();
         byte[] evaResultInvBytes = new TcpPacket(evaResultInvJson.toPrettyString()).buildPacket();
         int port = 10005;
         ServerSocket serverSocket = new ServerSocket(port);
 
+        int i = 0;
         while (true) {
             Socket socket = serverSocket.accept();
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
@@ -53,16 +92,37 @@ public class MockEva {
             int read = 0;
             readRemoteContent(byteArrayBuilder, dataInputStream);
 
-            // 发送收据
-            System.out.println(Arrays.toString(evaReceiptBytes));
-            dataOutputStream.write(evaReceiptBytes);
-            dataOutputStream.flush();
-            // 接收tcp
+            if (i % 2 == 0) {
+
+                // 接收tcp
+                // 发送收据
+                System.out.println("第一次发送收据");
+                System.out.println(Arrays.toString(evaReceiptBytes));
+                dataOutputStream.write(evaReceiptBytes);
+                dataOutputStream.flush();
+                // 接收tcp
 //            readRemoteContent(byteArrayBuilder, dataInputStream);
 //            dataOutputStream.write(evaResultBytes);
-            System.out.println(Arrays.toString(evaResultInvBytes));
-            dataOutputStream.write(evaResultInvBytes);
-            dataOutputStream.flush();
+                System.out.println("第一次发送无效结果");
+                System.out.println(Arrays.toString(evaResultInvBytes));
+                dataOutputStream.write(evaResultInvBytes);
+                dataOutputStream.flush();
+            }
+            else {
+                // 发送收据
+                System.out.println("第二次发送收据");
+                System.out.println(Arrays.toString(evaReceiptBytes));
+                dataOutputStream.write(evaReceiptBytes);
+                dataOutputStream.flush();
+                // 接收tcp
+//            readRemoteContent(byteArrayBuilder, dataInputStream);
+//            dataOutputStream.write(evaResultBytes);
+                System.out.println("第二次发送有效结果");
+                System.out.println(Arrays.toString(evaResultBytes));
+                dataOutputStream.write(evaResultBytes);
+                dataOutputStream.flush();
+            }
+            i++;
 
         }
 

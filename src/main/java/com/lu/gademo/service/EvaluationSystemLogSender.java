@@ -1,8 +1,9 @@
 package com.lu.gademo.service;
 
 import com.lu.gademo.entity.effectEva.SendEvaReq;
+import com.lu.gademo.model.effectEva.EvaluationSystemReturnResult;
 
-public interface EvaluationSystemLogSender {
-    void send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
-                        byte[] desenFileData);
+public interface  EvaluationSystemLogSender {
+    EvaluationSystemReturnResult send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
+                                                byte[] desenFileData, Boolean ifSendFile);
 }

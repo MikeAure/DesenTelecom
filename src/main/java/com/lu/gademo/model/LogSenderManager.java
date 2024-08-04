@@ -8,11 +8,13 @@ import com.lu.gademo.dao.effectEva.*;
 import com.lu.gademo.dao.evidence.*;
 import com.lu.gademo.dao.ruleCheck.*;
 import com.lu.gademo.dao.split.SendSplitDesenDataDao;
+import com.lu.gademo.entity.LogCollectResult;
 import com.lu.gademo.entity.effectEva.*;
 import com.lu.gademo.entity.evidence.*;
 import com.lu.gademo.entity.ruleCheck.*;
 import com.lu.gademo.entity.split.SendSplitDesenData;
-import com.lu.gademo.event.ReDesensitizeEvent;
+import com.lu.gademo.event.*;
+import com.lu.gademo.model.effectEva.EvaluationSystemReturnResult;
 import com.lu.gademo.service.*;
 import com.lu.gademo.utils.DesenInfoStringBuilders;
 import com.lu.gademo.utils.LogCollectUtil;
@@ -22,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.DataInputStream;
@@ -170,7 +174,33 @@ public class LogSenderManager {
 //        return getArrayNode(desenIntentionList);
 //    }
 
-    
+    @EventListener
+    @Async
+    public void handleLogManagerEvent(LogManagerEvent logManagerEvent) {
+        SendEvaReq sendEvaReq = logManagerEvent.getSendEvaReq();
+        SendRuleReq sendRuleReq = logManagerEvent.getSendRuleReq();
+        SubmitEvidenceLocal submitEvidenceLocal = logManagerEvent.getSubmitEvidenceLocal();
+        ReqEvidenceSave reqEvidenceSave = logManagerEvent.getReqEvidenceSave();
+        SendSplitDesenData sendSplitDesenData = logManagerEvent.getSendSplitDesenData();
+        byte[] rawFileBytes = logManagerEvent.getRawFileBytes();
+        byte[] desenFileBytes = logManagerEvent.getDesenFileBytes();
+        // 测试，暂不发送文件
+        EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes, false);
+        if (evaluationSystemReturnResult != null) {
+            RecEvaResult recEvaResult = evaluationSystemReturnResult.getRecEvaResult();
+            RecEvaResultInv recEvaResultInv = evaluationSystemReturnResult.getRecEvaResultInv();
+
+            if (recEvaResult != null && recEvaResultInv == null) {
+                // 保存脱敏效果评测结果
+                eventPublisher.publishEvent(new ThreeSystemsEvent(this, submitEvidenceLocal, reqEvidenceSave, sendRuleReq, sendSplitDesenData, desenFileBytes));
+            }
+            if (recEvaResult == null && recEvaResultInv != null) {
+                // 保存脱敏效果评测结果无效异常消息
+                eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv));
+            }
+        }
+    }
+
 
     /**
      * 向评测系统发送日志
@@ -931,6 +961,64 @@ public class LogSenderManager {
 
     }
 
+    public LogCollectResult buildLogCollectResults(String globalID, String evidenceID, Boolean desenCom, String objectMode,
+                                                   DesenInfoStringBuilders infoBuilders,
+                                                   String rawFileName, byte[] rawFileBytes, long rawFileSize,
+                                                   String desenFileName, byte[] desenFileBytes, long desenFileSize,
+                                                   String fileType, String rawFileSuffix,
+                                                   String startTime, String endTime) {
+        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
+        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
+                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
+                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
+                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
+                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
+                fileType, rawFileSuffix, desenCom);
+        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
+                infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
+                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
+        SendSplitDesenData sendSplitDesenData = logCollectUtil.buildSendSplitReq(infoBuilders.desenInfoAfterIden, infoBuilders.desenAlg,
+                rawFileBytes, desenFileBytes, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+
+        return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, sendEvaReq, sendRuleReq, sendSplitDesenData);
+    }
+
+
+    /**
+     *
+     * @param reqEvidenceSave
+     * @param submitEvidenceLocal
+     * @param sendEvaReq
+     * @param sendRuleReq
+     * @param sendSplitDesenData
+     * @param rawFileBytes
+     * @param desenFileBytes
+     */
+    public void submitToFourSystems(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal, SendEvaReq sendEvaReq,
+                                    SendRuleReq sendRuleReq, SendSplitDesenData sendSplitDesenData, byte[] rawFileBytes, byte[] desenFileBytes){
+
+
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        executorService.submit(() -> {
+            evidenceSystemLogSender.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+        });
+        executorService.submit(() -> {
+            evaluationSystemLogSender.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes, true);
+        });
+        executorService.submit(() -> {
+            ruleCheckSystemLogSender.send2RuleCheck(sendRuleReq);
+        });
+        executorService.submit(() -> {
+            splitSystemLogSender.send2Split(sendSplitDesenData, desenFileBytes);
+        });
+        executorService.shutdown();
+    }
+
     /**
      *
      * @param globalID
@@ -954,45 +1042,25 @@ public class LogSenderManager {
                                     String desenFileName, byte[] desenFileBytes, long desenFileSize,
                                     String fileType, String rawFileSuffix,
                                     String startTime, String endTime) {
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        LogCollectResult logCollectResult = buildLogCollectResults(globalID, evidenceID, desenCom, objectMode, infoBuilders,
+                rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, fileType, rawFileSuffix,
+                startTime, endTime);
+        submitToFourSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
+                logCollectResult.getSendEvaReq(), logCollectResult.getSendRuleReq(), logCollectResult.getSendSplitDesenData(),
+                rawFileBytes, desenFileBytes);
 
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
+    }
 
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+    /**
+     *
+     * @param logCollectResult
+     * @param rawFileBytes
+     * @param desenFileBytes
+     */
+    public void submitToFourSystems(LogCollectResult logCollectResult, byte[] rawFileBytes, byte[] desenFileBytes) {
+        submitToFourSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
+                logCollectResult.getSendEvaReq(), logCollectResult.getSendRuleReq(), logCollectResult.getSendSplitDesenData(),
+                rawFileBytes, desenFileBytes);
 
-        executorService.submit(() -> {
-            send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
-                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
-                fileType, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
-                infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            send2RuleCheck(sendRuleReq);
-        });
-
-        SendSplitDesenData sendSplitDesenData = logCollectUtil.buildSendSplitReq(infoBuilders.desenInfoAfterIden, infoBuilders.desenAlg,
-                rawFileBytes, desenFileBytes, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-        executorService.submit(() -> {
-            send2Split(sendSplitDesenData, rawFileBytes);
-        });
-
-        executorService.shutdown();
     }
 }

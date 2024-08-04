@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.ruleCheck.*;
 import com.lu.gademo.entity.ruleCheck.*;
+import com.lu.gademo.event.ThreeSystemsEvent;
 import com.lu.gademo.model.TcpPacket;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.DataInputStream;
@@ -54,12 +57,23 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
     @Autowired
     private RecRuleTimeDao recRuleTimeDao;
 
+    @EventListener
+    @Async
+    @Override
+    public void ruleCheckHandleThreeSystemEvent(ThreeSystemsEvent threeSystemsEvent) {
+        // 三个系统的请求
+        SendRuleReq sendRuleReq = threeSystemsEvent.getSendRuleReq();
+        // 发送给合规检查系统
+        send2RuleCheck(sendRuleReq);
+    }
+
     /**
      * @param sendRuleReq 合规检查请求
      */
     public void send2RuleCheck(SendRuleReq sendRuleReq) {
         // 合规检查请求信息存储到数据库
         sendRuleReqDao.save(sendRuleReq);
+        log.info("合规检测请求：{}", sendRuleReq.toString());
 //            System.out.println(dataJson.toPrettyString());
         try (
                 // 连接服务器

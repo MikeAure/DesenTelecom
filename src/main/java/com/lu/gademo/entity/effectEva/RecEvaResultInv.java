@@ -7,7 +7,6 @@ import java.util.Objects;
 @Table(name = "rec_eva_result_inv")
 // 脱敏效果测评结果无效异常消息
 public class RecEvaResultInv {
-
     @Id
     @Column(name = "evaresultid")
     private String evaResultID;
@@ -71,14 +70,9 @@ public class RecEvaResultInv {
     @Basic
     @Column(name = "deseneffectevaret")
     private Boolean desenEffectEvaRet;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RecEvaResultInv)) return false;
-        RecEvaResultInv that = (RecEvaResultInv) o;
-        return Objects.equals(evaResultID, that.evaResultID) && Objects.equals(evaPerformer, that.evaPerformer) && Objects.equals(desenInfoPreID, that.desenInfoPreID) && Objects.equals(desenInfoAfterID, that.desenInfoAfterID) && Objects.equals(desenIntention, that.desenIntention) && Objects.equals(desenRequirements, that.desenRequirements) && Objects.equals(desenControlSet, that.desenControlSet) && Objects.equals(desenAlg, that.desenAlg) && Objects.equals(desenAlgParam, that.desenAlgParam) && Objects.equals(desenPerformStartTime, that.desenPerformStartTime) && Objects.equals(desenPerformEndTime, that.desenPerformEndTime) && Objects.equals(desenLevel, that.desenLevel) && Objects.equals(desenPerformer, that.desenPerformer) && Objects.equals(desenCom, that.desenCom) && Objects.equals(desenDeviation, that.desenDeviation) && Objects.equals(desenExtendedcontrol, that.desenExtendedcontrol) && Objects.equals(desenInformationloss, that.desenInformationloss) && Objects.equals(desenUsability, that.desenUsability) && Objects.equals(desenComplexity, that.desenComplexity) && Objects.equals(desenEffectEvaRet, that.desenEffectEvaRet);
-    }
+    @Basic
+    @Column(name = "desenFailedColName")
+    private String desenFailedColName;
 
     public String getEvaPerformer() {
         return evaPerformer;
@@ -240,8 +234,51 @@ public class RecEvaResultInv {
         this.evaResultID = evaResultID;
     }
 
+    public String getDesenFailedColName() {
+        return desenFailedColName;
+    }
+
+    public void setDesenFailedColName(String desenFailedColName) {
+        this.desenFailedColName = desenFailedColName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecEvaResultInv)) return false;
+        RecEvaResultInv that = (RecEvaResultInv) o;
+        return Objects.equals(getEvaResultID(), that.getEvaResultID()) && Objects.equals(getEvaPerformer(), that.getEvaPerformer()) && Objects.equals(getDesenInfoPreID(), that.getDesenInfoPreID()) && Objects.equals(getDesenInfoAfterID(), that.getDesenInfoAfterID()) && Objects.equals(getDesenIntention(), that.getDesenIntention()) && Objects.equals(getDesenRequirements(), that.getDesenRequirements()) && Objects.equals(getDesenControlSet(), that.getDesenControlSet()) && Objects.equals(getDesenAlg(), that.getDesenAlg()) && Objects.equals(getDesenAlgParam(), that.getDesenAlgParam()) && Objects.equals(getDesenPerformStartTime(), that.getDesenPerformStartTime()) && Objects.equals(getDesenPerformEndTime(), that.getDesenPerformEndTime()) && Objects.equals(getDesenLevel(), that.getDesenLevel()) && Objects.equals(getDesenPerformer(), that.getDesenPerformer()) && Objects.equals(getDesenCom(), that.getDesenCom()) && Objects.equals(getDesenDeviation(), that.getDesenDeviation()) && Objects.equals(getDesenExtendedcontrol(), that.getDesenExtendedcontrol()) && Objects.equals(getDesenInformationloss(), that.getDesenInformationloss()) && Objects.equals(getDesenUsability(), that.getDesenUsability()) && Objects.equals(getDesenComplexity(), that.getDesenComplexity()) && Objects.equals(getDesenEffectEvaRet(), that.getDesenEffectEvaRet()) && Objects.equals(getDesenFailedColName(), that.getDesenFailedColName());
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(evaResultID, evaPerformer, desenInfoPreID, desenInfoAfterID, desenIntention, desenRequirements, desenControlSet, desenAlg, desenAlgParam, desenPerformStartTime, desenPerformEndTime, desenLevel, desenPerformer, desenCom, desenDeviation, desenExtendedcontrol, desenInformationloss, desenUsability, desenComplexity, desenEffectEvaRet);
+        return Objects.hash(getEvaResultID(), getEvaPerformer(), getDesenInfoPreID(), getDesenInfoAfterID(), getDesenIntention(), getDesenRequirements(), getDesenControlSet(), getDesenAlg(), getDesenAlgParam(), getDesenPerformStartTime(), getDesenPerformEndTime(), getDesenLevel(), getDesenPerformer(), getDesenCom(), getDesenDeviation(), getDesenExtendedcontrol(), getDesenInformationloss(), getDesenUsability(), getDesenComplexity(), getDesenEffectEvaRet(), getDesenFailedColName());
+    }
+
+    @Override
+    public String toString() {
+        return "RecEvaResultInv{" +
+                "evaResultID='" + evaResultID + '\'' +
+                ", evaPerformer='" + evaPerformer + '\'' +
+                ", desenInfoPreID='" + desenInfoPreID + '\'' +
+                ", desenInfoAfterID='" + desenInfoAfterID + '\'' +
+                ", desenIntention='" + desenIntention + '\'' +
+                ", desenRequirements='" + desenRequirements + '\'' +
+                ", desenControlSet='" + desenControlSet + '\'' +
+                ", desenAlg='" + desenAlg + '\'' +
+                ", desenAlgParam='" + desenAlgParam + '\'' +
+                ", desenPerformStartTime='" + desenPerformStartTime + '\'' +
+                ", desenPerformEndTime='" + desenPerformEndTime + '\'' +
+                ", desenLevel='" + desenLevel + '\'' +
+                ", desenPerformer='" + desenPerformer + '\'' +
+                ", desenCom=" + desenCom +
+                ", desenDeviation=" + desenDeviation +
+                ", desenExtendedcontrol=" + desenExtendedcontrol +
+                ", desenInformationloss=" + desenInformationloss +
+                ", desenUsability=" + desenUsability +
+                ", desenComplexity=" + desenComplexity +
+                ", desenEffectEvaRet=" + desenEffectEvaRet +
+                ", desenFailedColName='" + desenFailedColName + '\'' +
+                '}';
     }
 }

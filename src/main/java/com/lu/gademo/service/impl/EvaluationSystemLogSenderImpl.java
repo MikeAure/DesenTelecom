@@ -8,6 +8,7 @@ import com.lu.gademo.dao.effectEva.*;
 import com.lu.gademo.entity.effectEva.*;
 import com.lu.gademo.event.ReDesensitizeEvent;
 import com.lu.gademo.model.TcpPacket;
+import com.lu.gademo.model.effectEva.EvaluationSystemReturnResult;
 import com.lu.gademo.service.EvaluationSystemLogSender;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
@@ -60,8 +61,9 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
      * @param sendEvaReq 评测请求
      */
     @Override
-    public void send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
-                               byte[] desenFileData ) {
+    public EvaluationSystemReturnResult send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
+                                                       byte[] desenFileData, Boolean ifSendFile ) {
+        EvaluationSystemReturnResult evaluationSystemReturnResult = null;
         try {
             // 本地保存请求
             sendEvaReqDao.save(sendEvaReq);
@@ -120,11 +122,13 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             log.info("已发送脱敏效果评测系统请求");
 
             // TODO: 增加发送文件的开关
-            // 发送原始文件
-            outputStream.write(rawFileData);
-            // 发送脱敏后的文件
-            outputStream.write(desenFileData);
-            outputStream.flush();
+            if (ifSendFile) {
+                // 发送原始文件
+                outputStream.write(rawFileData);
+                // 发送脱敏后的文件
+                outputStream.write(desenFileData);
+                outputStream.flush();
+            }
 
 
             log.info("Chosen algorithm：" + sendEvaReq.getDesenAlg());
@@ -232,6 +236,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
 
                     log.info("脱敏效果评测结果：{}", recContent.toPrettyString());
                     log.info("已接收脱敏效果评测结果");
+                    evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, recEvaResult, null);
                 }
                 // 接收脱敏效果测评结果无效异常消息
                 else if (dataTypeNum == 0x3401) {
@@ -245,6 +250,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
                     // 插入数据库
                     recEvaResultInvDao.save(recEvaResultInv);
                     log.info("已接收脱敏效果测评结果无效异常消息");
+                    evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, null, recEvaResultInv);
                 }
             }
 
@@ -270,13 +276,14 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             inputStream.close();
             dataInputStream.close();
             socket.close();
-
             // 本地保存收据
             sendEvaReceiptDao.save(sendEvaReceipt);
+            return evaluationSystemReturnResult;
         } catch (ConnectException connectException) {
             log.error("未与脱敏效果评测系统建立连接");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+        return null;
     }
 }

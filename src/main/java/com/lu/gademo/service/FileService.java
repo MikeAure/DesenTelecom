@@ -1,5 +1,6 @@
 package com.lu.gademo.service;
 
+import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.effectEva.RecEvaResultInv;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +17,14 @@ public interface FileService {
      * file 原始excel文件
      * params 脱敏参数
      */
-    void redesen(RecEvaResultInv recEvaResultInv) throws Exception;
+    void redesenExcel(RecEvaResultInv recEvaResultInv) throws Exception;
+    ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
+
     ResponseEntity<byte[]> dealImage(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
 
-    ResponseEntity<byte[]> dealExcel(MultipartFile file, String params, String sheet, Boolean ifSaveExcel) throws IOException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException;
+    ResponseEntity<byte[]> dealExcel(MultipartFile file, String params, String sheet, Boolean ifSaveExcel) throws IOException;
+
+    ResponseEntity<byte[]> dealExcel(FileStorageDetails file, String params, String sheet, Boolean ifSaveExcel) throws IOException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException;
 
     ResponseEntity<byte[]> dealVideo(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
 

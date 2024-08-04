@@ -1,9 +1,11 @@
 package com.lu.gademo.controller;
 
 import com.lu.gademo.entity.ExcelParam;
+import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
+import com.lu.gademo.service.impl.FileStorageService;
 import com.lu.gademo.utils.AlgorithmsFactory;
 import com.lu.gademo.utils.RecvFileDesen;
 import com.lu.gademo.utils.RecvFiles;
@@ -83,6 +85,7 @@ public class FileController extends BaseController {
     private String getFileSuffix(String fileName) {
         return fileName.split("\\.")[fileName.split("\\.").length - 1];
     }
+
     /**
      * 参数分别为脱敏文件、脱敏参数
      */
@@ -92,6 +95,10 @@ public class FileController extends BaseController {
                                             @RequestParam("algName") String algName,
                                             @RequestParam("sheet") String sheet
     ) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        FileStorageService fileStorageService = new FileStorageService();
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFile(file);
+        log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
+        log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
         // 调用脱敏函数
         String fileName = file.getOriginalFilename();
         if (fileName == null) {
@@ -104,7 +111,7 @@ public class FileController extends BaseController {
 
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
-            return fileService.dealExcel(file, params, sheet, true);
+            return fileService.dealExcel(fileStorageDetails, params, sheet, true);
         } else if (imageType.contains(fileType)) {
             return fileService.dealImage(file, params, algName);
         } else if (videoType.contains(fileType)) {
@@ -116,16 +123,6 @@ public class FileController extends BaseController {
         } else {
             return fileService.dealGraph(file, params);
         }
-
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "desenText", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public String desenText(@RequestParam String textInput,
-                            @RequestParam String textType,
-                            @RequestParam String privacyLevel,
-                            @RequestParam String algName) throws ParseException {
-        return fileService.desenText(textInput, textType, privacyLevel, algName);
 
     }
 
@@ -159,6 +156,17 @@ public class FileController extends BaseController {
         }
 
     }
+
+    @ResponseBody
+    @RequestMapping(value = "desenText", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public String desenText(@RequestParam String textInput,
+                            @RequestParam String textType,
+                            @RequestParam String privacyLevel,
+                            @RequestParam String algName) throws ParseException {
+        return fileService.desenText(textInput, textType, privacyLevel, algName);
+
+    }
+
 
     // 接收信工所Office文档
     @PostMapping(value = "recvFileDesen", produces = "application/json;charset=UTF-8")

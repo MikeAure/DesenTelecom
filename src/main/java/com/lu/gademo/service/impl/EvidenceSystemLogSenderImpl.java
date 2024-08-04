@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.evidence.*;
 import com.lu.gademo.entity.evidence.*;
+import com.lu.gademo.event.ThreeSystemsEvent;
 import com.lu.gademo.model.TcpPacket;
 import com.lu.gademo.service.EvidenceSystemLogSender;
 import com.lu.gademo.utils.Util;
@@ -13,6 +14,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.DataInputStream;
@@ -74,12 +77,23 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    @EventListener
+    @Async
+    @Override
+    public void evidenceHandleThressSystemEvent(ThreeSystemsEvent threeSystemsEvent) {
+        ReqEvidenceSave reqEvidenceSave = threeSystemsEvent.getReqEvidenceSave();
+        SubmitEvidenceLocal submitEvidenceLocal = threeSystemsEvent.getSubmitEvidenceLocal();
+        send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+
+    }
+
     /**
      * @param reqEvidenceSave     请求存证
      * @param submitEvidenceLocal 本地存证
      * @param submitEvidenceLocal 中心存证
      */
     public void send2Evidence(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal) {
+
         // 中心存证
         ObjectNode reqData = objectMapper.createObjectNode();
         // objectSize: 处置对象的大小
@@ -106,7 +120,8 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         reqEvidence.set("data", reqData);
         // dataSign: 对data字段的签名
         reqEvidence.put("datasign", reqEvidenceSave.getDatasign());
-        log.info(String.valueOf(reqEvidenceSave));
+        log.info("发送给中心存证系统的请求: {}", String.valueOf(reqEvidenceSave));
+        log.info("发送给本地存证系统的请求: {}", String.valueOf(submitEvidenceLocal));
         // 相关请求信息存储到数据库
         reqEvidenceSaveDao.save(reqEvidenceSave);
 

@@ -16,7 +16,7 @@ public class RedesenOperationTest {
     void redesenTest() throws Exception {
         RecEvaResultInv recEvaResultInv = new RecEvaResultInv();
         recEvaResultInv.setDesenInfoAfterID("166a838a226cbd20870e10e298b88b2510987a7bbbfc86eff5d2e39a1f7db2b3");
-        fileService.redesen(recEvaResultInv);
+        fileService.redesenExcel(recEvaResultInv);
     }
 
 }
