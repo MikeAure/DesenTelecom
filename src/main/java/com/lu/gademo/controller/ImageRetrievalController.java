@@ -1,10 +1,10 @@
 package com.lu.gademo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.entity.effectEva.SendEvaReq;
-import com.lu.gademo.entity.evidence.ReqEvidenceSave;
-import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
-import com.lu.gademo.entity.ruleCheck.SendRuleReq;
+import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
+import com.lu.gademo.entity.ga.evidence.ReqEvidenceSave;
+import com.lu.gademo.entity.ga.evidence.SubmitEvidenceLocal;
+import com.lu.gademo.entity.ga.ruleCheck.SendRuleReq;
 import com.lu.gademo.model.LogSenderManager;
 import com.lu.gademo.utils.*;
 import lombok.extern.slf4j.Slf4j;

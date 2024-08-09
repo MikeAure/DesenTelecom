@@ -1,6 +1,6 @@
 package com.lu.gademo.event;
 
-import com.lu.gademo.entity.effectEva.RecEvaResultInv;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
 import org.springframework.context.ApplicationEvent;
 
 public class ReDesensitizeEvent extends ApplicationEvent {

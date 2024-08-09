@@ -1,6 +1,6 @@
 package com.lu.gademo.dao;
 
-import com.lu.gademo.dao.support.IBaseDao;
+import com.lu.gademo.dao.ga.support.IBaseDao;
 import com.lu.gademo.entity.Hotel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

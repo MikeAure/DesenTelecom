@@ -1,9 +1,32 @@
 spring:
+    jackson:
+        serialization:
+            indent_output: false
+
     datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        password: BRysj0725HhRhL##
-        url: jdbc:mysql://localhost:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-        username: root
+        ga:
+            jdbc-url: jdbc:mysql://localhost:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
+            driver-class-name: com.mysql.cj.jdbc.Driver
+
+        crm:
+            jdbc-url: jdbc:mysql://localhost:3306/crm?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
+            driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            jadira:
+                usertype:
+                    autoRegisterUserTypes: true
+        show-sql: true
+
+    devtools:
+        add-properties: false
+
     freemarker:
         cache: false
         charset: UTF-8
@@ -16,17 +39,6 @@ spring:
             template_update_delay: 0
         suffix: .ftl
         template-loader-path: classpath:/templates/
-    jackson:
-        serialization:
-            indent_output: false
-    jpa:
-        hibernate:
-            ddl-auto: update
-        properties:
-            jadira:
-                usertype:
-                    autoRegisterUserTypes: true
-        show-sql: true
 
     servlet:
         multipart:
@@ -94,4 +106,5 @@ systemId:
     ruleCheckSystemId: '0x33000000'
 
 logSenderManager:
-    ifSendToEvaFirst: false
+    ifSendToEvaFirst: true
+    ifSaveToDatabase: true

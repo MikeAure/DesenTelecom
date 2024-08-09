@@ -3,19 +3,20 @@ package com.lu.gademo.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.ExcelParam;
-import com.lu.gademo.entity.effectEva.SendEvaReq;
-import com.lu.gademo.entity.evidence.ReqEvidenceSave;
-import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
-import com.lu.gademo.entity.ruleCheck.SendRuleReq;
-import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
+import com.lu.gademo.entity.ga.evidence.ReqEvidenceSave;
+import com.lu.gademo.entity.ga.evidence.SubmitEvidenceLocal;
+import com.lu.gademo.entity.ga.ruleCheck.SendRuleReq;
+import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -185,6 +186,19 @@ public class LogCollectUtil {
 
     }
 
+    public Map<String, ExcelParam> jsonStringToParamsMap(String params) throws IOException {
+        Map<String, ExcelParam> result = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ExcelParam> excelParamList = objectMapper.readValue(params, new TypeReference<List<ExcelParam>>() {
+        });
+        for (ExcelParam excelParam :
+                excelParamList) {
+            result.put(excelParam.getColumnName(), excelParam);
+        }
+
+        return result;
+    }
+
     public SendRuleReq buildSendRuleReq(String evidenceID, byte[] rawFileBytes, byte[] desenFileBytes,
                                         StringBuilder desenInfoAfterIden, StringBuilder desenIntention,
                                         StringBuilder desenRequirements, String desenControlSet,
@@ -195,7 +209,7 @@ public class LogCollectUtil {
         SendRuleReq sendRuleReq = new SendRuleReq();
         sendRuleReq.setEvidenceId(evidenceID);
         sendRuleReq.setDesenInfoAfterIden(desenInfoAfterIden.toString());
-        sendRuleReq.setDataType(dataType.toString());
+        sendRuleReq.setFileDataType(dataType.toString());
         sendRuleReq.setDesenInfoPre(util.getSM3Hash(rawFileBytes));
         sendRuleReq.setDesenInfoAfter(util.getSM3Hash(desenFileBytes));
         sendRuleReq.setDesenIntention(desenIntention.toString());

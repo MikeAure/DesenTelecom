@@ -1,6 +1,6 @@
 package com.lu.gademo;
 
-import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import com.lu.gademo.model.LogSenderManager;
 import com.lu.gademo.utils.LogCollectUtil;
 import org.junit.jupiter.api.Test;

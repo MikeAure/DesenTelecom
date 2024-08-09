@@ -1,7 +1,7 @@
 package com.lu.gademo.service.support.impl;
 
-import com.lu.gademo.dao.support.IBaseDao;
-import com.lu.gademo.entity.support.BaseEntity;
+import com.lu.gademo.dao.ga.support.IBaseDao;
+import com.lu.gademo.entity.ga.support.BaseEntity;
 import com.lu.gademo.service.support.IBaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

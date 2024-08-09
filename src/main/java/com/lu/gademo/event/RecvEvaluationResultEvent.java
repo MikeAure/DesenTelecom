@@ -1,6 +1,6 @@
 package com.lu.gademo.event;
 
-import com.lu.gademo.entity.effectEva.RecEvaResult;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResult;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Objects;

@@ -13,7 +13,7 @@ public class ExcelParamServiceImpl implements ExcelParamService {
     @Autowired
     private ExcelParamDao excelParamDao;
 
-    public List<ExcelParam> getParams(String name) {
+    public List<ExcelParam> getParamsByTableName(String name) {
         return excelParamDao.getTableParamsByName(name);
     }
 

@@ -2,16 +2,16 @@ package com.lu.gademo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.lu.gademo.dao.effectEva.SendEvaReqDao;
+import com.lu.gademo.dao.ga.effectEva.SendEvaReqDao;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.LogCollectResult;
-import com.lu.gademo.entity.effectEva.RecEvaResultInv;
-import com.lu.gademo.entity.effectEva.SendEvaReq;
-import com.lu.gademo.entity.evidence.ReqEvidenceSave;
-import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
-import com.lu.gademo.entity.ruleCheck.SendRuleReq;
-import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
+import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
+import com.lu.gademo.entity.ga.evidence.ReqEvidenceSave;
+import com.lu.gademo.entity.ga.evidence.SubmitEvidenceLocal;
+import com.lu.gademo.entity.ga.ruleCheck.SendRuleReq;
+import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import com.lu.gademo.event.LogManagerEvent;
 import com.lu.gademo.event.ReDesensitizeEvent;
 import com.lu.gademo.model.LogSenderManager;
@@ -45,9 +45,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -99,7 +97,7 @@ public class FileServiceImpl implements FileService {
                            DpUtil dpUtil, LogCollectUtil logCollectUtil, ApplicationEventPublisher eventPublisher,
                            SendEvaReqDao sendEvaReqDao,
                            @Value("${logSenderManager.ifSendToEvaFirst}")
-                               Boolean ifSendEvaFirst) throws IOException {
+                           Boolean ifSendEvaFirst) throws IOException {
         this.algorithmsFactory = algorithmsFactory;
         this.dp = dp;
         this.replacement = replacement;
@@ -132,6 +130,7 @@ public class FileServiceImpl implements FileService {
 
     /**
      * excel文件重脱敏函数
+     *
      * @param recEvaResultInv
      * @throws Exception
      */
@@ -148,10 +147,10 @@ public class FileServiceImpl implements FileService {
         String[] desenFileNameList = desenFileName.split("_");
         String[] desenAlgList = evaReq.getDesenAlg().split(",");
         String[] desenLevelList = evaReq.getDesenLevel().split(",");
-
+        // 取模板名，根据模板名在数据库中找到相应的算法
         String templateName = evaReq.getFileType() + "_param";
 
-        List<ExcelParam> originExcelParam = excelParamService.getParams(templateName);
+        List<ExcelParam> originExcelParam = excelParamService.getParamsByTableName(templateName);
         List<ExcelParam> resultExcelParam = new ArrayList<>();
         for (int i = 0; i < originExcelParam.size(); i++) {
             ExcelParam excelParamTemp = originExcelParam.get(i);
@@ -201,7 +200,7 @@ public class FileServiceImpl implements FileService {
 //            // do something.
 //        }
 //        MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
-        dealExcel(fileStorageDetails, jsonParamString, templateName, false);
+        dealExcel(fileStorageDetails, jsonParamString, evaReq.getFileType(), false);
     }
 
     @Override
@@ -284,7 +283,7 @@ public class FileServiceImpl implements FileService {
 
         // 选择不同的日志发送方式
         if (ifSendToEvaFirst) {
-            eventPublisher.publishEvent(new LogManagerEvent(this, logCollectResult, rawFileBytes, desenFileBytes));
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails, logCollectResult, rawFileBytes, desenFileBytes));
         } else {
             logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
         }
@@ -427,48 +426,7 @@ public class FileServiceImpl implements FileService {
 
     }
 
-    @Override
-    public ResponseEntity<byte[]> dealExcel(FileStorageDetails fileStorageDetails, String params, String sheetName, Boolean ifSaveExcelParams) throws IOException {
-        // 包含不同的流转场景信息
-        String[] parts = sheetName.split("_");
-        String sheetTemplate = String.join("_", Arrays.copyOfRange(parts, 0, 2));
-        DecimalFormat df = new DecimalFormat("#");
-        Boolean desenCom = false;
-        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
-        String objectMode = "text";
-
-        // 设置原文件保存路径
-        String rawFileName = fileStorageDetails.getRawFileName();
-        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
-        Path rawFilePath = fileStorageDetails.getRawFilePath();
-        String rawFilePathString = fileStorageDetails.getRawFilePathString();
-        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
-        Long rawFileSize = fileStorageDetails.getRawFileSize();
-
-        // 设置脱敏后文件路径信息
-        String desenFileName = fileStorageDetails.getDesenFileName();
-        Path desenFilePath = fileStorageDetails.getDesenFilePath();
-        log.info(desenFilePath.toAbsolutePath().toString());
-        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
-
-        // 读取excel文件
-        InputStream inputStream = Files.newInputStream(rawFilePath);
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
-
-        //脱敏参数处理,转为json
-        List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
-        // 保存参数到数据库中
-        saveExcelParamsToDatabase(sheetName, ifSaveExcelParams, excelParamList);
-
-        // 数据类型
-        List<Integer> dataType = new ArrayList<>();
-        // 数据行数
-        int totalRowNum = sheet.getLastRowNum();
-        // 字段名行
-        Row fieldNameRow = sheet.getRow(0);
-        // 列数
-        int columnCount = fieldNameRow.getPhysicalNumberOfCells(); // 获取列数
+    private void realDealExcel(Sheet sheet, DesenInfoStringBuilders infoBuilders, List<ExcelParam> excelParamList, int totalRowNum, Row fieldNameRow, int columnCount) throws IOException {
         log.info("Total column number is " + columnCount);
         // 调用脱敏程序处理
         log.info("Start Excel file desen");
@@ -481,7 +439,6 @@ public class FileServiceImpl implements FileService {
             // 取列名
             String columnName = fieldNameRow.getCell(columnIndex).toString();
             log.info("Current column name: " + columnName);
-
             // 当前列操作脱敏的参数
             ExcelParam excelParam = null;
             // 遍历模板中的列名，找到匹配的脱敏参数
@@ -498,12 +455,12 @@ public class FileServiceImpl implements FileService {
             int algoNum = excelParam.getK();
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(algoNum);
             log.info("Excel Param: {}", excelParam);
-            dataType.add(excelParam.getDataType());
 
             addDataTypeAndInfoIden(infoBuilders, excelParam, columnName, algoNum);
 
             // 取列数据
             List<Object> objs = new ArrayList<>();
+
             // 从第一列开始取
             for (int rowIndex = 1; rowIndex <= totalRowNum; rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
@@ -832,18 +789,66 @@ public class FileServiceImpl implements FileService {
             }
 
         }
+    }
+
+    private LogInfo processExcel(FileStorageDetails fileStorageDetails, String params, String sheetName, Boolean ifSaveExcelParams) throws IOException {
+        // 包含不同的流转场景信息
+        String[] parts = sheetName.split("_");
+        String sheetTemplate = String.join("_", Arrays.copyOfRange(parts, 0, parts.length));
+        DecimalFormat df = new DecimalFormat("#");
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "text";
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info(desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        // 读取excel文件
+        InputStream inputStream = Files.newInputStream(rawFilePath);
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        //脱敏参数处理,转为json
+        List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
+        // 保存参数到数据库中
+        saveExcelParamsToDatabase(sheetName, ifSaveExcelParams, excelParamList);
+        // 数据行数
+        int totalRowNum = sheet.getLastRowNum();
+        // 字段名行
+        Row fieldNameRow = sheet.getRow(0);
+        // 列数
+        int columnCount = fieldNameRow.getPhysicalNumberOfCells(); // 获取列数
+        log.info("Total column number is " + columnCount);
+        // 调用脱敏程序处理
+        log.info("Start Excel file desen");
+        // 脱敏开始时间
+        String startTime = util.getTime();
+        long startTimePoint = System.nanoTime();
+
+        realDealExcel(sheet, infoBuilders, excelParamList, totalRowNum, fieldNameRow, columnCount);
+
         // 结束时间
         long endTimePoint = System.nanoTime();
         // 脱敏结束时间
         String endTime = util.getTime();
-        log.info("Desensitization finished in " + (endTimePoint - startTimePoint) / 10e6 + "ms");
-
+        log.info("Desensitization finished in " + (endTimePoint - startTimePoint) / 1e6 + "ms");
         // 单条运行时间
         long oneTime = (endTimePoint - startTimePoint) / (totalRowNum - 1) / columnCount;
         log.info("Single data running time：" + oneTime + " ns");
 
         // 一秒数据量
-        log.info("Number of dealt data per second:" + 10e9 / oneTime);
+        log.info("Number of dealt data per second:" + 1e9 / oneTime);
         log.info("Excel desen finished");
 
         // 保存处理后的Excel数据到ByteArrayOutputStream中
@@ -891,15 +896,27 @@ public class FileServiceImpl implements FileService {
         fileStorageDetails.setDesenFileSize(desenFileSize);
         // 存证系统
         String evidenceID = util.getSM3Hash((new String(newExcelData, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        return LogInfo.builder().fileType(sheetName).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
 
+    @Override
+    public ResponseEntity<byte[]> dealExcel(FileStorageDetails fileStorageDetails, String params, String sheetName, Boolean ifSaveExcelParams) throws IOException, ExecutionException, InterruptedException {
+
+        LogInfo logInfo = processExcel(fileStorageDetails, params, sheetName, ifSaveExcelParams);
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(globalID, evidenceID, desenCom,
-                objectMode, infoBuilders, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, sheetTemplate, rawFileSuffix, startTime, endTime);
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
 
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
         // 选择不同的日志发送方式
         if (ifSendToEvaFirst) {
-            eventPublisher.publishEvent(new LogManagerEvent(this, logCollectResult, rawFileBytes, desenFileBytes));
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails, logCollectResult, rawFileBytes, desenFileBytes));
         } else {
             logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
         }
@@ -908,6 +925,12 @@ public class FileServiceImpl implements FileService {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
         return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+//        ResponseEntity<byte[]> responseEntityResult = new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+//        responseEntityCompletableFuture.complete(responseEntityResult);
+//        return responseEntityCompletableFuture.get();
+
+
+
     }
 
     @Override
@@ -1727,8 +1750,6 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
 
-        ObjectNode effectEvaContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReq));
-
         executorService.submit(() -> {
             logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
         });
@@ -1776,7 +1797,6 @@ public class FileServiceImpl implements FileService {
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
         Long rawFileSize = file.getSize();
-
         // 保存源文件
         file.transferTo(rawFilePath.toAbsolutePath());
         // 设置脱敏后文件路径信息

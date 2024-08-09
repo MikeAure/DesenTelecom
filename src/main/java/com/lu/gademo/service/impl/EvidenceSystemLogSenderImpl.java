@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.lu.gademo.dao.evidence.*;
-import com.lu.gademo.entity.evidence.*;
+import com.lu.gademo.dao.ga.evidence.*;
+import com.lu.gademo.entity.ga.evidence.*;
 import com.lu.gademo.event.ThreeSystemsEvent;
 import com.lu.gademo.model.TcpPacket;
 import com.lu.gademo.service.EvidenceSystemLogSender;
@@ -25,11 +25,6 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 
 @Slf4j
 @Data

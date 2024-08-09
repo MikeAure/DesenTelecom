@@ -1,6 +1,6 @@
 package com.lu.gademo.event;
 
-import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Objects;

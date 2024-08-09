@@ -1,10 +1,10 @@
 package com.lu.gademo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.dao.effectEva.SendEvaReqDao;
+import com.lu.gademo.dao.ga.effectEva.SendEvaReqDao;
 import com.lu.gademo.entity.ExcelParam;
-import com.lu.gademo.entity.effectEva.RecEvaResultInv;
-import com.lu.gademo.entity.effectEva.SendEvaReq;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
+import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import com.lu.gademo.service.DesensitizationService;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
@@ -51,7 +51,7 @@ public class DesensitizationServiceImpl implements DesensitizationService {
         String[] desenLevelList = evaReq.getDesenAlg().split(",");
         String templateName = evaReq.getFileType();
 
-        List<ExcelParam> originExcelParam = excelParamService.getParams(templateName);
+        List<ExcelParam> originExcelParam = excelParamService.getParamsByTableName(templateName);
         for (int i = 0; i < originExcelParam.size(); i++) {
             // 根据日志修改脱敏级别
             originExcelParam.get(i).setTmParam(Integer.parseInt(desenLevelList[i]));

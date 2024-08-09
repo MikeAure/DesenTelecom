@@ -11,8 +11,10 @@ import com.lu.gademo.utils.impl.DpImpl;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 public class DpTest {
@@ -25,8 +27,27 @@ public class DpTest {
     }
     @Test
     public void testLaplaceMechanism()  {
+        int numberOfElements = 500000;
+        double maxValue = 10000.0;
+
+        // 创建一个列表来存储生成的浮点数
+        List<Double> randomFloats = new ArrayList<>(numberOfElements);
+
+        // 创建一个Random对象
+        Random random = new Random();
+
+        // 生成随机浮点数并添加到列表中
+        for (int i = 0; i < numberOfElements; i++) {
+            double randomFloat = maxValue * random.nextDouble();
+            randomFloats.add(randomFloat);
+        }
+
+        // 输出列表中的前10个数作为示例
+        for (int i = 0; i < 10; i++) {
+            System.out.println(randomFloats.get(i));
+        }
 //        // Dp dp = new DpImpl();
-        DSObject dsObject = new DSObject(Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0));
+        DSObject dsObject = new DSObject(randomFloats);
         DSObject result = dp.service(dsObject, 1, 1);
         for (Object number : result.getList()) {
             System.out.println(number);

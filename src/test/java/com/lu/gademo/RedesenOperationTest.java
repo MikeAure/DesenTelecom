@@ -1,6 +1,6 @@
 package com.lu.gademo;// 用于测试重新脱敏的功能
 
-import com.lu.gademo.entity.effectEva.RecEvaResultInv;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
 import com.lu.gademo.service.FileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

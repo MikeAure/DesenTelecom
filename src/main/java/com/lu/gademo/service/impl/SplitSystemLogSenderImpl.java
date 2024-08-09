@@ -2,8 +2,8 @@ package com.lu.gademo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.lu.gademo.dao.split.SendSplitDesenDataDao;
-import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.dao.ga.split.SendSplitDesenDataDao;
+import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import com.lu.gademo.event.ThreeSystemsEvent;
 import com.lu.gademo.model.TcpPacketSplit;
 import com.lu.gademo.utils.Util;

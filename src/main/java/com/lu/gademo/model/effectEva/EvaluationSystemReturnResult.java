@@ -1,8 +1,8 @@
 package com.lu.gademo.model.effectEva;
 
-import com.lu.gademo.entity.effectEva.RecEvaReqReceipt;
-import com.lu.gademo.entity.effectEva.RecEvaResult;
-import com.lu.gademo.entity.effectEva.RecEvaResultInv;
+import com.lu.gademo.entity.ga.effectEva.RecEvaReqReceipt;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResult;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

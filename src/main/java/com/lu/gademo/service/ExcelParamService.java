@@ -5,7 +5,7 @@ import com.lu.gademo.entity.ExcelParam;
 import java.util.List;
 
 public interface ExcelParamService {
-    List<ExcelParam> getParams(String name);
+    List<ExcelParam> getParamsByTableName(String name);
 
     void deleteAll(String name);
 

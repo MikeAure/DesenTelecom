@@ -21,7 +21,7 @@ public class TemplateParamController {
     @ResponseBody
     @RequestMapping("/{typeName}param/list")
     public List<ExcelParam> getSceneParams(@PathVariable String typeName) {
-        return excelParamService.getParams(typeName + "_param");
+        return excelParamService.getParamsByTableName(typeName + "_param");
     }
 
 }

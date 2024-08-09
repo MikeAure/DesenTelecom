@@ -1,9 +1,9 @@
 package com.lu.gademo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.dao.templateParam.onlineTaxi2ParamDao;
-import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
-import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
+import com.lu.gademo.dao.ga.templateParam.onlineTaxi2ParamDao;
+import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
+import com.lu.gademo.entity.ga.templateParam.onlineTaxi2Param;
 import com.lu.gademo.utils.RecvFiles;
 import com.mashape.unirest.http.JsonNode;
 import org.junit.jupiter.api.Test;

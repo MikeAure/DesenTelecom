@@ -1,6 +1,6 @@
 package com.lu.gademo.entity;
 
-import com.lu.gademo.entity.support.BaseEntity;
+import com.lu.gademo.entity.ga.support.BaseEntity;
 
 import javax.persistence.*;
 import java.sql.Date;

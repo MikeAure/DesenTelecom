@@ -1,6 +1,6 @@
 package com.lu.gademo.service;
 
-import com.lu.gademo.entity.effectEva.RecEvaResultInv;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
 
 public interface DesensitizationService {
 

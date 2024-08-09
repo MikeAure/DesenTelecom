@@ -4,20 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.lu.gademo.dao.effectEva.*;
-import com.lu.gademo.dao.evidence.*;
-import com.lu.gademo.dao.ruleCheck.*;
-import com.lu.gademo.dao.split.SendSplitDesenDataDao;
+import com.lu.gademo.dao.ga.effectEva.*;
+import com.lu.gademo.dao.ga.evidence.*;
+import com.lu.gademo.dao.ga.ruleCheck.*;
+import com.lu.gademo.dao.ga.split.SendSplitDesenDataDao;
 import com.lu.gademo.entity.LogCollectResult;
-import com.lu.gademo.entity.effectEva.*;
-import com.lu.gademo.entity.evidence.*;
-import com.lu.gademo.entity.ruleCheck.*;
-import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.entity.ga.effectEva.*;
+import com.lu.gademo.entity.ga.evidence.*;
+import com.lu.gademo.entity.ga.ruleCheck.*;
+import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import com.lu.gademo.event.*;
 import com.lu.gademo.model.effectEva.EvaluationSystemReturnResult;
 import com.lu.gademo.service.*;
 import com.lu.gademo.utils.DesenInfoStringBuilders;
 import com.lu.gademo.utils.LogCollectUtil;
+import com.lu.gademo.utils.LogInfo;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -152,6 +153,8 @@ public class LogSenderManager {
     @Autowired
     private RuleCheckSystemLogSender ruleCheckSystemLogSender;
 
+    @Value("${logSenderManager.ifSaveToDatabase}")
+    private Boolean ifSaveToDatabase;
     @Autowired
     private LogCollectUtil logCollectUtil;
 
@@ -184,8 +187,9 @@ public class LogSenderManager {
         SendSplitDesenData sendSplitDesenData = logManagerEvent.getSendSplitDesenData();
         byte[] rawFileBytes = logManagerEvent.getRawFileBytes();
         byte[] desenFileBytes = logManagerEvent.getDesenFileBytes();
-        // 测试，暂不发送文件
-        EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes, false);
+        //TODO: 测试，最后需要改成发送文件
+        EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(sendEvaReq,
+                rawFileBytes, desenFileBytes, false);
         if (evaluationSystemReturnResult != null) {
             RecEvaResult recEvaResult = evaluationSystemReturnResult.getRecEvaResult();
             RecEvaResultInv recEvaResultInv = evaluationSystemReturnResult.getRecEvaResultInv();
@@ -193,6 +197,12 @@ public class LogSenderManager {
             if (recEvaResult != null && recEvaResultInv == null) {
                 // 保存脱敏效果评测结果
                 eventPublisher.publishEvent(new ThreeSystemsEvent(this, submitEvidenceLocal, reqEvidenceSave, sendRuleReq, sendSplitDesenData, desenFileBytes));
+                // 发送消息，将脱敏后的表格文件内容保存到数据库表中
+                if (ifSaveToDatabase) {
+                    String entityName = sendEvaReq.getFileType();
+                    System.out.println(entityName);
+                    eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, logManagerEvent.getFileStorageDetails()));
+                }
             }
             if (recEvaResult == null && recEvaResultInv != null) {
                 // 保存脱敏效果评测结果无效异常消息
@@ -200,7 +210,6 @@ public class LogSenderManager {
             }
         }
     }
-
 
     /**
      * 向评测系统发送日志
@@ -424,7 +433,6 @@ public class LogSenderManager {
             log.error(e.getMessage());
         }
     }
-
     /**
      * @param sendRuleReq 合规检查请求
      */
@@ -961,6 +969,32 @@ public class LogSenderManager {
 
     }
 
+    public LogCollectResult buildLogCollectResults(LogInfo logInfo) {
+        return buildLogCollectResults(logInfo.getGlobalID(), logInfo.getEvidenceID(), logInfo.getDesenCom(), logInfo.getObjectMode(),
+                logInfo.getInfoBuilders(), logInfo.getRawFileName(), logInfo.getRawFileBytes(), logInfo.getRawFileSize(),
+                logInfo.getDesenFileName(), logInfo.getDesenFileBytes(), logInfo.getDesenFileSize(),
+                logInfo.getFileType(), logInfo.getRawFileSuffix(), logInfo.getStartTime(), logInfo.getEndTime());
+    }
+
+    /**
+     * 构造发送给四个系统的日志信息
+     * @param globalID
+     * @param evidenceID
+     * @param desenCom
+     * @param objectMode
+     * @param infoBuilders
+     * @param rawFileName
+     * @param rawFileBytes
+     * @param rawFileSize
+     * @param desenFileName
+     * @param desenFileBytes
+     * @param desenFileSize
+     * @param fileType
+     * @param rawFileSuffix
+     * @param startTime
+     * @param endTime
+     * @return 包含四个系统日志信息的结构体
+     */
     public LogCollectResult buildLogCollectResults(String globalID, String evidenceID, Boolean desenCom, String objectMode,
                                                    DesenInfoStringBuilders infoBuilders,
                                                    String rawFileName, byte[] rawFileBytes, long rawFileSize,

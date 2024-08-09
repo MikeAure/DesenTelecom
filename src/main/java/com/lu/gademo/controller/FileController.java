@@ -2,7 +2,7 @@ package com.lu.gademo.controller;
 
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
-import com.lu.gademo.entity.RecvFilesEntity.ExcelEntity;
+import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.FileStorageService;
@@ -47,32 +47,36 @@ import java.util.*;
 @CrossOrigin("*")
 @RequestMapping("/File")
 public class FileController extends BaseController {
-    AlgorithmsFactory algorithmsFactory;
+    private AlgorithmsFactory algorithmsFactory;
     // 系统id
-    RecvFileDesen officeFileDesen;
-    Boolean readyState;
+    private RecvFileDesen officeFileDesen;
+    private Boolean readyState;
     // SendBackFileName
-    String sendBackFileName;
+    private String sendBackFileName;
     // 脱敏完成情况
-    boolean sendBackFlag;
+    private boolean sendBackFlag;
     // 图像格式
-    List<String> imageType;
+    private List<String> imageType;
     // 视频格式
-    List<String> videoType;
+    private List<String> videoType;
     // 音频格式
-    List<String> audioType;
+    private List<String> audioType;
 
     private FileService fileService;
     // param  service
 
     private ExcelParamService excelParamService;
 
+    private FileStorageService fileStorageService;
+
     @Autowired
-    public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService, ExcelParamService excelParamService) {
+    public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
+                          ExcelParamService excelParamService, FileStorageService fileStorageService) {
         this.algorithmsFactory = algorithmsFactory;
         this.officeFileDesen = officeFileDesen;
         this.fileService = fileService;
         this.excelParamService = excelParamService;
+        this.fileStorageService = fileStorageService;
         this.readyState = true;
         this.sendBackFileName = "";
         this.sendBackFlag = false;
@@ -95,7 +99,6 @@ public class FileController extends BaseController {
                                             @RequestParam("algName") String algName,
                                             @RequestParam("sheet") String sheet
     ) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        FileStorageService fileStorageService = new FileStorageService();
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFile(file);
         log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
         log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
@@ -175,21 +178,21 @@ public class FileController extends BaseController {
 
         String fileName = file.getOriginalFilename();
         if (fileName == null) {
-            return ResponseEntity.ok().body(new Result<>("error", "Request file name is null"));
+            return ResponseEntity.ok().body(new Result<>(400, "error", "Request file name is null"));
         }
 
         String fileType = getFileSuffix(fileName);
         List<String> officeFileTypes = Arrays.asList("xlsx", "docx", "pptx");
 
         if (!officeFileTypes.contains(fileType)) {
-            return ResponseEntity.ok().body(new Result<>("error", "File type not supported."));
+            return ResponseEntity.ok().body(new Result<>(400, "error", "File type not supported."));
         }
         try {
-            return ResponseEntity.ok().body(new Result<>("ok", officeFileDesen.desenRecvFile(file)));
+            return ResponseEntity.ok().body(new Result<>(200, "ok", officeFileDesen.desenRecvFile(file)));
 
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.ok().body(new Result<>("error", e.getMessage()));
+            return ResponseEntity.ok().body(new Result<>(400, "error", e.getMessage()));
         }
 
     }
@@ -197,7 +200,7 @@ public class FileController extends BaseController {
     //    @GetMapping(value = "recvOnLineTaxiFile")
 //    @ResponseBody
     public ResponseEntity<byte[]> recvOnLineTaxiFile() {
-        List<ExcelParam> excelParamList = excelParamService.getParams("onlinetaxi2" + "_param");
+        List<ExcelParam> excelParamList = excelParamService.getParamsByTableName("onlinetaxi2" + "_param");
         String time = String.valueOf(System.currentTimeMillis());
         String rawFileName = "raw_" + time + ".xlsx";
         String rawFilePath = Paths.get("./raw_files").normalize().toAbsolutePath() + "\\" + rawFileName;

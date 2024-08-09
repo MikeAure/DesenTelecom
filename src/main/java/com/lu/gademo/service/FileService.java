@@ -1,7 +1,7 @@
 package com.lu.gademo.service;
 
 import com.lu.gademo.entity.FileStorageDetails;
-import com.lu.gademo.entity.effectEva.RecEvaResultInv;
+import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.concurrent.ExecutionException;
 
 public interface FileService {
     /**
@@ -24,7 +25,7 @@ public interface FileService {
 
     ResponseEntity<byte[]> dealExcel(MultipartFile file, String params, String sheet, Boolean ifSaveExcel) throws IOException;
 
-    ResponseEntity<byte[]> dealExcel(FileStorageDetails file, String params, String sheet, Boolean ifSaveExcel) throws IOException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException;
+    ResponseEntity<byte[]> dealExcel(FileStorageDetails file, String params, String sheet, Boolean ifSaveExcel) throws IOException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, ExecutionException;
 
     ResponseEntity<byte[]> dealVideo(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
 

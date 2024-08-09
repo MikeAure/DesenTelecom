@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 
 @Slf4j
 @Data
@@ -62,6 +59,45 @@ public class FileStorageService {
 
         // Save the original file
         file.transferTo(rawFilePath);
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .rawFileBytes(rawFileBytes)
+                .rawFileSize(rawFileSize)
+                .desenFileName(desenFileName)
+                .desenFileSuffix(rawFileSuffix)
+                .desenFilePath(desenFilePath)
+                .desenFilePathString(desenFilePathString)
+                .build();
+    }
+
+    public FileStorageDetails getRawFileStorageDetails(Path file) throws IOException {
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        if (!Files.isRegularFile(file)) {
+            throw new IOException("Input file is not regular file");
+        }
+
+        String originalFileName = file.getFileName().toString();
+        System.out.println(originalFileName);
+        String fileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+        String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        String rawFileNameTemp = fileTimeStamp + "_" + fileName;
+        String rawFileName = fileTimeStamp + "_" + originalFileName;
+        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        byte[] rawFileBytes = Files.readAllBytes(file);
+        Long rawFileSize = Files.size(file);
+
+        Files.copy(file, rawFilePath, StandardCopyOption.REPLACE_EXISTING);
+        // Path for the desensitized file
+        String desenFileTimeStamp = String.valueOf(System.currentTimeMillis());
+        String desenFileName = rawFileNameTemp + "_" + desenFileTimeStamp + "." + rawFileSuffix;
+        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
 
         return FileStorageDetails.builder()
                 .rawFileName(rawFileName)

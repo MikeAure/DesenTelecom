@@ -1,7 +1,7 @@
 package com.lu.gademo.service;
 
-import com.lu.gademo.entity.evidence.ReqEvidenceSave;
-import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
+import com.lu.gademo.entity.ga.evidence.ReqEvidenceSave;
+import com.lu.gademo.entity.ga.evidence.SubmitEvidenceLocal;
 import com.lu.gademo.event.ThreeSystemsEvent;
 
 public interface EvidenceSystemLogSender {

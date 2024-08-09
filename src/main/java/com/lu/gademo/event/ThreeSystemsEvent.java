@@ -1,10 +1,9 @@
 package com.lu.gademo.event;
 
-import com.lu.gademo.entity.evidence.ReqEvidenceSave;
-import com.lu.gademo.entity.evidence.SubmitEvidenceLocal;
-import com.lu.gademo.entity.evidence.SubmitEvidenceRemote;
-import com.lu.gademo.entity.ruleCheck.SendRuleReq;
-import com.lu.gademo.entity.split.SendSplitDesenData;
+import com.lu.gademo.entity.ga.evidence.ReqEvidenceSave;
+import com.lu.gademo.entity.ga.evidence.SubmitEvidenceLocal;
+import com.lu.gademo.entity.ga.ruleCheck.SendRuleReq;
+import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Arrays;

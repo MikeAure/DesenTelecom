@@ -1,10 +1,10 @@
 package com.lu.gademo;
 
-import com.lu.gademo.entity.templateParam.onlineTaxi2Param;
+import com.lu.gademo.entity.ga.templateParam.onlineTaxi2Param;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.lu.gademo.dao.templateParam.onlineTaxi2ParamDao;
+import com.lu.gademo.dao.ga.templateParam.onlineTaxi2ParamDao;
 
 import java.util.List;
 

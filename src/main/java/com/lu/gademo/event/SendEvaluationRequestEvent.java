@@ -1,6 +1,6 @@
 package com.lu.gademo.event;
 
-import com.lu.gademo.entity.effectEva.SendEvaReq;
+import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Objects;

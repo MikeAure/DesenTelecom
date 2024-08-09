@@ -1,6 +1,6 @@
 package com.lu.gademo.event;
 
-import com.lu.gademo.entity.ruleCheck.SendRuleReq;
+import com.lu.gademo.entity.ga.ruleCheck.SendRuleReq;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Objects;

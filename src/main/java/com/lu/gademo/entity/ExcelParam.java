@@ -1,7 +1,7 @@
 package com.lu.gademo.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.entity.support.BaseEntity;
+import com.lu.gademo.entity.ga.support.BaseEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
