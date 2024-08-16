@@ -13,16 +13,16 @@ import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.sql.Date;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import com.lu.gademo.utils.DateParseUtil;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Component
@@ -51,22 +51,18 @@ public class DpUtilImpl implements DpUtil {
     //k-匿名算法
     public static List<Double> k_num(List<Double> array, int k) {
         HashMap<Integer, Double> hashMap = new HashMap<>();
-
         // 将每个值的索引和值存储在哈希表中
         for (int i = 0; i < array.size(); i++) {
             hashMap.put(i, array.get(i));
         }
-
         // 将数组转换为原始类型数组
         Double[] arrayPrimitive = array.toArray(new Double[0]);
-
         // 对数组进行排序
         Arrays.sort(arrayPrimitive);
-
+//        System.out.println(Arrays.toString(arrayPrimitive));
         // 将数组分割成每K个一组的子数组
         int numGroups = (int) Math.ceil((double) array.size() / k);
         List<Double>[] groups = new ArrayList[numGroups];
-
         for (int i = 0; i < numGroups; i++) {
             int start = i * k;
             int end = Math.min((i + 1) * k, array.size());
@@ -84,11 +80,18 @@ public class DpUtilImpl implements DpUtil {
             groups = Arrays.copyOf(groups, numGroups - 1);
         }
 
+        Map<Integer, Double> averageMapper = new HashMap<>();
+        for (int i = 0; i < groups.length; i++) {
+            Double min = groups[i].get(0);
+            Double max = groups[i].get(groups[i].size() - 1);
+            Double average = (min + max) / 2;
+            averageMapper.put(i, average);
+        }
+
         // 根据哈希表的数据项的值，确定在哪一个子数组，并用子数组的最大与最小值的平均值更新数据项的值
         for (HashMap.Entry<Integer, Double> entry : hashMap.entrySet()) {
             int index = entry.getKey();
             double value = entry.getValue();
-
             int groupIndex = -1;
             for (int i = 0; i < groups.length; i++) {
                 if (groups[i].contains(value)) {
@@ -96,14 +99,8 @@ public class DpUtilImpl implements DpUtil {
                     break;
                 }
             }
-
             if (groupIndex >= 0) {
-                List<Double> group = groups[groupIndex];
-                double min = group.get(0);
-                double max = group.get(group.size() - 1);
-                double average = (min + max) / 2.0;
-
-                hashMap.put(index, average);
+                hashMap.put(index, averageMapper.get(groupIndex));
             }
         }
 
@@ -112,7 +109,46 @@ public class DpUtilImpl implements DpUtil {
         for (int i = 0; i < array.size(); i++) {
             updatedArray.add(hashMap.get(i));
         }
+        return updatedArray;
+    }
 
+    public static List<Double> kNumNew(List<Double> array, int k) {
+        HashMap<Integer, Double> indexValueMap = new HashMap<>();
+        // 将每个值的索引和值存储在哈希表中
+        for (int i = 0; i < array.size(); i++) {
+            indexValueMap.put(i, array.get(i));
+        }
+        // 将map条目转换到列表中并排序
+        List<Map.Entry<Integer, Double>> entries = new ArrayList<>(indexValueMap.entrySet());
+        entries.sort(Map.Entry.comparingByValue());
+        // 将数组分割成每K个一组的子数组
+        int numGroups = (int) Math.ceil((double) array.size() / k);
+        List<Double>[] groups = new ArrayList[numGroups];
+        for (int i = 0; i < numGroups; i++) {
+            int start = i * k;
+            int end = Math.min((i + 1) * k, array.size());
+            int nextEnd = Math.min((i + 2) * k, array.size());
+            if ((nextEnd - end) < k ) {
+                end = nextEnd;
+            }
+            Double min = entries.get(start).getValue();
+            Double max = entries.get(end - 1).getValue();
+            Double average = (min + max) / 2;
+//            System.out.println("Min: " + min);
+//            System.out.println();
+            for (int j = start; j < end; j++) {
+                entries.get(j).setValue(average);
+            }
+        }
+        LinkedHashMap<Integer, Double> sortedResult = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Double> entry : entries) {
+            sortedResult.put(entry.getKey(), entry.getValue());
+        }
+        // 根据哈希表的键构建新数组
+        List<Double> updatedArray = new ArrayList<>(array.size());
+        for (int i = 0; i < array.size(); i++) {
+            updatedArray.add(sortedResult.get(i));
+        }
         return updatedArray;
     }
 
@@ -170,7 +206,8 @@ public class DpUtilImpl implements DpUtil {
             }
             //扰动概率p
             double temp = Math.exp(epsilon);
-            p = new BigDecimal(temp).divide(new BigDecimal(temp + code1.size() - 1), 6, RoundingMode.HALF_UP).doubleValue();
+            p = new BigDecimal(temp).divide(new BigDecimal(temp + code1.size() - 1), 6,
+                    RoundingMode.HALF_UP).doubleValue();
             //循环处理数据
             for (int i = 0; i < re_data.size(); i++) {
                 //		获取一个小数 区间为 (0,1)若大于p，执行扰动
@@ -507,7 +544,6 @@ public class DpUtilImpl implements DpUtil {
                 int index = l / denominator;
                 int index2 = reDatum.length() - index;
 
-
                 StringBuilder substr2 = new StringBuilder();
                 for (int j = 0; j < index2 - index; j++) {
                     substr2.append("*");
@@ -546,10 +582,14 @@ public class DpUtilImpl implements DpUtil {
             } else {
                 StringBuilder str = new StringBuilder(reDatum.substring(0, 1));
                 if (privacyLevel == 1) {
-                    for (int j = 0; j < reDatum.length() - 2; j++) {
+                    if (reDatum.length() == 2) {
                         str.append("*");
+                    } else {
+                        for (int j = 0; j < reDatum.length() - 2; j++) {
+                            str.append("*");
+                        }
+                        str.append(reDatum.substring(reDatum.length() - 1));
                     }
-                    str.append(reDatum.substring(reDatum.length() - 1));
                     nameC.add(str.toString());
                 }
                 if (privacyLevel == 2) {
@@ -558,10 +598,9 @@ public class DpUtilImpl implements DpUtil {
                     }
                     nameC.add(str.toString());
                 }
-                if (privacyLevel == 3){
+                if (privacyLevel == 3) {
                     str.delete(0, str.length());
                     for (int j = 0; j < reDatum.length(); j++) {
-
                         str.append("*");
                     }
                     nameC.add(str.toString());
@@ -611,17 +650,18 @@ public class DpUtilImpl implements DpUtil {
                 if (privacyLevel == 2) {
                     return newAddr.toString();
                 }
-                index = addr.indexOf("市");
+                index = addr.indexOf("区");
                 if (index == -1) {
                     index = addr.indexOf("县");
                 }
                 if (index == -1) {
-                    index = addr.indexOf("区");
+                    index = addr.indexOf("市");
                 }
                 newAddr.append(addr, 0, index + 1);
                 return newAddr.toString();
-            } else if (addr.contains("北京") || addr.contains("上海") || addr.contains("重庆") || addr.contains("天津")) {
-                int index = addr.indexOf("市");
+
+            } else if (addr.contains("自治区")) {
+                int index = addr.indexOf("自治区") + 2;
                 newAddr.append(addr, 0, index + 1);
                 addr = addr.substring(index + 1);
                 if (privacyLevel == 3) {
@@ -629,8 +669,72 @@ public class DpUtilImpl implements DpUtil {
                 }
                 index = addr.indexOf("市");
                 if (index == -1) {
-                    index = addr.indexOf("县");
+                    index = addr.indexOf("盟");
                 }
+                if (index == -1) {
+                    if (addr.contains("地区")) {
+                        index = addr.indexOf("地区") + 1;
+                    } else if (addr.contains("自治州")) {
+                        index = addr.indexOf("自治州") + 2;
+                    }
+                }
+                newAddr.append(addr, 0, index + 1);
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 2) {
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("县");
+                if (index == -1) {
+                    index = addr.indexOf("旗");
+                }
+                if (index == -1) {
+                    index = addr.indexOf("区");
+                }
+                if (index == -1) {
+                    index = addr.indexOf("市");
+                }
+                newAddr.append(addr, 0, index + 1);
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 1) {
+                    return newAddr.toString();
+                }
+            } else if (addr.contains("特别行政区") || addr.contains("香港") || addr.contains("澳门")) {
+                int index = -1;
+                if (addr.contains("特别行政区")) {
+                    index = addr.indexOf("特别行政区") + 4;
+                } else if (addr.contains("香港")) {
+                    index = addr.indexOf("香港") + 1;
+                } else if (addr.contains("澳门")) {
+                    index = addr.indexOf("澳门") + 1;
+                }
+                newAddr.append(addr, 0, index + 1);
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 3) {
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("区");
+                newAddr.append(addr, 0, index + 1);
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 2) {
+                    return newAddr.toString();
+                }
+                if (addr.contains("街道")) {
+                    index = addr.indexOf("街道") + 1;
+                } else if (addr.contains("道")) {
+                    index = addr.indexOf("道");
+                }
+                newAddr.append(addr, 0, index + 1);
+                if (privacyLevel == 1) {
+                    return newAddr.toString();
+                }
+            } else if (addr.contains("北京") || addr.contains("上海") || addr.contains("重庆") || addr.contains("天津")) {
+                int index = addr.indexOf("市");
+                newAddr.append(addr, 0, index + 1);
+                addr = addr.substring(index + 1);
+                if (privacyLevel == 3) {
+                    return newAddr.toString();
+                }
+                index = addr.indexOf("县");
                 if (index == -1) {
                     index = addr.indexOf("区");
                 }
@@ -648,44 +752,6 @@ public class DpUtilImpl implements DpUtil {
                 }
                 newAddr.append(addr, 0, index + 1);
                 return newAddr.toString();
-            } else if (addr.contains("自治区")) {
-                int index = addr.indexOf("区");
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 3) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("市");
-                if (index == -1) {
-                    index = addr.indexOf("盟");
-                }
-                if (index == -1) {
-                    if (addr.contains("地区")) {
-                        index = addr.indexOf("区");
-                    } else if (addr.contains("自治州")) {
-                        index = addr.indexOf("州");
-                    }
-                }
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 2) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("市");
-                if (index == -1) {
-                    index = addr.indexOf("县");
-                }
-                if (index == -1) {
-                    index = addr.indexOf("旗");
-                }
-                if (index == -1) {
-                    index = addr.indexOf("区");
-                }
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 1) {
-                    return newAddr.toString();
-                }
             }
             return newAddr.toString();
         }
@@ -833,28 +899,27 @@ public class DpUtilImpl implements DpUtil {
 
     @Override
     public List<Date> dpDate(List<Object> datas, Integer privacyLevel) throws ParseException {
-
-        List<Date> re_data = new ArrayList<>();
+        List<Date> reData = new ArrayList<>();
         java.util.Date tempDate;
-
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Object data : datas) {
             if (data == null) {
-                re_data.add(null);
+                reData.add(null);
             } else {
-                tempDate = DateParseUtil.parseDate(data);
+                tempDate = fmt.parse(data.toString());
                 if (tempDate == null) {
                     // TODO: 应有更好的处理方法
 //                    throw new ParseException("Parse date error : " + data, 0);
-                    re_data.add(null);
+                    reData.add(null);
                 } else {
                     Date parsedDate = new Date(tempDate.getTime());
-                    re_data.add(parsedDate);
+                    reData.add(parsedDate);
                 }
             }
         }
         //不保护，直接返回
         if (privacyLevel == 0) {
-            return re_data;
+            return reData;
         }
         List<Date> newDate = new ArrayList<>();
         BigDecimal si = new BigDecimal(1);
@@ -867,15 +932,17 @@ public class DpUtilImpl implements DpUtil {
         }
         BigDecimal beta = si.divide(epsilon, 6, RoundingMode.HALF_UP);
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
+        //添加噪声，依次加day、hour、minute
+        LaplaceDistribution ld = new LaplaceDistribution(0, betad);
         //循环处理数据
-        for (int i = 0; i < re_data.size(); i++) {
+        for (int i = 0; i < reData.size(); i++) {
             //空值不处理
-            if (re_data.get(i) == null) {
+            if (reData.get(i) == null) {
                 newDate.add(null);
             } else {
-                //添加噪声，依次加day、hour、minute
-                LaplaceDistribution ld = new LaplaceDistribution(0, betad);
                 double noise = ld.sample();//随机采样一个拉普拉斯分布值
+                double noiseTuncation = Math.round(noise * 1000) / 1000.0;
+                Long scaledNoise = (long) (noise * 86400000);
                 String[] s = String.valueOf(noise).split("\\.");
                 String day = s[0];
                 double dvalue = Double.valueOf(("0." + s[1]));
@@ -889,21 +956,21 @@ public class DpUtilImpl implements DpUtil {
                 String second = s3[0];
                 String msecond = s3[1].substring(0, 3);
                 //日期格式
-                SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 String d;
-                DateFormat format1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                Date datetemp = new Date(0);
-
+                Date dateTemp = new Date(0);
                 //根据noise干扰
                 if (noise >= 0) {
-                    d = df.format(new Date(re_data.get(i).getTime() + Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond)));
-                    datetemp = new Date(format1.parse(d).getTime());
+                    d = fmt.format(new Date(reData.get(i).getTime() + Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond)));
+                    dateTemp = new Date(fmt.parse(d).getTime());
+//                    d = fmt.format(new Date(reData.get(i).getTime() + scaledNoise));
+//                    dateTemp = new Date(fmt.parse(d).getTime());
                 } else {
-                    d = df.format(new Date(re_data.get(i).getTime() - (Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond))));
-                    datetemp = new Date(format1.parse(d).getTime());
+                    d = fmt.format(new Date(reData.get(i).getTime() - (Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond))));
+                    dateTemp = new Date(fmt.parse(d).getTime());
+//                    d = fmt.format(new Date(reData.get(i).getTime() - scaledNoise));
+//                    dateTemp = new Date(fmt.parse(d).getTime());
                 }
-
-                newDate.add(datetemp);
+                newDate.add(dateTemp);
             }
         }
         return newDate;
@@ -920,7 +987,7 @@ public class DpUtilImpl implements DpUtil {
                 milliseconds.add(0.0);
             else {
                 //java.util.Date utilDate = dateFormat.parse(data + "");
-                java.util.Date date = DateParseUtil.parseDate(data.toString());
+                java.util.Date date = dateFormat.parse(data.toString());
 
                 //Date sqlDate = new Date(utilDate.getTime());
                 // 日期解析可能失败,如果失败则添加0
@@ -939,7 +1006,7 @@ public class DpUtilImpl implements DpUtil {
                 if (data == null) {
                     reData.add(null);
                 } else {
-                    java.util.Date date = DateParseUtil.parseDate(data.toString());
+                    java.util.Date date = dateFormat.parse(data.toString());
                     // 如果解析失败则添加null
                     if (date == null) {
                         reData.add(null);
@@ -957,16 +1024,15 @@ public class DpUtilImpl implements DpUtil {
             k = 1;
         } else if (privacyLevel == 2) {
             k = 3;
-        } else if (privacyLevel == 3) {
+        } else {
             k = 5;
         }
         //执行k-匿名
-        List<Double> newMilliseconds = k_num(milliseconds, k);
+        List<Double> newMilliseconds = kNumNew(milliseconds, k);
         //毫秒转为日期
         List<Date> newDate = new ArrayList<>();
         for (double m : newMilliseconds) {
-            String date = dateFormat.format(new java.util.Date((long) m));
-            newDate.add(new Date(dateFormat.parse(date).getTime()));
+            newDate.add(new Date((long) m));
         }
         return newDate;
     }
@@ -1507,6 +1573,7 @@ public class DpUtilImpl implements DpUtil {
         }
 
         Random random = new Random();
+
 
         //循环处理数据
         for (int i = 0; i < re_data.size(); i++) {

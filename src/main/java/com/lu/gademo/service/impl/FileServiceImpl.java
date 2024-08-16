@@ -1,7 +1,6 @@
 package com.lu.gademo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dao.ga.effectEva.SendEvaReqDao;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
@@ -45,7 +44,10 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -65,9 +67,7 @@ public class FileServiceImpl implements FileService {
     private Anonymity anonymity;
     // 发送类
     private LogSenderManager logSenderManager;
-
     private ExcelParamService excelParamService;
-
     private final DpUtil dpUtil;
     // 工具类
     private Util util;
@@ -80,6 +80,8 @@ public class FileServiceImpl implements FileService {
     private Path rawFileDirectory;
     private Path desenFileDirectory;
 
+    FileStorageService fileStorageService;
+
     private final ObjectMapper objectMapper;
     private Boolean ifSendToEvaFirst;
 
@@ -87,7 +89,7 @@ public class FileServiceImpl implements FileService {
     @EventListener
     public void handleReDesensitizeEvent(ReDesensitizeEvent event) throws Exception {
         // TODO: 其他模态的数据的脱敏
-        redesenExcel(event.getRecEvaResultInv());
+        redesenExcel(event);
     }
 
     @Autowired
@@ -107,14 +109,12 @@ public class FileServiceImpl implements FileService {
         this.util = util;
         this.excelParamService = excelParamService;
         this.dpUtil = dpUtil;
-//        this.desenCom = false;
         this.randomNum = new Random();
         this.logCollectUtil = logCollectUtil;
         this.eventPublisher = eventPublisher;
         this.currentDirectory = Paths.get("");
         this.rawFileDirectory = Paths.get("raw_files");
         this.desenFileDirectory = Paths.get("desen_files");
-
         if (!Files.exists(rawFileDirectory)) {
             Files.createDirectory(rawFileDirectory);
         }
@@ -128,83 +128,348 @@ public class FileServiceImpl implements FileService {
         this.ifSendToEvaFirst = ifSendEvaFirst;
     }
 
-    /**
-     * excel文件重脱敏函数
-     *
-     * @param recEvaResultInv
-     * @throws Exception
-     */
-    @Override
-    public void redesenExcel(RecEvaResultInv recEvaResultInv) throws Exception {
-        String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
-        String[] updateFieldList = recEvaResultInv.getDesenFailedColName().split(",");
-        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
-        // 字段名列表
-        String[] attributeNameList = evaReq.getDesenInfoPreIden().split(",");
-        String rawFileName = evaReq.getDesenInfoPre();
-        String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
-        String desenFileName = evaReq.getDesenInfoAfter();
-        String[] desenFileNameList = desenFileName.split("_");
-        String[] desenAlgList = evaReq.getDesenAlg().split(",");
-        String[] desenLevelList = evaReq.getDesenLevel().split(",");
-        // 取模板名，根据模板名在数据库中找到相应的算法
-        String templateName = evaReq.getFileType() + "_param";
+    private LogInfo processExcel(FileStorageDetails fileStorageDetails, String params, String sheetName,
+                                 Boolean ifSaveExcelParams) throws IOException {
+        // 包含不同的流转场景信息
+        String[] parts = sheetName.split("_");
+        String sheetTemplate = String.join("_", Arrays.copyOfRange(parts, 0, parts.length));
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "text";
 
-        List<ExcelParam> originExcelParam = excelParamService.getParamsByTableName(templateName);
-        List<ExcelParam> resultExcelParam = new ArrayList<>();
-        for (int i = 0; i < originExcelParam.size(); i++) {
-            ExcelParam excelParamTemp = originExcelParam.get(i);
-            if (Arrays.asList(updateFieldList).contains(excelParamTemp.getColumnName())) {
-                resultExcelParam.add(addDesenLevel(originExcelParam.get(i), desenLevelList[i], true));
-            } else {
-                resultExcelParam.add(addDesenLevel(originExcelParam.get(i), desenLevelList[i], false));
-            }
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info(desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        // 读取excel文件
+        InputStream inputStream = Files.newInputStream(rawFilePath);
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        //脱敏参数处理,转为json
+        List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
+        // 保存参数到数据库中
+        saveExcelParamsToDatabase(sheetName, ifSaveExcelParams, excelParamList);
+        // 数据行数
+        int totalRowNum = sheet.getLastRowNum();
+        // 字段名行
+        Row fieldNameRow = sheet.getRow(0);
+        // 列数
+        int columnCount = fieldNameRow.getPhysicalNumberOfCells(); // 获取列数
+        log.info("表格总列数：{}", columnCount);
+        // 调用脱敏程序处理
+        String startTime = util.getTime();
+        log.info("开始对表格文件{}进行脱敏", rawFileName);
+        Map<Integer, List<?>> desenResult = realDealExcel(sheet, infoBuilders, excelParamList, totalRowNum, fieldNameRow, columnCount);
+        log.info("表格文件脱敏结束");
+        String endTime = util.getTime();
+        log.info("正在写入Excel文件");
+        for (Map.Entry<Integer, List<?>> entry : desenResult.entrySet()) {
+            util.write2Excel(sheet, totalRowNum, entry.getKey(), entry.getValue());
         }
-        String jsonParamString = objectMapper.writeValueAsString(resultExcelParam);
-        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
-        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
-        byte[] rawFileBytes = Files.readAllBytes(rawFilePath);
-        Long rawFileSize = Files.size(rawFilePath);
-        String timeStamp = String.valueOf(System.currentTimeMillis());
-//        System.out.println(rawFileName.split("_")[1]);
-        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
-        String recFileName = String.join("_", desenFileNameList);
-        log.info("recFileName {}", recFileName);
-        Path desenFilePath = desenFileDirectory.resolve(recFileName);
-        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+        log.info("Excel文件写入完成");
+        // 保存处理后的Excel数据到ByteArrayOutputStream中
+        // 保存脱敏后文件
+        // 脱敏文件路径
+        FileOutputStream fileOutputStream = new FileOutputStream(desenFilePathString);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        workbook.write(byteArrayOutputStream);
+        byte[] newExcelData = byteArrayOutputStream.toByteArray();
+        fileOutputStream.write(newExcelData);
 
-        FileStorageDetails fileStorageDetails = FileStorageDetails.builder()
-                .rawFileName(rawFileName)
-                .rawFileSuffix(rawFileSuffix)
-                .rawFilePath(rawFilePath)
-                .rawFilePathString(rawFilePathString)
-                .rawFileBytes(rawFileBytes)
-                .rawFileSize(rawFileSize)
-                .desenFileName(recFileName)
-                .desenFileSuffix(rawFileSuffix)
-                .desenFilePath(desenFilePath)
-                .desenFilePathString(desenFilePathString)
-                .build();
-//        Path recFile = rawFileDirectory.resolve(recFileName);
-//        Files.copy(rawFile, recFile);
-//        File file = new File("/path/to/file");
-//        FileItem fileItem = new DiskFileItem(recFileName, Files.probeContentType(rawFile.toPath()), false,
-//                recFileName, (int) rawFile.length(), rawFile.getParentFile());
-//        try {
-//            InputStream input = new FileInputStream(rawFile);
-//            OutputStream os = fileItem.getOutputStream();
-//            IOUtils.copy(input, os);
-//            // Or faster..
-//            // IOUtils.copy(new FileInputStream(file), fileItem.getOutputStream());
-//        } catch (IOException ex) {
-//            // do something.
-//        }
-//        MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
-        dealExcel(fileStorageDetails, jsonParamString, evaReq.getFileType(), false);
+        // 保存参数文件到本地txt文件
+        Path paramDirectory = Paths.get("desen_params");
+        if (!Files.exists(paramDirectory)) {
+            Files.createDirectory(paramDirectory);
+        }
+        String paramsFileName = "params" + rawFileName.substring(0, rawFileName.lastIndexOf('.')) + ".txt";
+        String paramsFilePath = paramDirectory.resolve(paramsFileName).toAbsolutePath().toString();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(paramsFilePath))) {
+            for (ExcelParam p : excelParamList) {
+                // 将每个Person对象转换为字符串并写入文件
+                String line = p.toString();
+                writer.write(line);
+                writer.newLine(); // 换行
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            log.error("Failed to save params to file");
+        }
+
+        // 关闭工作簿和流
+        fileOutputStream.close();
+        workbook.close();
+        inputStream.close();
+        // 标志脱敏完成
+        desenCom = true;
+        // 脱敏前信息
+        // 将文件字节流转换为字符串
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+
+        fileStorageDetails.setDesenFileBytes(desenFileBytes);
+        fileStorageDetails.setDesenFileSize(desenFileSize);
+        // 存证系统
+        String evidenceID = util.getSM3Hash((new String(newExcelData, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        return LogInfo.builder().fileType(sheetName).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
     }
 
-    @Override
-    public ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException {
+    private LogInfo processSingleExcel(FileStorageDetails fileStorageDetails, String params, String algName
+    ) throws IOException {
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "text";
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info(desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        // 读取excel文件
+        InputStream inputStream = Files.newInputStream(rawFilePath);
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        // 保存脱敏后文件
+        // 脱敏文件路径
+        FileOutputStream fileOutputStream = new FileOutputStream(desenFilePathString);
+        // 保存参数文件
+        int desenParam = Integer.parseInt(String.valueOf(params.charAt(params.length() - 1)));
+        // 数据类型
+        List<Integer> dataType = new ArrayList<>();
+        // 数据行数
+        int totalRowNum = sheet.getLastRowNum();
+        // 字段名行
+        Row fieldRow = sheet.getRow(0);
+        // 列数
+        int columnCount = fieldRow.getPhysicalNumberOfCells(); // 获取列数
+        log.info("Total column number is " + columnCount);
+        // 调用脱敏程序处理
+        log.info("Start Excel file desen");
+        // 脱敏开始时间
+        String startTime = util.getTime();
+        long startTimePoint = System.nanoTime();
+
+        //  逐列处理
+        DataFormatter dataFormatter = new DataFormatter();
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+            // 取列名
+            String colName = fieldRow.getCell(columnIndex).toString();
+            log.info("Column Index: {}, Column Name: {}", columnIndex, colName);
+
+            // 脱敏前信息类型标识
+            infoBuilders.desenInfoPreIden.append(colName);
+            infoBuilders.desenInfoAfterIden.append(colName);
+            // 读取脱敏级别
+            infoBuilders.desenLevel.append(desenParam);
+            // 脱敏意图
+            infoBuilders.desenIntention.append(colName).append("脱敏,");
+            // 脱敏数据类型
+            infoBuilders.fileDataType.append(rawFileSuffix);
+            // 取列数据
+            List<Object> objs = new ArrayList<>();
+
+            for (int j = 1; j <= totalRowNum; j++) {
+                Row row = sheet.getRow(j);
+                if (row != null) {
+                    Cell cell = row.getCell(columnIndex);
+                    objs.add(cell);
+                }
+            }
+            AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName.trim());
+            DSObject dsObject = new DSObject(objs);
+
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
+
+            switch (algName.trim()) {
+                case "dpDate": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("添加Laplace噪声,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+
+                    List<Date> dates = getDsList(algorithmInfo, dsObject, desenParam);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, dates);
+                    break;
+                }
+                case "dpCode": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("随机扰动,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+
+                    List<String> datas = getDsList(algorithmInfo, dsObject, desenParam);
+
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+                case "laplaceToValue": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("添加差分隐私Laplace噪声,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    // 脱敏
+                    List<Double> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    // 写列数据
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+
+                case "randomUniformToValue": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("添加随机均匀噪声,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    // 脱敏
+                    List<Double> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    // 写列数据
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+                case "randomLaplaceToValue": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("添加随机laplace噪声,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    List<Double> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+                case "randomGaussianToValue": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("添加随机高斯噪声,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    List<Double> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+                case "valueShift": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("数值偏移,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+
+                    List<Double> datas = getDsList(algorithmInfo, dsObject, desenParam);
+
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+                case "floor": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("数值取整,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    if (desenParam == 0) {
+                        util.write2Excel(sheet, totalRowNum, columnIndex, objs);
+                    } else {
+                        List<Integer> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                        util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    }
+                    break;
+                }
+                case "valueMapping": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("数值映射,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    List<Double> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+                case "truncation": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("截断,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    List<String> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+
+                case "floorTime":
+                case "suppressEmail":
+                case "addressHide":
+                case "nameHide":
+                case "numberHide":
+                case "suppressIpRandomParts":
+                case "suppressAllIp": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("抑制,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    List<String> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+
+                case "SHA512":
+                case "passReplace":
+                case "value_hide": {
+                    // 脱敏要求
+                    infoBuilders.desenRequirements.append(colName).append("置换,");
+                    infoBuilders.desenAlg.append(algorithmInfo.getId());
+                    List<String> datas = getDsList(algorithmInfo, dsObject, desenParam);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
+                    break;
+                }
+            }
+        }
+        // 结束时间
+        long endTimePoint = System.nanoTime();
+        // 脱敏结束时间
+        String endTime = util.getTime();
+
+        log.info("Desensitization finished in" + (endTimePoint - startTimePoint) / 1e6 + "ms");
+        long oneTime = (endTimePoint - startTimePoint) / columnCount / (totalRowNum - 1);
+        // 打印单条运行时间
+        log.info("Single data running time：" + oneTime + " ns");
+        // 一秒数据量
+        log.info("Number of dealt data per second:" + 1e9 / oneTime);
+        log.info("Excel desen finished");
+
+        // 保存处理后的Excel数据到outputStream中
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        workbook.write(byteArrayOutputStream);
+        byte[] newExcelData = byteArrayOutputStream.toByteArray();
+        fileOutputStream.write(newExcelData);
+
+        // 标志脱敏完成
+        desenCom = true;
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        // 脱敏前信息
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+
+        // 存证系统
+        String evidenceID = util.getSM3Hash((new String(newExcelData, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+
+        // 关闭工作簿和流
+        fileOutputStream.close();
+        workbook.close();
+        inputStream.close();
+
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
+
+    private LogInfo processImage(FileStorageDetails fileStorageDetails, String params, String algName)
+            throws IOException {
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "image";
@@ -224,26 +489,15 @@ public class FileServiceImpl implements FileService {
         String desenFilePathString = fileStorageDetails.getDesenFilePathString();
 
         // 脱敏参数处理
-        Integer desenParam = Integer.valueOf(params);
-
+        Integer reqDesenParam = Integer.valueOf(params);
         // 调用脱敏程序处理
         DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
-
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
         log.info("Start image desen");
         // 脱敏开始时间
         String startTime = util.getTime();
         long startTimePoint = System.currentTimeMillis();
-        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
-        List<Object> algorithmParams = algorithmInfo.getParams();
-        infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (algorithmInfo.getParams() == null) {
-            infoBuilders.desenAlgParam.append("无参");
-        } else {
-            infoBuilders.desenAlgParam.append(algorithmParams.get(desenParam).toString());
-        }
-        // TODO: 非失真算法的脱敏级别
-        infoBuilders.desenLevel.append(desenParam + 1);
-        algorithmInfo.execute(dsObject, desenParam);
+        algorithmInfo.execute(dsObject, reqDesenParam);
         // 脱敏后收集信息
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -259,6 +513,14 @@ public class FileServiceImpl implements FileService {
         // 脱敏后文件字节流
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        infoBuilders.desenLevel.append(reqDesenParam + 1);
+        if (algorithmInfo.getParams() == null) {
+            infoBuilders.desenAlgParam.append("无参");
+        } else {
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(reqDesenParam).toString());
+        }
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("image");
         // 脱敏后类型
@@ -276,27 +538,601 @@ public class FileServiceImpl implements FileService {
         // 本地存证
         // 存证系统
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
+
+
+    private LogInfo processVideo(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException {
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "video";
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info("Video desen file path: {}", desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        Integer desenParam = Integer.valueOf(params);
+        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
+
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+
+        // 调用脱敏程序处理
+        log.info("Start video desen");
+        // 脱敏开始时间
+        String startTime = util.getTime();
+        long startTimePoint = System.currentTimeMillis();
+        algorithmInfo.execute(dsObject, desenParam);
+
+        // 脱敏后收集信息
+        // 结束时间
+        long endTimePoint = System.currentTimeMillis();
+        // 脱敏耗时
+        long executionTime = endTimePoint - startTimePoint;
+        log.info("Desensitization finished in " + executionTime + "ms");
+        log.info("Video desen finished");
+        // 脱敏结束时间
+        String endTime = util.getTime();
+        // 标志脱敏完成
+        desenCom = true;
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+        // 脱敏后文件字节流
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        // 脱敏算法
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        if (algorithmInfo.getParams() == null) {
+            infoBuilders.desenAlgParam.append("无参");
+        } else {
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
+        }
+        infoBuilders.desenLevel.append(desenParam + 1);
+        // 脱敏前类型
+        infoBuilders.desenInfoPreIden.append("video");
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append("video");
+        // 脱敏意图
+        infoBuilders.desenIntention.append("对视频脱敏");
+        // 脱敏要求
+        infoBuilders.desenRequirements.append("对视频脱敏");
+        // 脱敏数据类型
+        infoBuilders.fileDataType.append(rawFileSuffix);
+
+        fileStorageDetails.setDesenFileBytes(desenFileBytes);
+        fileStorageDetails.setDesenFileSize(desenFileSize);
+        // 存证系统evidenceID
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
+
+    private LogInfo processAudio(FileStorageDetails fileStorageDetails, String params, String algName)
+            throws IOException {
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "audio";
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info(desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        // 脱敏参数处理
+        String[] paramsList = params.split(",");
+        int desenParam = Integer.parseInt(paramsList[paramsList.length - 1]);
+        // 获取脱敏算法
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+        List<String> paths = Arrays.asList(rawFilePathString, desenFilePathString);
+
+        DSObject desenObj = new DSObject(paths);
+
+        // 调用脱敏程序处理
+        log.info("Start Audio desen");
+        // 开始时间
+        String startTime = util.getTime();
+        // 脱敏开始时间
+        long startTimePoint = System.currentTimeMillis();
+        algorithmInfo.execute(desenObj, desenParam);
+        // 结束时间
+        long endTimePoint = System.currentTimeMillis();
+        // 脱敏耗时
+        long executionTime = endTimePoint - startTimePoint;
+        // 脱敏结束时间
+        String endTime = util.getTime();
+        log.info("Desensitization finished in " + executionTime + "ms");
+        log.info("Audio desen finished");
+        // 标志脱敏完成
+        desenCom = true;
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+        // 脱敏后文件字节流
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        if (algorithmInfo.getParams() == null) {
+            infoBuilders.desenAlgParam.append("无参");
+        } else {
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
+        }
+        // 脱敏级别
+        infoBuilders.desenLevel.append(desenParam + 1);
+        // 脱敏前类型
+        infoBuilders.desenInfoPreIden.append("audio");
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append("audio");
+        // 脱敏意图
+        infoBuilders.desenIntention.append("对音频脱敏");
+        // 脱敏要求
+        infoBuilders.desenRequirements.append("对声纹脱敏");
+        // 脱敏数据类型
+        infoBuilders.fileDataType.append(rawFileSuffix);
+
+        fileStorageDetails.setDesenFileBytes(desenFileBytes);
+        fileStorageDetails.setDesenFileSize(desenFileSize);
+        // 存证系统
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(globalID, evidenceID, desenCom,
-                objectMode, infoBuilders, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
 
+    private LogInfo processGraph(FileStorageDetails fileStorageDetails, String params) throws IOException {
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "graph";
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info(desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        // 调用脱敏程序处理
+        String desenParam = String.valueOf(params.charAt(params.length() - 1));
+        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
+
+        // 调用脱敏程序处理
+        log.info("Start Graph desen");
+        // 开始时间
+        String startTime = util.getTime();
+        // 脱敏开始时间
+        long startTimePoint = System.currentTimeMillis();
+        dp.service(dsObject, 7, Integer.parseInt(desenParam));
+
+        // 结束时间
+        long endTimePoint = System.currentTimeMillis();
+        // 脱敏耗时
+        long executionTime = endTimePoint - startTimePoint;
+        // 脱敏结束时间
+        String endTime = util.getTime();
+        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "Graph");
+        // 标志脱敏完成
+        desenCom = true;
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+        // 脱敏后文件字节流
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        // 脱敏算法
+        infoBuilders.desenAlg.append(60);
+        // 脱敏参数
+        double[] param = new double[]{5.0, 1.0, 0.2};
+        infoBuilders.desenAlgParam.append(param[Integer.parseInt(desenParam)]);
+        // 脱敏级别
+        infoBuilders.desenLevel.append(Integer.parseInt(params) + 1);
+        // 脱敏前类型
+        infoBuilders.desenInfoPreIden.append(objectMode);
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append(objectMode);
+        // 脱敏意图
+        infoBuilders.desenIntention.append("对图形脱敏");
+        // 脱敏要求
+        infoBuilders.desenRequirements.append("对图形脱敏");
+        // 脱敏数据类型
+        infoBuilders.fileDataType.append(rawFileSuffix);
+
+        fileStorageDetails.setDesenFileBytes(desenFileBytes);
+        fileStorageDetails.setDesenFileSize(desenFileSize);
+        // 存证系统
+        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
+
+
+    private LogInfo processReplaceVideoBackground(FileStorageDetails fileStorageDetails, String params,
+                                                         String algName, FileStorageDetails sheetStorageDetails) throws IOException {
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "video";
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info("Video desen file path: {}", desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+        // 设置原文件保存路径
+        String imageFileName = sheetStorageDetails.getRawFileName();
+        String rawBgPathString = sheetStorageDetails.getRawFilePathString();
+
+        String desenParam = String.valueOf(params.charAt(params.length() - 1));
+
+        long startTimePoint;
+        long endTimePoint;
+        long executionTime = 0;
+        String startTime = util.getTime();
+        startTimePoint = System.currentTimeMillis();
+        // 执行脱敏算法
+        List<String> rawData = Arrays.asList(rawFilePathString, rawBgPathString, desenFilePathString);
+        DSObject dsObject = new DSObject(rawData);
+        // 调用脱敏程序处理
+        String resultString = algorithmInfo.execute(dsObject, Integer.valueOf(params)).getList().toString();
+        log.info(resultString);
+        // 结束时间
+        endTimePoint = System.currentTimeMillis();
+        executionTime = endTimePoint - startTimePoint;
+        String endTime = util.getTime();
+        // 脱敏耗时
+        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "Video");
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        // 标志脱敏完成
+        desenCom = true;
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+
+        // 脱敏算法
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        // 脱敏参数
+        infoBuilders.desenAlgParam.append(rawBgPathString);
+        // 脱敏级别
+        infoBuilders.desenLevel.append(Integer.parseInt(desenParam) + 1);
+        // 脱敏前类型
+        infoBuilders.desenInfoPreIden.append("video");
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append("video");
+        // 脱敏意图
+        infoBuilders.desenIntention.append("对视频脱敏");
+        // 脱敏要求
+        infoBuilders.desenRequirements.append("对视频脱敏");
+        // 脱敏数据类型
+        infoBuilders.fileDataType.append(rawFileSuffix);
+
+        fileStorageDetails.setDesenFileBytes(desenFileBytes);
+        fileStorageDetails.setDesenFileSize(desenFileSize);
+
+        // 存证系统
+        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
+
+    private LogInfo processReplaceFace(FileStorageDetails fileStorageDetails, String params, String algName, FileStorageDetails sheetStorageDetails) throws IOException {
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "image";
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info("Video desen file path: {}", desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        // 设置替换的人脸图片文件保存路径
+        String rawFacePathString = sheetStorageDetails.getRawFilePathString();
+
+        // 设置脱敏后文件路径信息
+        // 调用脱敏程序处理
+        String desenParam = String.valueOf(params.charAt(params.length() - 1));
+        long startTimePoint;
+        long endTimePoint;
+        long executionTime;
+        String startTime;
+        // 开始时间
+        // 脱敏开始时间
+        startTime = util.getTime();
+        startTimePoint = System.currentTimeMillis();
+        List<String> rawData = Arrays.asList(rawFilePathString, rawFacePathString, desenFilePathString);
+        DSObject dsObject = new DSObject(rawData);
+        String resultString = algorithmInfo.execute(dsObject, Integer.valueOf(params)).getList().toString();
+        if (resultString != null) {
+            log.info(resultString);
+        }
+        // 结束时间
+        endTimePoint = System.currentTimeMillis();
+        executionTime = endTimePoint - startTimePoint;
+        String endTime = util.getTime();
+        // 脱敏耗时
+        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "Image");
+
+        // 标志脱敏完成
+        desenCom = true;
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+        // 脱敏后文件字节流
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        // 脱敏算法
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        // 脱敏参数
+        infoBuilders.desenAlgParam.append(rawFacePathString);
+        // 脱敏前类型
+        infoBuilders.desenInfoPreIden.append("image");
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append("image");
+        // 脱敏意图
+        infoBuilders.desenIntention.append("对图像脱敏");
+        // 脱敏要求
+        infoBuilders.desenRequirements.append("对图像脱敏");
+        // 脱敏数据类型
+        infoBuilders.fileDataType.append(rawFileSuffix);
+        // 设置脱敏等级
+        infoBuilders.desenLevel.append(Integer.parseInt(desenParam) + 1);
+
+        fileStorageDetails.setDesenFileBytes(desenFileBytes);
+        fileStorageDetails.setDesenFileSize(desenFileSize);
+        // 存证系统
+        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
+
+    private LogInfo processReplaceFaceVideo(FileStorageDetails fileStorageDetails, String params, String algName,
+                                                   FileStorageDetails sheet) throws IOException {
+        Boolean desenCom = false;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "video";
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+
+        // 设置原文件保存路径
+        String rawFileName = fileStorageDetails.getRawFileName();
+        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+        Path rawFilePath = fileStorageDetails.getRawFilePath();
+        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        Long rawFileSize = fileStorageDetails.getRawFileSize();
+
+        // 设置原文件保存路径
+        // 设置脱敏后文件路径信息
+        String desenFileName = fileStorageDetails.getDesenFileName();
+        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+        log.info("Video desen file path: {}", desenFilePath.toAbsolutePath().toString());
+        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+
+        String rawFacePathString = sheet.getRawFilePathString();
+
+        // 调用脱敏程序处理
+        String desenParam = String.valueOf(params.charAt(params.length() - 1));
+        long startTimePoint;
+        long endTimePoint;
+        long executionTime;
+        String startTime;
+        // 开始时间
+        // 脱敏开始时间
+        startTime = util.getTime();
+        startTimePoint = System.currentTimeMillis();
+
+        // 执行脱敏
+        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, rawFacePathString, desenFilePathString));
+        algorithmInfo.execute(dsObject);
+        // 结束时间
+        endTimePoint = System.currentTimeMillis();
+        // 脱敏耗时
+        executionTime = endTimePoint - startTimePoint;
+        logCollectUtil.logExecutionTime(String.valueOf(executionTime), objectMode);
+
+        // 脱敏结束时间
+        String endTime = util.getTime();
+        // 标志脱敏完成
+        desenCom = true;
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+        // rawFileBytes
+        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+
+        // 脱敏算法
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        // 脱敏参数
+        infoBuilders.desenAlgParam.append(rawFacePathString);
+        // 脱敏级别
+        infoBuilders.desenLevel.append(Integer.parseInt(desenParam) + 1);
+        // 脱敏前类型
+        infoBuilders.desenInfoPreIden.append("video");
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append("video");
+        // 脱敏意图
+        infoBuilders.desenIntention.append("对视频脱敏");
+        // 脱敏要求
+        infoBuilders.desenRequirements.append("对视频脱敏");
+        // 脱敏数据类型
+        infoBuilders.fileDataType.append(rawFileSuffix);
+
+        fileStorageDetails.setDesenFileBytes(desenFileBytes);
+        fileStorageDetails.setDesenFileSize(desenFileSize);
+
+        // 存证系统
+        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        return LogInfo.builder().fileType(objectMode).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
+                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
+                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
+                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
+    }
+    /**
+     * 执行重脱敏的逻辑
+     * @param event
+     * @throws Exception
+     */
+    @Override
+    public void redesenExcel(ReDesensitizeEvent event) throws Exception {
+        RecEvaResultInv recEvaResultInv = event.getRecEvaResultInv();
+        LogManagerEvent logManagerEvent = event.getLogManagerEvent();
+        String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
+        String[] updateFieldList = recEvaResultInv.getDesenFailedColName().split(",");
+        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
+        // 字段名列表
+        String[] attributeNameList = evaReq.getDesenInfoPreIden().split(",");
+        String rawFileName = evaReq.getDesenInfoPre();
+        String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
+        String desenFileName = evaReq.getDesenInfoAfter();
+        String[] desenFileNameList = desenFileName.split("_");
+        String[] desenAlgList = evaReq.getDesenAlg().split(",");
+        String[] desenLevelList = evaReq.getDesenLevel().split(",");
+        // 取模板名，根据模板名在数据库中找到相应的算法
+        String templateName = evaReq.getFileType() + "_param";
+
+        List<ExcelParam> originExcelParam = excelParamService.getParamsByTableName(templateName);
+        List<ExcelParam> resultExcelParam = new ArrayList<>();
+        for (int i = 0; i < originExcelParam.size(); i++) {
+            ExcelParam excelParamTemp = originExcelParam.get(i);
+            // 根据评测结果针对特定字段提升脱敏等级
+            if (Arrays.asList(updateFieldList).contains(excelParamTemp.getColumnName())) {
+                resultExcelParam.add(addDesenLevel(originExcelParam.get(i), desenLevelList[i], true));
+            } else {
+                resultExcelParam.add(addDesenLevel(originExcelParam.get(i), desenLevelList[i], false));
+            }
+        }
+        // 将脱敏参数转为字符串，方便接口复用
+        String jsonParamString = objectMapper.writeValueAsString(resultExcelParam);
+        // 读取原始文件内容
+        Path rawFilePath = fileStorageService.getRawFileDirectory().resolve(rawFileName);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        byte[] rawFileBytes = Files.readAllBytes(rawFilePath);
+        Long rawFileSize = Files.size(rawFilePath);
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+//        System.out.println(rawFileName.split("_")[1]);
+        // 构造新的脱敏后文件名
+        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
+        String recFileName = String.join("_", desenFileNameList);
+        log.info("recFileName {}", recFileName);
+        Path desenFilePath = fileStorageService.getDesenFileDirectory().resolve(recFileName);
+        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+
+        FileStorageDetails fileStorageDetails = FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .rawFileBytes(rawFileBytes)
+                .rawFileSize(rawFileSize)
+                .desenFileName(recFileName)
+                .desenFileSuffix(rawFileSuffix)
+                .desenFilePath(desenFilePath)
+                .desenFilePathString(desenFilePathString)
+                .build();
+
+        LogInfo logInfo = processExcel(fileStorageDetails, jsonParamString, evaReq.getFileType(), false);
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = logManagerEvent.getResponseEntityCompletableFuture();
+        eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails, logCollectResult, responseEntityCompletableFuture));
+    }
+
+    @Override
+    public ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+        // 处理图片
+        LogInfo logInfo = processImage(fileStorageDetails, params, algName);
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
         // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
         if (ifSendToEvaFirst) {
-            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails, logCollectResult, rawFileBytes, desenFileBytes));
-        } else {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
+        }
+        // 直接发给四个系统
+        else {
             logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            if (logInfo.getRawFileSuffix().equals("png")) {
+                headers.setContentType(MediaType.IMAGE_PNG);
+            } else {
+                headers.setContentType(MediaType.IMAGE_JPEG);
+            }
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
         }
-
-        // 读取文件返回
-        HttpHeaders headers = new HttpHeaders();
-        if ((rawFileSuffix.equals("png"))) {
-            headers.setContentType(MediaType.IMAGE_PNG);
-        } else {
-            headers.setContentType(MediaType.IMAGE_JPEG);
+        // 在此处等待响应返回
+        // TODO: Controller Advice
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
         }
-        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
-        return ResponseEntity.ok().headers(headers).body(desenFileBytes);
 
     }
 
@@ -305,7 +1141,6 @@ public class FileServiceImpl implements FileService {
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "image";
-
         // 设置文件时间戳
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
         // 设置原文件信息
@@ -325,27 +1160,15 @@ public class FileServiceImpl implements FileService {
         String desenFileName = "desen_" + rawFileName;
         Path desenFilePath = desenFileDirectory.resolve(desenFileName);
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();
-
         // 脱敏参数处理
         Integer desenParam = Integer.valueOf(params);
-
         // 调用脱敏程序处理
         DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
-
-        log.info("Start image desen");
         // 脱敏开始时间
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
+        log.info("Start image desen");
         String startTime = util.getTime();
         long startTimePoint = System.currentTimeMillis();
-        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
-        List<Object> algorithmParams = algorithmInfo.getParams();
-        infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (algorithmInfo.getParams() == null) {
-            infoBuilders.desenAlgParam.append("无参");
-        } else {
-            infoBuilders.desenAlgParam.append(algorithmParams.get(desenParam).toString());
-        }
-        // TODO: 非失真算法的脱敏级别
-        infoBuilders.desenLevel.append(desenParam + 1);
         algorithmInfo.execute(dsObject, desenParam);
         // 脱敏后收集信息
         // 结束时间
@@ -362,6 +1185,15 @@ public class FileServiceImpl implements FileService {
         // 脱敏后文件字节流
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        if (algorithmInfo.getParams() == null) {
+            infoBuilders.desenAlgParam.append("无参");
+        } else {
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
+        }
+        // TODO: 非失真算法的脱敏级别
+        infoBuilders.desenLevel.append(desenParam + 1);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("image");
         // 脱敏后类型
@@ -373,46 +1205,12 @@ public class FileServiceImpl implements FileService {
         // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
 
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        // 本地存证
-        // 存证系统
-        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) +
+                util.getTime()).getBytes());
 
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg,
-                rawFileName, rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(), infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlgParam, startTime, endTime,
-                infoBuilders.desenLevel, desenCom);
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
-                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes,
-                    desenFileBytes);
-        });
-        // 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-        // 关闭线程池
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix,
+                startTime, endTime);
         // 读取文件返回
         HttpHeaders headers = new HttpHeaders();
         if ((rawFileSuffix.equals("png"))) {
@@ -426,42 +1224,30 @@ public class FileServiceImpl implements FileService {
 
     }
 
-    private void realDealExcel(Sheet sheet, DesenInfoStringBuilders infoBuilders, List<ExcelParam> excelParamList, int totalRowNum, Row fieldNameRow, int columnCount) throws IOException {
-        log.info("Total column number is " + columnCount);
-        // 调用脱敏程序处理
-        log.info("Start Excel file desen");
-        // 脱敏开始时间
-        String startTime = util.getTime();
-        long startTimePoint = System.nanoTime();
+    private Map<Integer, List<?>> realDealExcel(Sheet sheet, DesenInfoStringBuilders infoBuilders,
+                                                List<ExcelParam> excelParamList, int totalRowNum,
+                                                Row fieldNameRow, int columnCount) throws IOException {
         //  脱敏，逐列处理
+        Map<String, ExcelParam> excelParamMap = new HashMap<>();
+        Map<Integer, List<?>> desenResult = new HashMap<>();
+        Map<Integer, List<Object>> preprocessedData = new HashMap<>();
+        for (ExcelParam item : excelParamList) {
+            excelParamMap.put(item.getColumnName().trim(), item);
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DataFormatter dataFormatter = new DataFormatter();
+
+        // 对表格数据进行预处理
         for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-            DataFormatter dataFormatter = new DataFormatter();
-            // 取列名
             String columnName = fieldNameRow.getCell(columnIndex).toString();
-            log.info("Current column name: " + columnName);
+            log.info("Current preprocessed column name: " + columnName);
             // 当前列操作脱敏的参数
             ExcelParam excelParam = null;
             // 遍历模板中的列名，找到匹配的脱敏参数
-            for (ExcelParam param : excelParamList) {
-                if (columnName.trim().equals(param.getColumnName().trim())) {
-                    excelParam = param;
-                }
-            }
-            if (excelParam == null) {
-                log.error("Current column name does't match any column in the template");
-                throw new IOException("Current column name does't match any column in the template");
-            }
-
-            int algoNum = excelParam.getK();
-            AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(algoNum);
-            log.info("Excel Param: {}", excelParam);
-
-            addDataTypeAndInfoIden(infoBuilders, excelParam, columnName, algoNum);
-
-            // 取列数据
+            excelParam = excelParamMap.get(columnName.trim());
             List<Object> objs = new ArrayList<>();
-
-            // 从第一列开始取
+            // 从第一行开始取
             for (int rowIndex = 1; rowIndex <= totalRowNum; rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
                 if (row != null) {
@@ -489,7 +1275,6 @@ public class FileServiceImpl implements FileService {
                                 String dateString = cell.getStringCellValue();
                                 java.util.Date date = DateParseUtil.parseDate(dateString);
                                 if (date != null) {
-                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                                     String formattedDate = sdf.format(date);
                                     objs.add(formattedDate);
                                 } else {
@@ -500,12 +1285,18 @@ public class FileServiceImpl implements FileService {
                                 if (DateUtil.isCellDateFormatted(cell)) {
                                     // 如果单元格是日期类型
                                     java.util.Date numericDate = cell.getDateCellValue();
-                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                                     String formattedDate = sdf.format(numericDate);
 //                                    System.out.println("Formatted Date from Numeric: " + formattedDate);
                                     objs.add(formattedDate);
                                 } else {
-                                    objs.add(dataFormatter.formatCellValue(cell));
+                                    String formatCellValue = dataFormatter.formatCellValue(cell);
+                                    java.util.Date date2 = DateParseUtil.parseDate(formatCellValue);
+                                    if (date2 != null) {
+                                        String formattedDate = sdf.format(date2);
+                                        objs.add(formattedDate);
+                                    } else {
+                                        log.error("Invalid Date String: " + formatCellValue);
+                                    }
                                 }
                                 break;
                             default:
@@ -552,8 +1343,33 @@ public class FileServiceImpl implements FileService {
                     }
                 }
             }
-            int columnDataType = excelParam.getDataType();
+            preprocessedData.put(columnIndex, objs);
+        }
 
+        Long startTimePoint = System.currentTimeMillis();
+        // 脱敏
+        log.info("开始脱敏");
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+            // 取列名
+            String columnName = fieldNameRow.getCell(columnIndex).toString();
+            log.info("Current desen column name: " + columnName);
+            // 当前列操作脱敏的参数
+            ExcelParam excelParam = null;
+            // 遍历模板中的列名，找到匹配的脱敏参数
+            excelParam = excelParamMap.get(columnName.trim());
+            if (excelParam == null) {
+                log.error("Current column name does't match any column in the template");
+                throw new IOException("Current column name does't match any column in the template");
+            }
+
+            int algoNum = excelParam.getK();
+            AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(algoNum);
+            log.info("Excel Param: {}", excelParam);
+            addDataTypeAndInfoIden(infoBuilders, excelParam, columnName, algoNum);
+            // 取列数据
+            List<Object> objs = new ArrayList<>();
+            objs = preprocessedData.get(columnIndex);
+            int columnDataType = excelParam.getDataType();
             // 添加脱敏参数
             infoBuilders.desenAlgParam.append(
                     excelParam.getTmParam() == 0 ? "没有脱敏," :
@@ -563,7 +1379,6 @@ public class FileServiceImpl implements FileService {
             switch (columnDataType) {
                 // 数值型数据
                 case 0: {
-                    System.out.println(objs.size());
                     List<Double> tempResult;
                     switch (algoNum) {
                         // 差分隐私laplace噪声
@@ -573,8 +1388,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
 
@@ -585,8 +1401,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
 
@@ -597,8 +1414,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
                         // 基于随机高斯噪声的数值加噪算法
@@ -608,8 +1426,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
                         // 数值偏移
@@ -619,8 +1438,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
 
                         }
@@ -633,9 +1453,9 @@ public class FileServiceImpl implements FileService {
                             List<String> list = getDsList(algorithmInfo, rawData, excelParam);
                             // 写列数据
                             if (excelParam.getTmParam() == 0) {
-                                util.write2Excel(sheet, totalRowNum, columnIndex, objs);
+                                desenResult.put(columnIndex, objs);
                             } else {
-                                util.write2Excel(sheet, totalRowNum, columnIndex, list);
+                                desenResult.put(columnIndex, list);
                             }
                             break;
                         }
@@ -646,26 +1466,12 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
-//                        default: {
-//                            // 脱敏算法参数
-//                            Map<Integer, String> map = new HashMap<>();
-//                            map.put(0, "没有脱敏,");
-//                            map.put(1, "10,");
-//                            map.put(2, "30,");
-//                            map.put(3, "50,");
-//                            infoBuilders.desenAlgParam.append(map.get(excelParam.getTmParam()));
-//                            // 脱敏要求
-//                            infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("进行分组置换,");
-//                            // 脱敏
-//                            tempResult = dpUtil.k_NumberCode(objs, excelParam.getTmParam());
-//                            // 写列数据
-//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
-//                            break;
-//                        }
+
                     }
                     break;
                 }
@@ -673,23 +1479,16 @@ public class FileServiceImpl implements FileService {
                 case 1: {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("随机扰动,");
-                    //
                     DSObject rawData = new DSObject(objs);
                     List<String> dpCode = getDsList(algorithmInfo, rawData, excelParam);
+                    desenResult.put(columnIndex, dpCode);
                     // 写列数据
-                    util.write2Excel(sheet, totalRowNum, columnIndex, dpCode);
+//                    util.write2Excel(sheet, totalRowNum, columnIndex, dpCode);
                     break;
                 }
 
                 case 3: {
                     List<String> tempResult;
-
-//                    if (excelParam.getTmParam() == 0) {
-//                        infoBuilders.desenAlgParam.append("没有脱敏,");
-//                    } else {
-//                        infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参，"
-//                                : algorithmInfo.getParams().get(excelParam.getTmParam()).toString() + ",");
-//                    }
                     switch (algoNum) {
                         case 11: {
                             // 脱敏要求
@@ -697,8 +1496,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
                         case 13:
@@ -712,8 +1512,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
                         case 17: {
@@ -721,8 +1522,9 @@ public class FileServiceImpl implements FileService {
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("哈希,");
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
-                            tempResult = getDsList(algorithmInfo, rawData, excelParam);                            // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+                            tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);// 写列数据
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
                         case 19:
@@ -732,8 +1534,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             tempResult = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, tempResult);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
                     }
@@ -751,8 +1554,9 @@ public class FileServiceImpl implements FileService {
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
                             dates = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, dates);
                             // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, dates);
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, dates);
                             break;
                         }
                         case 18: {
@@ -760,28 +1564,11 @@ public class FileServiceImpl implements FileService {
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("日期进行分组置换,");
                             // 脱敏
                             DSObject rawData = new DSObject(objs);
-                            dates = getDsList(algorithmInfo, rawData, excelParam);                            // 写列数据
-                            util.write2Excel(sheet, totalRowNum, columnIndex, dates);
+                            dates = getDsList(algorithmInfo, rawData, excelParam);
+                            desenResult.put(columnIndex, dates);// 写列数据
+//                            util.write2Excel(sheet, totalRowNum, columnIndex, dates);
                             break;
                         }
-//                        default: {
-//                            if (excelParam.getTmParam() == 0) {
-//                                infoBuilders.desenAlgParam.append("没有脱敏,");
-//                            } else {
-//                                infoBuilders.desenAlgParam.append("无参,");
-//                            }
-//                            // 脱敏要求:
-//                            infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("取整处理,");
-//                            // 脱敏
-//                            DSObject rawData = new DSObject(objs);
-//                            times = algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
-//                                    .stream()
-//                                    .map(obj -> obj != null ? (String) obj : null)
-//                                    .collect(Collectors.toList());
-//                            // 写列数据
-//                            util.write2Excel(sheet, totalRowNum, columnIndex, times);
-//                            break;
-//                        }
                     }
                     break;
                 }
@@ -789,147 +1576,63 @@ public class FileServiceImpl implements FileService {
             }
 
         }
-    }
+        Long endTimePoint = System.currentTimeMillis();
+        Long totalMilliSeconds = endTimePoint - startTimePoint;
+        Double everyColumnTime = totalMilliSeconds / (double) columnCount;
+        Double singleCellTime = everyColumnTime / totalRowNum;
+        Double cellsInOneSecond = 1000 / singleCellTime;
 
-    private LogInfo processExcel(FileStorageDetails fileStorageDetails, String params, String sheetName, Boolean ifSaveExcelParams) throws IOException {
-        // 包含不同的流转场景信息
-        String[] parts = sheetName.split("_");
-        String sheetTemplate = String.join("_", Arrays.copyOfRange(parts, 0, parts.length));
-        DecimalFormat df = new DecimalFormat("#");
-        Boolean desenCom = false;
-        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
-        String objectMode = "text";
+        log.info("脱敏表格精确总用时：{} ms", endTimePoint - startTimePoint);
+        log.info("脱敏表格每列用时：{} ms", everyColumnTime);
+        log.info("每秒钟可脱敏单元格数量：{}", cellsInOneSecond);
+        return desenResult;
 
-        // 设置原文件保存路径
-        String rawFileName = fileStorageDetails.getRawFileName();
-        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
-        Path rawFilePath = fileStorageDetails.getRawFilePath();
-        String rawFilePathString = fileStorageDetails.getRawFilePathString();
-        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
-        Long rawFileSize = fileStorageDetails.getRawFileSize();
-
-        // 设置脱敏后文件路径信息
-        String desenFileName = fileStorageDetails.getDesenFileName();
-        Path desenFilePath = fileStorageDetails.getDesenFilePath();
-        log.info(desenFilePath.toAbsolutePath().toString());
-        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
-
-        // 读取excel文件
-        InputStream inputStream = Files.newInputStream(rawFilePath);
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
-
-        //脱敏参数处理,转为json
-        List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
-        // 保存参数到数据库中
-        saveExcelParamsToDatabase(sheetName, ifSaveExcelParams, excelParamList);
-        // 数据行数
-        int totalRowNum = sheet.getLastRowNum();
-        // 字段名行
-        Row fieldNameRow = sheet.getRow(0);
-        // 列数
-        int columnCount = fieldNameRow.getPhysicalNumberOfCells(); // 获取列数
-        log.info("Total column number is " + columnCount);
-        // 调用脱敏程序处理
-        log.info("Start Excel file desen");
-        // 脱敏开始时间
-        String startTime = util.getTime();
-        long startTimePoint = System.nanoTime();
-
-        realDealExcel(sheet, infoBuilders, excelParamList, totalRowNum, fieldNameRow, columnCount);
-
-        // 结束时间
-        long endTimePoint = System.nanoTime();
-        // 脱敏结束时间
-        String endTime = util.getTime();
-        log.info("Desensitization finished in " + (endTimePoint - startTimePoint) / 1e6 + "ms");
-        // 单条运行时间
-        long oneTime = (endTimePoint - startTimePoint) / (totalRowNum - 1) / columnCount;
-        log.info("Single data running time：" + oneTime + " ns");
-
-        // 一秒数据量
-        log.info("Number of dealt data per second:" + 1e9 / oneTime);
-        log.info("Excel desen finished");
-
-        // 保存处理后的Excel数据到ByteArrayOutputStream中
-        // 保存脱敏后文件
-        // 脱敏文件路径
-        FileOutputStream fileOutputStream = new FileOutputStream(desenFilePathString);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        workbook.write(byteArrayOutputStream);
-        byte[] newExcelData = byteArrayOutputStream.toByteArray();
-        fileOutputStream.write(newExcelData);
-
-        // 保存参数文件到本地txt文件
-        Path paramDirectory = Paths.get("desen_params");
-        if (!Files.exists(paramDirectory)) {
-            Files.createDirectory(paramDirectory);
-        }
-        String paramsFileName = "params" + rawFileName.substring(0, rawFileName.lastIndexOf('.')) + ".txt";
-        String paramsFilePath = paramDirectory.resolve(paramsFileName).toAbsolutePath().toString();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(paramsFilePath))) {
-            for (ExcelParam p : excelParamList) {
-                // 将每个Person对象转换为字符串并写入文件
-                String line = p.toString();
-                writer.write(line);
-                writer.newLine(); // 换行
-            }
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            log.error("Failed to save params to file");
-        }
-
-        // 关闭工作簿和流
-        fileOutputStream.close();
-        workbook.close();
-        inputStream.close();
-
-        // 标志脱敏完成
-        desenCom = true;
-        // 脱敏前信息
-        // 将文件字节流转换为字符串
-        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
-        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
-        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
-
-        fileStorageDetails.setDesenFileBytes(desenFileBytes);
-        fileStorageDetails.setDesenFileSize(desenFileSize);
-        // 存证系统
-        String evidenceID = util.getSM3Hash((new String(newExcelData, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-        return LogInfo.builder().fileType(sheetName).desenFileBytes(desenFileBytes).desenFileSize(desenFileSize)
-                .desenFileName(desenFileName).desenCom(desenCom).evidenceID(evidenceID).globalID(globalID).objectMode(objectMode)
-                .rawFileName(rawFileName).rawFileBytes(rawFileBytes).rawFileSize(rawFileSize).startTime(startTime).endTime(endTime)
-                .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
     }
 
     @Override
-    public ResponseEntity<byte[]> dealExcel(FileStorageDetails fileStorageDetails, String params, String sheetName, Boolean ifSaveExcelParams) throws IOException, ExecutionException, InterruptedException {
-
+    public ResponseEntity<byte[]> dealExcel(FileStorageDetails fileStorageDetails, String params, String sheetName,
+                                            Boolean ifSaveExcelParams) throws IOException, ExecutionException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         LogInfo logInfo = processExcel(fileStorageDetails, params, sheetName, ifSaveExcelParams);
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+        // 构造日志收集结果
         LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
-
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
         byte[] rawFileBytes = logInfo.getRawFileBytes();
         byte[] desenFileBytes = logInfo.getDesenFileBytes();
         String desenFileName = logInfo.getDesenFileName();
-
-        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
         // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
         if (ifSendToEvaFirst) {
-            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails, logCollectResult, rawFileBytes, desenFileBytes));
-        } else {
-            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
         }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
-        return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
-//        ResponseEntity<byte[]> responseEntityResult = new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
-//        responseEntityCompletableFuture.complete(responseEntityResult);
-//        return responseEntityCompletableFuture.get();
-
-
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
+        }
+        // 在此处等待响应返回
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
 
     }
 
@@ -1319,24 +2022,6 @@ public class FileServiceImpl implements FileService {
                             util.write2Excel(sheet, totalRowNum, columnIndex, dates);
                             break;
                         }
-//                        default: {
-//                            if (excelParam.getTmParam() == 0) {
-//                                infoBuilders.desenAlgParam.append("没有脱敏,");
-//                            } else {
-//                                infoBuilders.desenAlgParam.append("无参,");
-//                            }
-//                            // 脱敏要求:
-//                            infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("取整处理,");
-//                            // 脱敏
-//                            DSObject rawData = new DSObject(objs);
-//                            times = algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
-//                                    .stream()
-//                                    .map(obj -> obj != null ? (String) obj : null)
-//                                    .collect(Collectors.toList());
-//                            // 写列数据
-//                            util.write2Excel(sheet, totalRowNum, columnIndex, times);
-//                            break;
-//                        }
                     }
                     break;
                 }
@@ -1412,7 +2097,7 @@ public class FileServiceImpl implements FileService {
         SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
                 rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 //        // 发送方法
 //        executorService.submit(() -> {
 //            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
@@ -1424,17 +2109,12 @@ public class FileServiceImpl implements FileService {
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
                 sheetTemplate, rawFileSuffix, desenCom);
-//
-//        // 发送方法
-//        executorService.submit(() -> {
-//            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-//        });
-//
-//        // 拆分重构系统
+
+        // 拆分重构系统
         SendSplitDesenData sendSplitDesenData = logCollectUtil.buildSendSplitReq(infoBuilders.desenInfoAfterIden, infoBuilders.desenAlg,
                 rawFileBytes, desenFileBytes, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-//
+
         // 合规检查系统
         SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
                 infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
@@ -1447,8 +2127,7 @@ public class FileServiceImpl implements FileService {
 //        executorService.shutdown();
 
         // 使用单独方法构建线程池发送日志
-//        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, sheetTemplate, rawFileSuffix, startTime, endTime);
-        eventPublisher.publishEvent(new LogManagerEvent(this, submitEvidenceLocal, reqEvidenceSave, sendEvaReq, sendSplitDesenData, sendRuleReq, rawFileBytes, desenFileBytes));
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, sheetTemplate, rawFileSuffix, startTime, endTime);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
@@ -1457,19 +2136,65 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public ResponseEntity<byte[]> dealVideo(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+
+        LogInfo logInfo = processVideo(fileStorageDetails, params, algName);
+
+        // 构造日志收集结果
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+        // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
+        if (ifSendToEvaFirst) {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
+        }
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes));
+        }
+        // 在此处等待响应返回
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
+    }
+
+
+    @Override
     public ResponseEntity<byte[]> dealVideo(MultipartFile file, String params, String algName) throws IOException {
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "video";
-
         // 设置文件时间戳
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
-
         // 设置原文件信息
         if (file.getOriginalFilename() == null) {
             throw new IOException("Input file name is null");
         }
-
         // 设置原文件保存路径
         String rawFileName = fileTimeStamp + file.getOriginalFilename();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
@@ -1489,9 +2214,6 @@ public class FileServiceImpl implements FileService {
         DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
 
         AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
-        infoBuilders.desenAlg.append(algorithmInfo.getId());
-        infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam));
-        infoBuilders.desenLevel.append(desenParam + 1);
 
         // 调用脱敏程序处理
         log.info("Start video desen");
@@ -1499,62 +2221,6 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         long startTimePoint = System.currentTimeMillis();
         algorithmInfo.execute(dsObject, desenParam);
-
-//        switch (algName) {
-//            case "meanValueVideo" : {
-//                desenAlg.append(50);
-//                int[] paramsTemp = new int[] {9, 15, 21};
-//                desenAlgParam.append(paramsTemp[desenParam]);
-//                desenLevel.append(desenParam + 1);
-//                DSObject result = generalization.service(dsObject, 17, desenParam);
-//                break;
-//            }
-//            case "gaussian_blur_video" : {
-//                desenAlg.append(51);
-//                int[] paramsTemp = new int[] {3, 5, 8};
-//                desenAlgParam.append(paramsTemp[desenParam]);
-//                desenLevel.append(desenParam + 1);
-//                DSObject result = generalization.service(dsObject, 15, desenParam);
-//
-//                break;
-//            }
-//            case "pixelate_video" : {
-//                desenAlg.append(52);
-//                int[] paramsTemp = new int[] {5, 10, 15};
-//                desenAlgParam.append(paramsTemp[desenParam]);
-//                desenLevel.append(desenParam + 1);
-//                DSObject result = generalization.service(dsObject, 14, desenParam);
-//
-//                break;
-//            }
-//            case "box_blur_video" : {
-//                desenAlg.append(53);
-//                int[] paramsTemp = new int[] {2, 4, 8};
-//                desenAlgParam.append(paramsTemp[desenParam]);
-//                desenLevel.append(desenParam + 1);
-//                DSObject result = generalization.service(dsObject, 16, desenParam);
-//
-//                break;
-//            }
-//            case "replace_region_video" : {
-//                desenAlg.append(54);
-//                int[][] paramsTemp = new int[][] {{100, 100, 200, 200}, {50, 50, 300, 300}, {25, 25, 400, 400}};
-//                desenAlgParam.append(Arrays.toString(paramsTemp[desenParam]));
-//                desenLevel.append(desenParam + 1);
-//                DSObject result = generalization.service(dsObject, 18, desenParam);
-//                break;
-//            }
-//
-//            case "video_add_color_offset" :{
-//                desenAlg.append(55);
-//                int[] paramsTemp = new int[] {20, 50, 100};
-//                desenAlgParam.append(paramsTemp[desenParam]);
-//                desenLevel.append(desenParam + 1);
-//                DSObject result = replacement.service(dsObject, 14, desenParam);
-//                break;
-//            }
-//
-//        }
 
         // 脱敏后收集信息
         // 结束时间
@@ -1572,6 +2238,13 @@ public class FileServiceImpl implements FileService {
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         // 脱敏算法
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        if (algorithmInfo.getParams() == null) {
+            infoBuilders.desenAlgParam.append("无参");
+        } else {
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
+        }
+        infoBuilders.desenLevel.append(desenParam + 1);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("video");
         // 脱敏后类型
@@ -1582,58 +2255,14 @@ public class FileServiceImpl implements FileService {
         infoBuilders.desenRequirements.append("对视频脱敏");
         // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
-
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-
         // 存证系统evidenceID
-        //
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
 
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName, rawFileBytes, rawFileSize,
-                desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(), infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
-                desenFileName, desenFileBytes, desenFileSize,
-                infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg, infoBuilders.desenAlgParam,
-                startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
-                infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam,
-                startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        // 关闭线程池
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
 
         // 读取文件返回
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, "video/mp4");
         headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
 
         return ResponseEntity.ok()
@@ -1642,19 +2271,61 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> dealAudio(MultipartFile file, String params, String algName, String sheet) throws IOException, SQLException, InterruptedException {
+    public ResponseEntity<byte[]> dealAudio(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, SQLException, InterruptedException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+        LogInfo logInfo = processAudio(fileStorageDetails, params, algName);
+        // 构造日志收集结果
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+        // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
+        if (ifSendToEvaFirst) {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
+        }
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
+        }
+        // 在此处等待响应返回
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
+    }
+
+    @Override
+    public ResponseEntity<byte[]> dealAudio(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException {
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "audio";
-
         // 设置文件时间戳
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
-
         // 设置原文件信息
         if (file.getOriginalFilename() == null) {
             throw new IOException("Input file name is null");
         }
-
         // 设置原文件保存路径
         String rawFileName = fileTimeStamp + file.getOriginalFilename();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
@@ -1672,13 +2343,11 @@ public class FileServiceImpl implements FileService {
 
         // 脱敏参数处理
         String[] paramsList = params.split(",");
-        String desenParam = paramsList[paramsList.length - 1];
-
+        int desenParam = Integer.parseInt(paramsList[paramsList.length - 1]);
         // 获取脱敏算法
         AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
-        // 添加脱敏算法信息
-        infoBuilders.desenAlg.append(algorithmInfo.getId());
         List<String> paths = Arrays.asList(rawFilePathString, desenFilePathString);
+
         DSObject desenObj = new DSObject(paths);
 
         // 调用脱敏程序处理
@@ -1687,18 +2356,7 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         // 脱敏开始时间
         long startTimePoint = System.currentTimeMillis();
-        int paramInteger = Integer.parseInt(desenParam);
-        List<Object> param = algorithmInfo.getParams();
-        if (algorithmInfo.getParams() == null) {
-            infoBuilders.desenAlgParam.append("无参");
-        } else {
-            algorithmInfo.execute(desenObj, paramInteger);
-        }
-        // 脱敏参数
-        infoBuilders.desenAlgParam.append(param.get(paramInteger));
-        // 脱敏级别
-        infoBuilders.desenLevel.append(paramInteger + 1);
-
+        algorithmInfo.execute(desenObj, desenParam);
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
         // 脱敏耗时
@@ -1713,60 +2371,30 @@ public class FileServiceImpl implements FileService {
         // 脱敏后文件字节流
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        infoBuilders.desenAlg.append(algorithmInfo.getId());
+        if (algorithmInfo.getParams() == null) {
+            infoBuilders.desenAlgParam.append("无参");
+        } else {
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
+        }
+        // 脱敏级别
+        infoBuilders.desenLevel.append(desenParam + 1);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("audio");
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append("audio");
         // 脱敏意图
         infoBuilders.desenIntention.append("对音频脱敏");
         // 脱敏要求
         infoBuilders.desenRequirements.append("对声纹脱敏");
         // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
         // 存证系统
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        // 发送方法
-       /* Thread evidenceThread = new Thread(() -> sendData.send2Evidence(reqEvidenceSave, submitEvidenceLocal));
-        evidenceThread.start();*/
-        Future<?> future_evidence = executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // TODO: 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        // 关闭线程池
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
 
         // 设置HTTP响应头部信息
         HttpHeaders headers = new HttpHeaders();
@@ -1775,6 +2403,51 @@ public class FileServiceImpl implements FileService {
 
         // 返回处理后的音频文件数据给前端
         return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> dealGraph(FileStorageDetails fileStorageDetails, String params) throws IOException, SQLException, InterruptedException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+        LogInfo logInfo = processGraph(fileStorageDetails, params);
+        // 构造日志收集结果
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+        // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
+        if (ifSendToEvaFirst) {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
+        }
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
+        }
+        // 在此处等待响应返回
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
     }
 
     @Override
@@ -1848,49 +2521,11 @@ public class FileServiceImpl implements FileService {
         // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
 
-        // 脱敏文件流
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-
         // 存证系统
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // TODO: 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        // 关闭线程池
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
 
         // 返回数据给前端
         HttpHeaders headers = new HttpHeaders();
@@ -1900,147 +2535,240 @@ public class FileServiceImpl implements FileService {
         return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
     }
 
+    //    @Override
+//    public ResponseEntity<byte[]> dealCsv(FileStorageDetails fileStorageDetails, String params, String algName) throws InterruptedException, IOException {
+//        Boolean desenCom = false;
+//        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+//        String objectMode = "text";
+//
+//        // 设置原文件保存路径
+//        String rawFileName = fileStorageDetails.getRawFileName();
+//        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+//        Path rawFilePath = fileStorageDetails.getRawFilePath();
+//        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+//        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+//        Long rawFileSize = fileStorageDetails.getRawFileSize();
+//
+//        // 设置脱敏后文件路径信息
+//        String desenFileName = fileStorageDetails.getDesenFileName();
+//        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+//        log.info(desenFilePath.toAbsolutePath().toString());
+//        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+//
+//        // 脱敏参数
+//        String privacyLevel = String.valueOf(params.charAt(params.length() - 1));
+//        int[] k_anonymity_param = new int[]{5, 10, 20};
+//        int[] l_diversity_param = new int[]{2, 4, 6};
+//        double[] t_closeness_param = new double[]{0.6, 0.4, 0.2};
+//        String desenParam;
+//        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
+//        // 脱敏开始时间
+//        String startTime = util.getTime();
+//        // 开始时间
+//        // TODO: 整合该部分进AlgorithmsFactory
+//        long desenStartTime = System.currentTimeMillis();
+//        switch (algName) {
+//            case "k_anonymity":
+//                infoBuilders.desenAlg.append(25);
+//                anonymity.service(dsObject, 1, Integer.parseInt(privacyLevel));
+//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
+//                break;
+//            case "l_diversity":
+//                infoBuilders.desenAlg.append(26);
+//                anonymity.service(dsObject, 7, Integer.parseInt(privacyLevel));
+//                desenParam = String.valueOf(l_diversity_param[Integer.parseInt(privacyLevel)]);
+//                break;
+//            case "t_closeness":
+//                infoBuilders.desenAlg.append(27);
+//                anonymity.service(dsObject, 10, Integer.parseInt(privacyLevel));
+//                desenParam = String.valueOf(t_closeness_param[Integer.parseInt(privacyLevel)]);
+//                break;
+//
+//            default:
+//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
+//        }
+//        infoBuilders.desenAlgParam.append(desenParam);
+//        // 脱敏级别
+//        infoBuilders.desenLevel.append(privacyLevel + 1);
+//        // 脱敏结束时间
+//        String endTime = util.getTime();
+//        // 结束时间
+//        long desenEndTime = System.currentTimeMillis();
+//        long executionTime = desenEndTime - desenStartTime;
+//        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "CSV");
+//
+//        // 标志脱敏完成
+//        desenCom = true;
+//        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+//
+//        // 脱敏后信息
+//        // 脱敏后文件大小
+//        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+//        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+//        // 脱敏前类型
+//        infoBuilders.desenInfoPreIden.append("csv文件");
+//        // 脱敏后类型
+//        infoBuilders.desenInfoAfterIden.append("csv文件");
+//        // 脱敏意图
+//        infoBuilders.desenIntention.append("对csv文件脱敏");
+//        // 脱敏要求
+//        infoBuilders.desenRequirements.append("对csv文件脱敏");
+//        // 脱敏数据类型
+//        infoBuilders.fileDataType.append(rawFileSuffix);
+//
+//        // 存证系统
+//        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+//        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+//        // 返回excel给前端
+//        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+//                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+//
+//        return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+//    }
+//    @Override
+//    public ResponseEntity<byte[]> dealCsv(FileStorageDetails fileStorageDetails, String params, String algName)
+//            throws IOException, InterruptedException {
+//        Boolean desenCom = false;
+//        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+//        String objectMode = "text";
+//
+//        /// 设置原文件保存路径
+//        String rawFileName = fileStorageDetails.getRawFileName();
+//        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
+//        Path rawFilePath = fileStorageDetails.getRawFilePath();
+//        String rawFilePathString = fileStorageDetails.getRawFilePathString();
+//        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+//        Long rawFileSize = fileStorageDetails.getRawFileSize();
+//
+//        // 设置脱敏后文件路径信息
+//        String desenFileName = fileStorageDetails.getDesenFileName();
+//        Path desenFilePath = fileStorageDetails.getDesenFilePath();
+//        log.info(desenFilePath.toAbsolutePath().toString());
+//        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+//
+//        // 脱敏参数
+//        String privacyLevel = String.valueOf(params.charAt(params.length() - 1));
+//        int[] k_anonymity_param = new int[]{5, 10, 20};
+//        int[] l_diversity_param = new int[]{2, 4, 6};
+//        double[] t_closeness_param = new double[]{0.6, 0.4, 0.2};
+//        String desenParam;
+//        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
+//        // 脱敏开始时间
+//        String startTime = util.getTime();
+//        // 开始时间
+//        // TODO: 整合该部分进AlgorithmsFactory
+//        long desenStartTime = System.currentTimeMillis();
+//        switch (algName) {
+//            case "k_anonymity":
+//                infoBuilders.desenAlg.append(25);
+//                anonymity.service(dsObject, 1, Integer.parseInt(privacyLevel));
+//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
+//                break;
+//            case "l_diversity":
+//                infoBuilders.desenAlg.append(26);
+//                anonymity.service(dsObject, 7, Integer.parseInt(privacyLevel));
+//                desenParam = String.valueOf(l_diversity_param[Integer.parseInt(privacyLevel)]);
+//                break;
+//            case "t_closeness":
+//                infoBuilders.desenAlg.append(27);
+//                anonymity.service(dsObject, 10, Integer.parseInt(privacyLevel));
+//                desenParam = String.valueOf(t_closeness_param[Integer.parseInt(privacyLevel)]);
+//                break;
+//
+//            default:
+//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
+//        }
+//        infoBuilders.desenAlgParam.append(desenParam);
+//        // 脱敏级别
+//        infoBuilders.desenLevel.append(privacyLevel + 1);
+//        // 脱敏结束时间
+//        String endTime = util.getTime();
+//
+//        // 结束时间
+//        long desenEndTime = System.currentTimeMillis();
+//        long executionTime = desenEndTime - desenStartTime;
+//        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "CSV");
+//
+//        // 标志脱敏完成
+//        desenCom = true;
+//        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+//
+//        // 脱敏后信息
+//        // 脱敏后文件大小
+//        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+//        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+//        // 脱敏前类型
+//        infoBuilders.desenInfoPreIden.append("csv文件");
+//        // 脱敏后类型
+//        infoBuilders.desenInfoAfterIden.append("csv文件");
+//        // 脱敏意图
+//        infoBuilders.desenIntention.append("对csv文件脱敏");
+//        // 脱敏要求
+//        infoBuilders.desenRequirements.append("对csv文件脱敏");
+//        // 脱敏数据类型
+//        infoBuilders.fileDataType.append(rawFileSuffix);
+//        // 存证系统
+//        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
+//        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+//
+//        // 返回excel给前端
+//        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+//                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+//
+//        return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+//    }
     @Override
-    public ResponseEntity<byte[]> dealCsv(MultipartFile file, String params, String algName) throws InterruptedException, IOException {
-        Boolean desenCom = false;
-        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
-        String objectMode = "text";
-
-        // 设置文件时间戳
-        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
-
-        // 设置原文件信息
-        if (file.getOriginalFilename() == null) {
-            throw new IOException("Input file name is null");
+    public ResponseEntity<byte[]> dealSingleExcel(FileStorageDetails fileStorageDetails, String params, String algName)
+            throws IOException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+        LogInfo logInfo = processSingleExcel(fileStorageDetails, params, algName);
+        // 构造日志收集结果
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+        // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
+        if (ifSendToEvaFirst) {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
         }
-        // 设置原文件保存路径
-        String rawFileName = fileTimeStamp + file.getOriginalFilename();
-        String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
-        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
-        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
-        byte[] rawFileBytes = file.getBytes();
-        Long rawFileSize = file.getSize();
-
-        // 保存源文件
-        file.transferTo(rawFilePath.toAbsolutePath());
-        // 设置脱敏后文件路径信息
-        String desenFileName = "desen_" + rawFileName;
-        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
-        String desenFilePathString = desenFilePath.toAbsolutePath().toString();// 读取文件
-        InputStream inputStream = file.getInputStream();
-
-        // 脱敏参数
-        String privacyLevel = String.valueOf(params.charAt(params.length() - 1));
-        int[] k_anonymity_param = new int[]{5, 10, 20};
-        int[] l_diversity_param = new int[]{2, 4, 6};
-        double[] t_closeness_param = new double[]{0.6, 0.4, 0.2};
-        String desenParam;
-        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
-        // 脱敏开始时间
-        String startTime = util.getTime();
-        // 开始时间
-        // TODO: 整合该部分进AlgorithmsFactory
-        long desenStartTime = System.currentTimeMillis();
-        switch (algName) {
-            case "k_anonymity":
-                infoBuilders.desenAlg.append(25);
-                anonymity.service(dsObject, 1, Integer.parseInt(privacyLevel));
-                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
-                break;
-            case "l_diversity":
-                infoBuilders.desenAlg.append(26);
-                anonymity.service(dsObject, 7, Integer.parseInt(privacyLevel));
-                desenParam = String.valueOf(l_diversity_param[Integer.parseInt(privacyLevel)]);
-                break;
-            case "t_closeness":
-                infoBuilders.desenAlg.append(27);
-                anonymity.service(dsObject, 10, Integer.parseInt(privacyLevel));
-                desenParam = String.valueOf(t_closeness_param[Integer.parseInt(privacyLevel)]);
-                break;
-
-            default:
-                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
         }
-        infoBuilders.desenAlgParam.append(desenParam);
-        // 脱敏级别
-        infoBuilders.desenLevel.append(privacyLevel + 1);
-        // 脱敏结束时间
-        String endTime = util.getTime();
-
-        // 结束时间
-        long desenEndTime = System.currentTimeMillis();
-        long executionTime = desenEndTime - desenStartTime;
-        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "CSV");
-
-        // 标志脱敏完成
-        desenCom = true;
-        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
-
-        // 脱敏后信息
-        // 脱敏后文件大小
-        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
-        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
-        // 脱敏前类型
-        infoBuilders.desenInfoPreIden.append("csv文件");
-        // 脱敏后类型
-        infoBuilders.desenInfoAfterIden.append("csv文件");
-        // 脱敏意图
-        infoBuilders.desenIntention.append("对csv文件脱敏");
-        // 脱敏要求
-        infoBuilders.desenRequirements.append("对csv文件脱敏");
-        // 脱敏数据类型
-        infoBuilders.fileDataType.append(rawFileSuffix);
-
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-
-        // 存证系统
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // TODO: 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        // 关闭线程池
-        executorService.shutdown();
-        // 关闭工作簿和流
-        inputStream.close();
-        // 返回excel给前端
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
-
-        return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+        // 在此处等待响应返回
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
     }
 
     @Override
@@ -2080,7 +2808,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏文件路径
         FileOutputStream fileOutputStream = new FileOutputStream(desenFilePathString);
         // 保存参数文件
-        int param = Integer.parseInt(String.valueOf(params.charAt(params.length() - 1)));
+        int desenParam = Integer.parseInt(String.valueOf(params.charAt(params.length() - 1)));
         // 数据类型
         List<Integer> dataType = new ArrayList<>();
         // 数据行数
@@ -2098,33 +2826,34 @@ public class FileServiceImpl implements FileService {
 
         //  逐列处理
         DataFormatter dataFormatter = new DataFormatter();
-        for (int colIndex = 0; colIndex < columnCount; colIndex++) {
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
             // 取列名
-            String colName = fieldRow.getCell(colIndex).toString();
-            log.info("Column Index: {}, Column Name: {}", colIndex, colName);
+            String colName = fieldRow.getCell(columnIndex).toString();
+            log.info("Column Index: {}, Column Name: {}", columnIndex, colName);
 
             // 脱敏前信息类型标识
             infoBuilders.desenInfoPreIden.append(colName);
             infoBuilders.desenInfoAfterIden.append(colName);
             // 读取脱敏级别
-            infoBuilders.desenLevel.append(param);
+            infoBuilders.desenLevel.append(desenParam);
             // 脱敏意图
             infoBuilders.desenIntention.append(colName).append("脱敏,");
             // 脱敏数据类型
             infoBuilders.fileDataType.append(rawFileSuffix);
             // 取列数据
             List<Object> objs = new ArrayList<>();
+
             for (int j = 1; j <= totalRowNum; j++) {
                 Row row = sheet.getRow(j);
                 if (row != null) {
-                    Cell cell = row.getCell(colIndex);
+                    Cell cell = row.getCell(columnIndex);
                     objs.add(cell);
                 }
             }
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName.trim());
             DSObject dsObject = new DSObject(objs);
 
-            infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参" : algorithmInfo.getParams().get(param - 1));
+            infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
 
             switch (algName.trim()) {
                 case "dpDate": {
@@ -2132,12 +2861,12 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("添加Laplace噪声,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
 
-                    List<Date> dates = algorithmInfo.execute(dsObject, param).getList()
+                    List<Date> dates = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (Date) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, dates);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, dates);
                     break;
                 }
                 case "dpCode": {
@@ -2145,12 +2874,12 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("随机扰动,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
 
-                    List<String> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<String> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (String) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "laplaceToValue": {
@@ -2158,13 +2887,13 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("添加差分隐私Laplace噪声,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
                     // 脱敏
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<Double> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
                     // 写列数据
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "gaussianToValue": {
@@ -2172,12 +2901,12 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("添加差分隐私高斯噪声,");
                     infoBuilders.desenAlg.append(4);
 
-                    List<Double> datas = dp.service(dsObject, 27, param).getList()
+                    List<Double> datas = dp.service(dsObject, 27, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "randomUniformToValue": {
@@ -2185,25 +2914,25 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("添加随机均匀噪声,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
 
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<Double> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "randomLaplaceToValue": {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("添加随机laplace噪声,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<Double> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
 //                            .filter(obj -> obj instanceof Double)
                             .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "randomGaussianToValue": {
@@ -2211,12 +2940,12 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("添加随机高斯噪声,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
 
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<Double> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "valueShift": {
@@ -2224,26 +2953,26 @@ public class FileServiceImpl implements FileService {
                     infoBuilders.desenRequirements.append(colName).append("数值偏移,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
 
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<Double> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "floor": {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("数值取整,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
-                    if (param == 0) {
-                        util.write2Excel(sheet, totalRowNum, colIndex, objs);
+                    if (desenParam == 0) {
+                        util.write2Excel(sheet, totalRowNum, columnIndex, objs);
                     } else {
-                        List<Integer> datas = algorithmInfo.execute(dsObject, param).getList()
+                        List<Integer> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                                 .stream()
                                 .map(obj -> obj == null ? null : (Integer) obj)
                                 .collect(Collectors.toList());
-                        util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                        util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     }
                     break;
                 }
@@ -2251,24 +2980,24 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("数值映射,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
-                    List<Double> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<Double> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (Double) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
                 case "truncation": {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("截断,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
-                    List<String> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<String> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
                             .map(obj -> obj == null ? null : (String) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
 
@@ -2282,13 +3011,13 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("抑制,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
-                    List<String> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<String> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
 //                            .filter(obj -> obj instanceof String)
                             .map(obj -> obj == null ? null : (String) obj)
                             .collect(Collectors.toList());
 
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
 
@@ -2298,12 +3027,12 @@ public class FileServiceImpl implements FileService {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("置换,");
                     infoBuilders.desenAlg.append(algorithmInfo.getId());
-                    List<String> datas = algorithmInfo.execute(dsObject, param).getList()
+                    List<String> datas = algorithmInfo.execute(dsObject, desenParam).getList()
                             .stream()
 //                            .filter(obj -> obj instanceof String)
                             .map(obj -> obj == null ? null : (String) obj)
                             .collect(Collectors.toList());
-                    util.write2Excel(sheet, totalRowNum, colIndex, datas);
+                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
             }
@@ -2314,12 +3043,12 @@ public class FileServiceImpl implements FileService {
         // 脱敏结束时间
         String endTime = util.getTime();
 
-        log.info("Desensitization finished in" + (endTimePoint - startTimePoint) / 10e6 + "ms");
+        log.info("Desensitization finished in" + (endTimePoint - startTimePoint) / 1e6 + "ms");
         long oneTime = (endTimePoint - startTimePoint) / columnCount / (totalRowNum - 1);
         // 打印单条运行时间
         log.info("Single data running time：" + oneTime + " ns");
         // 一秒数据量
-        log.info("Number of dealt data per second:" + 10e9 / oneTime);
+        log.info("Number of dealt data per second:" + 1e9 / oneTime);
         log.info("Excel desen finished");
 
         // 保存处理后的Excel数据到outputStream中
@@ -2335,46 +3064,12 @@ public class FileServiceImpl implements FileService {
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         // 脱敏前信息
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
         // 存证系统
         String evidenceID = util.getSM3Hash((new String(newExcelData, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
 
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // TODO: 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
 
         // 关闭工作簿和流
         fileOutputStream.close();
@@ -2392,7 +3087,58 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> replaceVideoBackground(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException {
+    public ResponseEntity<byte[]> replaceVideoBackground(FileStorageDetails fileStorageDetails, String params,
+                                                         String algName, FileStorageDetails sheetStorageDetails) throws IOException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+
+        LogInfo logInfo = processReplaceVideoBackground(fileStorageDetails, params, algName, sheetStorageDetails);
+
+        // 构造日志收集结果
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+        // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
+        if (ifSendToEvaFirst) {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
+        }
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes));
+        }
+        // 在此处等待响应返回
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<byte[]> replaceVideoBackground(MultipartFile file, String params, String algName, MultipartFile sheet)
+            throws IOException{
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "video";
@@ -2453,8 +3199,7 @@ public class FileServiceImpl implements FileService {
         // 标志脱敏完成
         desenCom = true;
         String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
-        // 脱敏算法
-        infoBuilders.desenAlg.append(55);
+
         // 脱敏参数
 //        int[] param = algorithmInfo.getParams().toArray();
 //        List<Object> algParams = algorithmInfo.getParams();
@@ -2463,8 +3208,10 @@ public class FileServiceImpl implements FileService {
 //        } else {
 //            infoBuilders.desenAlgParam.append(algParams);
 //        }
+        // 脱敏算法
+        infoBuilders.desenAlg.append(55);
         // 脱敏参数
-        infoBuilders.desenAlgParam.append(imageFileName);
+        infoBuilders.desenAlgParam.append(rawBgPathString);
         // 脱敏级别
         infoBuilders.desenLevel.append(Integer.parseInt(desenParam) + 1);
         // 脱敏前类型
@@ -2477,51 +3224,13 @@ public class FileServiceImpl implements FileService {
         infoBuilders.desenRequirements.append("对视频脱敏");
         // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
-
         ObjectMapper objectMapper = new ObjectMapper();
-
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-
         // 存证系统
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // TODO: 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-        // 关闭线程池
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "video/mp4");
@@ -2534,12 +3243,61 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public ResponseEntity<byte[]> replaceFace(FileStorageDetails fileStorageDetails, String params, String algName, FileStorageDetails sheetStorageDetails) throws IOException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+        // 处理图片
+        LogInfo logInfo = processReplaceFace(fileStorageDetails, params, algName, sheetStorageDetails);
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+        // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
+        if (ifSendToEvaFirst) {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
+        }
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            if (logInfo.getRawFileSuffix().equals("png")) {
+                headers.setContentType(MediaType.IMAGE_PNG);
+            } else {
+                headers.setContentType(MediaType.IMAGE_JPEG);
+            }
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
+        }
+        // 在此处等待响应返回
+        // TODO: Controller Advice
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
+    }
+
+    @Override
     public ResponseEntity<byte[]> replaceFace(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException {
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "image";
         AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName);
-
         // 设置文件时间戳
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -2567,7 +3325,7 @@ public class FileServiceImpl implements FileService {
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();
 
         // 调用脱敏程序处理
-        infoBuilders.desenAlgParam.append(imageFileName);
+
         String desenParam = String.valueOf(params.charAt(params.length() - 1));
         long startTimePoint;
         long endTimePoint;
@@ -2577,8 +3335,6 @@ public class FileServiceImpl implements FileService {
         // 脱敏开始时间
         startTime = util.getTime();
         startTimePoint = System.currentTimeMillis();
-
-
         List<String> rawData = Arrays.asList(rawFilePathString, rawFacePathString, desenFilePathString);
         DSObject dsObject = new DSObject(rawData);
         String resultString = algorithmInfo.execute(dsObject, Integer.valueOf(params)).getList().toString();
@@ -2601,6 +3357,8 @@ public class FileServiceImpl implements FileService {
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         // 脱敏算法
         infoBuilders.desenAlg.append(algorithmInfo.getId());
+        // 脱敏参数
+        infoBuilders.desenAlgParam.append(rawFacePathString);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("image");
         // 脱敏后类型
@@ -2613,51 +3371,12 @@ public class FileServiceImpl implements FileService {
         infoBuilders.fileDataType.append(rawFileSuffix);
         // 设置脱敏等级
         infoBuilders.desenLevel.append(Integer.parseInt(desenParam) + 1);
-        // 脱敏后文件大小
-        ObjectMapper objectMapper = new ObjectMapper();
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
         // 存证系统
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // TODO: 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-        ObjectNode ruleCheckContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendRuleReq));
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        // 关闭线程池
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
         HttpHeaders headers = new HttpHeaders();
         if (rawFileName.contains("jpg")) {
             headers.setContentType(MediaType.IMAGE_JPEG);
@@ -2668,6 +3387,55 @@ public class FileServiceImpl implements FileService {
 
         return ResponseEntity.ok()
                 .headers(headers).body(desenFileBytes);
+    }
+
+    @Override
+    public ResponseEntity<byte[]> replaceFaceVideo(FileStorageDetails fileStorageDetails, String params, String algName,
+                                                   FileStorageDetails sheetStorageDetails) throws IOException {
+        HttpHeaders errorHttpHeaders = new HttpHeaders();
+        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+
+        LogInfo logInfo = processReplaceFaceVideo(fileStorageDetails, params, algName, sheetStorageDetails);
+
+        // 构造日志收集结果
+        LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
+        // 构造响应结果
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = new CompletableFuture<>();
+        // 获取文件信息
+        byte[] rawFileBytes = logInfo.getRawFileBytes();
+        byte[] desenFileBytes = logInfo.getDesenFileBytes();
+        String desenFileName = logInfo.getDesenFileName();
+        // 选择不同的日志发送方式
+        // 选择首先发给评测系统评测
+        if (ifSendToEvaFirst) {
+            eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                    logCollectResult, responseEntityCompletableFuture));
+        }
+        // 直接发给四个系统
+        else {
+            logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+            responseEntityCompletableFuture.complete(ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes));
+        }
+        // 在此处等待响应返回
+        try {
+            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+        } catch (TimeoutException e) {
+            log.error("等待处理结果超时：{}", e.getMessage());
+            String errorMsg = "等待处理结果超时";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (InterruptedException e) {
+            log.error("等待处理结果时异常中断：{}", e.getMessage());
+            String errorMsg = "等待处理结果时异常中断";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        } catch (ExecutionException e) {
+            log.error("等待处理结果时执行异常：{}", e.getMessage());
+            String errorMsg = "等待处理结果时执行异常";
+            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
+        }
     }
 
     @Override
@@ -2735,9 +3503,9 @@ public class FileServiceImpl implements FileService {
         // 脱敏算法
         infoBuilders.desenAlg.append(algorithmInfo.getId());
         // 脱敏参数
-        infoBuilders.desenAlgParam.append(imageFileName);
+        infoBuilders.desenAlgParam.append(rawFacePathString);
         // 脱敏级别
-        infoBuilders.desenLevel.append(Integer.parseInt(desenParam));
+        infoBuilders.desenLevel.append(Integer.parseInt(desenParam) + 1);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("video");
         // 脱敏后类型
@@ -2747,55 +3515,13 @@ public class FileServiceImpl implements FileService {
         // 脱敏要求
         infoBuilders.desenRequirements.append("对视频脱敏");
         // 脱敏数据类型
-        infoBuilders.fileDataType.append("video");
-        // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
         // 存证系统
         //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
-
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes,
-                desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes);
-        });
-
-        // TODO: 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-
-        // 关闭线程池
-        executorService.shutdown();
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "video/mp4");
@@ -2907,6 +3633,13 @@ public class FileServiceImpl implements FileService {
     // 从DSObject获取脱敏结果
     private <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
         return algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
+                .stream()
+                .map(item -> item != null ? (T) item : null)
+                .collect(Collectors.toList());
+    }
+
+    private <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, int param) {
+        return algorithmInfo.execute(rawData, param).getList()
                 .stream()
                 .map(item -> item != null ? (T) item : null)
                 .collect(Collectors.toList());

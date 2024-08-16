@@ -38,6 +38,40 @@ public class KAnonymityController {
         this.anonymity = anonymity;
     }
 
+    @PostMapping("/KAnonymity")
+    public ResponseEntity<?> kAnonymity(@RequestParam("csvFile") MultipartFile csvFile,
+                                              @RequestParam Map<String, MultipartFile> templates,
+                                              @RequestParam("params") String params,
+                                              @RequestParam("attribute") String attribute) {
+        try {
+            String originalCsvFileName = csvFile.getOriginalFilename();
+            saveFile(csvFile, originalCsvFileName);
+            if (originalCsvFileName != null) {
+                String baseName = originalCsvFileName.substring(0, originalCsvFileName.lastIndexOf('.'));
+                String extension = originalCsvFileName.substring(originalCsvFileName.lastIndexOf('.'));
+                for (Map.Entry<String, MultipartFile> entry : templates.entrySet()) {
+                    if (!Objects.equals(entry.getKey(), "csvFile")) {
+                        String fileName = baseName + "_hierarchy_" + entry.getKey() + extension;
+                        saveFile(entry.getValue(), fileName);
+                    }
+                }
+                DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
+                dsObject.setIntVal(templates.size());
+                String output = anonymity.service(dsObject, 1, Integer.parseInt(params)).getStringVal();
+                byte[] fileContent = Files.readAllBytes(Paths.get(output));
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + output);
+                headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+
+                return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
+
     @PostMapping("/LDiversity/Distinct")
     public ResponseEntity<?> LDistinctEntropy(@RequestParam("csvFile") MultipartFile csvFile,
                                                @RequestParam Map<String, MultipartFile> templates,
@@ -125,6 +159,39 @@ public class KAnonymityController {
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
                 String output = anonymity.service(dsObject, 9, Integer.parseInt(params)).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + output);
+                headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+
+                return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return null;
+    }
+
+    @PostMapping("/TCloseness")
+    public ResponseEntity<?> tCloseness(@RequestParam("csvFile") MultipartFile csvFile,
+                                        @RequestParam Map<String, MultipartFile> templates,
+                                        @RequestParam("params") String params,
+                                        @RequestParam("attribute") String attribute) {
+        try {
+            String originalCsvFileName = csvFile.getOriginalFilename();
+            saveFile(csvFile, originalCsvFileName);
+            if (originalCsvFileName != null) {
+                String baseName = originalCsvFileName.substring(0, originalCsvFileName.lastIndexOf('.'));
+                String extension = originalCsvFileName.substring(originalCsvFileName.lastIndexOf('.'));
+                for (Map.Entry<String, MultipartFile> entry : templates.entrySet()) {
+                    if (!Objects.equals(entry.getKey(), "csvFile")) {
+                        String fileName = baseName + "_hierarchy_" + entry.getKey() + extension;
+                        saveFile(entry.getValue(), fileName);
+                    }
+                }
+                DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
+                String output = anonymity.service(dsObject, 10, Integer.parseInt(params)).getStringVal();
+                byte[] fileContent = Files.readAllBytes(Paths.get(output));
+
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + output);
                 headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");

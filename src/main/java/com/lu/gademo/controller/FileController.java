@@ -38,6 +38,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 文件脱敏controller
@@ -98,8 +99,8 @@ public class FileController extends BaseController {
                                             @RequestParam("params") String params,
                                             @RequestParam("algName") String algName,
                                             @RequestParam("sheet") String sheet
-    ) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFile(file);
+    ) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, ExecutionException {
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
         log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
         log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
         // 调用脱敏函数
@@ -120,10 +121,8 @@ public class FileController extends BaseController {
         } else if (videoType.contains(fileType)) {
             return fileService.dealVideo(file, params, algName);
         } else if (audioType.contains(fileType)) {
-            return fileService.dealAudio(file, params, algName, sheet);
-        } else if ("csv".equals(fileType)) {
-            return fileService.dealCsv(file, params, algName);
-        } else {
+            return fileService.dealAudio(file, params, algName);
+        }  else {
             return fileService.dealGraph(file, params);
         }
 
@@ -144,6 +143,9 @@ public class FileController extends BaseController {
                                                    @RequestParam("algName") String algName,
                                                    @RequestPart("sheet") MultipartFile sheet
     ) throws IOException, InterruptedException, SQLException {
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+        FileStorageDetails sheetStorageDetails = fileStorageService.saveRawFile(sheet);
+
         switch (algName) {
             case "video_face_sub": {
                 return fileService.replaceFaceVideo(file, params, algName, sheet);

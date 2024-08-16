@@ -85,15 +85,12 @@ public class SendEvaReq extends BaseEntity {
     @Basic
     @Column(name = "desenfilesize")
     private Long desenFileSize;
-
     @Basic
     @Column(name = "filetype")
     private String fileType;
-
     @Basic
     @Column(name = "filesuffix")
     private String fileSuffix;
-
     @Basic
     @Column(name = "status")
     private String status;

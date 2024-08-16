@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <title>Insert title here</title>
     <link rel="shortcut icon" href="favicon.ico" />
@@ -9,21 +10,20 @@
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet" />
     <link href="${ctx!}/css/animate.css" rel="stylesheet" />
     <link
-      rel="stylesheet"
-      type="text/css"
-      href="${ctx!}/css/multiple-select.min.css"
-    />
+        rel="stylesheet"
+        type="text/css"
+        href="${ctx!}/css/multiple-select.min.css" />
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet" />
     <link href="${ctx!}/css/plugins/chosen/chosen.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="${ctx!}/css/GA.css" />
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet" />
     <link
-      href="${ctx!}/css/plugins/bootstrap-table/bootstrap-table.min.css"
-      rel="stylesheet"
-    />
+        href="${ctx!}/css/plugins/bootstrap-table/bootstrap-table.min.css"
+        rel="stylesheet" />
     <link href="${ctx!}/css/GA.css" rel="stylesheet" />
-  </head>
-  <body>
+</head>
+
+<body>
     <!-- 全局js -->
     <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
     <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
@@ -31,1003 +31,1302 @@
     <script src="${ctx!}/js/plugins/chosen/chosen.jquery.js"></script>
     <script src="${ctx!}/js/bootstrap.min.js"></script>
     <script src="${ctx!}/js/echarts.min.js"></script>
-
     <!-- Bootstrap table -->
     <script src="${ctx!}/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
     <script src="${ctx!}/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
     <script src="${ctx!}/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
-
     <!-- Peity -->
     <script src="${ctx!}/js/plugins/peity/jquery.peity.min.js"></script>
-
     <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
     <script src="${ctx!}/js/multiple-select.min.js"></script>
-
     <!-- 自定义js -->
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
     <script type="text/javascript">
-      let sheet = "shortvideo";
-      window.onload = function () {
+    let sheet = "shortvideo";
+    window.onload = function() {
         let selectedFile; // 全局变量，用于存储选择的文件
-        let currentSceneValue = document.getElementById("choose_transfer_scene").value;
+        let currentSceneValue = document.getElementById(
+            "choose_transfer_scene"
+        ).value;
         let suffix = "";
         let sceneName = sheet;
-        document.getElementById("choose_transfer_scene").addEventListener("change", function () {
-          currentSceneValue = this.value;
-          console.log("Selected value:", currentSceneValue);
 
-          switch (currentSceneValue) {
-            case "1":
-              suffix = "_low";
-              break;
-            case "2":
-              suffix = "_medium";
-              break;
-            case "3":
-              suffix = "_high"
-              break;
-            default:
-              suffix = "";
-              break;
-          }
-          sceneName = sheet + suffix;
-          console.log(suffix);
-          console.log("Current scene name: " + sceneName);
-
-        });
-        document.getElementById("showTemplate").addEventListener("click", function () {
-          // 清空
-          // document.getElementById("fileInfo").innerHTML = "";
-          document.getElementById("table_list").innerHTML = ""
-          document.getElementById("table_list2").innerHTML = ""
-          document.getElementById("table_body").innerHTML = ""
-          // 拼接html
-          let html = "";
-          let xhr = new XMLHttpRequest();
-          xhr.onreadystatechange = function () {
-            if (xhr.status === 200 && xhr.readyState === 4) {
-              let data_str = xhr.responseText;
-              let data = JSON.parse(data_str);
-              console.log(data.length)
-
-              html += "<div class=\"table-responsive\">" +
-                      "<table class=\"table table-striped\">" +
-                      "<thead>" +
-                      "<tr>" +
-                      "<th>编号</th>" +
-                      "<th>字段缩写</th>" +
-                      "<th>字段名</th>" +
-                      "<th>字段类型</th>" +
-                      /*  "<th>脱敏算法</th>" +
-                        "<th>隐私保护等级</th>" +*/
-                      "</tr>" +
-                      "</thead>" +
-                      "<tbody id=\"table2\">";
-              for (let i = 0; i < data.length; i++) {
-                s = data[i];
-                //console.log(s)
-                html += "<tr id = " + "row_" + i + ">";
-                html += "<td>" + s.id + "</td>";
-                html += "<td>" + s.fieldName + "</td>";
-                html += "<td>" + s.columnName + "</td>";
-                html += "<td>"
-                switch (s.dataType) {
-                  case 0:
-                    html += "数值型数据"
-                    break;
-                  case 1:
-                    html += "编码型数据"
-                    break;
-                  case 3:
-                    html += "文本型数据"
-                    break;
-                  case 4:
-                    html += "时间数据"
-                    break;
+        // 设置流转场景
+        document
+            .getElementById("choose_transfer_scene")
+            .addEventListener("change", function() {
+                currentSceneValue = this.value;
+                console.log("Selected value:", currentSceneValue);
+                switch (currentSceneValue) {
+                    case "1":
+                        suffix = "_low";
+                        break;
+                    case "2":
+                        suffix = "_medium";
+                        break;
+                    case "3":
+                        suffix = "_high";
+                        break;
+                    default:
+                        suffix = "";
+                        break;
                 }
-                html += "</td>"
-                html += "</tr>";
-              }
-              document.getElementById("table_body").innerHTML = html
+                sceneName = sheet + suffix;
+                console.log(suffix);
+                console.log("Current scene name: " + sceneName);
+            });
+        
+        // 场景模板展示按钮的点击事件响应
+        document
+            .getElementById("showTemplate")
+            .addEventListener("click", function() {
+                // 清空
+                // document.getElementById("fileInfo").innerHTML = "";
+                document.getElementById("table_list").innerHTML = "";
+                document.getElementById("table_list2").innerHTML = "";
+                document.getElementById("table_body").innerHTML = "";
+                // 拼接html
+                let html = "";
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.status === 200 && xhr.readyState === 4) {
+                        let data_str = xhr.responseText;
+                        let data = JSON.parse(data_str);
+                        console.log(data.length);
+                        html +=
+                            '<div class="table-responsive">' +
+                            '<table class="table table-striped">' +
+                            "<thead>" +
+                            "<tr>" +
+                            "<th>编号</th>" +
+                            "<th>字段缩写</th>" +
+                            "<th>字段名</th>" +
+                            "<th>字段类型</th>" +
+                            /*  "<th>脱敏算法</th>" +
+                                    "<th>隐私保护等级</th>" +*/
+                            "</tr>" +
+                            "</thead>" +
+                            '<tbody id="table2">';
+                        for (let i = 0; i < data.length; i++) {
+                            s = data[i];
+                            //console.log(s)
+                            html += "<tr id = " + "row_" + i + ">";
+                            html += "<td>" + s.id + "</td>";
+                            html += "<td>" + s.fieldName + "</td>";
+                            html += "<td>" + s.columnName + "</td>";
+                            html += "<td>";
+                            switch (s.dataType) {
+                                case 0:
+                                    html += "数值型数据";
+                                    break;
+                                case 1:
+                                    html += "编码型数据";
+                                    break;
+                                case 3:
+                                    html += "文本型数据";
+                                    break;
+                                case 4:
+                                    html += "时间数据";
+                                    break;
+                            }
+                            html += "</td>";
+                            html += "</tr>";
+                        }
+                        document.getElementById("table_body").innerHTML = html;
+                    }
+                };
+                console.log("Set template: " + sceneName);
+                xhr.open("get", "/" + sceneName + "param/list", false);
+                xhr.send();
+                document.getElementById("table_body").innerHTML = html;
+            });
+
+        // 设置需求模板按钮的点击事件响应
+        document
+            .getElementById("setTemplate")
+            .addEventListener("click", function() {
+                // 清空
+                document.getElementById("table_list").innerHTML = "";
+                document.getElementById("table_list2").innerHTML = "";
+                document.getElementById("table_body").innerHTML = "";
+                // 拼接html
+                let html = "";
+                console.log("sheet:" + sheet);
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.status === 200 && xhr.readyState === 4) {
+                        let data_str = xhr.responseText;
+                        let data = JSON.parse(data_str);
+                        console.log(data.length)
+                        html +=
+                            '<div class="table-responsive">' +
+                            '<table class="table table-striped">' +
+                            '<thead>' +
+                            '<tr>' +
+                            '<th>编号</th>' +
+                            '<th>字段缩写</th>' +
+                            '<th>字段名</th>' +
+                            '<th>字段类型</th>' +
+                            '<th>脱敏算法</th>' +
+                            '<th>隐私保护等级</th>' +
+                            '</tr>' +
+                            '</thead>' +
+                            '<tbody id="table2">';
+                        for (let i = 0; i < data.length; i++) {
+                            s = data[i];
+                            console.log(s);
+                            html += "<tr id = " + "row_" + i + ">";
+                            html += "<td>" + s.id + "</td>";
+                            html += "<td>" + s.fieldName + "</td>";
+                            html += "<td>" + s.columnName + "</td>";
+                            html += "<td><select>";
+                            /*html += "<option selected value = " + -1 + ">请选择字段数据类型</option>"*/
+                            switch (s.dataType) {
+                                case 0:
+                                    html +=
+                                        "<option value = " +
+                                        0 +
+                                        " selected>数值型数据</option>";
+                                    break;
+                                case 1:
+                                    html +=
+                                        "<option value = " +
+                                        1 +
+                                        " selected>编码型数据</option>";
+                                    break;
+                                case 3:
+                                    html +=
+                                        "<option value = " +
+                                        3 +
+                                        " selected>文本型数据</option>";
+                                    break;
+                                case 4:
+                                    html +=
+                                        "<option value = " + 4 + " selected>时间数据</option>";
+                                    break;
+                            }
+                            html += "</select></td>";
+                            //算法
+                            html += "<td><select>";
+                            switch (s.dataType) {
+                                case 0:
+                                    switch (s.k) {
+                                        case 3:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                " selected>基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                        case 4:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                " selected>基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                        case 5:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                ">基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                " selected>基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                        case 6:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                ">基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                " selected>基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                        case 7:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                ">基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                " selected>基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                        case 8:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                ">基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                8 +
+                                                " selected>数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                        case 9:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                ">基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html +=
+                                                "<option value = " +
+                                                9 +
+                                                " selected>数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                        case 10:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                ">基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " +
+                                                10 +
+                                                " selected>数值映射</option>";
+                                            break;
+                                        default:
+                                            html +=
+                                                "<option value = " +
+                                                3 +
+                                                " selected>基于拉普拉斯差分隐私的数值加噪算法</option>";
+                                            // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
+                                            html +=
+                                                "<option value = " +
+                                                5 +
+                                                ">基于随机均匀噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                6 +
+                                                ">基于随机拉普拉斯噪声的数值加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                7 +
+                                                ">基于随机高斯噪声的数值加噪算法</option>";
+                                            html += "<option value = " + 8 + ">数值偏移</option>";
+                                            html += "<option value = " + 9 + ">数值取整</option>";
+                                            html +=
+                                                "<option value = " + 10 + ">数值映射</option>";
+                                            break;
+                                    }
+                                    break;
+                                case 1:
+                                    html +=
+                                        "<option value = " +
+                                        2 +
+                                        " selected>编码型数据差分隐私脱敏算法</option>";
+                                    break;
+                                case 3:
+                                    switch (s.k) {
+                                        case 11:
+                                            html +=
+                                                "<option value = " +
+                                                11 +
+                                                " selected>尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 13:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " +
+                                                13 +
+                                                " selected>邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 14:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                14 +
+                                                " selected>地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 15:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                15 +
+                                                " selected>名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 16:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                16 +
+                                                " selected>编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 17:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                " selected>假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 19:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                19 +
+                                                " selected>密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 20:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " +
+                                                20 +
+                                                " selected>数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 21:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " +
+                                                21 +
+                                                " selected>IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                        case 22:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 16 + ">编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                " selected>IP地址随机抑制</option>";
+                                            break;
+                                        default:
+                                            html +=
+                                                "<option value = " + 11 + ">尾部截断</option>";
+                                            html +=
+                                                "<option value = " + 13 + ">邮箱抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 14 + ">地址抑制算法</option>";
+                                            html +=
+                                                "<option value = " + 15 + ">名称抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                16 +
+                                                " selected>编号抑制算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                17 +
+                                                ">假名化-哈希算法</option>";
+                                            html +=
+                                                "<option value = " + 19 + ">密码随机置换</option>";
+                                            html +=
+                                                "<option value = " + 20 + ">数值替换</option>";
+                                            html +=
+                                                "<option value = " + 21 + ">IP地址全抑制</option>";
+                                            html +=
+                                                "<option value = " +
+                                                22 +
+                                                ">IP地址随机抑制</option>";
+                                            break;
+                                    }
+                                    break;
+                                case 4:
+                                    switch (s.k) {
+                                        case 1:
+                                            html +=
+                                                "<option value = " +
+                                                1 +
+                                                " selected>基于差分隐私的日期加噪算法</option>";
+                                            html +=
+                                                "<option value = " + 18 + ">日期分组置换</option>";
+                                            /*html += "<option value = " + 12 + ">时间取整</option>"*/
+                                            break;
+                                        case 18:
+                                            html +=
+                                                "<option value = " +
+                                                1 +
+                                                ">基于差分隐私的日期加噪算法</option>";
+                                            html +=
+                                                "<option value = " +
+                                                18 +
+                                                " selected>日期分组置换</option>";
+                                            /*html += "<option value = " + 12 + ">时间取整</option>"*/
+                                            break;
+                                        default:
+                                            html +=
+                                                "<option value = " +
+                                                1 +
+                                                " selected>基于差分隐私的日期加噪算法</option>";
+                                            html +=
+                                                "<option value = " + 18 + ">日期分组置换</option>";
+                                            /*html += "<option value = " + 12 + ">时间取整</option>"*/
+                                            break;
+                                    }
+                                    break;
+                            }
+                            html += "</select></td>";
+                            // 隐私级别
+                            html += "<td><select>";
+                            html +=
+                                "<option value = " + -1 + ">请选择隐私保护程度</option>";
+                            switch (s.tmParam) {
+                                case 0:
+                                    html +=
+                                        "<option value = " +
+                                        0 +
+                                        " selected>无隐私保护处理</option>";
+                                    html += "<option value = " + 1 + ">低程度</option>";
+                                    html += "<option value = " + 2 + ">中程度</option>";
+                                    html += "<option value = " + 3 + ">高程度</option>";
+                                    break;
+                                case 1:
+                                    html +=
+                                        "<option value = " + 0 + ">无隐私保护处理</option>";
+                                    html +=
+                                        "<option value = " + 1 + " selected>低程度</option>";
+                                    html += "<option value = " + 2 + ">中程度</option>";
+                                    html += "<option value = " + 3 + ">高程度</option>";
+                                    break;
+                                case 2:
+                                    html +=
+                                        "<option value = " + 0 + ">无隐私保护处理</option>";
+                                    html += "<option value = " + 1 + ">低程度</option>";
+                                    html +=
+                                        "<option value = " + 2 + " selected>中程度</option>";
+                                    html += "<option value = " + 3 + ">高程度</option>";
+                                    break;
+                                case 3:
+                                    html +=
+                                        "<option value = " + 0 + ">无隐私保护处理</option>";
+                                    html += "<option value = " + 1 + ">低程度</option>";
+                                    html += "<option value = " + 2 + ">中程度</option>";
+                                    html +=
+                                        "<option value = " + 3 + " selected>高程度</option>";
+                                    break;
+                                default:
+                                    html +=
+                                        "<option value = " + 0 + ">无隐私保护处理</option>";
+                                    html += "<option value = " + 1 + ">低程度</option>";
+                                    html +=
+                                        "<option value = " + 2 + " selected>中程度</option>";
+                                    html += "<option value = " + 3 + ">高程度</option>";
+                                    break;
+                            }
+                            html += "</select></td>";
+                            html += "</tr>";
+                        }
+                        document.getElementById("table_body").innerHTML = html;
+                    }
+                };
+                xhr.open("get", "/" + sceneName + "param/list", false);
+                xhr.send();
+                document.getElementById("table_body").innerHTML = html;
+            });
+
+        // 选择文件按钮点击后的事件响应
+        document
+            .getElementById("fileUpload")
+            .addEventListener("change", (event) => {
+                choose_file(event);
+            });
+        
+        // 提交脱敏按钮点击后的事件响应
+        document.getElementById("submit").onclick = function() {
+            let tr;
+            let dataArray = [];
+            let table_body = document.getElementById("table2");
+            if (!table_body) {
+                alert("请先设置模板参数");
+                return;
             }
-          }
-
-          console.log("Set template: " + sceneName);
-
-          xhr.open("get", "/" + sceneName + "param/list", false);
-          xhr.send();
-          document.getElementById("table_body").innerHTML = html;
-        })
-        document.getElementById("setTemplate").addEventListener("click", function () {
-          // 清空
-          // document.getElementById("fileInfo").innerHTML = "";
-          document.getElementById("table_list").innerHTML = "";
-          document.getElementById("table_list2").innerHTML = "";
-          document.getElementById("table_body").innerHTML = "";
-          // 拼接html
-          let html = "";
-          console.log("sheet:" + sheet)
-          let xhr = new XMLHttpRequest();
-          xhr.onreadystatechange = function () {
-            if (xhr.status === 200 && xhr.readyState === 4) {
-              let data_str = xhr.responseText;
-              let data = JSON.parse(data_str);
-              console.log(data.length)
-
-
-              html += "<div class=\"table-responsive\">" +
-                      "<table class=\"table table-striped\">" +
-                      "<thead>" +
-                      "<tr>" +
-                      "<th>编号</th>" +
-                      "<th>字段缩写</th>" +
-                      "<th>字段名</th>" +
-                      "<th>字段类型</th>" +
-                      "<th>脱敏算法</th>" +
-                      "<th>隐私保护等级</th>" +
-                      "</tr>" +
-                      "</thead>" +
-                      "<tbody id=\"table2\">";
-              for (let i = 0; i < data.length; i++) {
-                s = data[i];
-                console.log(s)
-                html += "<tr id = " + "row_" + i + ">";
-                html += "<td>" + s.id + "</td>";
-                html += "<td>" + s.fieldName + "</td>";
-                html += "<td>" + s.columnName + "</td>";
-                /*  html += "<td>"
-                  // 字段类型
-                  switch (s.dataType) {
-                      case 0:
-                          html += "数值型数据"
-                          break;
-                      case 1:
-                          html += "编码型数据"
-                          break;
-                      case 3:
-                          html += "文本型数据"
-                          break;
-                      case 4:
-                          html += "时间数据"
-                          break;
-                  }
-                  html += "</td>"*/
-
-                html += "<td><select>"
-                /*html += "<option selected value = " + -1 + ">请选择字段数据类型</option>"*/
-                switch (s.dataType) {
-                  case 0:
-                    html += "<option value = " + 0 + " selected>数值型数据</option>"
-                    /*html += "<option value = " + 1 + ">编码型数据</option>"
-                    html += "<option value = " + 3 + ">文本型数据</option>"
-                    html += "<option value = " + 4 + ">时间数据</option>"*/
-                    break;
-                  case 1:
-                    /*html += "<option value = " + 0 + ">数值型数据</option>"*/
-                    html += "<option value = " + 1 + " selected>编码型数据</option>"
-                    /*html += "<option value = " + 3 + ">文本型数据</option>"
-                    html += "<option value = " + 4 + ">时间数据</option>"*/
-                    break;
-
-                  case 3:
-                    /* html += "<option value = " + 0 + ">数值型数据</option>"
-                     html += "<option value = " + 1 + ">编码型数据</option>"*/
-                    html += "<option value = " + 3 + " selected>文本型数据</option>"
-                    /*html += "<option value = " + 4 + ">时间数据</option>"*/
-                    break;
-                  case 4:
-                    /* html += "<option value = " + 0 + ">数值型数据</option>"
-                     html += "<option value = " + 1 + ">编码型数据</option>"
-                     html += "<option value = " + 3 + ">文本型数据</option>"*/
-                    html += "<option value = " + 4 + " selected>时间数据</option>"
-                    break;
-                }
-                html += "</select></td>"
-
-                //算法
-                html += "<td><select>"
-                switch (s.dataType) {
-                  case 0:
-                    switch (s.k) {
-                      case 3:
-                        html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                      case 4:
-                        html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                      case 5:
-                        html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + " selected>基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                      case 6:
-                        html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + " selected>基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                      case 7:
-                        html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + " selected>基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                      case 8:
-                        html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + " selected>数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                      case 9:
-                        html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + " selected>数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                      case 10:
-                        html += "<option value = " + 3 + ">基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + " selected>数值映射</option>"
-                        break;
-                      default:
-                        html += "<option value = " + 3 + " selected>基于拉普拉斯差分隐私的数值加噪算法</option>"
-                        // html += "<option value = " + 4 + ">基于高斯机制差分隐私的数值加噪算法</option>"
-                        html += "<option value = " + 5 + ">基于随机均匀噪声的数值加噪算法</option>"
-                        html += "<option value = " + 6 + ">基于随机拉普拉斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 7 + ">基于随机高斯噪声的数值加噪算法</option>"
-                        html += "<option value = " + 8 + ">数值偏移</option>"
-                        html += "<option value = " + 9 + ">数值取整</option>"
-                        html += "<option value = " + 10 + ">数值映射</option>"
-                        break;
-                    }
-                    break;
-                  case 1:
-                    html += "<option value = " + 2 + " selected>编码型数据差分隐私脱敏算法</option>"
-                    break;
-
-                  case 3:
-                    switch (s.k) {
-                      case 11:
-                        html += "<option value = " + 11 + " selected>尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 13:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + " selected>邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 14:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + " selected>地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 15:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + " selected>名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 16:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + " selected>编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 17:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + " selected>假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 19:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + " selected>密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 20:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + " selected>数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 21:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + " selected>IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                      case 22:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + ">编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + " selected>IP地址随机抑制</option>"
-                        break;
-                      default:
-                        html += "<option value = " + 11 + ">尾部截断</option>"
-                        html += "<option value = " + 13 + ">邮箱抑制算法</option>"
-                        html += "<option value = " + 14 + ">地址抑制算法</option>"
-                        html += "<option value = " + 15 + ">名称抑制算法</option>"
-                        html += "<option value = " + 16 + " selected>编号抑制算法</option>"
-                        html += "<option value = " + 17 + ">假名化-哈希算法</option>"
-                        html += "<option value = " + 19 + ">密码随机置换</option>"
-                        html += "<option value = " + 20 + ">数值替换</option>"
-                        html += "<option value = " + 21 + ">IP地址全抑制</option>"
-                        html += "<option value = " + 22 + ">IP地址随机抑制</option>"
-                        break;
-                    }
-                    break;
-                  case 4:
-                    switch (s.k) {
-                      case 1:
-                        html += "<option value = " + 1 + " selected>基于差分隐私的日期加噪算法</option>"
-                        html += "<option value = " + 18 + ">日期分组置换</option>"
-                        /*html += "<option value = " + 12 + ">时间取整</option>"*/
-                        break;
-                      case 18:
-                        html += "<option value = " + 1 + ">基于差分隐私的日期加噪算法</option>"
-                        html += "<option value = " + 18 + " selected>日期分组置换</option>"
-                        /*html += "<option value = " + 12 + ">时间取整</option>"*/
-                        break;
-                      default:
-                        html += "<option value = " + 1 + " selected>基于差分隐私的日期加噪算法</option>"
-                        html += "<option value = " + 18 + ">日期分组置换</option>"
-                        /*html += "<option value = " + 12 + ">时间取整</option>"*/
-                        break;
-                    }
-                    break;
-                }
-                html += "</select></td>"
-
-                // 隐私级别
-                html += "<td><select>"
-                html += "<option value = " + -1 + ">请选择隐私保护程度</option>"
-                switch (s.tmParam) {
-                  case 0:
-                    html += "<option value = " + 0 + " selected>无隐私保护处理</option>"
-                    html += "<option value = " + 1 + ">低程度</option>"
-                    html += "<option value = " + 2 + ">中程度</option>"
-                    html += "<option value = " + 3 + ">高程度</option>"
-                    break;
-                  case 1:
-                    html += "<option value = " + 0 + ">无隐私保护处理</option>"
-                    html += "<option value = " + 1 + " selected>低程度</option>"
-                    html += "<option value = " + 2 + ">中程度</option>"
-                    html += "<option value = " + 3 + ">高程度</option>"
-                    break;
-                  case 2:
-                    html += "<option value = " + 0 + ">无隐私保护处理</option>"
-                    html += "<option value = " + 1 + ">低程度</option>"
-                    html += "<option value = " + 2 + " selected>中程度</option>"
-                    html += "<option value = " + 3 + ">高程度</option>"
-                    break;
-
-                  case 3:
-                    html += "<option value = " + 0 + ">无隐私保护处理</option>"
-                    html += "<option value = " + 1 + ">低程度</option>"
-                    html += "<option value = " + 2 + ">中程度</option>"
-                    html += "<option value = " + 3 + " selected>高程度</option>"
-                    break;
-                  default:
-                    html += "<option value = " + 0 + ">无隐私保护处理</option>"
-                    html += "<option value = " + 1 + ">低程度</option>"
-                    html += "<option value = " + 2 + " selected>中程度</option>"
-                    html += "<option value = " + 3 + ">高程度</option>"
-                    break;
-                }
-
-                html += "</select></td>"
-
-                html += "</tr>";
-              }
-              document.getElementById("table_body").innerHTML = html
+            for (let i = 0; i < table_body.rows.length; i++) {
+                data = {};
+                tr = table_body.rows[i];
+                //console.log(tr);
+                data.id = tr.childNodes[0].innerHTML;
+                data.fieldName = tr.childNodes[1].innerHTML;
+                data.columnName = tr.childNodes[2].innerHTML;
+                data.dataType = tr.childNodes[3].firstChild.value;
+                data.k = tr.childNodes[4].firstChild.value;
+                data.tmParam = tr.childNodes[5].firstChild.value;
+                dataArray.push(JSON.stringify(data));
+                //console.log(dataArray);
             }
-          }
-
-          xhr.open("get", "/" + sceneName + "param/list", false);
-          xhr.send();
-          document.getElementById("table_body").innerHTML = html;
-
-          //document.getElementById("fileUpload").addEventListener("change", choose_file)
-        });
-        document.getElementById("fileUpload").addEventListener("change", (event) => {
-          choose_file(event)
-        });
-
-        document.getElementById("submit").onclick = function () {
-          let tr;
-          let dataArray = [];
-          let table_body = document.getElementById("table2")
-          if (!table_body) {
-            alert("请先设置模板参数")
-            return;
-          }
-          for (let i = 0; i < table_body.rows.length; i++) {
-            data = {};
-            tr = table_body.rows[i];
-            //console.log(tr);
-            data.id = tr.childNodes[0].innerHTML;
-            data.fieldName = tr.childNodes[1].innerHTML;
-            data.columnName = tr.childNodes[2].innerHTML;
-            data.dataType = tr.childNodes[3].firstChild.value;
-
-            data.k = tr.childNodes[4].firstChild.value;
-            data.tmParam = tr.childNodes[5].firstChild.value;
-            dataArray.push(JSON.stringify(data));
-            //console.log(dataArray);
-          }
-
-          if (!selectedFile) {
-            alert("请选择文件");
-            return;
-          }
-
-          let formData = new FormData();
-          formData.set("file", selectedFile);
-          formData.set("sheet", sceneName);
-          formData.set("algName", "distortion");
-          formData.set("params", JSON.stringify(dataArray));
-          console.log("Scenename in formData: " + sceneName);
-
-          console.log(dataArray.length);
-
-          //构建formData,发送给后端
-
-          fetch('/File/desenFile', {
-            method: 'POST',
-            body: formData
-          })
-                  .then(response => response.blob())
-                  .then(blob => {
+            if (!selectedFile) {
+                alert("请选择文件");
+                return;
+            }
+            let formData = new FormData();
+            formData.set("file", selectedFile);
+            formData.set("sheet", sceneName);
+            formData.set("algName", "distortion");
+            formData.set("params", JSON.stringify(dataArray));
+            console.log("Scenename in formData: " + sceneName);
+            console.log(dataArray.length);
+            //构建formData,发送给后端
+            fetch('/File/desenFile', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.status === 500) {
+                        // Handle server error
+                        return response.text().then(failedMsg => {
+                            alert(failedMsg);
+                            throw new Error(failedMsg); // Throw an error to stop further processing
+                        });
+                    }
+                    // console.log(response.headers.get('Content-Disposition'));
+                    // let fileName = response.headers.get('Content-Disposition').split('filename=')[1].split(';')[0];
+                    // fileName = fileName.replaceAll('"', '')
+                    // console.log(fileName);
+                    // return response.blob().then(blob => ({ blob, fileName }));  // If the status is not 500, proceed to handle the file blob
+                    return response.blob();
+                })
+                .then(blob => {
                     // 脱敏后
-                    document.getElementById("afterData").innerHTML = "脱敏后数据"
+                    document.getElementById("afterData").innerHTML = "脱敏后数据";
                     const reader1 = new FileReader();
-                    reader1.onload = function (event) {
-                      const data = event.target.result;
-                      const workbook = XLSX.read(data, {type: 'binary'});
-                      const sheetName = workbook.SheetNames[0];
-                      const sheet = workbook.Sheets[sheetName];
-                      const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-                      let pageSize = 10;
-                      let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                      let currentPage1 = 1;
+                    reader1.onload = function(event) {
+                        const data = event.target.result;
+                        const workbook = XLSX.read(data, {type: 'binary'});
+                        const sheetName = workbook.SheetNames[0];
+                        const sheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                        let pageSize = 10;
+                        let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                        let currentPage1 = 1;
 
-                      function displayTable1(page1) {
-                        let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
-                        let endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
-
-                        let tableContent1 = '<thead><tr>';
-                        let headers1 = jsonData[0];
-                        headers1.forEach(function (header1) {
-                          tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
-                        });
-                        tableContent1 += '</tr></thead><tbody>';
-
-                        for (let i = startIndex1; i < endIndex; i++) {
-                          tableContent1 += '<tr>';
-                          for (let j = 0; j < headers1.length; j++) {
-                            let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
-                            tableContent1 += '<td>' + cellValue + '</td>';
-                          }
-                          tableContent1 += '</tr>';
+                        function displayTable1(page1) {
+                            let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
+                            let endIndex = Math.min(
+                                startIndex1 + pageSize,
+                                jsonData.length
+                            );
+                            let tableContent1 = '<thead><tr>';
+                            let headers1 = jsonData[0];
+                            headers1.forEach(function(header1) {
+                                tableContent1 +=
+                                    '<th style="white-space: nowrap;">' + header1 + "</th>";
+                            });
+                            tableContent1 += '</tr></thead><tbody>';
+                            for (let i = startIndex1; i < endIndex; i++) {
+                                tableContent1 += '<tr>';
+                                for (let j = 0; j < headers1.length; j++) {
+                                    let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                    tableContent1 += '<td>' + cellValue + '</td>';
+                                }
+                                tableContent1 += '</tr>';
+                            }
+                            tableContent1 += '</tbody>';
+                            $("#dataTable1").html(tableContent1);
                         }
+                        displayTable1(currentPage1);
 
-                        tableContent1 += '</tbody>';
-
-                        $('#dataTable1').html(tableContent1);
-                      }
-
-                      displayTable1(currentPage1);
-
-                      function renderPagination1() {
-                        let pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
-                        pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
-
-                        $('#pagination1').html(pagination1);
-
-                        $('#pagination1 a').off('click').on('click', function (e) {
-                          e.preventDefault();
-                          let page = $(this).data('page');
-                          console.log(page)
-                          if (page === 'prev1') {
-                            currentPage1 = Math.max(1, currentPage1 - 1);
-                          } else if (page === 'next1') {
-                            currentPage1 = Math.min(pageCount, currentPage1 + 1);
-                          }
-                          displayTable1(currentPage1);
-                          $('#totalPages1').text(currentPage1 + "/" + pageCount);
-                          // renderPagination1();
-                        });
-
-                        $('#totalPages1').text(currentPage1 + "/" + pageCount);
-                      }
-
-                      $('#paginationContainer1').show();
-                      renderPagination1();
-
-                      $('#goToPage1').off("click").on('click', function () {
-                        let pageNumber1 = parseInt($('#pageInput1').val());
-                        if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
-                          console.log(pageCount);
-                          currentPage1 = pageNumber1;
-                          displayTable1(currentPage1);
-                          renderPagination1();
-                        } else {
-                          alert('请输入有效页数！');
+                        function renderPagination1() {
+                            let pagination1 =
+                                '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
+                            pagination1 +=
+                                '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
+                            $("#pagination1").html(pagination1);
+                            $("#pagination1 a")
+                                .off("click")
+                                .on("click", function(e) {
+                                    e.preventDefault();
+                                    let page = $(this).data("page");
+                                    console.log(page);
+                                    if (page === "prev1") {
+                                        currentPage1 = Math.max(1, currentPage1 - 1);
+                                    } else if (page === "next1") {
+                                        currentPage1 = Math.min(pageCount, currentPage1 + 1);
+                                    }
+                                    displayTable1(currentPage1);
+                                    $("#totalPages1").text(currentPage1 + "/" + pageCount);
+                                    // renderPagination1();
+                                });
+                            $("#totalPages1").text(currentPage1 + "/" + pageCount);
                         }
-                      });
+                        $("#paginationContainer1").show();
+                        renderPagination1();
+                        $("#goToPage1")
+                            .off("click")
+                            .on("click", function() {
+                                let pageNumber1 = parseInt($("#pageInput1").val());
+                                if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
+                                    console.log(pageCount);
+                                    currentPage1 = pageNumber1;
+                                    displayTable1(currentPage1);
+                                    renderPagination1();
+                                } else {
+                                    alert("请输入有效页数！");
+                                }
+                            });
                     };
-
                     reader1.readAsBinaryString(blob);
-
                     // 创建一个下载链接
+
                     const downloadLink = document.createElement('a');
                     downloadLink.href = URL.createObjectURL(blob);
+                    // if (fileName) {
+                    //     downloadLink.download = fileName; // 下载的文件名
+                    // } else {
+                    //     downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
+                    // }
                     downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
                     downloadLink.click();
                     // after.appendChild(downloadLink);
-                  })
-                  .catch(error => console.error('Error:', error));
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function choose_file(event) {
-          //读取文件
-          selectedFile = event.target.files[0]
-          // 文件名，扩展名
-          const fileName = selectedFile.name;
-          const fileExtension = fileName.split('.').pop().toLowerCase();
+            //读取文件
+            selectedFile = event.target.files[0];
+            // 文件名，扩展名
+            const fileName = selectedFile.name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+            if (selectedFile) {
+                if ("xlsx" === fileExtension) {
+                    console.log('Selected file:', selectedFile);
+                    console.log(fileExtension);
+                    // 这里可以执行其他操作，例如显示文件名或预览文件
+                    document.getElementById("fileInfo").innerHTML = 
+                        '<div  style="font-size: 20px; text-align: center"> <span>' +
+                        '<strong>' + 
+                        fileName + 
+                        '文件</strong>已选择' +
+                        '</span>' +
+                        '</div>';
+                    // 脱敏前
+                    document.getElementById("preData").innerHTML = "脱敏前数据";
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        let data = new Uint8Array(e.target.result);
+                        let workbook = XLSX.read(data, {type: 'array'});
+                        let sheetName = workbook.SheetNames[0];
+                        let sheet = workbook.Sheets[sheetName];
+                        let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                        let pageSize = 10;
+                        let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                        let currentPage = 1;
 
-          if (selectedFile) {
+                        function displayTable(page) {
+                            let startIndex = (page - 1) * pageSize + 1; // 跳过表头
+                            let endIndex = Math.min(
+                                startIndex + pageSize,
+                                jsonData.length
+                            );
+                            let tableContent = '<thead><tr>';
+                            let headers = jsonData[0];
+                            headers.forEach(function(header) {
+                                tableContent +=
+                                    '<th style="white-space: nowrap;">' + header + '</th>';
+                            });
+                            tableContent += '</tr></thead><tbody>';
+                            for (let i = startIndex; i < endIndex; i++) {
+                                tableContent += '<tr>';
+                                for (let j = 0; j < headers.length; j++) {
+                                    let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                    tableContent += '<td>' + cellValue + '</td>';
+                                }
+                                tableContent += '</tr>';
+                            }
+                            tableContent += '</tbody>';
+                            $('#dataTable').html(tableContent);
+                        }
+                        displayTable(currentPage);
 
-            if ("xlsx" === fileExtension) {
-
-              console.log('Selected file:', selectedFile);
-              console.log(fileExtension)
-              // 这里可以执行其他操作，例如显示文件名或预览文件
-
-              document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                      "<strong>" + fileName + "文件</strong>已选择" + "</span>" + "</div>";
-              // 脱敏前
-              document.getElementById("preData").innerHTML = "脱敏前数据"
-              let reader = new FileReader();
-              reader.onload = function (e) {
-                let data = new Uint8Array(e.target.result);
-                let workbook = XLSX.read(data, {type: 'array'});
-
-                let sheetName = workbook.SheetNames[0];
-                let sheet = workbook.Sheets[sheetName];
-
-                let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-
-                let pageSize = 10;
-                let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                let currentPage = 1;
-
-                function displayTable(page) {
-                  let startIndex = (page - 1) * pageSize + 1; // 跳过表头
-                  let endIndex = Math.min(startIndex + pageSize, jsonData.length);
-
-                  let tableContent = '<thead><tr>';
-                  let headers = jsonData[0];
-                  headers.forEach(function (header) {
-                    tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
-                  });
-                  tableContent += '</tr></thead><tbody>';
-
-                  for (let i = startIndex; i < endIndex; i++) {
-                    tableContent += '<tr>';
-                    for (let j = 0; j < headers.length; j++) {
-                      let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
-                      tableContent += '<td>' + cellValue + '</td>';
-                    }
-                    tableContent += '</tr>';
-                  }
-
-                  tableContent += '</tbody>';
-
-                  $('#dataTable').html(tableContent);
+                        function renderPagination() {
+                            let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
+                            pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
+                            $('#pagination').html(pagination);
+                            $('#pagination a')
+                                .off('click')
+                                .on('click', function(e) {
+                                    e.preventDefault();
+                                    let page = $(this).data('page');
+                                    console.log(page);
+                                    if (page === 'prev') {
+                                        currentPage = Math.max(1, currentPage - 1);
+                                    } else if (page === 'next') {
+                                        currentPage = Math.min(pageCount, currentPage + 1);
+                                    }
+                                    displayTable(currentPage);
+                                    $('#totalPages').text(currentPage + '/' + pageCount);
+                                    }
+                            );
+                            $('#totalPages').text(currentPage + '/' + pageCount);
+                        }
+                        $('#paginationContainer').show();
+                        renderPagination();
+                        $('#goToPage')
+                            .off("click")
+                            .on("click", function() {
+                                let pageNumber = parseInt($('#pageInput').val());
+                                if (pageNumber >= 1 && pageNumber <= pageCount) {
+                                    console.log(pageCount);
+                                    currentPage = pageNumber;
+                                    displayTable(currentPage);
+                                    renderPagination();
+                                } else {
+                                    alert('请输入有效页数！');
+                                }
+                        });
+                    };
+                    reader.readAsArrayBuffer(selectedFile);
+                } else {
+                    alert("请提交excel文件")
                 }
-
-                displayTable(currentPage);
-
-                function renderPagination() {
-                  let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
-                  pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
-
-                  $('#pagination').html(pagination);
-
-                  $('#pagination a').off('click').on('click', function (e) {
-                    e.preventDefault();
-                    let page = $(this).data('page');
-                    console.log(page)
-                    if (page === 'prev') {
-                      currentPage = Math.max(1, currentPage - 1);
-                    } else if (page === 'next') {
-                      currentPage = Math.min(pageCount, currentPage + 1);
-                    }
-                    displayTable(currentPage);
-                    $('#totalPages').text(currentPage + '/' + pageCount);
-                    // renderPagination();
-                  });
-
-                  $('#totalPages').text(currentPage + '/' + pageCount);
-                }
-
-                $('#paginationContainer').show();
-                renderPagination();
-
-                $('#goToPage').off("click").on("click", function () {
-                  let pageNumber = parseInt($('#pageInput').val());
-                  if (pageNumber >= 1 && pageNumber <= pageCount) {
-                    console.log(pageCount);
-                    currentPage = pageNumber;
-                    displayTable(currentPage);
-                    renderPagination();
-                  } else {
-                    alert('请输入有效页数！');
-                  }
-                });
-              };
-              reader.readAsArrayBuffer(selectedFile);
             } else {
-              alert("请提交excel文件")
+                document.getElementById("fileInfo").innerHTML = "";
             }
-
-          } else {
-            document.getElementById("fileInfo").innerHTML = "";
-          }
         }
-
-      }
+    }
     </script>
     <img
-      src="/img/shortvideo.jpg"
-      style="height: 25vh; display: block; margin: 0 auto"
-      alt="shortvideo"
-    />
+        src="/img/shortvideo.jpg"
+        style="height: 25vh; display: block; margin: 0 auto"
+        alt="shortvideo" />
     <div class="row">
-      <div class="col-sm-12">
-        <div class="ibox float-e-margins">
-          <div class="midtile form-group m-t">
-            <label for="choose_transfer_scene" style="font-size: 20px"
-              >选择流转场景</label
-            >
-            <select
-              name="transfer_scene"
-              id="choose_transfer_scene"
-              style="font-size: 20px; text-align: center"
-            >
-              <option value="111" selected>请选择流转场景</option>
-              <option value="1">用户本地</option>
-              <option value="2">同机构不同系统</option>
-              <option value="3">不同机构不同系统</option>
-            </select>
-          </div>
-          <div class="midtile">
-            <div class="col-sm-5 m-b-xs">
-              <button
-                type="button"
-                class="btn btn-sm btn-primary"
-                id="showTemplate"
-              >
-                场景模板展示
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-primary"
-                id="setTemplate"
-              >
-                设置需求模板
-              </button>
-              <form
-                id="uploadForm"
-                action="/upload"
-                method="post"
-                enctype="multipart/form-data"
-              >
-                <input type="file" id="fileUpload" style="display: none" />
-                <label for="fileUpload" class="upload-btn"> 选择文件 </label>
-              </form>
-              <div class="btn2">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-primary"
-                  id="submit"
-                >
-                  提交脱敏
-                </button>
-              </div>
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="midtile form-group m-t">
+                    <label for="choose_transfer_scene" style="font-size: 20px">选择流转场景</label>
+                    <select
+                        name="transfer_scene"
+                        id="choose_transfer_scene"
+                        style="font-size: 20px; text-align: center">
+                        <option value="111" selected>请选择流转场景</option>
+                        <option value="1">用户本地</option>
+                        <option value="2">同机构不同系统</option>
+                        <option value="3">不同机构不同系统</option>
+                    </select>
+                </div>
+                <div class="midtile">
+                    <div class="col-sm-5 m-b-xs">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            id="showTemplate">
+                            场景模板展示
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            id="setTemplate">
+                            设置需求模板
+                        </button>
+                        <form
+                            id="uploadForm"
+                            action="/upload"
+                            method="post"
+                            enctype="multipart/form-data">
+                            <input type="file" accept=".xlsx" id="fileUpload" style="display: none" />
+                            <label for="fileUpload" class="upload-btn"> 选择文件 </label>
+                        </form>
+                        <div class="btn2">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                id="submit">
+                                提交脱敏
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!--文件上传信息-->
+                <div id="fileInfo"></div>
+                <div id="after"></div>
+                <div class="ibox-content">
+                    <div id="table_body"></div>
+                </div>
+                <div class="button1"></div>
+                <div id="showTable"></div>
             </div>
-          </div>
-          <!--文件上传信息-->
-          <div id="fileInfo"></div>
-          <div id="after"></div>
-          <div class="ibox-content">
-            <div id="table_body"></div>
-          </div>
-          <div class="button1"></div>
-          <div id="showTable"></div>
         </div>
-      </div>
     </div>
     <div>
-      <div>
-        <span id="preData" class="center-text"></span>
-      </div>
-      <div id="dataTableContainer">
-        <table id="dataTable" class="table table-bordered">
-          <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-      </div>
-      <div id="paginationContainer" class="mt-3" style="display: none">
-        <nav>
-          <div
-            id="paginationInfo"
-            class="d-flex justify-content-between align-items-center"
-          >
-            <ul class="pagination mb-0" id="pagination"></ul>
-            <div class="form-group mb-0 text-center">
-              <label for="pageInput">跳转至：</label>
-              <input
-                type="number"
-                class="form-control"
-                id="pageInput"
-                min="1"
-              />
-              <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
-            </div>
-            <div id="totalPages"></div>
-          </div>
-        </nav>
-      </div>
-      <div>
-        <span id="afterData" class="center-text"></span>
-      </div>
-      <div id="dataTableContainer1">
-        <table id="dataTable1" class="table table-bordered">
-          <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-      </div>
-      <div id="paginationContainer1" class="mt-3" style="display: none">
-        <nav>
-          <div
-            id="paginationInfo1"
-            class="d-flex justify-content-between align-items-center"
-          >
-            <ul class="pagination mb-0" id="pagination1"></ul>
-            <div class="form-group mb-0 text-center">
-              <label for="pageInput1">跳转至：</label>
-              <input
-                type="number"
-                class="form-control"
-                id="pageInput1"
-                min="1"
-              />
-              <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
-            </div>
-            <div id="totalPages1"></div>
-          </div>
-        </nav>
-      </div>
-    </div>
-
-    <div class="wrapper wrapper-content animated fadeInRight">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="ibox">
-            <div class="row row-lg">
-              <div class="col-sm-12">
-                <!-- Example Card View -->
-                <div class="example-wrap">
-                  <div class="example">
-                    <table id="table_list"></table>
-                  </div>
-                </div>
-                <div class="example-wrap">
-                  <div class="example">
-                    <table id="table_list2"></table>
-                  </div>
-                </div>
-                <!-- End Example Card View -->
-              </div>
-            </div>
-          </div>
+        <div>
+            <span id="preData" class="center-text"></span>
         </div>
-      </div>
+        <div id="dataTableContainer">
+            <table id="dataTable" class="table table-bordered">
+                <!-- 这里将用 JavaScript 动态创建表格内容 -->
+            </table>
+        </div>
+        <div id="paginationContainer" class="mt-3" style="display: none">
+            <nav>
+                <div
+                    id="paginationInfo"
+                    class="d-flex justify-content-between align-items-center">
+                    <ul class="pagination mb-0" id="pagination"></ul>
+                    <div class="form-group mb-0 text-center">
+                        <label for="pageInput">跳转至：</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="pageInput"
+                            min="1" />
+                        <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
+                    </div>
+                    <div id="totalPages"></div>
+                </div>
+            </nav>
+        </div>
+        <div>
+            <span id="afterData" class="center-text"></span>
+        </div>
+        <div id="dataTableContainer1">
+            <table id="dataTable1" class="table table-bordered">
+                <!-- 这里将用 JavaScript 动态创建表格内容 -->
+            </table>
+        </div>
+        <div id="paginationContainer1" class="mt-3" style="display: none">
+            <nav>
+                <div
+                    id="paginationInfo1"
+                    class="d-flex justify-content-between align-items-center">
+                    <ul class="pagination mb-0" id="pagination1"></ul>
+                    <div class="form-group mb-0 text-center">
+                        <label for="pageInput1">跳转至：</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="pageInput1"
+                            min="1" />
+                        <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
+                    </div>
+                    <div id="totalPages1"></div>
+                </div>
+            </nav>
+        </div>
     </div>
-  </body>
-  <style>
-    .center-text {
-      /*text-align: center;*/
-      font-size: 2em;
-    }
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox">
+                    <div class="row row-lg">
+                        <div class="col-sm-12">
+                            <!-- Example Card View -->
+                            <div class="example-wrap">
+                                <div class="example">
+                                    <table id="table_list"></table>
+                                </div>
+                            </div>
+                            <div class="example-wrap">
+                                <div class="example">
+                                    <table id="table_list2"></table>
+                                </div>
+                            </div>
+                            <!-- End Example Card View -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+.center-text {
+    /*text-align: center;*/
+    font-size: 2em;
+}
 
-    /* 设置表格样式 */
-    #dataTableContainer {
-      width: 100%;
-      overflow-x: auto;
-    }
+/* 设置表格样式 */
+#dataTableContainer {
+    width: 100%;
+    overflow-x: auto;
+}
 
-    #dataTable {
-      width: 100%;
-      margin: 0 auto;
-    }
+#dataTable {
+    width: 100%;
+    margin: 0 auto;
+}
 
-    #paginationInfo {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+#paginationInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    #paginationInfo input {
-      width: 5em;
-      text-align: center;
-    }
+#paginationInfo input {
+    width: 5em;
+    text-align: center;
+}
 
-    /* 设置表格样式 */
-    #dataTableContainer1 {
-      width: 100%;
-      overflow-x: auto;
-    }
+/* 设置表格样式 */
+#dataTableContainer1 {
+    width: 100%;
+    overflow-x: auto;
+}
 
-    #dataTable1 {
-      width: 100%;
-      margin: 0 auto;
-    }
+#dataTable1 {
+    width: 100%;
+    margin: 0 auto;
+}
 
-    #paginationInfo1 {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+#paginationInfo1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    #paginationInfo1 input {
-      width: 5em;
-      text-align: center;
-    }
+#paginationInfo1 input {
+    width: 5em;
+    text-align: center;
+}
 
-    #submit {
-      background-color: #347aa9;
-      padding: 5px 20px;
-      cursor: pointer;
-      color: black;
-      font-size: 20px;
-      display: inline-block;
-      text-align: center;
-      /*margin-right: 50px;*/
-    }
+#submit {
+    background-color: #347aa9;
+    padding: 5px 20px;
+    cursor: pointer;
+    color: black;
+    font-size: 20px;
+    display: inline-block;
+    text-align: center;
+    /*margin-right: 50px;*/
+}
 
-    .btn2 {
-      line-height: 30px;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-    }
+.btn2 {
+    line-height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
 
-    /*选择框居中*/
-    .midtile {
-      line-height: 30px;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-    }
+/*选择框居中*/
+.midtile {
+    line-height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
 
-    /*上传按钮*/
-    .upload-btn,
-    #showTemplate,
-    #setTemplate {
-      background-color: #347aa9;
-      color: white;
-      cursor: pointer;
-      padding: 5px 20px;
-      text-align: center;
-      font-size: 20px;
-      display: inline-block;
-      margin: 30px;
-    }
-  </style>
+/*上传按钮*/
+.upload-btn,
+#showTemplate,
+#setTemplate {
+    background-color: #347aa9;
+    color: white;
+    cursor: pointer;
+    padding: 5px 20px;
+    text-align: center;
+    font-size: 20px;
+    display: inline-block;
+    margin: 30px;
+}
+</style>
+
 </html>

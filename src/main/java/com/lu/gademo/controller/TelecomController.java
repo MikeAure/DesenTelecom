@@ -66,9 +66,7 @@ public class TelecomController {
             } else if (videoType.contains(fileType)) {
                 responseData = fileService.dealVideo(file, params, algName).getBody();
             } else if (audioType.contains(fileType)) {
-                responseData = fileService.dealAudio(file, params, algName, sheet).getBody();
-            } else if ("csv".equals(fileType)) {
-                responseData = fileService.dealCsv(file, params, algName).getBody();
+                responseData = fileService.dealAudio(file, params, algName).getBody();
             } else {
                 responseData = fileService.dealGraph(file, params).getBody();
             }

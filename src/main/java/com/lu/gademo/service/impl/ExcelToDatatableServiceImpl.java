@@ -5,7 +5,6 @@ import com.lu.gademo.entity.crm.CustomerDesenMsgHigh;
 import com.lu.gademo.entity.crm.CustomerDesenMsgLow;
 import com.lu.gademo.entity.crm.CustomerDesenMsgMedium;
 import com.lu.gademo.event.SaveExcelToDatabaseEvent;
-import javafx.util.StringConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -14,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Column;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -36,6 +38,8 @@ public class ExcelToDatatableServiceImpl {
 
     @EventListener
     public <T> void saveToDatabaseAfterEvaluation(SaveExcelToDatabaseEvent saveExcelToDatabaseEvent) {
+        CompletableFuture<ResponseEntity<byte[]>> futureResult = saveExcelToDatabaseEvent.getFutureResult();
+        ResponseEntity<byte[]> responseEntity = saveExcelToDatabaseEvent.getResponseEntity();
         log.info("Saving to database");
         FileStorageDetails fileStorageDetails = saveExcelToDatabaseEvent.getFileStorageDetails();
         String entityClassName = saveExcelToDatabaseEvent.getEntityClassName();
@@ -51,16 +55,31 @@ public class ExcelToDatatableServiceImpl {
         String entityName = builder.toString();
         log.info("EntityName: {}", entityName);
         log.info("DesenFilePathString: {}", fileStorageDetails.getDesenFilePathString());
-
-        importExcelToDatabase(getEntityByName(entityName), fileStorageDetails.getDesenFilePathString());
+        try {
+            exportExcelToDatabase(getEntityByName(entityName), fileStorageDetails.getDesenFilePathString());
+        } catch (Exception e) {
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+            log.error("电子表格导出到数据库失败：{}", e.getMessage());
+            String errorMsg = "电子表格导出到数据库失败";
+            futureResult.complete(ResponseEntity.status(500).headers(httpHeaders).body(errorMsg.getBytes()));
+        }
+        log.info("{} 已存储到数据库中", entityName);
+        // 保存数据库成功后再发送对前端的响应
+        futureResult.complete(responseEntity);
     }
 
-    private  Class<?> getEntityByName(String entityName) {
+    /**
+     * 获取用于表示CustomerDesenMsg数据表不同脱敏策略的实体类
+     * @param entityName 实体类名称，根据其中的部分字符串确定脱敏策略的种类
+     * @return 所选策略对应的CustomerDesenMsg实体类
+     */
+    private Class<?> getEntityByName(String entityName) {
         if (entityName.contains("Low")) {
             return CustomerDesenMsgLow.class;
         } else if (entityName.contains("Medium")) {
             return CustomerDesenMsgMedium.class;
-        } else{
+        } else {
             return CustomerDesenMsgHigh.class;
         }
     }
@@ -78,11 +97,12 @@ public class ExcelToDatatableServiceImpl {
 
     /**
      * 从Excel导入数据到数据库
+     *
      * @param entityClass 数据库表对应的JPA实体类
-     * @param filePath Excel文件字符串
-     * @param <T> 泛型类型
+     * @param filePath    Excel文件字符串
+     * @param <T>         泛型类型
      */
-    public <T> void importExcelToDatabase(Class<T> entityClass, String filePath) {
+    public <T> void exportExcelToDatabase(Class<T> entityClass, String filePath) throws Exception {
         try (FileInputStream fis = new FileInputStream(filePath);
              Workbook workbook = new XSSFWorkbook(fis)) {
 
@@ -118,7 +138,8 @@ public class ExcelToDatatableServiceImpl {
             repository.saveAll(entities);
 
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("将Excel文件存储到数据库中出现错误");
+            throw new Exception(e);
         }
     }
 
@@ -135,6 +156,7 @@ public class ExcelToDatatableServiceImpl {
 
     /**
      * 获取单元格的值并转换为指定类型
+     *
      * @param cell 电子表格中的单元格
      * @param type 实体类中对应字段的类型
      * @return 返回单元格的数据
@@ -151,11 +173,11 @@ public class ExcelToDatatableServiceImpl {
                 return parsed.atStartOfDay();
             }
         } else if (type == int.class || type == Integer.class) {
-            return (int) cell.getNumericCellValue();
+            return cell.getCellType() == CellType.STRING ? Integer.parseInt(cell.getStringCellValue()) : (int) cell.getNumericCellValue();
         } else if (type == long.class || type == Long.class) {
-            return (long) cell.getNumericCellValue();
+            return cell.getCellType() == CellType.STRING ? Long.parseLong(cell.getStringCellValue()) : (long) cell.getNumericCellValue();
         } else if (type == double.class || type == Double.class) {
-            return cell.getNumericCellValue();
+            return cell.getCellType() == CellType.STRING ? Double.parseDouble(cell.getStringCellValue()) : cell.getNumericCellValue();
         } else if (type == boolean.class || type == Boolean.class) {
             return cell.getBooleanCellValue();
         }

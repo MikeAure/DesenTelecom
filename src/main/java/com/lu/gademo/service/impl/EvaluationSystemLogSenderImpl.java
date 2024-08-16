@@ -128,37 +128,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
                 outputStream.write(desenFileData);
                 outputStream.flush();
             }
-
-
             log.info("Chosen algorithm：" + sendEvaReq.getDesenAlg());
-
-            // 效果评测请求信息存储到数据库
-            //sendEvaReqDao.save(sendEvaReq);
-           /* // 发送前后数据
-            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-            // 原数据
-            // 发送数组大小（占四个字节）
-            dataOutputStream.writeInt(pre.length);
-            System.out.println("原数组" + pre.length);
-            // 发送字节数组本身
-            dataOutputStream.write(pre);
-            dataOutputStream.flush();
-            // 脱敏数据
-            // 发送数组大小（占四个字节）
-            dataOutputStream.writeInt(newExcelData.length);
-            System.out.println("脱敏数组" +newExcelData.length);
-            // 发送字节数组本身
-            dataOutputStream.write(newExcelData);
-            dataOutputStream.flush();
-
-            // 参数数据
-            // 发送数组大小（占四个字节）
-            dataOutputStream.writeInt(params.length);
-            System.out.println("参数数组" + params.length);
-            // 发送字节数组本身
-            dataOutputStream.write(params);
-            dataOutputStream.flush();*/
-
 
             // 各个实体对象
             RecEvaResultInv recEvaResultInv = new RecEvaResultInv();
@@ -171,7 +141,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
 
             int recvNum = 2;
             // 依次读取
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < recvNum; i++) {
                 // tcp头
                 // 读取头部
                 byte[] header = new byte[14];
@@ -181,71 +151,55 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
                 log.info("DataLength: " + dataLength);
                 // 读取数据域内容
                 byte[] dataBytes = new byte[dataLength - 34];
-
                 dataInputStream.read(dataBytes);
                 String jsonData = new String(dataBytes, StandardCharsets.UTF_8);
                 log.info(jsonData);
-                // Write dataBytes to file
-//                try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("D:\\test.json"), "UTF-8")) {
-//                    writer.write(jsonData);
-//                    System.out.println("JSON数据已成功以UTF-8编码写入文件");
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
                 // 认证与校验
                 byte[] auth = new byte[16];
                 dataInputStream.read(auth);
                 //String 转 json
                 JsonNode jsonNode = mapper.readTree(jsonData);
-                JsonNode recContent = jsonNode.get("content");
+                JsonNode recvContent = jsonNode.get("content");
 
                 int dataTypeNum = jsonNode.get("dataType").asInt();
                 log.info("脱敏评估系统DataType: " + dataTypeNum);
                 // 接收收据
                 if (dataTypeNum == 0x3131) {
                     // 获取实体
-                    recEvaReqReceipt = mapper.treeToValue(recContent, RecEvaReqReceipt.class);
+                    recEvaReqReceipt = mapper.treeToValue(recvContent, RecEvaReqReceipt.class);
                     String certificateID = recEvaReqReceipt.getCertificateID();
                     log.info("CertificateID: " + certificateID);
                     // 检测重复
                     if (recEvaReqReceiptDao.existsById(certificateID)) {
-                        log.info("Before delete");
                         recEvaReqReceiptDao.deleteById(certificateID);
-                        log.info("After delete");
                     }
                     // 插入数据库
                     recEvaReqReceiptDao.save(recEvaReqReceipt);
                     log.info("已接收脱敏效果评测请求收据");
-
                 }
                 // 接收脱敏效果评测结果
                 else if (dataTypeNum == 0x3132) {
                     // 获取实体
-                    recEvaResult = mapper.treeToValue(recContent, RecEvaResult.class);
-//                    System.out.println(recEvaResult.toString());
-                    evaResultId = recContent.get("evaResultID").asText();
-//                    System.out.println(evaResultId);
+                    recEvaResult = mapper.treeToValue(recvContent, RecEvaResult.class);
+                    evaResultId = recvContent.get("evaResultID").asText();
 //                     检测重复
                     if (recEvaResultDao.existsById(recEvaResult.getEvaResultID())) {
                         recEvaResultDao.deleteById(recEvaResult.getEvaResultID());
                     }
                     // 插入数据库
                     recEvaResultDao.save(recEvaResult);
-                    recEvaResultInv.setDesenInfoAfterID(recEvaResult.getDesenInfoAfterID());
-
-                    log.info("脱敏效果评测结果：{}", recContent.toPrettyString());
+                    log.info("脱敏效果评测结果：{}", recvContent.toPrettyString());
                     log.info("已接收脱敏效果评测结果");
                     evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, recEvaResult, null);
                 }
                 // 接收脱敏效果测评结果无效异常消息
                 else if (dataTypeNum == 0x3401) {
                     // 获取实体
-                    recEvaResultInv = mapper.treeToValue(recContent, RecEvaResultInv.class);
+                    recEvaResultInv = mapper.treeToValue(recvContent, RecEvaResultInv.class);
 //                     检测重复
                     if (recEvaResultInvDao.existsById(recEvaResultInv.getEvaResultID())) {
                         recEvaResultInvDao.deleteById(recEvaResultInv.getEvaResultID());
                     }
-//                    eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv));
                     // 插入数据库
                     recEvaResultInvDao.save(recEvaResultInv);
                     log.info("已接收脱敏效果测评结果无效异常消息");
@@ -266,7 +220,6 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             dataJson1.set("data", data1);
             TcpPacket tcpPacket1 = new TcpPacket(objectMapper.writeValueAsString(dataJson1));
             byte[] tcp1 = tcpPacket1.buildPacket();
-
             // 发送
             outputStream.write(tcp1);
             outputStream.flush();
@@ -282,6 +235,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             log.error("未与脱敏效果评测系统建立连接");
         } catch (IOException e) {
             log.error(e.getMessage());
+
         }
         return null;
     }

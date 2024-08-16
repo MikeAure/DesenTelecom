@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "send_rule_req")
 public class SendRuleReq {
-
     @Id
     @Column(name = "evidenceid")
     private String evidenceId;

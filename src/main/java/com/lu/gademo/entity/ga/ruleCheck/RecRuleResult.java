@@ -6,7 +6,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "rec_rule_result")
 public class RecRuleResult {
-
     @Id
     @Column(name = "reportid")
     private String reportId;

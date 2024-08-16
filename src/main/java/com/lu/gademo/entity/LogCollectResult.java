@@ -8,6 +8,9 @@ import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 
 import java.util.Objects;
 
+/**
+ * 用于存储向中心存证系统、本地存证系统、合规检测系统、脱敏效果评测系统、拆分重构系统的日志实体类
+ */
 public class LogCollectResult {
     private ReqEvidenceSave reqEvidenceSave;
     private SubmitEvidenceLocal submitEvidenceLocal;

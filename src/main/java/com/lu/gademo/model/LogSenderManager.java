@@ -8,6 +8,7 @@ import com.lu.gademo.dao.ga.effectEva.*;
 import com.lu.gademo.dao.ga.evidence.*;
 import com.lu.gademo.dao.ga.ruleCheck.*;
 import com.lu.gademo.dao.ga.split.SendSplitDesenDataDao;
+import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.LogCollectResult;
 import com.lu.gademo.entity.ga.effectEva.*;
 import com.lu.gademo.entity.ga.evidence.*;
@@ -26,6 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +42,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -158,56 +164,72 @@ public class LogSenderManager {
     @Autowired
     private LogCollectUtil logCollectUtil;
 
-//    private ArrayNode getArrayNode(String[] rawList) {
-//        ArrayNode desenIntentionArrayNode = objectMapper.createArrayNode();
-//        for (String singleDesenIntention : rawList) {
-//            desenIntentionArrayNode.add(singleDesenIntention);
-//        }
-//        return desenIntentionArrayNode;
-//    }
-//
-//    private ArrayNode trimCommaAndReturnArrayNode(String rawString) {
-//        String[] desenIntentionList = new String[0];
-//        if (rawString.endsWith(",")) {
-//            desenIntentionList = rawString.substring(0, rawString.length() - 1).split(",");
-//        } else {
-//            desenIntentionList = rawString.split(",");
-//        }
-////        System.out.println(Arrays.toString(desenIntentionList));
-//        return getArrayNode(desenIntentionList);
-//    }
-
     @EventListener
     @Async
     public void handleLogManagerEvent(LogManagerEvent logManagerEvent) {
+        FileStorageDetails fileStorageDetails = logManagerEvent.getFileStorageDetails();
         SendEvaReq sendEvaReq = logManagerEvent.getSendEvaReq();
         SendRuleReq sendRuleReq = logManagerEvent.getSendRuleReq();
         SubmitEvidenceLocal submitEvidenceLocal = logManagerEvent.getSubmitEvidenceLocal();
         ReqEvidenceSave reqEvidenceSave = logManagerEvent.getReqEvidenceSave();
         SendSplitDesenData sendSplitDesenData = logManagerEvent.getSendSplitDesenData();
-        byte[] rawFileBytes = logManagerEvent.getRawFileBytes();
-        byte[] desenFileBytes = logManagerEvent.getDesenFileBytes();
-        //TODO: 测试，最后需要改成发送文件
+        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
+        byte[] desenFileBytes = fileStorageDetails.getDesenFileBytes();
+        CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = logManagerEvent.getResponseEntityCompletableFuture();
+
+        String fileDataType = sendRuleReq.getFileDataType();
+        String fileType = sendEvaReq.getFileType();
+        String fileSuffix = sendEvaReq.getFileSuffix();
+
+        log.info("fileDataType: {}", fileDataType);
+        log.info("fileType: {}", fileType);
+        log.info("fileSuffix: {}", fileSuffix);
+
+        // TODO: 测试，最后需要改成发送文件
         EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(sendEvaReq,
-                rawFileBytes, desenFileBytes, false);
+                rawFileBytes, desenFileBytes, true);
         if (evaluationSystemReturnResult != null) {
             RecEvaResult recEvaResult = evaluationSystemReturnResult.getRecEvaResult();
             RecEvaResultInv recEvaResultInv = evaluationSystemReturnResult.getRecEvaResultInv();
 
             if (recEvaResult != null && recEvaResultInv == null) {
-                // 保存脱敏效果评测结果
+                // TODO: 实现不同的数据模态
+                HttpHeaders headers = new HttpHeaders();
+                switch (fileSuffix) {
+                    case "jpg":
+                    case "jpeg":
+                        headers.setContentType(MediaType.IMAGE_JPEG);
+                        break;
+                    case "png":
+                        headers.setContentType(MediaType.IMAGE_PNG);
+                        break;
+                    case "mp4":
+                        headers.setContentType(MediaType.parseMediaType("video/mp4"));
+                        break;
+                    default:
+                        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                        break;
+                }
+                headers.setContentDispositionFormData("attachment", fileStorageDetails.getDesenFileName()); // 示例文件名，可根据实际情况调整
+                ResponseEntity<byte[]> responseEntityResult = new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+
+                // 向其他系统发送日志信息
                 eventPublisher.publishEvent(new ThreeSystemsEvent(this, submitEvidenceLocal, reqEvidenceSave, sendRuleReq, sendSplitDesenData, desenFileBytes));
-                // 发送消息，将脱敏后的表格文件内容保存到数据库表中
+                // 将脱敏后的表格文件内容保存到数据库表中
                 if (ifSaveToDatabase) {
                     String entityName = sendEvaReq.getFileType();
-                    System.out.println(entityName);
-                    eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, logManagerEvent.getFileStorageDetails()));
+                    eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails, responseEntityCompletableFuture, responseEntityResult));
+                } else {
+                    responseEntityCompletableFuture.complete(responseEntityResult);
                 }
             }
             if (recEvaResult == null && recEvaResultInv != null) {
                 // 保存脱敏效果评测结果无效异常消息
-                eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv));
+                eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv, logManagerEvent));
             }
+        } else {
+            responseEntityCompletableFuture.complete(ResponseEntity.status(500).
+                    contentType(MediaType.TEXT_PLAIN).body("与评测系统建立连接失败".getBytes()));
         }
     }
 
@@ -221,11 +243,9 @@ public class LogSenderManager {
         try {
             // 本地保存请求
             sendEvaReqDao.save(sendEvaReq);
-
             ObjectNode content = objectMapper.valueToTree(sendEvaReq);
             String evaRequestDesenIntention = content.get("desenIntention").asText();
             String evaRequestDesenRequirements = content.get("desenRequirements").asText();
-
             ArrayNode evaRequestDesenIntentionArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenIntention, objectMapper);
             ArrayNode evaRequestDesenRequirementsArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenRequirements, objectMapper);
 
@@ -969,6 +989,11 @@ public class LogSenderManager {
 
     }
 
+    /**
+     * 构造发送给四个系统的日志信息
+     * @param logInfo 存储日志信息所需要的结构体
+     * @return 包含四个系统日志信息的结构体
+     */
     public LogCollectResult buildLogCollectResults(LogInfo logInfo) {
         return buildLogCollectResults(logInfo.getGlobalID(), logInfo.getEvidenceID(), logInfo.getDesenCom(), logInfo.getObjectMode(),
                 logInfo.getInfoBuilders(), logInfo.getRawFileName(), logInfo.getRawFileBytes(), logInfo.getRawFileSize(),
@@ -1005,7 +1030,7 @@ public class LogSenderManager {
         SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
                 rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
                 desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
@@ -1024,7 +1049,7 @@ public class LogSenderManager {
 
 
     /**
-     *
+     * 接收已构建好的四个日志和原始文件、脱敏后文件字节数组，将日志和文件信息发送给四个系统
      * @param reqEvidenceSave
      * @param submitEvidenceLocal
      * @param sendEvaReq
@@ -1054,7 +1079,7 @@ public class LogSenderManager {
     }
 
     /**
-     *
+     * 接收各种需要的信息，在方法内部构建日志集合，再发送给对应的四个系统
      * @param globalID
      * @param desenCom
      * @param objectMode
@@ -1086,7 +1111,7 @@ public class LogSenderManager {
     }
 
     /**
-     *
+     * 使用已构建好的日志集合，直接将日志发送给四个系统
      * @param logCollectResult
      * @param rawFileBytes
      * @param desenFileBytes

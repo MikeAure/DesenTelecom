@@ -34,7 +34,7 @@ public class FileStorageService {
         }
     }
 
-    public FileStorageDetails saveRawFile(MultipartFile file) throws IOException {
+    public FileStorageDetails saveRawFileWithDesenInfo(MultipartFile file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
         if (file.getOriginalFilename() == null) {
@@ -74,6 +74,33 @@ public class FileStorageService {
                 .build();
     }
 
+    public FileStorageDetails saveRawFile(MultipartFile file) throws IOException {
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        if (file.getOriginalFilename() == null) {
+            throw new IOException("Input file name is null");
+        }
+
+        String originalFileName = file.getOriginalFilename();
+        String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        String rawFileName = fileTimeStamp + "_" + originalFileName;
+        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        byte[] rawFileBytes = file.getBytes();
+        Long rawFileSize = file.getSize();
+
+        // Save the original file
+        file.transferTo(rawFilePath);
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .rawFileBytes(rawFileBytes)
+                .rawFileSize(rawFileSize)
+                .build();
+    }
     public FileStorageDetails getRawFileStorageDetails(Path file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -111,6 +138,16 @@ public class FileStorageService {
                 .desenFilePath(desenFilePath)
                 .desenFilePathString(desenFilePathString)
                 .build();
+    }
+
+    public void saveRawFileWithDesenInfo(String fileName, byte[] rawFileBytes) throws IOException {
+        // 确保父目录存在
+        Path filePath = rawFileDirectory.resolve(fileName);
+//        if (Files.notExists(rawFilePath.getParent())) {
+//            Files.createDirectories(rawFilePath.getParent());
+//        }
+        // 使用Files.write来保存文件
+        Files.write(filePath, rawFileBytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
     }
 
     public void saveDesenFile(Path desenFilePath, byte[] desenFileBytes) throws IOException {

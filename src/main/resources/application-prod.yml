@@ -1,0 +1,104 @@
+spring:
+    jackson:
+        serialization:
+            indent_output: false
+    datasource:
+        ga:
+            jdbc-url: jdbc:mysql://localhost:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
+            driver-class-name: com.mysql.cj.jdbc.Driver
+
+        crm:
+            jdbc-url: jdbc:mysql://localhost:3306/crm?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
+            driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            jadira:
+                usertype:
+                    autoRegisterUserTypes: true
+        show-sql: true
+
+#    devtools:
+#        add-properties: false
+
+    freemarker:
+        charset: UTF-8
+        check-template-location: true
+        content-type: text/html
+        expose-request-attributes: true
+        expose-session-attributes: true
+        request-context-attribute: request
+        settings:
+            template_update_delay: 0
+        suffix: .ftl
+        template-loader-path: classpath:/templates/
+
+    servlet:
+        multipart:
+            maxFileSize: 100MB
+            maxRequestSize: 100MB
+
+    thymeleaf:
+        encoding: UTF-8
+        mode: ftl
+mybatis:
+    configuration:
+        log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+server:
+    port: 8352
+
+logging:
+    file:
+        path: .
+    level:
+        org:
+            hibernate: INFO
+            hibernate.SQL: INFO
+
+effectEva:
+    address: 172.28.72.223
+    port: 10005
+evidence:
+    localAddress: 172.28.72.214
+    localPort: 50004
+    remoteAddress: 172.28.72.214
+    remotePort: 50005
+ruleCheck:
+    address: 172.28.72.224
+    port: 30002
+splitReconstruct:
+    address: 172.28.72.225
+    port: 40011
+
+evidenceSystem:
+    evidenceReceipt:
+        mainCommand: '0x0001'
+        msgVersion: '0x1000'
+        subCommand: '0x0020'
+    evidenceRequest:
+        mainCommand: '0x0001'
+        msgVersion: '0x1000'
+        subCommand: '0x0020'
+    evidenceResponse:
+        mainCommand: '0x0001'
+        msgVersion: '0x1000'
+        subCommand: '0x0020'
+    submitEvidence:
+        mainCommand: '0x0003'
+        msgVersion: '0x3110'
+        subCommand: '0x0031'
+
+systemId:
+    desenToolsetSystemId: '0x31000000'
+    evaluationSystemId: '0x32000000'
+    evidenceSystemId: '0x10000000'
+    ruleCheckSystemId: '0x33000000'
+
+logSenderManager:
+    ifSendToEvaFirst: false
+    ifSaveToDatabase: false

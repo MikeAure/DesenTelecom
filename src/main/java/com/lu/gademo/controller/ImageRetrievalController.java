@@ -167,7 +167,7 @@ public class ImageRetrievalController {
         SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg,
                 rawFileName, rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(), infoBuilders.desenIntention,
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlgParam, startTime, endTime,
-                infoBuilders.desenLevel, desenCom);
+                infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         // 发送方法
         executorService.submit(() -> {
             logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
@@ -304,7 +304,7 @@ public class ImageRetrievalController {
         SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg,
                 rawFileName, rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(), infoBuilders.desenIntention,
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlgParam, startTime, endTime,
-                infoBuilders.desenLevel, desenCom);
+                infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         // 发送方法
         executorService.submit(() -> {
             logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);

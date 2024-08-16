@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
@@ -15,40 +16,35 @@
     <link href="${ctx!}/css/style.css?v=4.1.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
     <link href="${ctx!}/css/GA.css" rel="stylesheet">
-    <#--    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>-->
-    <!-- 全局js -->
-    <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
-    <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
-    <script src="${ctx!}/js/xlsx.full.min.js"></script>
-    <script src="${ctx!}/js/plugins/chosen/chosen.jquery.js"></script>
-    <script src="${ctx!}/js/bootstrap.min.js"></script>
-    <script src="${ctx!}/js/echarts.min.js"></script>
-
-    <!-- Bootstrap table -->
-    <script src="${ctx!}/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
-    <script src="${ctx!}/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
-    <script src="${ctx!}/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
-
-    <!-- Peity -->
-    <script src="${ctx!}/js/plugins/peity/jquery.peity.min.js"></script>
-
-    <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
-    <script src="${ctx!}/js/multiple-select.min.js"></script>
-
-
-    <!-- 自定义js -->
-    <script src="${ctx!}/js/content.js?v=1.0.0"></script>
-    <script type="text/javascript">
+    <#-- <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js">
+        </script>-->
+        <!-- 全局js -->
+        <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
+        <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
+        <script src="${ctx!}/js/xlsx.full.min.js"></script>
+        <script src="${ctx!}/js/plugins/chosen/chosen.jquery.js"></script>
+        <script src="${ctx!}/js/bootstrap.min.js"></script>
+        <script src="${ctx!}/js/echarts.min.js"></script>
+        <!-- Bootstrap table -->
+        <script src="${ctx!}/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+        <script src="${ctx!}/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+        <script src="${ctx!}/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+        <!-- Peity -->
+        <script src="${ctx!}/js/plugins/peity/jquery.peity.min.js"></script>
+        <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
+        <script src="${ctx!}/js/multiple-select.min.js"></script>
+        <!-- 自定义js -->
+        <script src="${ctx!}/js/content.js?v=1.0.0"></script>
+        <script type="text/javascript">
         let sheet = "onlinetaxi2";
-        window.onload = function () {
+        window.onload = function() {
             let selectedFile; // 全局变量，用于存储选择的文件
             let currentSceneValue = document.getElementById("choose_transfer_scene").value;
             let suffix = "";
             let sceneName = sheet;
-            document.getElementById("choose_transfer_scene").addEventListener("change", function () {
+            document.getElementById("choose_transfer_scene").addEventListener("change", function() {
                 currentSceneValue = this.value;
                 console.log("Selected value:", currentSceneValue);
-
                 switch (currentSceneValue) {
                     case "1":
                         suffix = "_low";
@@ -66,9 +62,8 @@
                 sceneName = sheet + suffix;
                 console.log(suffix);
                 console.log("Current scene name: " + sceneName);
-
             });
-            document.getElementById("showTemplate").addEventListener("click", function () {
+            document.getElementById("showTemplate").addEventListener("click", function() {
                 // 清空
                 // document.getElementById("fileInfo").innerHTML = "";
                 document.getElementById("table_list").innerHTML = ""
@@ -77,12 +72,11 @@
                 // 拼接html
                 let html = "";
                 let xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function () {
+                xhr.onreadystatechange = function() {
                     if (xhr.status === 200 && xhr.readyState === 4) {
                         let data_str = xhr.responseText;
                         let data = JSON.parse(data_str);
                         console.log(data.length)
-
                         html += "<div class=\"table-responsive\">" +
                             "<table class=\"table table-striped\">" +
                             "<thead>" +
@@ -124,14 +118,12 @@
                         document.getElementById("table_body").innerHTML = html
                     }
                 }
-
                 console.log("Set template: " + sceneName);
-
                 xhr.open("get", "/" + sceneName + "param/list", false);
                 xhr.send();
                 document.getElementById("table_body").innerHTML = html;
             })
-            document.getElementById("setTemplate").addEventListener("click", function () {
+            document.getElementById("setTemplate").addEventListener("click", function() {
                 // 清空
                 // document.getElementById("fileInfo").innerHTML = "";
                 document.getElementById("table_list").innerHTML = "";
@@ -141,13 +133,11 @@
                 let html = "";
                 console.log("sheet:" + sheet)
                 let xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function () {
+                xhr.onreadystatechange = function() {
                     if (xhr.status === 200 && xhr.readyState === 4) {
                         let data_str = xhr.responseText;
                         let data = JSON.parse(data_str);
                         console.log(data.length)
-
-
                         html += "<div class=\"table-responsive\">" +
                             "<table class=\"table table-striped\">" +
                             "<thead>" +
@@ -185,7 +175,6 @@
                                       break;
                               }
                               html += "</td>"*/
-
                             html += "<td><select>"
                             /*html += "<option selected value = " + -1 + ">请选择字段数据类型</option>"*/
                             switch (s.dataType) {
@@ -201,7 +190,6 @@
                                     /*html += "<option value = " + 3 + ">文本型数据</option>"
                                     html += "<option value = " + 4 + ">时间数据</option>"*/
                                     break;
-
                                 case 3:
                                     /* html += "<option value = " + 0 + ">数值型数据</option>"
                                      html += "<option value = " + 1 + ">编码型数据</option>"*/
@@ -216,7 +204,6 @@
                                     break;
                             }
                             html += "</select></td>"
-
                             //算法
                             html += "<td><select>"
                             switch (s.dataType) {
@@ -317,7 +304,6 @@
                                 case 1:
                                     html += "<option value = " + 2 + " selected>编码型数据差分隐私脱敏算法</option>"
                                     break;
-
                                 case 3:
                                     switch (s.k) {
                                         case 11:
@@ -475,7 +461,6 @@
                                     break;
                             }
                             html += "</select></td>"
-
                             // 隐私级别
                             html += "<td><select>"
                             html += "<option value = " + -1 + ">请选择隐私保护程度</option>"
@@ -498,7 +483,6 @@
                                     html += "<option value = " + 2 + " selected>中程度</option>"
                                     html += "<option value = " + 3 + ">高程度</option>"
                                     break;
-
                                 case 3:
                                     html += "<option value = " + 0 + ">无隐私保护处理</option>"
                                     html += "<option value = " + 1 + ">低程度</option>"
@@ -512,26 +496,21 @@
                                     html += "<option value = " + 3 + ">高程度</option>"
                                     break;
                             }
-
                             html += "</select></td>"
-
                             html += "</tr>";
                         }
                         document.getElementById("table_body").innerHTML = html
                     }
                 }
-
                 xhr.open("get", "/" + sceneName + "param/list", false);
                 xhr.send();
                 document.getElementById("table_body").innerHTML = html;
-
                 //document.getElementById("fileUpload").addEventListener("change", choose_file)
             });
             document.getElementById("fileUpload").addEventListener("change", (event) => {
                 choose_file(event)
             });
-
-            document.getElementById("submit").onclick = function () {
+            document.getElementById("submit").onclick = function() {
                 let tr;
                 let dataArray = [];
                 let table_body = document.getElementById("table2")
@@ -547,39 +526,33 @@
                     data.fieldName = tr.childNodes[1].innerHTML;
                     data.columnName = tr.childNodes[2].innerHTML;
                     data.dataType = tr.childNodes[3].firstChild.value;
-
                     data.k = tr.childNodes[4].firstChild.value;
                     data.tmParam = tr.childNodes[5].firstChild.value;
                     dataArray.push(JSON.stringify(data));
                     //console.log(dataArray);
                 }
-
                 if (!selectedFile) {
                     alert("请选择文件");
                     return;
                 }
-
                 let formData = new FormData();
                 formData.set("file", selectedFile);
                 formData.set("sheet", sceneName);
                 formData.set("algName", "distortion");
                 formData.set("params", JSON.stringify(dataArray));
                 console.log("Scenename in formData: " + sceneName);
-
                 console.log(dataArray.length);
-
                 //构建formData,发送给后端
-
                 fetch('/File/desenFile', {
-                    method: 'POST',
-                    body: formData
-                })
+                        method: 'POST',
+                        body: formData
+                    })
                     .then(response => response.blob())
                     .then(blob => {
                         // 脱敏后
                         document.getElementById("afterData").innerHTML = "脱敏后数据"
                         const reader1 = new FileReader();
-                        reader1.onload = function (event) {
+                        reader1.onload = function(event) {
                             const data = event.target.result;
                             const workbook = XLSX.read(data, {type: 'binary'});
                             const sheetName = workbook.SheetNames[0];
@@ -592,37 +565,34 @@
                             function displayTable1(page1) {
                                 let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
                                 let endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
-
                                 let tableContent1 = '<thead><tr>';
                                 let headers1 = jsonData[0];
-                                headers1.forEach(function (header1) {
+                                headers1.forEach(function(header1) {
                                     tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
                                 });
                                 tableContent1 += '</tr></thead><tbody>';
-
                                 for (let i = startIndex1; i < endIndex; i++) {
                                     tableContent1 += '<tr>';
                                     for (let j = 0; j < headers1.length; j++) {
-                                        let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                        let cellValue = (jsonData[i]
+                                                [j] !==
+                                                undefined) ? jsonData[i]
+                                            [j] :
+                                            '';
                                         tableContent1 += '<td>' + cellValue + '</td>';
                                     }
                                     tableContent1 += '</tr>';
                                 }
-
                                 tableContent1 += '</tbody>';
-
                                 $('#dataTable1').html(tableContent1);
                             }
-
                             displayTable1(currentPage1);
 
                             function renderPagination1() {
                                 let pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
                                 pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
-
                                 $('#pagination1').html(pagination1);
-
-                                $('#pagination1 a').off('click').on('click', function (e) {
+                                $('#pagination1 a').off('click').on('click', function(e) {
                                     e.preventDefault();
                                     let page = $(this).data('page');
                                     console.log(page)
@@ -635,14 +605,11 @@
                                     $('#totalPages1').text(currentPage1 + "/" + pageCount);
                                     // renderPagination1();
                                 });
-
                                 $('#totalPages1').text(currentPage1 + "/" + pageCount);
                             }
-
                             $('#paginationContainer1').show();
                             renderPagination1();
-
-                            $('#goToPage1').off("click").on('click', function () {
+                            $('#goToPage1').off("click").on('click', function() {
                                 let pageNumber1 = parseInt($('#pageInput1').val());
                                 if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
                                     console.log(pageCount);
@@ -654,9 +621,7 @@
                                 }
                             });
                         };
-
                         reader1.readAsBinaryString(blob);
-
                         // 创建一个下载链接
                         const downloadLink = document.createElement('a');
                         downloadLink.href = URL.createObjectURL(blob);
@@ -673,29 +638,22 @@
                 // 文件名，扩展名
                 const fileName = selectedFile.name;
                 const fileExtension = fileName.split('.').pop().toLowerCase();
-
                 if (selectedFile) {
-
                     if ("xlsx" === fileExtension) {
-
                         console.log('Selected file:', selectedFile);
                         console.log(fileExtension)
                         // 这里可以执行其他操作，例如显示文件名或预览文件
-
                         document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
                             "<strong>" + fileName + "文件</strong>已选择" + "</span>" + "</div>";
                         // 脱敏前
                         document.getElementById("preData").innerHTML = "脱敏前数据"
                         let reader = new FileReader();
-                        reader.onload = function (e) {
+                        reader.onload = function(e) {
                             let data = new Uint8Array(e.target.result);
                             let workbook = XLSX.read(data, {type: 'array'});
-
                             let sheetName = workbook.SheetNames[0];
                             let sheet = workbook.Sheets[sheetName];
-
                             let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-
                             let pageSize = 10;
                             let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
                             let currentPage = 1;
@@ -703,37 +661,34 @@
                             function displayTable(page) {
                                 let startIndex = (page - 1) * pageSize + 1; // 跳过表头
                                 let endIndex = Math.min(startIndex + pageSize, jsonData.length);
-
                                 let tableContent = '<thead><tr>';
                                 let headers = jsonData[0];
-                                headers.forEach(function (header) {
+                                headers.forEach(function(header) {
                                     tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
                                 });
                                 tableContent += '</tr></thead><tbody>';
-
                                 for (let i = startIndex; i < endIndex; i++) {
                                     tableContent += '<tr>';
                                     for (let j = 0; j < headers.length; j++) {
-                                        let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                        let cellValue = (jsonData[i]
+                                                [j] !==
+                                                undefined) ? jsonData[i]
+                                            [j] :
+                                            '';
                                         tableContent += '<td>' + cellValue + '</td>';
                                     }
                                     tableContent += '</tr>';
                                 }
-
                                 tableContent += '</tbody>';
-
                                 $('#dataTable').html(tableContent);
                             }
-
                             displayTable(currentPage);
 
                             function renderPagination() {
                                 let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
                                 pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
-
                                 $('#pagination').html(pagination);
-
-                                $('#pagination a').off('click').on('click', function (e) {
+                                $('#pagination a').off('click').on('click', function(e) {
                                     e.preventDefault();
                                     let page = $(this).data('page');
                                     console.log(page)
@@ -746,14 +701,11 @@
                                     $('#totalPages').text(currentPage + '/' + pageCount);
                                     // renderPagination();
                                 });
-
                                 $('#totalPages').text(currentPage + '/' + pageCount);
                             }
-
                             $('#paginationContainer').show();
                             renderPagination();
-
-                            $('#goToPage').off("click").on("click", function () {
+                            $('#goToPage').off("click").on("click", function() {
                                 let pageNumber = parseInt($('#pageInput').val());
                                 if (pageNumber >= 1 && pageNumber <= pageCount) {
                                     console.log(pageCount);
@@ -769,219 +721,211 @@
                     } else {
                         alert("请提交excel文件")
                     }
-
                 } else {
                     document.getElementById("fileInfo").innerHTML = "";
                 }
             }
-
         }
-    </script>
-
+        </script>
 </head>
+
 <body>
-
-<img src="/img/onlinetaxi.jpg" style="height: 25vh; display: block; margin: 0 auto;" alt="onlinetaxi">
-<div class="row">
-    <div class="col-sm-12">
-        <div class="ibox float-e-margins">
-
-            <div class="midtile">
-                <div class="col-sm-5 m-b-xs">
-                    <button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
-                    <button type="button" class="btn btn-sm btn-primary" id="setTemplate"> 设置需求模板</button>
-                    <button type="button" class="btn btn-sm btn-primary" id="exportBtn"> 接收文件</button>
-                    <button type="button" class="btn btn-sm btn-primary" id="experimentBtn"> 接收文件</button>
-
-                    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" id="fileUpload" style="display: none;">
-                        <label for="fileUpload" class="upload-btn">
-                            选择文件
-                        </label>
-                    </form>
-                </div>
-            </div>
-            <!--文件上传信息-->
-            <div id=fileInfo>
-            </div>
-            <div id="after">
-
-            </div>
-            <div class="ibox-content">
-                <div id=table_body></div>
-            </div>
-            <div class="button1">
-                <div class="btn2">
-                    <#--<button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
-                    <button type="button" class="btn btn-sm btn-primary" id="setTemplate"> 设置需求模板</button>-->
-                    <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
-                </div>
-            </div>
-            <div id="showTable">
-            </div>
-
-        </div>
-    </div>
-</div>
-<div>
-    <div>
-        <span id="preData" class="center-text"></span>
-    </div>
-    <div id="dataTableContainer">
-        <table id="dataTable" class="table table-bordered">
-            <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-    </div>
-    <div id="paginationContainer" class="mt-3" style="display: none;">
-        <nav>
-            <div id="paginationInfo" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination mb-0" id="pagination"></ul>
-                <div class="form-group mb-0 text-center">
-                    <label for="pageInput">跳转至：</label>
-                    <input type="number" class="form-control" id="pageInput" min="1">
-                    <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
-                </div>
-                <div id="totalPages"></div>
-            </div>
-        </nav>
-    </div>
-    <div>
-        <span id="afterData" class="center-text"></span>
-    </div>
-    <div id="dataTableContainer1">
-        <table id="dataTable1" class="table table-bordered">
-            <!-- 这里将用 JavaScript 动态创建表格内容 -->
-        </table>
-    </div>
-    <div id="paginationContainer1" class="mt-3" style="display: none;">
-        <nav>
-            <div id="paginationInfo1" class="d-flex justify-content-between align-items-center">
-                <ul class="pagination mb-0" id="pagination1"></ul>
-                <div class="form-group mb-0 text-center">
-                    <label for="pageInput1">跳转至：</label>
-                    <input type="number" class="form-control" id="pageInput1" min="1">
-                    <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
-                </div>
-                <div id="totalPages1"></div>
-            </div>
-        </nav>
-    </div>
-</div>
-
-<div class="wrapper wrapper-content  animated fadeInRight">
+    <img src="/img/onlinetaxi.jpg" style="height: 25vh; display: block; margin: 0 auto;" alt="onlinetaxi">
     <div class="row">
         <div class="col-sm-12">
-            <div class="ibox ">
-
-                <div class="row row-lg">
-                    <div class="col-sm-12">
-                        <!-- Example Card View -->
-                        <div class="example-wrap">
-                            <div class="example">
-                                <table id="table_list"></table>
+            <div class="ibox float-e-margins">
+                <div class="midtile">
+                    <div class="col-sm-5 m-b-xs">
+                        <button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="setTemplate"> 设置需求模板</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="exportBtn"> 接收文件</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="experimentBtn"> 接收文件</button>
+                        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                            <input type="file" id="fileUpload" style="display: none;">
+                            <label for="fileUpload" class="upload-btn">
+                                选择文件
+                            </label>
+                        </form>
+                    </div>
+                </div>
+                <!--文件上传信息-->
+                <div id=fileInfo>
+                </div>
+                <div id="after">
+                </div>
+                <div class="ibox-content">
+                    <div id=table_body></div>
+                </div>
+                <div class="button1">
+                    <div class="btn2">
+                        <#--<button type="button" class="btn btn-sm btn-primary" id="showTemplate"> 场景模板展示</button>
+                            <button type="button" class="btn btn-sm btn-primary" id="setTemplate"> 设置需求模板</button>-->
+                            <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                    </div>
+                </div>
+                <div id="showTable">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div>
+            <span id="preData" class="center-text"></span>
+        </div>
+        <div id="dataTableContainer">
+            <table id="dataTable" class="table table-bordered">
+                <!-- 这里将用 JavaScript 动态创建表格内容 -->
+            </table>
+        </div>
+        <div id="paginationContainer" class="mt-3" style="display: none;">
+            <nav>
+                <div id="paginationInfo" class="d-flex justify-content-between align-items-center">
+                    <ul class="pagination mb-0" id="pagination"></ul>
+                    <div class="form-group mb-0 text-center">
+                        <label for="pageInput">跳转至：</label>
+                        <input type="number" class="form-control" id="pageInput" min="1">
+                        <button class="btn btn-primary mt-2" id="goToPage">跳转</button>
+                    </div>
+                    <div id="totalPages"></div>
+                </div>
+            </nav>
+        </div>
+        <div>
+            <span id="afterData" class="center-text"></span>
+        </div>
+        <div id="dataTableContainer1">
+            <table id="dataTable1" class="table table-bordered">
+                <!-- 这里将用 JavaScript 动态创建表格内容 -->
+            </table>
+        </div>
+        <div id="paginationContainer1" class="mt-3" style="display: none;">
+            <nav>
+                <div id="paginationInfo1" class="d-flex justify-content-between align-items-center">
+                    <ul class="pagination mb-0" id="pagination1"></ul>
+                    <div class="form-group mb-0 text-center">
+                        <label for="pageInput1">跳转至：</label>
+                        <input type="number" class="form-control" id="pageInput1" min="1">
+                        <button class="btn btn-primary mt-2" id="goToPage1">跳转</button>
+                    </div>
+                    <div id="totalPages1"></div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content  animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox ">
+                    <div class="row row-lg">
+                        <div class="col-sm-12">
+                            <!-- Example Card View -->
+                            <div class="example-wrap">
+                                <div class="example">
+                                    <table id="table_list"></table>
+                                </div>
                             </div>
-                        </div>
-                        <div class="example-wrap">
-                            <div class="example">
-                                <table id="table_list2"></table>
+                            <div class="example-wrap">
+                                <div class="example">
+                                    <table id="table_list2"></table>
+                                </div>
                             </div>
+                            <!-- End Example Card View -->
                         </div>
-                        <!-- End Example Card View -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 <style>
-    .center-text {
-        /*text-align: center;*/
-        font-size: 2em;
-    }
+.center-text {
+    /*text-align: center;*/
+    font-size: 2em;
+}
 
-    /* 设置表格样式 */
-    #dataTableContainer {
-        width: 100%;
-        overflow-x: auto;
-    }
+/* 设置表格样式 */
+#dataTableContainer {
+    width: 100%;
+    overflow-x: auto;
+}
 
-    #dataTable {
-        width: 100%;
-        margin: 0 auto;
-    }
+#dataTable {
+    width: 100%;
+    margin: 0 auto;
+}
 
-    #paginationInfo {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+#paginationInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    #paginationInfo input {
-        width: 5em;
-        text-align: center;
-    }
+#paginationInfo input {
+    width: 5em;
+    text-align: center;
+}
 
-    /* 设置表格样式 */
-    #dataTableContainer1 {
-        width: 100%;
-        overflow-x: auto;
-    }
+/* 设置表格样式 */
+#dataTableContainer1 {
+    width: 100%;
+    overflow-x: auto;
+}
 
-    #dataTable1 {
-        width: 100%;
-        margin: 0 auto;
-    }
+#dataTable1 {
+    width: 100%;
+    margin: 0 auto;
+}
 
-    #paginationInfo1 {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+#paginationInfo1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    #paginationInfo1 input {
-        width: 5em;
-        text-align: center;
-    }
+#paginationInfo1 input {
+    width: 5em;
+    text-align: center;
+}
 
-    #submit {
-        background-color: #347aa9;
-        padding: 5px 20px;
-        cursor: pointer;
-        color: black;
-        font-size: 20px;
-        display: inline-block;
-        text-align: center;
-        /*margin-right: 50px;*/
+#submit {
+    background-color: #347aa9;
+    padding: 5px 20px;
+    cursor: pointer;
+    color: black;
+    font-size: 20px;
+    display: inline-block;
+    text-align: center;
+    /*margin-right: 50px;*/
+}
 
-    }
+.btn2 {
+    line-height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
 
-    .btn2 {
-        line-height: 30px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
+/*选择框居中*/
+.midtile {
+    line-height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
 
-    /*选择框居中*/
-    .midtile {
-        line-height: 30px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
-
-    /*上传按钮*/
-    .upload-btn, #showTemplate, #setTemplate {
-        background-color: #347aa9;
-        color: white;
-        cursor: pointer;
-        padding: 5px 20px;
-        text-align: center;
-        font-size: 20px;
-        display: inline-block;
-        margin: 30px;
-    }
-
+/*上传按钮*/
+.upload-btn,
+#showTemplate,
+#setTemplate {
+    background-color: #347aa9;
+    color: white;
+    cursor: pointer;
+    padding: 5px 20px;
+    text-align: center;
+    font-size: 20px;
+    display: inline-block;
+    margin: 30px;
+}
 </style>
+
 </html>

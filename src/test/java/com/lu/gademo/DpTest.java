@@ -1,20 +1,29 @@
 package com.lu.gademo;
 
 import com.lu.gademo.utils.DSObject;
+import com.lu.gademo.utils.DateParseUtil;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.experimental.theories.suppliers.TestedOn;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.lu.gademo.utils.Dp;
-import com.lu.gademo.utils.impl.DpImpl;
 
 import java.io.File;
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootTest
 public class DpTest {
@@ -27,8 +36,16 @@ public class DpTest {
     }
     @Test
     public void testLaplaceMechanism()  {
-        int numberOfElements = 500000;
-        double maxValue = 10000.0;
+        List<Double> randomFloats = getDoubleList(50000, 10000.0);
+//        // Dp dp = new DpImpl();
+        DSObject dsObject = new DSObject(randomFloats);
+        DSObject result = dp.service(dsObject, 1, 1);
+        for (Object number : result.getList()) {
+            System.out.println(number);
+        }
+    }
+
+    private List<Double> getDoubleList(int numberOfElements, double maxValue) {
 
         // 创建一个列表来存储生成的浮点数
         List<Double> randomFloats = new ArrayList<>(numberOfElements);
@@ -46,17 +63,13 @@ public class DpTest {
         for (int i = 0; i < 10; i++) {
             System.out.println(randomFloats.get(i));
         }
-//        // Dp dp = new DpImpl();
-        DSObject dsObject = new DSObject(randomFloats);
-        DSObject result = dp.service(dsObject, 1, 1);
-        for (Object number : result.getList()) {
-            System.out.println(number);
-        }
+        return randomFloats;
     }
 
     @Test
     public void testReportNoisyMax1Laplace()  {
 //        // Dp dp = new DpImpl();
+
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
         DSObject result = dp.service(dsObject, 2, 10, 10);
@@ -264,8 +277,15 @@ public class DpTest {
     @Test
     public void testDpCode()  {
         // Dp dp = new DpImpl();
+        Random random = new Random();
+        String[] chosenList = new String[]{"A", "B", "C", "D", "E"};
+
+        List<String> newRawData = new ArrayList<>();
+        for (int i = 0; i < 50000; i++) {
+            newRawData.add(chosenList[random.nextInt(5)]);
+        }
         List<String> rawData = Arrays.asList("A", "B", "C", "D", "E");
-        DSObject dsObject = new DSObject(rawData);
+        DSObject dsObject = new DSObject(newRawData);
         DSObject result = dp.service(dsObject, 20, 2);
         for (Object s : result.getList()) {
             System.out.println(s);
@@ -275,8 +295,9 @@ public class DpTest {
     @Test
     public void testRandomUniformToValue()  {
         // Dp dp = new DpImpl();
+        List<Double> randomFloats = getDoubleList(100000, 10000.0);
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
-        DSObject dsObject = new DSObject(rawData);
+        DSObject dsObject = new DSObject(randomFloats);
         DSObject result = dp.service(dsObject, 21, 2);
         for (Object s : result.getList()) {
             System.out.println(s);
@@ -287,6 +308,7 @@ public class DpTest {
     @Test
     public void testRandomLaplaceToValue()  {
         // Dp dp = new DpImpl();
+
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
         DSObject result = dp.service(dsObject, 22, 2);
@@ -328,15 +350,195 @@ public class DpTest {
         }
     }
 
+    public static List<String> generateDates(int count) {
+        // 初始日期时间
+        LocalDateTime startTime = LocalDateTime.of(2019, 3, 2, 10, 58, 53);
+        // 日期时间格式器
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        List<String> dates = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            // 添加格式化后的日期时间到列表
+            dates.add(startTime.plusDays(i).format(formatter));
+        }
+        return dates;
+    }
+
+    private static List<String> generateRandomDates(int count) {
+        List<String> dates = new ArrayList<>(count);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        // 设置日期范围，比如从1970年到2023年
+        long startMillis = parseDate("1970-01-01").getTime();
+        long endMillis = parseDate("2023-12-31").getTime();
+        Random random = new Random();
+
+        for (int i = 0; i < count; i++) {
+            long randomMillis = ThreadLocalRandom.current().nextLong(startMillis, endMillis);
+            Date randomDate = new Date(randomMillis);
+            String formattedDate = dateFormat.format(randomDate);
+            dates.add(formattedDate);
+        }
+
+        return dates;
+    }
+
+    private static Date parseDate(String date) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        } catch (Exception e) {
+            throw new RuntimeException("日期解析失败: " + date, e);
+        }
+    }
+
     // 信工所
     @Test
-    public void testDpDate() {
+    public void testDpDate() throws ParseException {
         // Dp dp = new DpImpl();
         List<String> rawData = Arrays.asList("2019-03-02 10:58:53", "2019-03-02 10:58:54", "2019-03-02 10:58:55", "2019-03-02 10:58:56", "2019-03-02 10:58:57");
-        DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 26, 1);
-        for (Object s : result.getList()) {
-            System.out.println(s);
+        int numberOfDates = 50000;
+        List<String> dateList = generateRandomDates(numberOfDates);
+        // 输出前10个日期作为示例
+        List<String> resultList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(dateList.get(i));
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat resultFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (String dateString : dateList) {
+            resultList.add(resultFormat.format(dateFormat.parse(dateString)));
+        }
+        for (int i = 0; i < 10; i++) {
+            System.out.println(resultList.get(i));
+        }
+        List<String> newRawData = generateDates(50000);
+        DSObject dsObject = new DSObject(resultList);
+        DSObject result = dp.service(dsObject, 26, 3);
+//        for (Object s : result.getList()) {
+//            System.out.println(s);
+//        }
+    }
+
+    @Test
+    public void testDelimiter() {
+        String testTemp = "16.8";
+        String[] testTempList = testTemp.split("\\.");
+        String second = testTempList[0];
+        String msecond = testTempList[1];
+        System.out.println(second);
+        System.out.println(msecond);
+        Double noise = 2.137;
+        Double noiseResult = 2.137 * 86400000;
+        String day = "2";
+        String hour = "3";
+        String minute = "17";
+        String seconds = "16";
+        String mSeconds = "800";
+        int result = Integer.valueOf(day) * 24 * 60 * 60 * 1000 +
+                Integer.valueOf(hour) * 60 * 60 * 1000 +
+                Integer.valueOf(minute) * 60 * 1000 +
+                Integer.valueOf(seconds) * 1000 + Integer.valueOf(mSeconds);
+        System.out.println(result);
+        DecimalFormat fmt = new DecimalFormat("#");
+        System.out.println(fmt.format(noiseResult));
+    }
+
+    @Test
+    void testDateSpeed() throws IOException {
+        Path rawFilePath = Paths.get("D:\\Programming\\DesenTelecom\\src\\test\\resources\\test_data\\text\\生日数据1w条.xlsx");
+        InputStream inputStream = Files.newInputStream(rawFilePath);
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        // 数据行数
+        int totalRowNum = sheet.getLastRowNum();
+        // 字段名行
+        Row fieldNameRow = sheet.getRow(0);
+        // 列数
+        int columnCount = fieldNameRow.getPhysicalNumberOfCells(); // 获取列数
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        DataFormatter dataFormatter = new DataFormatter();
+
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+            List<Object> objs = new ArrayList<>();
+            Long part1Total = 0L;
+            Long part2Total = 0L;
+            Long part3Total = 0L;
+            for (int rowIndex = 1; rowIndex <= totalRowNum; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (row != null) {
+                    Cell cell = row.getCell(columnIndex);
+                    // 如果单元格为空
+                    if (cell == null || cell.getCellType() == CellType.BLANK || cell.getCellType() == CellType._NONE) {
+                        objs.add(null);
+                        continue;
+                    }
+                    // 如果表格中出现单元格中有null字符串的情况
+                    if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equalsIgnoreCase("null")) {
+                        objs.add(null);
+                        continue;
+                    }
+                    if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().equalsIgnoreCase("")) {
+                        objs.add(null);
+                        continue;
+                    }
+                    // 日期类型
+//                        objs.add(dataFormatter.formatCellValue(cell));
+                        switch (cell.getCellType()) {
+                            case STRING:
+                                // 如果单元格是字符串类型，尝试解析为日期
+                                String dateString = cell.getStringCellValue();
+                                java.util.Date date = DateParseUtil.parseDate(dateString);
+                                if (date != null) {
+                                    String formattedDate = sdf.format(date);
+                                    objs.add(formattedDate);
+                                } else {
+                                    System.out.println("Invalid Date String: " + dateString);
+                                }
+                                break;
+                            case NUMERIC:
+                                if (DateUtil.isCellDateFormatted(cell)) {
+                                    // 如果单元格是日期类型
+                                    java.util.Date numericDate = cell.getDateCellValue();
+                                    String formattedDate = sdf.format(numericDate);
+//                                    System.out.println("Formatted Date from Numeric: " + formattedDate);
+                                    objs.add(formattedDate);
+                                } else {
+                                    Long part1Start = System.currentTimeMillis();
+                                    String formatCellValue = dataFormatter.formatCellValue(cell);
+                                    Long part1End = System.currentTimeMillis();
+                                    part1Total += part1End - part1Start;
+
+                                    Long part2Start = System.currentTimeMillis();
+                                    java.util.Date date2 = DateParseUtil.parseDate(formatCellValue);
+                                    Long part2End = System.currentTimeMillis();
+                                    part2Total += part2End - part2Start;
+
+                                    Long part3Start = System.currentTimeMillis();
+                                    if (date2 != null) {
+                                        String formattedDate = sdf.format(date2);
+                                        objs.add(formattedDate);
+                                    } else {
+                                        System.out.println("Invalid Date String: " + formatCellValue);
+                                    }
+                                    Long part3End = System.currentTimeMillis();
+                                    part3Total += part3End - part3Start;
+                                }
+                                break;
+                            default:
+                                System.out.println("Unsupported Cell Type: " + cell.getCellType());
+                                break;
+                        }
+
+                }
+
+            }
+//            DSObject dsObject = new DSObject(objs);
+//            dp.service(dsObject, 26, 2);
+            System.out.println("Part1 total: " + part1Total);
+            System.out.println("Part2 total: " + part2Total);
+            System.out.println("Part3 total: " + part3Total);
+        }
+
     }
 }

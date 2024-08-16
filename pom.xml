@@ -215,7 +215,6 @@
 			<version>4.1.2</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -248,6 +247,29 @@
 		</dependency>
 
 	</dependencies>
+
+<!--	<profiles>-->
+<!--		&lt;!&ndash; 开发环境 &ndash;&gt;-->
+<!--		<profile>-->
+<!--			<id>dev</id>-->
+<!--			<activation>-->
+<!--				<activeByDefault>true</activeByDefault>-->
+<!--			</activation>-->
+<!--			<properties>-->
+<!--				<environment>dev</environment>-->
+<!--			</properties>-->
+<!--		</profile>-->
+<!--		&lt;!&ndash; 生产环境 &ndash;&gt;-->
+<!--		<profile>-->
+<!--			<id>prod</id>-->
+<!--			<activation>-->
+<!--				<activeByDefault>false</activeByDefault>-->
+<!--			</activation>-->
+<!--			<properties>-->
+<!--				<environment>prod</environment>-->
+<!--			</properties>-->
+<!--		</profile>-->
+<!--	</profiles>-->
 
 	<build>
 <!--		<testOutputDirectory>target/classes</testOutputDirectory>-->
@@ -291,6 +313,30 @@
 <!--			</plugin>-->
 
 		</plugins>
+
+<!--		<resources>-->
+<!--			&lt;!&ndash;排除配置文件&ndash;&gt;-->
+<!--			<resource>-->
+<!--				<directory>src/main/resources</directory>-->
+<!--				&lt;!&ndash;先排除所有的配置文件&ndash;&gt;-->
+<!--				<excludes>-->
+<!--					&lt;!&ndash;使用通配符，当然可以定义多个exclude标签进行排除&ndash;&gt;-->
+<!--					<exclude>application*.yml</exclude>-->
+<!--				</excludes>-->
+<!--			</resource>-->
+
+<!--			&lt;!&ndash;根据激活条件引入打包所需的配置和文件&ndash;&gt;-->
+<!--			<resource>-->
+<!--				<directory>src/main/resources</directory>-->
+<!--				&lt;!&ndash;引入所需环境的配置文件&ndash;&gt;-->
+<!--				<filtering>true</filtering>-->
+<!--				<includes>-->
+<!--					<include>application.yml</include>-->
+<!--					&lt;!&ndash;根据maven选择环境导入配置文件&ndash;&gt;-->
+<!--					<include>application-${environment}.yml</include>-->
+<!--				</includes>-->
+<!--			</resource>-->
+<!--		</resources>-->
 	</build>
 
 

@@ -9,9 +9,7 @@ import java.util.regex.Pattern;
 
 import org.deidentifier.arx.*;
 import org.deidentifier.arx.AttributeType.Hierarchy;
-import org.deidentifier.arx.criteria.DistinctLDiversity;
-import org.deidentifier.arx.criteria.EntropyLDiversity;
-import org.deidentifier.arx.criteria.RecursiveCLDiversity;
+import org.deidentifier.arx.criteria.*;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
 
@@ -42,7 +40,32 @@ public class KAnonymityUtil {
         return data;
     }
 
-    public String lDistinctDiversity(final String dataset, String dir, String params, String attribute) throws Exception {
+    public String kAnonymity(final String dataset, String dir, String params, String attribute, int length) throws Exception {
+        Data data = createData(dataset, dir);
+        // data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
+        ARXAnonymizer anonymizer = new ARXAnonymizer();
+        ARXConfiguration config = ARXConfiguration.create();
+        int level = 2;
+        switch (params) {
+            case "1": {
+                level = 4;
+                break;
+            }
+            case "2": {
+                level = 8;
+                break;
+            }
+        }
+        config.addPrivacyModel(new KAnonymity(level * length / 10));
+        config.setSuppressionLimit(0.04d);
+        config.setQualityModel(Metric.createEntropyMetric());
+        ARXResult result = anonymizer.anonymize(data, config);
+        DataHandle optimal = result.getOutput();
+        optimal.save(dir + File.separator + "output_" + dataset + ".csv", ';');
+        return dir + File.separator + "output_" + dataset + ".csv";
+    }
+
+    public String lDistinctDiversity(final String dataset, String dir, String params, String attribute, int length) throws Exception {
         Data data = createData(dataset, dir);
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
@@ -58,7 +81,7 @@ public class KAnonymityUtil {
                 break;
             }
         }
-        config.addPrivacyModel(new DistinctLDiversity(attribute, level));
+        config.addPrivacyModel(new DistinctLDiversity(attribute, length * level / 10));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
@@ -67,7 +90,7 @@ public class KAnonymityUtil {
         return dir + File.separator + "output_" + dataset + ".csv";
     }
 
-    public String lEntropyDiversity(final String dataset, String dir, String params, String attribute) throws Exception {
+    public String lEntropyDiversity(final String dataset, String dir, String params, String attribute, int length) throws Exception {
         Data data = createData(dataset, dir);
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
@@ -83,7 +106,7 @@ public class KAnonymityUtil {
                 break;
             }
         }
-        config.addPrivacyModel(new EntropyLDiversity(attribute, level));
+        config.addPrivacyModel(new EntropyLDiversity(attribute, length * level / 10));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
@@ -92,7 +115,7 @@ public class KAnonymityUtil {
         return dir + File.separator + "output_" + dataset + ".csv";
     }
 
-    public String lRecursiveCDiversity(final String dataset, String dir, String params, String attribute) throws Exception {
+    public String lRecursiveCDiversity(final String dataset, String dir, String params, String attribute, int length) throws Exception {
         Data data = createData(dataset, dir);
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
@@ -108,7 +131,32 @@ public class KAnonymityUtil {
                 break;
             }
         }
-        config.addPrivacyModel(new RecursiveCLDiversity(attribute, level, 2));
+        config.addPrivacyModel(new RecursiveCLDiversity(attribute, length * level / 10, 2));
+        config.setSuppressionLimit(0.04d);
+        config.setQualityModel(Metric.createEntropyMetric());
+        ARXResult result = anonymizer.anonymize(data, config);
+        DataHandle optimal = result.getOutput();
+        optimal.save(dir + File.separator + "output_" + dataset + ".csv", ';');
+        return dir + File.separator + "output_" + dataset + ".csv";
+    }
+
+    public String tCloseness(final String dataset, String dir, String params, String attribute, int length) throws Exception {
+        Data data = createData(dataset, dir);
+        data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
+        ARXAnonymizer anonymizer = new ARXAnonymizer();
+        ARXConfiguration config = ARXConfiguration.create();
+        int level = 2;
+        switch (params) {
+            case "1": {
+                level = 4;
+                break;
+            }
+            case "2": {
+                level = 8;
+                break;
+            }
+        }
+        config.addPrivacyModel(new EqualDistanceTCloseness(attribute, length * (1 - level / 10.0)));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);

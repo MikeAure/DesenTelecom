@@ -82,7 +82,7 @@ public class LogCollectUtil {
                                                         StringBuilder desenRequirements, String desenControlSet,
                                                         StringBuilder desenAlgParam, String startTime,
                                                         String endTime, StringBuilder desenLevel,
-                                                        Boolean desenCom) {
+                                                        Boolean desenCom, StringBuilder fileDataType) {
         SubmitEvidenceLocal submitEvidenceLocal = new SubmitEvidenceLocal();
         submitEvidenceLocal.setSystemID(systemID);
         submitEvidenceLocal.setSystemIP(util.getIP());
@@ -90,6 +90,7 @@ public class LogCollectUtil {
         submitEvidenceLocal.setSubCMD(evidenceSubmitSubCommand);
         submitEvidenceLocal.setEvidenceID(evidenceID);
         submitEvidenceLocal.setMsgVersion(evidenceSubmitMsgVersion);
+
 
         String rawFileHash = util.getSM3Hash(rawFileBytes);
         String rawFileSig = "";
@@ -129,6 +130,8 @@ public class LogCollectUtil {
         submitEvidenceLocal.setDesenPerformStartTime(startTime);
         submitEvidenceLocal.setDesenPerformEndTime(endTime);
         submitEvidenceLocal.setDesenLevel(desenLevel.toString());
+        submitEvidenceLocal.setFileDataType(fileDataType.toString());
+        log.info("Build submitEvidenceLocal finished");
         return submitEvidenceLocal;
     }
 

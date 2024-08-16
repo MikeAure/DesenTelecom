@@ -31,11 +31,18 @@ public class AnonymityImpl implements Anonymity {
             */
             case 1: {
                 if (params.length != 1) return null;
-                int[] k_anonymity_param = new int[]{5, 10, 20};
                 List<?> value = object.getList();
-                String path_k = Paths.get(currentPath, "generalization", "k_anonymity.py").toString();
-                String param = Integer.toString(k_anonymity_param[params[0].intValue()]);
-                return new DSObject(CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_k, param));
+                String param = Integer.toString(params[0].intValue());
+                String baseName = value.get(0).toString();
+                String dir = value.get(1).toString();
+                String attribute = value.get(2).toString();
+                String result;
+                try {
+                    result = kAnonymityUtil.kAnonymity(baseName, dir, param, attribute, object.getIntVal());
+                } catch (Exception e) {
+                    return null;
+                }
+                return new DSObject(result);
             }
 
             /*
@@ -157,9 +164,10 @@ public class AnonymityImpl implements Anonymity {
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
+                int length = value.size();
                 String result;
                 try {
-                    result = kAnonymityUtil.lDistinctDiversity(baseName, dir, param, attribute);
+                    result = kAnonymityUtil.lDistinctDiversity(baseName, dir, param, attribute, length);
                 } catch (Exception e) {
                     return null;
                 }
@@ -181,9 +189,10 @@ public class AnonymityImpl implements Anonymity {
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
+                int length = value.size();
                 String result;
                 try {
-                    result = kAnonymityUtil.lEntropyDiversity(baseName, dir, param, attribute);
+                    result = kAnonymityUtil.lEntropyDiversity(baseName, dir, param, attribute, length);
                 } catch (Exception e) {
                     return null;
                 }
@@ -205,9 +214,10 @@ public class AnonymityImpl implements Anonymity {
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
+                int length = value.size();
                 String result;
                 try {
-                    result = kAnonymityUtil.lRecursiveCDiversity(baseName, dir, param, attribute);
+                    result = kAnonymityUtil.lRecursiveCDiversity(baseName, dir, param, attribute, length);
                 } catch (Exception e) {
                     return null;
                 }
@@ -223,11 +233,19 @@ public class AnonymityImpl implements Anonymity {
             */
             case 10: {
                 if (params.length != 1) return null;
-                double[] t_closeness_param = new double[]{0.6, 0.4, 0.2};
                 List<?> value = object.getList();
-                String path_t = Paths.get(currentPath, "generalization", "t_closeness.py").toString();
-                String param = Double.toString(t_closeness_param[params[0].intValue()]);
-                return new DSObject(CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "", path_t, param));
+                String param = Integer.toString(params[0].intValue());
+                String baseName = value.get(0).toString();
+                String dir = value.get(1).toString();
+                String attribute = value.get(2).toString();
+                int length = value.size();
+                String result;
+                try {
+                    result = kAnonymityUtil.tCloseness(baseName, dir, param, attribute, length);
+                } catch (Exception e) {
+                    return null;
+                }
+                return new DSObject(result);
             }
 
             /*

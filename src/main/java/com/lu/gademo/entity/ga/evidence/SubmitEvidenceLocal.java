@@ -1,14 +1,16 @@
 package com.lu.gademo.entity.ga.evidence;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "submit_evidence_local")
 public class SubmitEvidenceLocal {
@@ -24,7 +26,6 @@ public class SubmitEvidenceLocal {
     @Basic
     @Column(name = "sub_cmd")
     private Integer subCMD;
-
     @Id
     @Column(name = "evidence_id")
     private String evidenceID;
@@ -109,6 +110,20 @@ public class SubmitEvidenceLocal {
     private String status;
     @Column(name = "child_system_id")
     private Integer childSystemId;
+    @Basic
+    @Column(name = "fileDataType", length = 255)
+    private String fileDataType;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SubmitEvidenceLocal)) return false;
+        SubmitEvidenceLocal that = (SubmitEvidenceLocal) o;
+        return Objects.equals(getSystemID(), that.getSystemID()) && Objects.equals(getSystemIP(), that.getSystemIP()) && Objects.equals(getMainCMD(), that.getMainCMD()) && Objects.equals(getSubCMD(), that.getSubCMD()) && Objects.equals(getEvidenceID(), that.getEvidenceID()) && Objects.equals(getMsgVersion(), that.getMsgVersion()) && Objects.equals(getSubmittime(), that.getSubmittime()) && Objects.equals(getGlobalID(), that.getGlobalID()) && Objects.equals(getOptTime(), that.getOptTime()) && Objects.equals(getFileTitle(), that.getFileTitle()) && Objects.equals(getFileAbstract(), that.getFileAbstract()) && Objects.equals(getFileKeyword(), that.getFileKeyword()) && Objects.equals(getDesenAlg(), that.getDesenAlg()) && Objects.equals(getFileSize(), that.getFileSize()) && Objects.equals(getFileHash(), that.getFileHash()) && Objects.equals(getFileSig(), that.getFileSig()) && Objects.equals(getDesenPerformer(), that.getDesenPerformer()) && Objects.equals(getDesenCom(), that.getDesenCom()) && Objects.equals(getDesenInfoPreID(), that.getDesenInfoPreID()) && Objects.equals(getDesenInfoAfterID(), that.getDesenInfoAfterID()) && Objects.equals(getDesenIntention(), that.getDesenIntention()) && Objects.equals(getDesenRequirements(), that.getDesenRequirements()) && Objects.equals(getDesenControlSet(), that.getDesenControlSet()) && Objects.equals(getDesenAlgParam(), that.getDesenAlgParam()) && Objects.equals(getDesenPerformStartTime(), that.getDesenPerformStartTime()) && Objects.equals(getDesenPerformEndTime(), that.getDesenPerformEndTime()) && Objects.equals(getDesenLevel(), that.getDesenLevel()) && Objects.equals(getDataHash(), that.getDataHash()) && Objects.equals(getRandomidentification(), that.getRandomidentification()) && Objects.equals(getDatasign(), that.getDatasign()) && Objects.equals(getParentSystemId(), that.getParentSystemId()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getChildSystemId(), that.getChildSystemId()) && Objects.equals(getFileDataType(), that.getFileDataType());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSystemID(), getSystemIP(), getMainCMD(), getSubCMD(), getEvidenceID(), getMsgVersion(), getSubmittime(), getGlobalID(), getOptTime(), getFileTitle(), getFileAbstract(), getFileKeyword(), getDesenAlg(), getFileSize(), getFileHash(), getFileSig(), getDesenPerformer(), getDesenCom(), getDesenInfoPreID(), getDesenInfoAfterID(), getDesenIntention(), getDesenRequirements(), getDesenControlSet(), getDesenAlgParam(), getDesenPerformStartTime(), getDesenPerformEndTime(), getDesenLevel(), getDataHash(), getRandomidentification(), getDatasign(), getParentSystemId(), getStatus(), getChildSystemId(), getFileDataType());
+    }
 }

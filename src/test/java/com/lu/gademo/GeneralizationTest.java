@@ -2,14 +2,20 @@ package com.lu.gademo;
 
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Generalization;
+import com.lu.gademo.utils.impl.DpUtilImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 public class GeneralizationTest {
@@ -18,6 +24,21 @@ public class GeneralizationTest {
     public GeneralizationTest(Generalization generalization) {
         this.generalization = generalization;
     }
+
+    public static List<String> generateDates(int count) {
+        // 初始日期时间
+        LocalDateTime startTime = LocalDateTime.of(2019, 3, 2, 10, 58, 53);
+        // 日期时间格式器
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        List<String> dates = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            // 添加格式化后的日期时间到列表
+            dates.add(startTime.plusDays(i).format(formatter));
+        }
+        return dates;
+    }
+
     @Test
     public void testTruncation()  {
         // // Generalization generalization = new GeneralizationImpl();
@@ -81,18 +102,18 @@ public class GeneralizationTest {
         // Generalization generalization = new GeneralizationImpl();
         List<String> rawData = Arrays.asList("陕西省西安市长安区西安电子科技大学南校区", "北京市海淀区北京大学",
                 "广西壮族自治区玉林市北流市塘岸收费站入口(北海方向)", "广西壮族自治区桂林市七星区施家园路75号附近停车场",
-                "海南省儋州市国营八一总场xxx地址", "海南省三沙市西沙群岛xxx村");
+                "海南省儋州市国营八一总场xxx地址", "海南省三沙市西沙群岛xxx村","广西壮族自治区北海市逢时花园重庆苑a区27号楼",
+                "香港特别行政区7-11-裕旺大厦11号楼", "香港特别行政区中西区金钟添马添美道2号", "香港中西区金钟添马添美道2号",
+                "重庆市江北区建北四支路2号北辰名都8-11层重庆市信息产业局", "黑龙江省哈尔滨市道里区哈尔滨市公安局");
         DSObject dsObject = new DSObject(rawData);
         DSObject result0 = generalization.service(dsObject, 4, 0);
         DSObject result1 = generalization.service(dsObject, 4, 1);
         DSObject result2 = generalization.service(dsObject, 4, 2);
         DSObject result3 = generalization.service(dsObject, 4, 3);
-
-        for (Object string : result1.getList()) {
+        for (Object string : result0.getList()) {
             System.out.println(string);
         }
-
-        for (Object string : result0.getList()) {
+        for (Object string : result1.getList()) {
             System.out.println(string);
         }
         result2.getList().forEach(System.out::println);
@@ -103,14 +124,15 @@ public class GeneralizationTest {
     @Test
     public void testDateGroupReplace()  {
         // Generalization generalization = new GeneralizationImpl();
-        List<String> rawData = Arrays.asList("2024-3-18", "2024-6-1");
-        DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 5, 1);
-        for (Object string : result.getList()) {
+        List<String> newRawData = generateDates(50000);
+//        List<String> rawData = Arrays.asList("2024-3-18", "2024-6-1");
+        DSObject dsObject = new DSObject(newRawData);
+        DSObject result = generalization.service(dsObject, 5, 3);
+        for (Object string : result.getList().stream().limit(10).collect(Collectors.toList())) {
             System.out.println(string);
         }
         DSObject result0 = generalization.service(dsObject, 5, 0);
-        for (Object string : result.getList()) {
+        for (Object string : result.getList().stream().limit(10).collect(Collectors.toList())) {
             System.out.println(string);
         }
     }
@@ -358,5 +380,36 @@ public class GeneralizationTest {
         for (Object s : result.getList()) {
             System.out.println(s);
         }
+    }
+
+    @Test
+    public void testKNum() {
+        Random random = new Random();
+        boolean allTestsPassed = true;
+        for (int i = 0; i < 100; i++) {
+            List<Double> numList = new ArrayList<>();
+            int numElements = random.nextInt(100000) + 1; // 生成1到20个元素
+            for (int j = 0; j < numElements; j++) {
+                numList.add(random.nextDouble() * 1000000); // 生成0到100之间的随机浮点数
+            }
+            int k = random.nextInt(numElements) + 1; // 确保k不为0
+
+            List<Double> doubleList = DpUtilImpl.k_num(numList, k);
+            List<Double> doubleList2 = DpUtilImpl.kNumNew(numList, k);
+
+            if (!doubleList.equals(doubleList2)) {
+                allTestsPassed = false;
+                System.out.println("Test failed for:");
+                System.out.println("List: " + numList);
+                System.out.println("k_num result: " + doubleList);
+                System.out.println("kNumNew result: " + doubleList2);
+                break;
+            }
+        }
+    }
+
+    @Test
+    void testSubstring() {
+        System.out.println("广西壮族自治区北海市逢时花园重庆苑a区".indexOf("自治区"));
     }
 }

@@ -501,7 +501,8 @@ public class DpImpl implements Dp {
                 for (String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
+                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty())
+                            .map(Double::parseDouble).collect(Collectors.toList());
                     if (!newList.isEmpty()) {
                         lists.add(newList);
                     }

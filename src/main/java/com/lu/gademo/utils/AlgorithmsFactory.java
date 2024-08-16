@@ -30,6 +30,7 @@ public class AlgorithmsFactory {
 
     @PostConstruct
     public void init() {
+        // 文本/表格
         algorithmInfoMap.put("dpDate", new AlgorithmInfo("dpDate", 1, AlgorithmType.DP, 26, Arrays.asList("0.1", "0.01", "0.001"), this.dp));
         algorithmInfoMap.put("dpCode", new AlgorithmInfo("dpCode", 2, AlgorithmType.DP, 20, Arrays.asList("3.6", "2", "0.7"), this.dp));
         algorithmInfoMap.put("laplaceToValue", new AlgorithmInfo("laplaceToValue", 3, AlgorithmType.DP, 1, Arrays.asList("10", "1", "0.1"), this.dp));
@@ -43,7 +44,7 @@ public class AlgorithmsFactory {
         algorithmInfoMap.put("floorTime", new AlgorithmInfo("floorTime", 12, AlgorithmType.GENERALIZATION, 3, null, this.generalization));
         algorithmInfoMap.put("suppressEmail", new AlgorithmInfo("suppressEmail", 13, AlgorithmType.REPLACEMENT, 8, Arrays.asList("1", "2", "3"), this.replacement));
         algorithmInfoMap.put("addressHide", new AlgorithmInfo("addressHide", 14, AlgorithmType.GENERALIZATION, 4, Arrays.asList("district", "city", "province"), this.generalization));
-        algorithmInfoMap.put("nameHide", new AlgorithmInfo("nameHide", 15, AlgorithmType.REPLACEMENT, 6, Arrays.asList("headtail", "first", "all"), this.replacement));
+        algorithmInfoMap.put("nameHide", new AlgorithmInfo("nameHide", 15, AlgorithmType.REPLACEMENT, 6, Arrays.asList("headtail", "first", "none"), this.replacement));
         algorithmInfoMap.put("numberHide", new AlgorithmInfo("numberHide", 16, AlgorithmType.REPLACEMENT, 7, Arrays.asList("3", "4", "5"), this.replacement));
         algorithmInfoMap.put("SHA512", new AlgorithmInfo("SHA512", 17, AlgorithmType.REPLACEMENT, 3, Arrays.asList("MD5", "SHA1", "SHA512"), this.replacement));
         algorithmInfoMap.put("date_group_replace", new AlgorithmInfo("date_group_replace", 18, AlgorithmType.GENERALIZATION, 5, Arrays.asList("10", "30", "50"), this.generalization));
@@ -52,17 +53,20 @@ public class AlgorithmsFactory {
         algorithmInfoMap.put("suppressAllIp", new AlgorithmInfo("suppressAllIp", 21, AlgorithmType.REPLACEMENT, 9, Arrays.asList("1", "12", "1234"), this.replacement));
         algorithmInfoMap.put("suppressIpRandomParts", new AlgorithmInfo("suppressIpRandomParts", 22, AlgorithmType.REPLACEMENT, 10, Arrays.asList("1", "2", "3"), this.replacement));
         algorithmInfoMap.put("Noisy_Histogram2", new AlgorithmInfo("Noisy_Histogram2", 23, AlgorithmType.DP, 25, null, this.dp));
+        // 图像脱敏
         algorithmInfoMap.put("Noisy_Histogram1", new AlgorithmInfo("Noisy_Histogram1", 24, AlgorithmType.DP, 24, null, this.dp));
         algorithmInfoMap.put("meanValueImage", new AlgorithmInfo("meanValueImage", 40, AlgorithmType.GENERALIZATION, 12, Arrays.asList("9", "15", "21"), this.generalization));
         algorithmInfoMap.put("gaussian_blur", new AlgorithmInfo("gaussian_blur", 41, AlgorithmType.GENERALIZATION, 10, Arrays.asList("3", "5", "8"), this.generalization));
         algorithmInfoMap.put("pixelate", new AlgorithmInfo("pixelate", 42, AlgorithmType.GENERALIZATION, 9, Arrays.asList("5", "10", "15"), this.generalization));
         algorithmInfoMap.put("box_blur", new AlgorithmInfo("box_blur", 43, AlgorithmType.GENERALIZATION, 11, Arrays.asList("2", "4", "8"), this.generalization));
         algorithmInfoMap.put("dpImage", new AlgorithmInfo("dpImage", 44, AlgorithmType.DP, 5, Arrays.asList("1.0", "0.5", "0.1"), this.dp));
-        algorithmInfoMap.put("replace_region", new AlgorithmInfo("replace_region", 45, AlgorithmType.GENERALIZATION, 13,
+        algorithmInfoMap.put("im_coder2", new AlgorithmInfo("im_coder2", 45, AlgorithmType.DP, 27, Arrays.asList("10", "1", "0.1"), this.dp));
+        algorithmInfoMap.put("replace_region", new AlgorithmInfo("replace_region", 46, AlgorithmType.GENERALIZATION, 13,
                 Arrays.asList(Arrays.asList("100", "100", "200", "200"), Arrays.asList("50", "50", "300", "300"), Arrays.asList("25", "25", "400", "400")), this.generalization));
-        algorithmInfoMap.put("image_exchange_channel", new AlgorithmInfo("image_exchange_channel", 46, AlgorithmType.REPLACEMENT, 11, null, this.replacement));
-        algorithmInfoMap.put("image_add_color_offset", new AlgorithmInfo("image_add_color_offset", 47, AlgorithmType.REPLACEMENT, 12, Arrays.asList("20", "50", "100"), this.replacement));
-        algorithmInfoMap.put("image_face_sub", new AlgorithmInfo("image_face_sub", 48, AlgorithmType.REPLACEMENT, 13, null, this.replacement));
+        algorithmInfoMap.put("image_exchange_channel", new AlgorithmInfo("image_exchange_channel", 47, AlgorithmType.REPLACEMENT, 11, null, this.replacement));
+        algorithmInfoMap.put("image_add_color_offset", new AlgorithmInfo("image_add_color_offset", 48, AlgorithmType.REPLACEMENT, 12, Arrays.asList("20", "50", "100"), this.replacement));
+        algorithmInfoMap.put("image_face_sub", new AlgorithmInfo("image_face_sub", 49, AlgorithmType.REPLACEMENT, 13, null, this.replacement));
+        // 视频脱敏
         algorithmInfoMap.put("meanValueVideo", new AlgorithmInfo("meanValueVideo", 50, AlgorithmType.GENERALIZATION, 17, Arrays.asList("9", "15", "21"), this.generalization));
         algorithmInfoMap.put("gaussian_blur_video", new AlgorithmInfo("gaussian_blur_video", 51, AlgorithmType.GENERALIZATION, 15, Arrays.asList("5", "10", "15"), this.generalization));
         algorithmInfoMap.put("pixelate_video", new AlgorithmInfo("pixelate_video", 52, AlgorithmType.GENERALIZATION, 14, Arrays.asList("5", "10", "15"), this.generalization));
@@ -72,18 +76,19 @@ public class AlgorithmsFactory {
         algorithmInfoMap.put("video_add_color_offset", new AlgorithmInfo("video_add_color_offset", 55, AlgorithmType.REPLACEMENT, 14, Arrays.asList("20", "50", "100"), this.replacement));
         algorithmInfoMap.put("video_remove_bg", new AlgorithmInfo("video_remove_bg", 56, AlgorithmType.REPLACEMENT, 16, null, this.replacement));
         algorithmInfoMap.put("video_face_sub", new AlgorithmInfo("video_face_sub", 57, AlgorithmType.REPLACEMENT, 15, null, this.replacement));
+        // 图形脱敏
         algorithmInfoMap.put("dpGraph", new AlgorithmInfo("dpGraph", 60, AlgorithmType.DP, 7, Arrays.asList("5.0", "1.0", "0.2"), this.dp));
-        algorithmInfoMap.put("dpAudio", new AlgorithmInfo("dpAudio", 71, AlgorithmType.DP, 6, Arrays.asList("5.0", "1.0", "0.2"), this.dp));
-        algorithmInfoMap.put("voice_replace", new AlgorithmInfo("voice_replace", 72, AlgorithmType.REPLACEMENT, 19, Arrays.asList("3.6", "2", "0.7"), this.replacement));
-        algorithmInfoMap.put("apply_audio_effects", new AlgorithmInfo("apply_audio_effects", 73, AlgorithmType.REPLACEMENT, 18, Arrays.asList(
+        // 音频脱敏
+        algorithmInfoMap.put("dpAudio", new AlgorithmInfo("dpAudio", 70, AlgorithmType.DP, 6, Arrays.asList("5.0", "1.0", "0.2"), this.dp));
+        algorithmInfoMap.put("voice_replace", new AlgorithmInfo("voice_replace", 71, AlgorithmType.REPLACEMENT, 19, Arrays.asList("3.6", "2", "0.7"), this.replacement));
+        algorithmInfoMap.put("apply_audio_effects", new AlgorithmInfo("apply_audio_effects", 72, AlgorithmType.REPLACEMENT, 18, Arrays.asList(
                 Arrays.asList("-3", "0.7", "-5", "5"), Arrays.asList("2", "0.8", "-10", "10"), Arrays.asList("5", "0.9", "-20", "20")), this.replacement));
-        algorithmInfoMap.put("audio_reshuffle", new AlgorithmInfo("audio_reshuffle", 74, AlgorithmType.REPLACEMENT, 17, Arrays.asList("5", "10", "15"), this.replacement));
-        algorithmInfoMap.put("audio_floor", new AlgorithmInfo("audio_floor", 75, AlgorithmType.GENERALIZATION, 19, Arrays.asList("3", "2", "1"), this.generalization));
-        algorithmInfoMap.put("audio_spec", new AlgorithmInfo("audio_spec", 76, AlgorithmType.GENERALIZATION, 20,
+        algorithmInfoMap.put("audio_reshuffle", new AlgorithmInfo("audio_reshuffle", 73, AlgorithmType.REPLACEMENT, 17, Arrays.asList("5", "10", "15"), this.replacement));
+        algorithmInfoMap.put("audio_floor", new AlgorithmInfo("audio_floor", 74, AlgorithmType.GENERALIZATION, 19, Arrays.asList("3", "2", "1"), this.generalization));
+        algorithmInfoMap.put("audio_spec", new AlgorithmInfo("audio_spec", 75, AlgorithmType.GENERALIZATION, 20,
                 Arrays.asList(Arrays.asList("0.1", "0.3"), Arrays.asList("0.3", "0.5"), Arrays.asList("0.5", "0.7")), this.generalization));
         algorithmInfoMap.put("audio_augmentation", new AlgorithmInfo("audio_augmentation", 76, AlgorithmType.GENERALIZATION, 21, null, this.generalization));
         algorithmInfoMap.put("audio_median", new AlgorithmInfo("audio_median", 77, AlgorithmType.GENERALIZATION, 22, Arrays.asList("0", "1", "2"), this.generalization));
-        algorithmInfoMap.put("im_coder2", new AlgorithmInfo("im_coder2", 45, AlgorithmType.DP, 27, Arrays.asList("10", "1", "0.1"), this.dp));
     }
 
     public AlgorithmInfo getAlgorithmInfoFromName(String name) {

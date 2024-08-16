@@ -260,6 +260,8 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         // desenLevel: 脱敏级别
         localEvidenceData.put("desenLevel", submitEvidenceLocal.getDesenLevel());
 
+        localEvidenceData.put("fileDataType", submitEvidenceLocal.getFileDataType());
+
         // 整个json
         ObjectNode localEvidenceJson = objectMapper.createObjectNode();
         localEvidenceJson.put("systemID", submitEvidenceLocal.getSystemID());

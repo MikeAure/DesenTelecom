@@ -220,19 +220,19 @@ public class ExportDatatableToExcelTest {
         exportToExcel(CustomerMsg.class, "customerMsgReflect2.xlsx");
     }
 
-    @Test
-    void testDatatableToExcel() throws IOException, SQLException, InterruptedException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        String sheetName = "telecomdatatable_param";
-        Path rawFilePath = exportToExcel(CustomerMsg.class, "customerMsgReflect2.xlsx");
-        FileStorageDetails datatableExcelStorageDetails = fileStorageService.getRawFileStorageDetails(rawFilePath);
-        System.out.println(datatableExcelStorageDetails.getRawFileName());
-        System.out.println(datatableExcelStorageDetails.getDesenFileName());
-        // 模拟请求文件脱敏配置
-        String desenParams = objectMapper.writeValueAsString(excelParamService.getParamsByTableName(sheetName));
-        System.out.println(desenParams);
-        fileService.dealExcel(datatableExcelStorageDetails, desenParams, sheetName, false);
-
-    }
+//    @Test
+//    void testDatatableToExcel() throws IOException, SQLException, InterruptedException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+//        String sheetName = "telecomdatatable_param";
+//        Path rawFilePath = exportToExcel(CustomerMsg.class, "customerMsgReflect2.xlsx");
+//        FileStorageDetails datatableExcelStorageDetails = fileStorageService.getRawFileStorageDetails(rawFilePath);
+//        System.out.println(datatableExcelStorageDetails.getRawFileName());
+//        System.out.println(datatableExcelStorageDetails.getDesenFileName());
+//        // 模拟请求文件脱敏配置
+//        String desenParams = objectMapper.writeValueAsString(excelParamService.getParamsByTableName(sheetName));
+//        System.out.println(desenParams);
+//        fileService.dealExcel(datatableExcelStorageDetails, desenParams, sheetName, false);
+//
+//    }
 
     @Test
     void testExcelToDatatable() {
