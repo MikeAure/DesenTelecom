@@ -1,7 +1,6 @@
 package com.lu.gademo.timeSeries;
 
 import Jama.Matrix;
-
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
@@ -65,13 +64,19 @@ public class KDTree {
 
     }
 
-    public static void printTree(Node root) {
-
+    public static StringBuilder stringOfKdTree(Node root) {
+        StringBuilder stringBuilder = new StringBuilder();
+        buildTreeString(root, stringBuilder);
+        return stringBuilder;
+    }
+    public static void buildTreeString(Node root, StringBuilder stringBuilder) {
+//        StringBuilder stringBuilder = new StringBuilder();
         if (root.isLeafNode) {
             LeafNode leafNode = (LeafNode) root;
 
-            System.out.println("leafnode");
-            System.out.println(leafNode.IDSet);
+            stringBuilder.append("leafnode\n");
+            stringBuilder.append(leafNode.IDSet);
+            stringBuilder.append("\n");
             return;
         }
 
@@ -81,9 +86,9 @@ public class KDTree {
             int c = interNode.c;
             int val = interNode.val;
 
-            System.out.println("c:" + c + ",val:" + val);
-            printTree(interNode.left);
-            printTree(interNode.right);
+            stringBuilder.append("c:").append(c).append(",val:").append(val).append("\n");
+            buildTreeString(interNode.left, stringBuilder);
+            buildTreeString(interNode.right, stringBuilder);
 
         }
 
@@ -166,7 +171,6 @@ public class KDTree {
                 BigInteger[] cipherL = encryptInterNode.cipherL;
                 BigInteger[] cipherR = encryptInterNode.cipherR;
 
-
                 // Parameter
                 BigInteger N = FiltrationParam.N;
 
@@ -222,7 +226,9 @@ public class KDTree {
 
         double t1 = System.currentTimeMillis();
         BigInteger encryptID = (BigInteger) distanceList.keySet().toArray()[0];
-        BigInteger encryptDistance = TWED.TWEDComputeCipher(queryRecord, distanceList.get(encryptID), encryptLamda, cipherMiunsOne, cipherOne, VerificationParam);
+        BigInteger encryptDistance = TWED.TWEDComputeCipher(queryRecord, distanceList.get(encryptID), encryptLamda,
+                cipherMiunsOne, cipherOne, VerificationParam);
+        // 同态操作
         BigInteger encryptValue = encryptDelta.add(cipherMiunsOne.multiply(encryptDistance).mod(N)).mod(N);
 
         // server S1

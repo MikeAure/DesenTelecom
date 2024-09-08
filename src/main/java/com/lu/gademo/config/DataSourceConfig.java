@@ -26,4 +26,11 @@ public class DataSourceConfig {
     public DataSource crmDataSource() {
         return DataSourceBuilder.create().build();
     }
+
+    @Bean(name = "dataPlatformDataSource")
+    @Qualifier("dataPlatformDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.dataplatform")
+    public DataSource dataPlatformDataSource() {
+        return DataSourceBuilder.create().build();
+    }
 }

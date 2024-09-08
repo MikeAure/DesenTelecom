@@ -9,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServerResponse {
+public class ServerResponse<T> {
     private String status;
-    private String message;
+    private T message;
 
     public ServerResponse(String status) {
         this.status = status;

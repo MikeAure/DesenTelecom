@@ -1,6 +1,7 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class GeneralizationImpl implements Generalization {
     private final DpUtil dpUtil;
@@ -31,6 +33,7 @@ public class GeneralizationImpl implements Generalization {
         String path2 = Paths.get(currentPath, "image", "dealImage.py").toString();
         String path4 = Paths.get(currentPath, "video", "desenVideo.py").toString();
         String path6 = Paths.get(currentPath, "audio", "audio.py").toString();
+        log.info("调用泛化算法统一接口");
 
         switch (alg) {
             /*

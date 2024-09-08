@@ -9,6 +9,10 @@ import org.springframework.context.ApplicationEvent;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * 该事件用于保存脱敏前后文件信息和发送给其它系统的实体类信息
+
+ */
 public class ThreeSystemsEvent extends ApplicationEvent {
     private final SubmitEvidenceLocal submitEvidenceLocal;
     private final ReqEvidenceSave reqEvidenceSave;

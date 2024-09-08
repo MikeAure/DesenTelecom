@@ -4,6 +4,7 @@ import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.DpUtil;
 import com.lu.gademo.utils.Replace;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class ReplaceImpl implements Replace {
     private final DpUtil dpUtil;
@@ -24,7 +26,7 @@ public class ReplaceImpl implements Replace {
         String currentPath = Paths.get("./").normalize().toAbsolutePath().toString();
         String dealImagePath = Paths.get(currentPath, "image", "dealImage.py").toString();
         String path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();
-
+        log.info("调用替换算法统一接口");
         switch (alg) {
 
             /*

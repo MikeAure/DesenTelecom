@@ -60,6 +60,9 @@ public interface Util {
      * @param <T>
      */
     <T> void write2Excel(Sheet sheet, int lastRowNum, int i, List<T> datas);
+    <T> void write2Excel(Sheet originalSheet, Sheet newSheet, int lastRowNum, int columnIndex, List<T> datas);
+
+    public void copySheet(Sheet sourceSheet, Sheet targetSheet);
 
     /**
      * @param inputStream 输入流

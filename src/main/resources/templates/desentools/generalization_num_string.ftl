@@ -49,7 +49,10 @@
         let outputArea = algoName + "_output";
         $("#" + buttonName).on("click", function () {
             let textInput = $("#" + inputName).val();
-            let privacyLevel = algoName === "date_group_replace" ? $("#date_group_replace_privacyLevel").val() : 1;
+            let privacyLevelControl = algoName + "_privacyLevel";
+            // let privacyLevel = algoName === "date_group_replace" ? $("#" + privacyLevelControl).val() : 1;
+            let privacyLevel = $("#" + privacyLevelControl).val();
+
             console.log("privacy level" + privacyLevel);
             let textType;
             switch (algoName) {
@@ -116,31 +119,42 @@
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                 </div>
-                <div class="container">
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5">
-                            <div class="input-group">
-                                <input type="text" id="truncation_input" class="form-control" placeholder="请输入文本"
-                                       style="font-size: 20px">
-                                <span class="input-group-btn">
+            </div>
+            <div style="text-align: center;" class="m-b">
+                <div style="margin: auto; font-size: 20px">
+                    请选择隐私保护等级
+                    <select id="truncation_privacyLevel">
+                        <option value="1"> 低程度</option>
+                        <option value="2" selected> 中程度</option>
+                        <option value="3"> 高程度</option>
+                    </select>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row justify-content-center" style="display: grid; place-items: center;">
+                    <div class="col-lg-5">
+                        <div class="input-group">
+                            <input type="text" id="truncation_input" class="form-control" placeholder="请输入文本"
+                                   style="font-size: 20px">
+                            <span class="input-group-btn">
                     <button class="btn btn-default" id="truncation_submitBtn" type="button"
                             style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                         提交脱敏
                     </button>
                         </span>
-                            </div>
-                            <div class="text-center">
-                                <label for="truncation_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
+                        </div>
+                        <div class="text-center">
+                            <label for="truncation_output"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="truncation_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <hr>
@@ -162,26 +176,36 @@
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                 </div>
-                <div class="container">
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5">
-                            <div class="input-group">
-                                <input type="text" id="floor_input" class="form-control" placeholder="请输入文本"
-                                       style="font-size: 20px">
-                                <span class="input-group-btn">
+            </div>
+            <div style="text-align: center;" class="m-b">
+                <div style="margin: auto; font-size: 20px">
+                    请选择隐私保护等级
+                    <select id="floor_privacyLevel">
+                        <option value="1"> 低程度</option>
+                        <option value="2" selected> 中程度</option>
+                        <option value="3"> 高程度</option>
+                    </select>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row justify-content-center" style="display: grid; place-items: center;">
+                    <div class="col-lg-5">
+                        <div class="input-group">
+                            <input type="text" id="floor_input" class="form-control" placeholder="请输入文本"
+                                   style="font-size: 20px">
+                            <span class="input-group-btn">
                     <button class="btn btn-default" id="floor_submitBtn" type="button"
                             style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                         提交脱敏
                     </button>
                         </span>
-                            </div>
-                            <div class="text-center">
-                                <label for="floor_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
+                        </div>
+                        <div class="text-center">
+                            <label for="floor_output"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="floor_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -208,26 +232,36 @@
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                 </div>
-                <div class="container">
-                    <div class="row justify-content-center" style="display: grid; place-items: center;">
-                        <div class="col-lg-5">
-                            <div class="input-group">
-                                <input type="text" id="floorTime_input" class="form-control" placeholder="请输入文本"
-                                       style="font-size: 20px">
-                                <span class="input-group-btn">
+            </div>
+            <div style="text-align: center;" class="m-b">
+                <div style="margin: auto; font-size: 20px">
+                    请选择隐私保护等级
+                    <select id="floorTime_privacyLevel">
+                        <option value="1"> 低程度</option>
+                        <option value="2" selected> 中程度</option>
+                        <option value="3"> 高程度</option>
+                    </select>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row justify-content-center" style="display: grid; place-items: center;">
+                    <div class="col-lg-5">
+                        <div class="input-group">
+                            <input type="text" id="floorTime_input" class="form-control" placeholder="请输入文本"
+                                   style="font-size: 20px">
+                            <span class="input-group-btn">
                     <button class="btn btn-default" id="floorTime_submitBtn" type="button"
                             style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                         提交脱敏
                     </button>
                         </span>
-                            </div>
-                            <div class="text-center">
-                                <label for="floorTime_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
+                        </div>
+                        <div class="text-center">
+                            <label for="floorTime_output"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="floorTime_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -254,6 +288,16 @@
                         输出：地址
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                </div>
+            </div>
+            <div style="text-align: center;" class="m-b">
+                <div style="margin: auto; font-size: 20px">
+                    请选择隐私保护等级
+                    <select id="addressHide_privacyLevel">
+                        <option value="1"> 低程度</option>
+                        <option value="2" selected> 中程度</option>
+                        <option value="3"> 高程度</option>
+                    </select>
                 </div>
             </div>
             <div class="container">
@@ -284,62 +328,63 @@
     </div>
     <hr>
     <div class="panel-body">
-    <div class="row">
-        <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-            5.日期分组算法</p>
-        <div <#--class="col-sm-6"-->
-                style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-            <#--<p style="font-size: 1.5em;">1.地址抑制算法</p>-->
-            <div>
-                <p style="font-size: 1.5em;text-align: justify;">
-                    说明：将日期数据分组，将分组内日期替换为同一日期。日期格式：2024-3-18
-                </p>
-                <p style="font-size: 1.5em;text-align: justify;">
-                    输入：日期数组
-                </p>
-                <p style="font-size: 1.5em;text-align: justify;">
-                    输出：日期数组
-                </p>
-                <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+        <div class="row">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                5.日期分组算法</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                <#--<p style="font-size: 1.5em;">1.地址抑制算法</p>-->
+                <div>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        说明：将日期数据分组，将分组内日期替换为同一日期。日期格式：2024-3-18
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输入：日期数组
+                    </p>
+                    <p style="font-size: 1.5em;text-align: justify;">
+                        输出：日期数组
+                    </p>
+                    <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                </div>
             </div>
-        </div>
-        <div style="text-align: center;" class="m-b">
-            <div style="margin: auto; font-size: 20px">
-                请选择隐私保护等级
-                <select id="date_group_replace_privacyLevel">
-                    <option value="1"> 低程度</option>
-                    <option value="2" selected> 中程度</option>
-                    <option value="3"> 高程度</option>
-                </select>
+            <div style="text-align: center;" class="m-b">
+                <div style="margin: auto; font-size: 20px">
+                    请选择隐私保护等级
+                    <select id="date_group_replace_privacyLevel">
+                        <option value="1"> 低程度</option>
+                        <option value="2" selected> 中程度</option>
+                        <option value="3"> 高程度</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="container">
-            <div class="row justify-content-center" style="display: grid; place-items: center;">
-                <div class="col-lg-5">
-                    <div class="input-group">
-                        <input type="text" id="date_group_replace_input" class="form-control" placeholder="请输入文本"
-                               style="font-size: 20px">
-                        <span class="input-group-btn">
+            <div class="container">
+                <div class="row justify-content-center" style="display: grid; place-items: center;">
+                    <div class="col-lg-5">
+                        <div class="input-group">
+                            <input type="text" id="date_group_replace_input" class="form-control"
+                                   placeholder="请输入文本"
+                                   style="font-size: 20px">
+                            <span class="input-group-btn">
                             <button class="btn btn-default" id="date_group_replace_submitBtn" type="button"
                                     style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                 提交脱敏
                             </button>
                         </span>
-                    </div>
+                        </div>
 
-                    <div class="text-center">
-                        <label for="addressHide_output"
-                               style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                        <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="text-center">
+                            <label for="addressHide_output"
+                                   style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
                                 <textarea id="date_group_replace_output" rows="2" cols="50" readonly
                                           style="margin-top: 10px;"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 

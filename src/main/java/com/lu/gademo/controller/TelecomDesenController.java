@@ -17,8 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-// 用于接收电信Agent的请求
+/**
+ * 用于接收电信Agent的请求
+ */
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -38,13 +41,18 @@ public class TelecomDesenController {
             String fieldName = rawConfig.getFieldName();
             int tmParam = rawConfig.getTmParam();
             ExcelParam reqConfig = null;
+            // 如果为主键列，则不脱敏
+            if (colName.equals("CUST_ID")) {
+                rawConfig.setTmParam(0);
+            }
             for (ExcelParam item : reqConfigs) {
-                if (item.getColumnName().equals(fieldName)) {
+                if (item.getColumnName().equals(colName)) {
                     reqConfig = item;
                     break;
                 }
             }
-            if (reqConfig != null) {
+            // 避免设置CUST_ID
+            if (reqConfig != null && !colName.equals("CUST_ID")) {
                 int reqConfigTmParam = reqConfig.getTmParam();
                 rawConfig.setTmParam(Math.max(tmParam, reqConfigTmParam));
             }
@@ -54,9 +62,9 @@ public class TelecomDesenController {
     // 电信Agent请求脱敏文件
     @PostMapping("/desenExcel")
     public Result<?> desenExcel(@RequestPart("file") MultipartFile file,
-                           @RequestParam("params") String params,
-                           @RequestParam("algName") String algName,
-                           @RequestParam("sheet") String sheetName) throws IOException {
+                                @RequestParam("params") String params,
+                                @RequestParam("algName") String algName,
+                                @RequestParam("sheet") String sheetName) throws IOException {
         FileStorageDetails fileStorageDetails1 = null;
         FileStorageDetails fileStorageDetails2 = null;
         FileStorageDetails fileStorageDetails3 = null;
@@ -97,7 +105,7 @@ public class TelecomDesenController {
         try {
             fileStorageDetails1 = fileStorageService.saveRawFileWithDesenInfo(file);
             fileStorageDetails2 = fileStorageService.saveRawFileWithDesenInfo(file);
-            fileStorageDetails3= fileStorageService.saveRawFileWithDesenInfo(file);
+            fileStorageDetails3 = fileStorageService.saveRawFileWithDesenInfo(file);
         } catch (IOException e) {
             log.error("Failed to save raw file: {}", e.getMessage());
             return new Result<>(500, "Failed to save file", "");
@@ -129,4 +137,68 @@ public class TelecomDesenController {
 
         return new Result<>(200, "Success", "");
     }
+//        try {
+//            log.info("正在使用低脱敏策略进行脱敏");
+//            FileStorageDetails finalFileStorageDetails = fileStorageDetails1;
+//            CompletableFuture<ResponseEntity<byte[]>> lowFuture = CompletableFuture.supplyAsync(() -> {
+//                try {
+//                    return fileService.dealExcel(finalFileStorageDetails, lowStrategyConfigString, lowStrategy, false);
+//                } catch (Exception e) {
+//                    throw new RuntimeException("Low strategy failed", e);
+//                }
+//            }).exceptionally(e -> {
+//                log.error("Low strategy failed", e);
+//                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            });
+//
+//            log.info("正在使用中脱敏策略进行脱敏");
+//            FileStorageDetails finalFileStorageDetails1 = fileStorageDetails2;
+//            CompletableFuture<ResponseEntity<byte[]>> mediumFuture = CompletableFuture.supplyAsync(() -> {
+//                try {
+//                    return fileService.dealExcel(finalFileStorageDetails1, mediumStrategyConfigString, mediumStrategy, false);
+//                } catch (Exception e) {
+//                    throw new RuntimeException("Medium strategy failed", e);
+//                }
+//            }).exceptionally(e -> {
+//                log.error("Medium strategy failed", e);
+//                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            });
+//
+//            log.info("正在使用高脱敏策略进行脱敏");
+//            FileStorageDetails finalFileStorageDetails2 = fileStorageDetails3;
+//            CompletableFuture<ResponseEntity<byte[]>> highFuture = CompletableFuture.supplyAsync(() -> {
+//                try {
+//                    return fileService.dealExcel(finalFileStorageDetails2, highStrategyConfigString, highStrategy, false);
+//                } catch (Exception e) {
+//                    throw new RuntimeException("High strategy failed", e);
+//                }
+//            }).exceptionally(e -> {
+//                log.error("High strategy failed", e);
+//                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            });
+//
+//            CompletableFuture<Void> allFutures = CompletableFuture.allOf(lowFuture, mediumFuture, highFuture);
+//
+//            allFutures.join(); // 等待所有任务完成
+//
+//            ResponseEntity<byte[]> lowResponseEntity = lowFuture.get();
+//            ResponseEntity<byte[]> mediumResponseEntity = mediumFuture.get();
+//            ResponseEntity<byte[]> highResponseEntity = highFuture.get();
+//
+//            log.info("LowResponseEntity Status Code: {}", lowResponseEntity.getStatusCode());
+//            log.info("MediumResponseEntity Status Code: {}", mediumResponseEntity.getStatusCode());
+//            log.info("HighResponseEntity Status Code: {}", highResponseEntity.getStatusCode());
+//
+//            if (lowResponseEntity.getStatusCode() != HttpStatus.OK ||
+//                    mediumResponseEntity.getStatusCode() != HttpStatus.OK ||
+//                    highResponseEntity.getStatusCode() != HttpStatus.OK) {
+//                // 如果有任意一个需求未完成，则返回异常结果
+//                return new Result<>(500, "Failed to complete all desen tasks", "");
+//            }
+//        } catch (Exception e) {
+//            log.error("Failed to desen excel: {}", e.getMessage());
+//            return new Result<>(500, "Failed to desen excel", "");
+//        }
+//        return new Result<>(200, "Success", "");
+//    }
 }

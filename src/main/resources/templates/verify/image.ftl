@@ -35,7 +35,7 @@
             font-size: 50px;
         }
 
-        #submit {
+        .btn2 > button{
             background-color: #347aa9;
             padding: 5px 20px;
             cursor: pointer;
@@ -120,22 +120,104 @@
     <!-- 自定义js -->
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
     <script type="text/javascript">
+        let defaultOption = 'meanValueImage'; // 预设的默认选项
+        document.addEventListener('DOMContentLoaded', function() {
+            let privacy_level = document.getElementById("privacyLevel");
+            let uploadForm = document.getElementById("uploadForm");
+            let facesubUploadControlGroup = document.getElementById("facesub-upload");
+            let submitBtn = $("#submit");
+            // 失真算法选择控件
+            let selectedAlgoName = document.getElementById('algonames');
+            fetch('/toolset/getDefaultSelection?toolsetName=' + 'image')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to fetch');
+                    }
+                })
+                .then(data => {
+                    if (data.code === 200 && data.message) {
+                        setDefaultOption(data.data);
+                        defaultOption = data.data;
+
+                        if ($("ul .active").index() === 0) {
+                            switch (defaultOption) {
+                                case "image_face_sub":
+                                    console.log("image_face_sub");
+                                    privacy_level.style.display = "none";
+                                    facesubUploadControlGroup.style.display = "block";
+                                    uploadForm.style.display = "none";
+                                    // submitBtn.removeEventListener("click", submitOriginMethod);
+                                    submitBtn.off("click").on("click", () => {
+                                        imageFaceSubUpload();
+                                    });
+                                    break;
+                                case "image_exchange_channel":
+                                    privacy_level.style.display = "none";
+                                    facesubUploadControlGroup.style.display = "none";
+                                    uploadForm.style.display = "block";
+                                    submitBtn.off("click").on("click", () => {
+                                        submitOriginMethod();
+                                    });
+                                    break;
+                                default:
+                                    privacy_level.style.display = "block";
+                                    facesubUploadControlGroup.style.display = "none";
+                                    uploadForm.style.display = "block";
+                                    submitBtn.off("click").on("click", () => {
+                                        submitOriginMethod();
+                                    });
+                                    break;
+                            }
+                        } else {
+                            // privacy_level.style.display = "none";
+                            facesubUploadControlGroup.style.display = "none";
+                            uploadForm.style.display = "block";
+                            document.getElementById("algonames").value = defaultOption;
+                            submitBtn.off("click").on("click", () => {
+                                submitOriginMethod();
+                            });
+                        }
+                    } else {
+                        setDefaultOption(defaultOption);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("获取默认算法失败");
+                    setDefaultOption(defaultOption);
+                });
+
+            function setDefaultOption(value) {
+                selectedAlgoName.value = value;
+            }
+        });
+
         window.onload = function () {
             let preArea = document.getElementById("pre");
             let afterArea = document.getElementById("after");
-            let replaceArea = document.getElementById("replace-result");
+            let replaceResultArea = document.getElementById("replace-result");
+            let selectedAlgoName = document.getElementById('algonames');
+
             let submitBtn = $("#submit");
             submitBtn.off("click").on("click", () => {
                 submitOriginMethod();
             });
-            const fileUploadBtn = document.getElementById("fileUpload");
-            fileUploadBtn.addEventListener("change", chooseFile);
+            // 非换脸算法的文件上传入口
+            const originalFileUpload = document.getElementById("fileUpload");
+            originalFileUpload.addEventListener("change", chooseFile);
+            // 原始文件
+            const faceSrc = document.getElementById("image_face_sub_src_fileupload");
+            // 换脸目标
+            const faceTarget = document.getElementById("image_face_sub_target_fileupload");
             let privacy_level = document.getElementById("privacyLevel");
             let uploadForm = document.getElementById("uploadForm");
-            let facesubUpload = document.getElementById("facesub-upload");
+            let facesubUploadControlGroup = document.getElementById("facesub-upload");
+
             $("#downloadEigenvector").hide();
 
-            $("#img_face_sub_src_fileupload")
+            $("#image_face_sub_src_fileupload")
                 .on("change", function (event) {
                     // 清空
                     document.getElementById("pre").innerHTML = "";
@@ -151,7 +233,7 @@
 
                         if (imageType.includes(fileExtension)) {
                             let input = document.getElementById(
-                                "img_face_sub_src_fileupload"
+                                "image_face_sub_src_fileupload"
                             );
                             let pre = document.getElementById("pre");
                             let file = input.files[0];
@@ -165,10 +247,11 @@
                         }
                     }
                 });
-            $("#img_face_sub_target_fileupload")
+
+            $("#image_face_sub_target_fileupload")
                 .on("change", function (event) {
                     // 清空
-                    document.getElementById("after").innerHTML = "";
+                    afterArea.innerHTML = "";
                     // 图片格式
                     const imageType = ["jpg", "jpeg", "png"];
                     //读取文件
@@ -181,7 +264,7 @@
 
                         if (imageType.includes(fileExtension)) {
                             let input = document.getElementById(
-                                "img_face_sub_target_fileupload"
+                                "image_face_sub_target_fileupload"
                             );
                             let file = input.files[0];
                             let after = document.getElementById("after");
@@ -195,66 +278,108 @@
                         }
                     }
                 });
+
             $("#algonames")
                 .on("change", function (event) {
+                    console.log("algoname-change event triggered");
+
+                    faceSrc.value = "";
+                    faceTarget.value = "";
+                    originalFileUpload.value = "";
+
+                    preArea.innerHTML = "";
+                    afterArea.innerHTML = "";
+                    replaceResultArea.innerHTML = "";
+
                     if ($("ul .active").index() === 0) {
                         switch (event.target.value) {
-                            case "img_face_sub":
-                                console.log("img_face_sub");
+                            case "image_face_sub":
+                                console.log("image_face_sub");
                                 privacy_level.style.display = "none";
-                                facesubUpload.style.display = "block";
+                                facesubUploadControlGroup.style.display = "block";
                                 uploadForm.style.display = "none";
                                 // submitBtn.removeEventListener("click", submitOriginMethod);
                                 submitBtn.off("click").on("click", () => {
-                                    img_face_sub_upload();
+                                    imageFaceSubUpload();
                                 });
                                 break;
                             case "image_exchange_channel":
                                 privacy_level.style.display = "none";
-                                facesubUpload.style.display = "none";
+                                facesubUploadControlGroup.style.display = "none";
                                 uploadForm.style.display = "block";
                                 submitBtn.off("click").on("click", () => {
                                     submitOriginMethod();
                                 });
-                                // submitBtn.removeEventListener("click", img_face_sub_upload);
+                                // submitBtn.removeEventListener("click", image_face_sub_upload);
                                 break;
                             default:
                                 privacy_level.style.display = "block";
-                                facesubUpload.style.display = "none";
+                                facesubUploadControlGroup.style.display = "none";
                                 uploadForm.style.display = "block";
                                 submitBtn.off("click").on("click", () => {
                                     submitOriginMethod();
                                 });
-                                // submitBtn.removeEventListener("click", img_face_sub_upload);
+                                // submitBtn.removeEventListener("click", image_face_sub_upload);
                                 break;
                         }
                     } else {
                         // privacy_level.style.display = "none";
-                        facesubUpload.style.display = "none";
+                        facesubUploadControlGroup.style.display = "none";
                         uploadForm.style.display = "block";
 
-                        document.getElementById("algonames").value = "dpImage";
+                        selectedAlgoName.value = defaultOption;
                         submitBtn.off("click").on("click", () => {
                             submitOriginMethod();
                         });
-                        // submitBtn.removeEventListener("click", img_face_sub_upload);
+                        // submitBtn.removeEventListener("click", image_face_sub_upload);
                     }
                 });
-            let tabs = document.querySelectorAll('a[data-toggle="tab"]');
 
             $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+                console.log("shown.bs.tab event triggered");
+
                 let isSelected = $("#tab-2").hasClass("active");
+                // 清空显示区域的图片
                 preArea.innerHTML = "";
                 afterArea.innerHTML = "";
-                replaceArea.innerHTML = "";
-                // privacy_level.style.display = "none";
-                facesubUpload.style.display = "none";
-                uploadForm.style.display = "block";
+                replaceResultArea.innerHTML = "";
+
+                // 清空失真脱敏算法中所有文件上传控件中的文件
+                originalFileUpload.value = "";
+                faceSrc.value = "";
+                faceTarget.value = "";
+
+                console.log("defaultOption: " + defaultOption);
+
+                if (defaultOption !== "image_exchange_channel" && defaultOption !== "image_face_sub") {
+                    privacy_level.style.display = "block";
+                } else {
+                    privacy_level.style.display = "none";
+                }
+
+                if (defaultOption === "image_face_sub") {
+                    facesubUploadControlGroup.style.display = "block";
+                    uploadForm.style.display = "none";
+                    submitBtn.off("click").on("click", () => {
+                        imageFaceSubUpload();
+                    });
+
+                } else {
+                    facesubUploadControlGroup.style.display = "none";
+                    uploadForm.style.display = "block";
+
+                }
                 $("#downloadEigenvector").hide();
-                document.getElementById("fileUpload").value = '';
-                $("#algonames").val("dpImage");
+                $("#setDefaultAlgorithm").show();
+
+                // 设置非失真脱敏算法选项卡显示默认值
+                selectedAlgoName.value = defaultOption;
                 if (isSelected) {
-                    $("#downloadEigenvector").show()
+                    // 设置展示的控件组
+                    facesubUploadControlGroup.style.display = "none";
+                    uploadForm.style.display = "block";
+                    $("#downloadEigenvector").show();
+                    $("#setDefaultAlgorithm").hide();
                     console.log("Tab 2 is now active!");
                     submitBtn.off("click").on("click", () => {
                         submitOriginMethod();
@@ -290,6 +415,32 @@
                         console.error("Error:", error);
                         alert(error);
                     });
+            });
+
+            // 设置默认算法
+            $("#setDefaultAlgorithm").on("click", function (e) {
+               let postData = new URLSearchParams();
+               postData.set("toolsetName", "image");
+               postData.set("defaultAlgName", $("#algonames").val());
+               console.log("postData: " + postData);
+
+               fetch ("/toolset/setDefaultToolset", {
+                   method: "POST",
+                   body: postData,
+               })
+                   .then(response => response.json())
+                   .then(data => {
+                       if (data.code === 200) {
+                           alert("设置默认算法成功！");
+                           defaultOption = $("#algonames").val();
+                       } else {
+                           throw new Error("设置默认算法失败！");
+                       }
+                   })
+                   .catch((error) => {
+                       alert(error);
+                       console.log(error);
+                   })
             });
             // $("#downloadEigenvector").on("click", function (e) {
             //         fetch("/imageRetrieval/downloadEigenVector")
@@ -379,7 +530,16 @@
                 method: "POST",
                 body: formData,
             })
-                .then((response) => response.blob())
+                .then((response) => {
+                    if (response.status === 500) {
+                        // Handle server error
+                        return response.text().then(failedMsg => {
+                            alert(failedMsg);
+                            throw new Error(failedMsg); // Throw an error to stop further processing
+                        });
+                    }
+                    return response.blob();
+                })
                 .then((blob) => {
                     let dealedImg = new Image();
                     dealedImg.src = URL.createObjectURL(blob);
@@ -430,17 +590,17 @@
             };
         };
 
-        function img_face_sub_upload() {
+        function imageFaceSubUpload() {
             document.getElementById("replace-result").innerHTML = "";
             // debugger
             // 清空
             // 目标面孔
             const imgSrcFile = document.getElementById(
-                "img_face_sub_src_fileupload"
+                "image_face_sub_src_fileupload"
             ).files[0];
             // 被换脸的文件
             const imgTargetFile = document.getElementById(
-                "img_face_sub_target_fileupload"
+                "image_face_sub_target_fileupload"
             ).files[0];
 
             // document.getElementById("video_remove_bg_img").innerHTML = "";
@@ -549,10 +709,10 @@
                                 <tr>
                                     <td>
                                         <select id="algonames">
-                                            <option value="dpImage" selected>
+                                            <option value="dpImage">
                                                 DP-基于差分隐私的图像加噪方法
                                             </option>
-                                            <option value="im_coder2" selected>
+                                            <option value="im_coder2">
                                                 DP-基于差分隐私的图像加噪方法2
                                             </option>
                                             <option value="meanValueImage">
@@ -576,7 +736,7 @@
                                             <option value="image_add_color_offset">
                                                 替换-图像颜色偏移
                                             </option>
-                                            <option value="img_face_sub">
+                                            <option value="image_face_sub">
                                                 替换-图像人脸替换算法
                                             </option>
                                         </select>
@@ -606,6 +766,7 @@
                                     </tbody>
                                 </table>
                             </div>
+
                         </div>
                     </div>
                     <div id="tab-2" class="tab-pane" style="text-align: center">
@@ -641,30 +802,32 @@
                     <div id="facesub-upload" style="display: none">
                         <input
                                 type="file"
-                                id="img_face_sub_src_fileupload"
+                                id="image_face_sub_src_fileupload"
                                 accept=".jpg, .jpeg, .png"
                                 style="display: none"
                         />
-                        <label for="img_face_sub_src_fileupload" class="upload-btn">
+                        <label for="image_face_sub_src_fileupload" class="upload-btn">
                             选择目标面孔
                         </label>
                         <input
                                 type="file"
-                                id="img_face_sub_target_fileupload"
+                                id="image_face_sub_target_fileupload"
                                 accept=".jpg, .jpeg, .png"
                                 style="display: none"
                         />
-                        <label for="img_face_sub_target_fileupload" class="upload-btn">
+                        <label for="image_face_sub_target_fileupload" class="upload-btn">
                             选择源文件
                         </label>
                     </div>
                 </div>
+                <div id="fileInfo"></div>
             </div>
             <div class="btn2">
                 <button type="button" class="btn btn-sm btn-primary" id="submit">
                     提交脱敏
                 </button>
-                <button type="button" class="btn btn-sm btn-primary" id="downloadEigenvector">
+                <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm"> 设置当前算法为默认算法</button>
+                <button type="button" class="btn btn-sm btn-primary m-l" id="downloadEigenvector">
                     获取原始图片特征向量文件
                 </button>
             </div>

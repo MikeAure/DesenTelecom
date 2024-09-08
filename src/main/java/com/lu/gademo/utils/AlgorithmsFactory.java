@@ -53,12 +53,12 @@ public class AlgorithmsFactory {
         algorithmInfoMap.put("suppressAllIp", new AlgorithmInfo("suppressAllIp", 21, AlgorithmType.REPLACEMENT, 9, Arrays.asList("1", "12", "1234"), this.replacement));
         algorithmInfoMap.put("suppressIpRandomParts", new AlgorithmInfo("suppressIpRandomParts", 22, AlgorithmType.REPLACEMENT, 10, Arrays.asList("1", "2", "3"), this.replacement));
         algorithmInfoMap.put("Noisy_Histogram2", new AlgorithmInfo("Noisy_Histogram2", 23, AlgorithmType.DP, 25, null, this.dp));
-        // 图像脱敏
         algorithmInfoMap.put("Noisy_Histogram1", new AlgorithmInfo("Noisy_Histogram1", 24, AlgorithmType.DP, 24, null, this.dp));
-        algorithmInfoMap.put("meanValueImage", new AlgorithmInfo("meanValueImage", 40, AlgorithmType.GENERALIZATION, 12, Arrays.asList("9", "15", "21"), this.generalization));
-        algorithmInfoMap.put("gaussian_blur", new AlgorithmInfo("gaussian_blur", 41, AlgorithmType.GENERALIZATION, 10, Arrays.asList("3", "5", "8"), this.generalization));
-        algorithmInfoMap.put("pixelate", new AlgorithmInfo("pixelate", 42, AlgorithmType.GENERALIZATION, 9, Arrays.asList("5", "10", "15"), this.generalization));
-        algorithmInfoMap.put("box_blur", new AlgorithmInfo("box_blur", 43, AlgorithmType.GENERALIZATION, 11, Arrays.asList("2", "4", "8"), this.generalization));
+        // 图片脱敏
+        algorithmInfoMap.put("meanValueImage", new AlgorithmInfo("meanValueImage", 40, AlgorithmType.GENERALIZATION, 12, Arrays.asList("15", "21", "27"), this.generalization));
+        algorithmInfoMap.put("gaussian_blur", new AlgorithmInfo("gaussian_blur", 41, AlgorithmType.GENERALIZATION, 10, Arrays.asList("16", "32", "64"), this.generalization));
+        algorithmInfoMap.put("pixelate", new AlgorithmInfo("pixelate", 42, AlgorithmType.GENERALIZATION, 9, Arrays.asList("15", "25", "35"), this.generalization));
+        algorithmInfoMap.put("box_blur", new AlgorithmInfo("box_blur", 43, AlgorithmType.GENERALIZATION, 11, Arrays.asList("4", "8", "16"), this.generalization));
         algorithmInfoMap.put("dpImage", new AlgorithmInfo("dpImage", 44, AlgorithmType.DP, 5, Arrays.asList("1.0", "0.5", "0.1"), this.dp));
         algorithmInfoMap.put("im_coder2", new AlgorithmInfo("im_coder2", 45, AlgorithmType.DP, 27, Arrays.asList("10", "1", "0.1"), this.dp));
         algorithmInfoMap.put("replace_region", new AlgorithmInfo("replace_region", 46, AlgorithmType.GENERALIZATION, 13,
@@ -87,8 +87,8 @@ public class AlgorithmsFactory {
         algorithmInfoMap.put("audio_floor", new AlgorithmInfo("audio_floor", 74, AlgorithmType.GENERALIZATION, 19, Arrays.asList("3", "2", "1"), this.generalization));
         algorithmInfoMap.put("audio_spec", new AlgorithmInfo("audio_spec", 75, AlgorithmType.GENERALIZATION, 20,
                 Arrays.asList(Arrays.asList("0.1", "0.3"), Arrays.asList("0.3", "0.5"), Arrays.asList("0.5", "0.7")), this.generalization));
-        algorithmInfoMap.put("audio_augmentation", new AlgorithmInfo("audio_augmentation", 76, AlgorithmType.GENERALIZATION, 21, null, this.generalization));
-        algorithmInfoMap.put("audio_median", new AlgorithmInfo("audio_median", 77, AlgorithmType.GENERALIZATION, 22, Arrays.asList("0", "1", "2"), this.generalization));
+        algorithmInfoMap.put("audio_augmentation", new AlgorithmInfo("audio_augmentation", 76, AlgorithmType.GENERALIZATION, 21, Arrays.asList("2", "4", "7"), this.generalization));
+        algorithmInfoMap.put("audio_median", new AlgorithmInfo("audio_median", 77, AlgorithmType.GENERALIZATION, 22, Arrays.asList("5", "10", "15"), this.generalization));
     }
 
     public AlgorithmInfo getAlgorithmInfoFromName(String name) {

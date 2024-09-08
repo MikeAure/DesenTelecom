@@ -1,5 +1,8 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.model.LogSenderManager;
+import com.lu.gademo.model.Server;
+import com.lu.gademo.service.impl.FileStorageService;
 import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.common.Vertex;
 import com.lu.gademo.trace.client.user.Customer;
@@ -7,6 +10,8 @@ import com.lu.gademo.trace.client.user.Driver;
 import com.lu.gademo.trace.client.util.CoordinateConversion;
 import com.lu.gademo.trace.client.util.MapUtils;
 import com.lu.gademo.trace.server.gui.ServerMain;
+import com.lu.gademo.utils.DesenInfoStringBuilders;
+import com.lu.gademo.utils.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,8 +22,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.Cipher;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,12 +48,18 @@ public class EncryptController {
     private Driver driver1;
     @Autowired
     private ServerMain server = new ServerMain();
+    @Autowired
+    private FileStorageService fileStorageService;
+    @Autowired
+    private Util util;
+    @Autowired
+    private LogSenderManager logSenderManager;
 
     private final double minLat = 34.14;
     private final double maxLat = 34.43;
     private final double minLon = 108.77;
     private final double maxLon = 109.12;
-    private final int numberOfPoints = 20000;
+    private final int numberOfPoints = 500000;
 
     private static final String symbol1 = "%%";//分隔符1
     private static final String symbol2 = "&&";//分隔符2
@@ -53,67 +67,153 @@ public class EncryptController {
     private final int k3 = 75;
 
     private double[][] randomPoints = new double[numberOfPoints][2];
+    private Random randomNum = new Random();
 
     // graph的非失真算法
     @ResponseBody
     @RequestMapping(value = "/desenGraph", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public String desenGraph(@RequestParam String rawData) throws Exception {
-        return MainTest.encryptGraph(rawData);
+    public ServerResponse<Map<String, String>> desenGraph(@RequestParam String rawData) throws Exception {
+        Boolean desenCom = true;
+        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+        String objectMode = "graph";
+        // 设置文件时间戳
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+        // 设置原文件信息
+
+        // 设置原文件保存路径
+        String rawFileName = fileTimeStamp + "UserInput";
+        String rawFileSuffix = "plaintext";
+        byte[] rawFileBytes = rawData.getBytes();
+        Long rawFileSize = (long) rawFileBytes.length;
+        String result = "";
+        // 调用视频加密方法
+        String startTime = util.getTime();
+        try {
+            result = MainTest.encryptGraph(rawData);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", null);
+        }
+        String endTime = util.getTime();
+        // 准备返回文件
+        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+
+        infoBuilders.desenAlg.append("106");
+        infoBuilders.desenAlgParam.append("非失真图形脱敏算法");
+        infoBuilders.desenLevel.append(0);
+        // 脱敏前类型
+        infoBuilders.desenInfoPreIden.append("graph");
+        // 脱敏后类型
+        infoBuilders.desenInfoAfterIden.append("graph");
+        // 脱敏意图
+        infoBuilders.desenIntention.append("对图形非失真脱敏");
+        // 脱敏要求
+        infoBuilders.desenRequirements.append("对图形非失真脱敏");
+        // 脱敏数据类型
+        infoBuilders.fileDataType.append(rawFileSuffix);
+
+        String evidenceID = util.getSM3Hash((new String(rawFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, rawFileName, rawFileBytes, rawFileSize, objectMode, rawFileSuffix,
+                startTime, endTime);
+        Map<String, String> sendResult = new HashMap<>();
+        sendResult.put("result", result);
+        sendResult.put("kdTree", MainTest.encryptedKDTreeString.toString());
+        return new ServerResponse<>("ok", sendResult);
     }
 
     @ResponseBody
     @RequestMapping(value = "/customerSetStartCoordinate", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse customerSetStartCoordinate(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
+    public ServerResponse<String> customerSetStartCoordinate(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
         try {
             customer.setStartLatitude(Double.parseDouble(startLatitude));
             customer.setStartLongitude(Double.parseDouble(startLongitude));
             System.out.println("Start: " + customer.getStartLatitude() + " " + customer.getStartLongitude());
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
 
     }
 
     @ResponseBody
     @RequestMapping(value = "/customerSetEndCoordinate", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse customerSetEndCoordinate(@RequestParam String endLatitude, @RequestParam String endLongitude) throws Exception {
+    public ServerResponse<String> customerSetEndCoordinate(@RequestParam String endLatitude, @RequestParam String endLongitude) throws Exception {
         try {
             customer.setEndLatitude(Double.parseDouble(endLatitude));
             customer.setEndLongitude(Double.parseDouble(endLongitude));
             System.out.println("Destination: " + customer.getEndLatitude() + " " + customer.getEndLongitude());
             customer.destInfoStr = "纬度：" + customer.getEndLatitude() + " 经度：" + customer.getEndLongitude();
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
 
     }
 
     @ResponseBody
     @RequestMapping(value = "/traceCustomerLogin", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse traceCustomerLogin() throws Exception {
-
+    public ServerResponse<String> traceCustomerLogin() throws Exception {
         try {
             customer.login();
-
-            customer.sendEncryptedMapData(customer.getStartLatitude(), customer.getEndLongitude());
+            String encryptedMapData = customer.sendEncryptedMapData(customer.getStartLatitude(), customer.getEndLongitude());
             customer.sendSquareAndCircleData();
 
+            Boolean desenCom = true;
+            DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+            String objectMode = "graph";
+            // 设置文件时间戳
+            String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+            // 设置原文件信息
+
+            // 设置原文件保存路径
+            String rawFileName = fileTimeStamp + "UserInput";
+            String rawFileSuffix = "plaintext";
+            // 使用乘客的起点和终点坐标作为原始数据
+            String rawData = String.valueOf(customer.getStartLongitude()) + String.valueOf(customer.getStartLatitude()) + String.valueOf(customer.getEndLongitude()) + String.valueOf(customer.getEndLatitude());
+            byte[] rawFileBytes = rawData.getBytes();
+            Long rawFileSize = (long) rawFileBytes.length;
+
+            // 调用视频加密方法
+            String startTime = util.getTime();
+//            String result = MainTest.encryptGraph(rawData);
+            String endTime = util.getTime();
+            // 准备返回文件
+            String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+
+            infoBuilders.desenAlg.append("101");
+            infoBuilders.desenAlgParam.append("非失真文本脱敏算法");
+            infoBuilders.desenLevel.append(0);
+            // 脱敏前类型
+            infoBuilders.desenInfoPreIden.append("text");
+            // 脱敏后类型
+            infoBuilders.desenInfoAfterIden.append("text");
+            // 脱敏意图
+            infoBuilders.desenIntention.append("对文本非失真脱敏");
+            // 脱敏要求
+            infoBuilders.desenRequirements.append("对文本非失真脱敏");
+            // 脱敏数据类型
+            infoBuilders.fileDataType.append(rawFileSuffix);
+
+            String evidenceID = util.getSM3Hash((new String(rawFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+            logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                    rawFileBytes, rawFileSize, rawFileName, rawFileBytes, rawFileSize, objectMode, rawFileSuffix,
+                    startTime, endTime);
+
 //            customer.connThread.join();
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", encryptedMapData);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error");
         }
 
     }
 
     @ResponseBody
     @RequestMapping(value = "/traceDriver1Login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse traceDriver1Login(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
+    public ServerResponse<String> traceDriver1Login(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
         System.out.println("Driver1: " + startLatitude + " " + startLongitude);
 
         driver0.setStartLatitude(Double.parseDouble(startLatitude));
@@ -122,16 +222,16 @@ public class EncryptController {
             driver0.login();
             driver0.sendEncryptedMapData(driver0.getStartLatitude(), driver0.getStartLongitude());
 //            driver1.connThread.join();
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/traceDriver2Login", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse traceDriver2Login(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
+    public ServerResponse<String> traceDriver2Login(@RequestParam String startLatitude, @RequestParam String startLongitude) throws Exception {
         System.out.println("Driver2: " + startLatitude + " " + startLongitude);
         driver1.setStartLatitude(Double.parseDouble(startLatitude));
         driver1.setStartLongitude(Double.parseDouble(startLongitude));
@@ -139,111 +239,111 @@ public class EncryptController {
             driver1.login();
             driver1.sendEncryptedMapData(driver1.getStartLatitude(), driver1.getStartLongitude());
 //            driver2.connThread.join();
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok");
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error");
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/serverStart", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse serverStart() {
+    public ServerResponse<String> serverStart() {
         try {
             server.start();
             // template.convertAndSend("/topic/serverLog", new ServerResponse("running"));
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
             // template.convertAndSend("/topic/serverLog", new ServerResponse("error"));
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/serverStop", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse serverStop() {
+    public ServerResponse<String> serverStop() {
         try {
             server.stop();
             // template.convertAndSend("/topic/serverLog", new ServerResponse("stop"));
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
             // template.convertAndSend("/topic/serverLog", new ServerResponse("error"));
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/customerStop", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse customerStop() {
+    public ServerResponse<String> customerStop() {
         customer.IS_ORDER_ACCEPTED = false;
         try {
             customer.close();
             // template.convertAndSend("/topic/serverLog", new ServerResponse("stop"));
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
             // template.convertAndSend("/topic/serverLog", new ServerResponse("error"));
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
 
     }
 
     @ResponseBody
     @RequestMapping(value = "/driver1Stop", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse driver1Stop() {
+    public ServerResponse<String> driver1Stop() {
         try {
             driver0.close();
             // template.convertAndSend("/topic/serverLog", new ServerResponse("stop"));
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
             // template.convertAndSend("/topic/serverLog", new ServerResponse("error"));
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/driver2Stop", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse driver2Stop() {
+    public ServerResponse<String> driver2Stop() {
         try {
             driver1.close();
             // template.convertAndSend("/topic/serverLog", new ServerResponse("stop"));
-            return new ServerResponse("ok");
+            return new ServerResponse<>("ok", "");
         } catch (Exception e) {
             // template.convertAndSend("/topic/serverLog", new ServerResponse("error"));
-            e.printStackTrace();
-            return new ServerResponse("error");
+            log.error(e.getMessage());
+            return new ServerResponse<>("error", "");
         }
     }
 
     @ResponseBody
     @RequestMapping(value = "/orderResult", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse orderResult() {
+    public ServerResponse<String> orderResult() {
         if (customer.IS_ORDER_ACCEPTED) {
             String driverName = customer.driverList.get(0).getUserName();
             log.info(driverName);
             if (driverName.contains("driver0")) {
-                return new ServerResponse("ok", "司机：" + "driver1" + "接单了");
+                return new ServerResponse<>("ok", "司机：" + "driver1" + "接单了");
             } else if (driverName.equals("driver1")) {
-                return new ServerResponse("ok", "司机：" + "driver2" + "接单了");
+                return new ServerResponse<>("ok", "司机：" + "driver2" + "接单了");
             } else {
-                return new ServerResponse("error", "未知司机");
+                return new ServerResponse<>("error", "未知司机");
             }
         }
-        return new ServerResponse("error", "没有司机接单");
+        return new ServerResponse<>("error", "没有司机接单");
     }
 
     @ResponseBody
     @RequestMapping(value = "/generateTestData", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ServerResponse generateTestData() {
+    public ServerResponse<String> generateTestData() {
         generateRandomGeoPoints(minLat, maxLat, minLon, maxLon, numberOfPoints);
         StringBuilder sb = new StringBuilder();
         for (double[] randomPoint : randomPoints) {
             sb.append(randomPoint[0]).append(" ").append(randomPoint[1]).append("\n");
         }
-        return new ServerResponse("ok", sb.toString());
+        return new ServerResponse<>("ok", sb.toString());
     }
 
     private void generateRandomGeoPoints(double minLat, double maxLat, double minLon, double maxLon, int numberOfPoints) {
@@ -263,6 +363,7 @@ public class EncryptController {
     @PostMapping(value = "/performenceTest",
             consumes = "application/json;charset=UTF-8")
     public ResponseEntity<byte[]> performenceTest(@RequestBody double[][] points) throws IOException {
+        log.info("开始非失真类文本算法性能测试");
         Path desenFilePath = Paths.get("desen_files");
         Map<String, String> returnResult = new HashMap<>();
         StringBuilder resultBuilder = new StringBuilder();
@@ -297,13 +398,15 @@ public class EncryptController {
             }
         }
         long endTimePoint = System.nanoTime();
-        double totalTime = (endTimePoint - startTimePoint) / 10e6;
-        log.info("Desensitization finished in " + Double.toString(totalTime) + "ms");
+        double totalTime = (endTimePoint - startTimePoint) / 1e6;
+        log.info("脱敏完成，共耗时：" + Double.toString(totalTime) + "ms");
+        log.info("单条脱敏记录耗时：" + Double.toString(totalTime / points.length) + "ms");
+        log.info("每秒钟脱敏可脱敏数据：{}", 1000 / (totalTime / points.length) + "条");
         // Shut down the executor
         executor.shutdown();
         String resultString = "脱敏" + points.length + "条数据用时" + totalTime + " ms\n" + resultBuilder.toString();
-        String fileName = System.currentTimeMillis() +"test_result.txt";
-        try(FileWriter fileWriter = new FileWriter(desenFilePath.resolve(fileName).toFile())) {
+        String fileName = System.currentTimeMillis() + "test_result.txt";
+        try (FileWriter fileWriter = new FileWriter(desenFilePath.resolve(fileName).toFile())) {
             fileWriter.write(resultString);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body(e.getMessage().getBytes());
@@ -311,6 +414,7 @@ public class EncryptController {
 
         // 准备返回文件
         File tempFile = desenFilePath.resolve(fileName).toFile();
+        log.info("脱敏后文件写入完成");
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=result.txt");
         return ResponseEntity.ok()
@@ -318,7 +422,6 @@ public class EncryptController {
                 .contentLength(tempFile.length())
                 .body(Files.readAllBytes(tempFile.toPath()));
     }
-
 
     private String simpilifiedOfAlgo(String message, Vertex UF_j) throws Exception {
         BigInteger x_j = BigInteger.valueOf(UF_j.getX());
@@ -361,37 +464,42 @@ public class EncryptController {
     }
 
     private Callable<String> getStringCallable(int i, String[] mapDatum, Vertex vertex) {
-        final int taskId = i;
         return () -> {
             StringBuffer stringBuffer = new StringBuffer();
-//            System.out.println("Current running: " + taskId);
-
             try {
+                // 与地图块进行计算
                 stringBuffer.append(simpilifiedOfAlgo(mapDatum[0], vertex)).append(";");
             } catch (Exception e) {
-                System.out.println("EncryptedCaledData: " + "数据处理出错！");
-                System.out.println(e.getMessage());
+                log.error("EncryptedCalculatedData: " + "数据处理出错！");
+                log.error(e.getMessage());
             }
-
-
             return stringBuffer.toString();
         };
     }
 
     @PostMapping(value = "/aesVideoEnc")
     public ResponseEntity<byte[]> aesVideoEnc(@RequestPart("file") MultipartFile file,
-                                            @RequestParam("password") String password
+                                              @RequestParam("password") String password
     ) {
         try {
-            Path currentDirectory = Paths.get("");
             Path rawFileDirectory = Paths.get("raw_files");
             Path desenFileDirectory = Paths.get("desen_files");
+            Boolean desenCom = false;
+            DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
+            String objectMode = "video";
             // 设置文件时间戳
             String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+            // 设置原文件信息
+            if (file.getOriginalFilename() == null) {
+                throw new IOException("Input file name is null");
+            }
             // 设置原文件保存路径
             String rawFileName = fileTimeStamp + file.getOriginalFilename();
+            String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
             Path rawFilePath = rawFileDirectory.resolve(rawFileName);
             String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+            byte[] rawFileBytes = file.getBytes();
+            Long rawFileSize = file.getSize();
 
             // 保存源文件
             file.transferTo(rawFilePath.toAbsolutePath());
@@ -400,21 +508,40 @@ public class EncryptController {
             Path desenFilePath = desenFileDirectory.resolve(desenFileName);
             String desenFilePathString = desenFilePath.toAbsolutePath().toString();
             // 调用视频加密方法
-
+            String startTime = util.getTime();
             videoAESEncOrDec(rawFilePathString, desenFilePathString, password, Cipher.ENCRYPT_MODE);
+            String endTime = util.getTime();
             // 准备返回文件
-            File tempFile = desenFilePath.toFile();
+            String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
+            // 脱敏后文件字节流
+            byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
+            Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+            infoBuilders.desenAlg.append("104");
+            infoBuilders.desenAlgParam.append("非失真视频脱敏算法");
+            infoBuilders.desenLevel.append(0);
+            // 脱敏前类型
+            infoBuilders.desenInfoPreIden.append("video");
+            // 脱敏后类型
+            infoBuilders.desenInfoAfterIden.append("video");
+            // 脱敏意图
+            infoBuilders.desenIntention.append("对视频非失真脱敏");
+            // 脱敏要求
+            infoBuilders.desenRequirements.append("对视频非失真脱敏");
+            // 脱敏数据类型
+            infoBuilders.fileDataType.append(rawFileSuffix);
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + desenFileName);
+            String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
+            logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                    rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix,
+                    startTime, endTime);
             return ResponseEntity.ok()
                     .headers(headers)
-                    .contentLength(tempFile.length())
-                    .body(Files.readAllBytes(tempFile.toPath()));
-        } catch(Exception e) {
+                    .contentLength(desenFileSize)
+                    .body(desenFileBytes);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         }
-
-
     }
 
     @PostMapping(value = "/aesVideoDec")
@@ -422,7 +549,6 @@ public class EncryptController {
                                               @RequestParam("password") String password
     ) {
         try {
-
             Path rawFileDirectory = Paths.get("raw_files");
             Path desenFileDirectory = Paths.get("desen_files");
             // 设置文件时间戳
@@ -449,7 +575,7 @@ public class EncryptController {
                     .headers(headers)
                     .contentLength(tempFile.length())
                     .body(Files.readAllBytes(tempFile.toPath()));
-        } catch(Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         }
     }

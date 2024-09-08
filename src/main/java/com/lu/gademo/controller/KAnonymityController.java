@@ -2,6 +2,7 @@ package com.lu.gademo.controller;
 
 import com.lu.gademo.utils.Anonymity;
 import com.lu.gademo.utils.DSObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 @Controller
 @RequestMapping("/KAnonymity")
 public class KAnonymityController {
@@ -44,6 +46,7 @@ public class KAnonymityController {
                                               @RequestParam("params") String params,
                                               @RequestParam("attribute") String attribute) {
         try {
+            System.out.println(templates);
             String originalCsvFileName = csvFile.getOriginalFilename();
             saveFile(csvFile, originalCsvFileName);
             if (originalCsvFileName != null) {
@@ -56,7 +59,7 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                dsObject.setIntVal(templates.size());
+                dsObject.setIntVal(templates.size() - 1);
                 String output = anonymity.service(dsObject, 1, Integer.parseInt(params)).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
@@ -67,7 +70,10 @@ public class KAnonymityController {
                 return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.TEXT_PLAIN);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(e.getMessage());
         }
         return null;
     }
@@ -100,8 +106,10 @@ public class KAnonymityController {
                 return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            log.error(e.getMessage());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.TEXT_PLAIN);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(e.getMessage());        }
         return null;
     }
 
@@ -134,8 +142,10 @@ public class KAnonymityController {
                 return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            log.error(e.getMessage());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.TEXT_PLAIN);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(e.getMessage());        }
         return null;
     }
 
@@ -166,8 +176,10 @@ public class KAnonymityController {
                 return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            log.error(e.getMessage());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.TEXT_PLAIN);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(e.getMessage());        }
         return null;
     }
 
@@ -199,7 +211,11 @@ public class KAnonymityController {
                 return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.TEXT_PLAIN);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(e.getMessage());
         }
         return null;
     }

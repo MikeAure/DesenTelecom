@@ -27,7 +27,7 @@ def interceptString(s, r):
 def add_args(parser: argparse.ArgumentParser):
     parser.add_argument("name", type=str)
     parser.add_argument("file", type=str)
-    parser.add_argument("-d", "--distance", type=float, default=0.3)
+    parser.add_argument("-d", "--distance", type=float, default=0.36)
     parser.add_argument(
         "-m", "--mode", choices=["register", "login"], default="register"
     )
@@ -140,6 +140,9 @@ def cli_main():
 
                 e3 = time.time()
                 # print('存储结束，用时：', str(e3 - s3) + '秒')
+                encrypted_voiceprint = os.path.join(file_save_location, user_name + "_encrypted_voiceprint.txt")
+                with open(encrypted_voiceprint, "w") as f:
+                    f.write(str(C))
                 result1.status = "ok"
     else:
         # print('登录声纹模板提取...')
@@ -191,7 +194,7 @@ def cli_main():
             # print("注册模板向量与认证模板向量之间的内积: ", inner_product)
 
             distance = A**2 + B**2 - 2 * inner_product
-            # print("注册模板向量与认证模板向量之间的欧式距离: ", distance)
+            print("Distance of register vector and login vector: ", distance)
 
             e1 = time.time()
             # print("计算注册模板向量与认证模板向量之间的欧式距离结束，用时：", str(e1 - s1) + '秒')
@@ -204,7 +207,7 @@ def cli_main():
                 result1.message = "distance too large"
             login_add(identifier[0], success)
 
-    print(json.dumps(result1.__dict__)).encode("utf-8")
+    print(json.dumps(result1.__dict__))
     return json.dumps(result1.__dict__).encode("utf-8")
 
 

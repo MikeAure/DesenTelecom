@@ -30,7 +30,8 @@ public class RandomNoiseController {
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public String desenValue(@RequestParam String rawData,
                              @RequestParam String samples,
-                             @RequestParam String algName) {
+                             @RequestParam String algName,
+                             @RequestParam String params) {
         String[] types = algName.split(",");
         algName = types[types.length - 1];
         log.info(algName);
@@ -51,18 +52,18 @@ public class RandomNoiseController {
                 break;
             }
             default:
-                throw new RuntimeException("Unkown algorithm: " + algName);
+                throw new RuntimeException("Unknown algorithm: " + algName);
 
         }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject resultDS = null;
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
 
-        if (algName.equals("report_noisy_max3")) {
-            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples), 1);
-        } else {
-            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples));
-        }
+//        if (algName.equals("report_noisy_max3")) {
+            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples), Integer.parseInt(params));
+//        } else {
+//            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples));
+//        }
 
         StringBuilder resultString = new StringBuilder();
         for (Object s : resultDS.getList()) {
@@ -77,7 +78,8 @@ public class RandomNoiseController {
                               @RequestParam String samples,
                               @RequestParam String algName,
                               @RequestParam String c,
-                              @RequestParam String t) {
+                              @RequestParam String t,
+                              @RequestParam String params) {
 
         String[] types = algName.split(",");
         algName = types[types.length - 1];
@@ -104,14 +106,14 @@ public class RandomNoiseController {
                 break;
             }
             default:
-                throw new RuntimeException("Unkown algorithm: " + algName);
+                throw new RuntimeException("Unknown algorithm: " + algName);
 
         }
 
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
 
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        DSObject resultDS = dp.service(rawObject, algNum, Integer.parseInt(c), Integer.parseInt(t));
+        DSObject resultDS = dp.service(rawObject, algNum, Integer.parseInt(c), Integer.parseInt(t), Integer.parseInt(params));
         StringBuilder resultString = new StringBuilder();
         for (Object s : resultDS.getList()) {
             resultString.append(s).append("\n");

@@ -17,7 +17,7 @@ public class smarthomeParam extends BaseEntity {
     private Integer id;
 
     //数据库中所存的字段名
-    private String filedName;
+    private String fieldName;
 
     //英文缩写的中文说明
     private String columnName;
@@ -36,7 +36,7 @@ public class smarthomeParam extends BaseEntity {
 //        System.out.println("json数据："+json);
         smarthomeParam param = new ObjectMapper().readValue(json, smarthomeParam.class);
         this.id = param.id;
-        this.filedName = param.filedName;
+        this.fieldName = param.fieldName;
         this.columnName = param.columnName;
         this.dataType = param.dataType;
         this.k = param.k;
@@ -54,12 +54,12 @@ public class smarthomeParam extends BaseEntity {
         this.id = id;
     }
 
-    public String getFiledName() {
-        return filedName;
+    public String getFieldName() {
+        return fieldName;
     }
 
-    public void setFiledName(String filedName) {
-        this.filedName = filedName;
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
     }
 
     public String getColumnName() {

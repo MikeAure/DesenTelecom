@@ -1,10 +1,10 @@
 package com.lu.gademo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.crm.CustomerDesenMsg;
 import com.lu.gademo.entity.crm.CustomerDesenMsgLow;
 import com.lu.gademo.entity.crm.CustomerMsg;
+import com.lu.gademo.mapper.crm.CrmParamDao;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.FileStorageService;
@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.io.FileInputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 
 import javax.persistence.Column;
@@ -26,7 +25,6 @@ import java.lang.reflect.Field;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -50,6 +48,8 @@ public class ExportDatatableToExcelTest {
     private ExcelParamService excelParamService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private CrmParamDao crmParamDao;
 
     public <T, ID> JpaRepository<T, ID> getRepository(Class<T> entityClass) {
         String repositoryName = entityClass.getSimpleName() + "Dao";
@@ -141,7 +141,7 @@ public class ExportDatatableToExcelTest {
         }
     }
 
-    public <T> void importExcelToDatabase(Class<T> entityClass, String filePath) {
+    public <T> void importExcelToDatabase(Class<T> entityClass, String filePath, String tableName) {
         try (FileInputStream fis = new FileInputStream(filePath);
             Workbook workbook = new XSSFWorkbook(fis)) {
 
@@ -173,8 +173,8 @@ public class ExportDatatableToExcelTest {
 
             // 获取对应的repository
             JpaRepository<T, ?> repository = getRepository(entityClass);
-            repository.deleteAll();
-            repository.saveAll(entities);
+            crmParamDao.deleteAll(tableName);
+            crmParamDao.insertList(tableName, (List<CustomerDesenMsg>) entities);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -235,9 +235,10 @@ public class ExportDatatableToExcelTest {
 //    }
 
     @Test
+//    @Transactional(transactionManager = "crmMybatisTransactionManager")
     void testExcelToDatatable() {
         Path desenFilePath = Paths.get("desen_files").resolve("1723121007221_customerMsgReflect2_1723128149665.xlsx");
-        importExcelToDatabase(CustomerDesenMsgLow.class, desenFilePath.toString());
+        importExcelToDatabase(CustomerDesenMsgLow.class, desenFilePath.toString(), "customer_desen_msg_low");
 
     }
 

@@ -1,10 +1,14 @@
 package com.lu.gademo.service.impl;
 
 import com.lu.gademo.entity.FileStorageDetails;
+import com.lu.gademo.entity.crm.CustomerDesenMsg;
 import com.lu.gademo.entity.crm.CustomerDesenMsgHigh;
 import com.lu.gademo.entity.crm.CustomerDesenMsgLow;
 import com.lu.gademo.entity.crm.CustomerDesenMsgMedium;
+import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
 import com.lu.gademo.event.SaveExcelToDatabaseEvent;
+import com.lu.gademo.mapper.crm.CrmParamDao;
+import com.lu.gademo.mapper.dataplatform.SadaGdpiClickDtlParamDao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -36,6 +40,12 @@ public class ExcelToDatatableServiceImpl {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private CrmDesenServiceImpl crmDesenService;
+
+    @Autowired
+    private DataPlatformDesenServiceImpl dataPlatformDesenService;
+
     @EventListener
     public <T> void saveToDatabaseAfterEvaluation(SaveExcelToDatabaseEvent saveExcelToDatabaseEvent) {
         CompletableFuture<ResponseEntity<byte[]>> futureResult = saveExcelToDatabaseEvent.getFutureResult();
@@ -43,30 +53,62 @@ public class ExcelToDatatableServiceImpl {
         log.info("Saving to database");
         FileStorageDetails fileStorageDetails = saveExcelToDatabaseEvent.getFileStorageDetails();
         String entityClassName = saveExcelToDatabaseEvent.getEntityClassName();
-        String[] entityNameList = entityClassName.split("_");
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < entityNameList.length; i++) {
-            if (i == 0) {
-                builder.append(entityNameList[i]);
-            } else {
-                builder.append(StringUtils.capitalize(entityNameList[i]));
-            }
-        }
-        String entityName = builder.toString();
-        log.info("EntityName: {}", entityName);
+//        String[] entityNameList = entityClassName.split("_");
+//        StringBuilder builder = new StringBuilder();
+//        for (int i = 0; i < entityNameList.length; i++) {
+//            if (i == 0) {
+//                builder.append(entityNameList[i]);
+//            } else {
+//                builder.append(StringUtils.capitalize(entityNameList[i]));
+//            }
+//        }
+//        String entityName = builder.toString();
+        log.info("EntityName: {}", entityClassName);
         log.info("DesenFilePathString: {}", fileStorageDetails.getDesenFilePathString());
-        try {
-            exportExcelToDatabase(getEntityByName(entityName), fileStorageDetails.getDesenFilePathString());
-        } catch (Exception e) {
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
-            log.error("电子表格导出到数据库失败：{}", e.getMessage());
-            String errorMsg = "电子表格导出到数据库失败";
-            futureResult.complete(ResponseEntity.status(500).headers(httpHeaders).body(errorMsg.getBytes()));
+
+        if (entityClassName.contains("sada_gdpi_click_dtl")) {
+            try {
+                exportSadaExcelToDatabase(fileStorageDetails.getDesenFilePathString(), entityClassName);
+                log.info("{} 已存储到数据库中", entityClassName);
+            } catch (Exception e) {
+                HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+                log.error("电子表格导出到数据库失败：{}", e.getMessage());
+                String errorMsg = "电子表格导出到数据库失败";
+                futureResult.complete(ResponseEntity.status(500).headers(httpHeaders).body(errorMsg.getBytes()));
+            }
+            // 保存数据库成功后再发送对前端的响应
+            futureResult.complete(responseEntity);
+            return;
+        } else if (entityClassName.contains("customer_desen_msg")) {
+            try {
+                exportCustomerDesenMsgExcelToDatabase(fileStorageDetails.getDesenFilePathString(), entityClassName);
+                log.info("{} 已存储到数据库中", entityClassName);
+            } catch (Exception e) {
+                HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+                log.error("电子表格导出到数据库失败：{}", e.getMessage());
+                String errorMsg = "电子表格导出到数据库失败";
+                futureResult.complete(ResponseEntity.status(500).headers(httpHeaders).body(errorMsg.getBytes()));
+            }
+            // 保存数据库成功后再发送对前端的响应
+            futureResult.complete(responseEntity);
+            return;
         }
-        log.info("{} 已存储到数据库中", entityName);
-        // 保存数据库成功后再发送对前端的响应
-        futureResult.complete(responseEntity);
+//        try {
+////            exportExcelToDatabase(CustomerDesenMsg.class, fileStorageDetails.getDesenFilePathString());
+//            exportCustomerDesenMsgExcelToDatabase(fileStorageDetails.getDesenFilePathString(), entityClassName);
+//            log.info("{} 已存储到数据库中", entityClassName);
+//
+//        } catch (Exception e) {
+//            HttpHeaders httpHeaders = new HttpHeaders();
+//            httpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+//            log.error("电子表格导出到数据库失败：{}", e.getMessage());
+//            String errorMsg = "电子表格导出到数据库失败";
+//            futureResult.complete(ResponseEntity.status(500).headers(httpHeaders).body(errorMsg.getBytes()));
+//        }
+//        // 保存数据库成功后再发送对前端的响应
+//        futureResult.complete(responseEntity);
     }
 
     /**
@@ -96,7 +138,7 @@ public class ExcelToDatatableServiceImpl {
     }
 
     /**
-     * 从Excel导入数据到数据库
+     * 从Excel导出数据到数据库
      *
      * @param entityClass 数据库表对应的JPA实体类
      * @param filePath    Excel文件字符串
@@ -143,6 +185,118 @@ public class ExcelToDatatableServiceImpl {
         }
     }
 
+    // 使用MyBatis做数据持久化
+    public void exportCustomerDesenMsgExcelToDatabase(String filePath, String tableName) throws Exception {
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            List<CustomerDesenMsg> entities = new ArrayList<>();
+
+            // 获取列名到字段的映射
+            Map<String, Field> fieldMap = getFieldMap(CustomerDesenMsg.class);
+            // 解析Excel数据
+            int rowCount = 0;
+            for (Row row : sheet) {
+                if (rowCount++ == 0) {
+                    continue; // Skip header row
+                }
+                CustomerDesenMsg entity = new CustomerDesenMsg();
+
+                for (Cell cell : row) {
+                    String columnName = sheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
+                    Field field = fieldMap.get(columnName);
+                    if (field != null) {
+                        field.setAccessible(true);
+                        Object value = getCellValueAsType(cell, field.getType());
+                        field.set(entity, value);
+                    }
+                }
+                entities.add(entity);
+            }
+            // 获取对应的repository
+            crmDesenService.deleteAndInsert(tableName, entities);
+
+        } catch (Exception e) {
+            log.error("将Excel文件存储到数据库中出现错误");
+            throw new Exception(e);
+        }
+    }
+
+    public void exportSadaExcelToDatabase(String filePath, String tableName) throws Exception {
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            List<SadaGdpiClickDtl> entities = new ArrayList<>();
+
+            // 获取列名到字段的映射
+            Map<String, Field> fieldMap = getFieldMap(SadaGdpiClickDtl.class);
+            // 解析Excel数据
+            int rowCount = 0;
+            for (Row row : sheet) {
+                if (rowCount++ == 0) {
+                    continue; // Skip header row
+                }
+                SadaGdpiClickDtl entity = new SadaGdpiClickDtl();
+
+                for (Cell cell : row) {
+                    String columnName = sheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
+                    Field field = fieldMap.get(columnName);
+                    if (field != null) {
+                        field.setAccessible(true);
+                        Object value = getCellValueAsType(cell, field.getType());
+                        field.set(entity, value);
+                    }
+                }
+                entities.add(entity);
+            }
+            // 获取对应的repository
+            dataPlatformDesenService.deleteAndInsert(tableName, entities);
+
+        } catch (Exception e) {
+            log.error("将Excel文件存储到数据库中出现错误");
+            throw new Exception(e);
+        }
+    }
+
+    // 使用MyBatis做数据持久化
+//    public <T> void exportExcelToDatabase(String filePath, String tableName, List<T> entities, Class<T> clazz) throws Exception {
+//        try (FileInputStream fis = new FileInputStream(filePath);
+//             Workbook workbook = new XSSFWorkbook(fis)) {
+//
+//            Sheet sheet = workbook.getSheetAt(0);
+//
+//            // 获取列名到字段的映射
+//            Map<String, Field> fieldMap = getFieldMap(CustomerDesenMsg.class);
+//            // 解析Excel数据
+//            int rowCount = 0;
+//            for (Row row : sheet) {
+//                if (rowCount++ == 0) {
+//                    continue; // Skip header row
+//                }
+//                T entity = clazz.getDeclaredConstructor().newInstance();
+//
+//                for (Cell cell : row) {
+//                    String columnName = sheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
+//                    Field field = fieldMap.get(columnName);
+//                    if (field != null) {
+//                        field.setAccessible(true);
+//                        Object value = getCellValueAsType(cell, field.getType());
+//                        field.set(entity, value);
+//                    }
+//                }
+//                entities.add(entity);
+//            }
+//            // 获取对应的repository
+//            crmDesenService.deleteAndInsert(tableName, entities);
+//
+//        } catch (Exception e) {
+//            log.error("将Excel文件存储到数据库中出现错误");
+//            throw new Exception(e);
+//        }
+//    }
+
     private <T> Map<String, Field> getFieldMap(Class<T> entityClass) {
         Map<String, Field> fieldMap = new HashMap<>();
         for (Field field : entityClass.getDeclaredFields()) {
@@ -162,15 +316,14 @@ public class ExcelToDatatableServiceImpl {
      * @return 返回单元格的数据
      */
     private Object getCellValueAsType(Cell cell, Class<?> type) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (type == String.class) {
             return cell.getCellType() == CellType.STRING ? cell.getStringCellValue() : cell.toString();
         } else if (type == LocalDateTime.class) {
             if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
                 return cell.getLocalDateTimeCellValue();
             } else {
-                LocalDate parsed = LocalDate.parse(cell.getStringCellValue(), formatter);
-                return parsed.atStartOfDay();
+                return LocalDateTime.parse(cell.getStringCellValue(), formatter);
             }
         } else if (type == int.class || type == Integer.class) {
             return cell.getCellType() == CellType.STRING ? Integer.parseInt(cell.getStringCellValue()) : (int) cell.getNumericCellValue();

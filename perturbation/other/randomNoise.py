@@ -22,6 +22,7 @@ if __name__ == '__main__':
     # 参数
     epsilon = 0.1
     sensitivity = 1
+    privacy_level = 2
 
     # 参数名
     algName = sys.argv[1]
@@ -34,47 +35,61 @@ if __name__ == '__main__':
 
     # 采样次数
     samples = int(sys.argv[3])
+    epsilon_list = [10, 1, 0.1]
+
+    if len(sys.argv) > 4:
+        privacy_level = int(sys.argv[4])
 
     if (algName == "noisy_hist2"):
-        mechanism = noisy_hist2.NoisyHist2(epsilon)
+        mechanism = noisy_hist2.NoisyHist2(epsilon_list[privacy_level])
         result = mechanism.m(data_array, samples)
         print(result)
     elif (algName == "report_noisy_max3"):
-        mechanism = report_noisy_max3.ReportNoisyMax3()
+        mechanism = report_noisy_max3.ReportNoisyMax3(epsilon_list[privacy_level])
         result = mechanism.m(data_array, samples)
         print(result)
     elif (algName == "report_noisy_max4"):
-        mechanism = report_noisy_max4.ReportNoisyMax4()
+        mechanism = report_noisy_max4.ReportNoisyMax4(epsilon_list[privacy_level])
         result = mechanism.m(data_array, samples)
         print(result)
     elif (algName == "sparse_vector_technique3"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
-        mechanism = sparse_vector_technique3.SparseVectorTechnique3(epsilon, c, t)
+        if len(sys.argv) > 5:
+            privacy_level = int(sys.argv[5])
+        mechanism = sparse_vector_technique3.SparseVectorTechnique3(epsilon_list[privacy_level], c, t)
         result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique4"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
-        mechanism = sparse_vector_technique4.SparseVectorTechnique4(epsilon, c, t)
+        if len(sys.argv) > 5:
+            privacy_level = int(sys.argv[5])
+        mechanism = sparse_vector_technique4.SparseVectorTechnique4(epsilon_list[privacy_level], c, t)
         result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique5"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
-        mechanism = sparse_vector_technique5.SparseVectorTechnique5(epsilon, c, t)
+        if len(sys.argv) > 5:
+            privacy_level = int(sys.argv[5])
+        mechanism = sparse_vector_technique5.SparseVectorTechnique5(epsilon_list[privacy_level], c, t)
         result = mechanism.m(data_array)
         print(result)
     elif (algName == "sparse_vector_technique6"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
-        mechanism = sparse_vector_technique6.SparseVectorTechnique6(epsilon, c, t)
+        if len(sys.argv) > 5:
+            privacy_level = int(sys.argv[5])
+        mechanism = sparse_vector_technique6.SparseVectorTechnique6(epsilon_list[privacy_level], c, t)
         result = mechanism.m(data_array)
         print(result)
     elif (algName == "report_noisy_max1"):
         c = int(sys.argv[3])
         t = float(sys.argv[4])
-        mechanism = sparse_vector_technique6.SparseVectorTechnique6(epsilon, c, t)
+        if len(sys.argv) > 5:
+            privacy_level = int(sys.argv[5])
+        mechanism = sparse_vector_technique6.SparseVectorTechnique6(epsilon_list[privacy_level], c, t)
         result = mechanism.m(data_array)
         print(result)
 

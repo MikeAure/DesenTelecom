@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -54,7 +55,6 @@
                     rho: $("#CirDummy_rho").val(),
                 }
             )
-
 
             if (position === "") {
                 alert("请输入文本");
@@ -158,16 +158,42 @@
                     document.getElementById("CaDSA_outputText").value = data;
                 })
                 .catch(error => console.error('Error:', error));
-        })
+        });
+
+        document.getElementById("K_anonymity_position_submitBtn").addEventListener("click", function () {
+            let position = $("#K_anonymity_position").val();
+            let k = $("#K_anonymity_position_k").val();
+
+            if (position === "") {
+                alert("请输入文本");
+                return; // Stop further execution if the text input is empty
+            }
+
+            fetch("/Location/K_anonymity_position", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body:
+                    '&rawData=' + encodeURIComponent(position) +
+                    '&k=' + encodeURIComponent(k)
+            })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("K_anonymity_position_outputText").value = data;
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
     }
 
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('k_anonymity_fileUpload').addEventListener('change', handleFileSelect, {passive: false});
         document.getElementById('k_anonymity_submit').addEventListener('click', handleSubmit);
-        document.getElementById('prevPage').addEventListener('click', function(event) {
+        document.getElementById('prevPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPage > 1) {
                 currentPage--;
@@ -175,7 +201,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedPrevPage').addEventListener('click', function(event) {
+        document.getElementById('desensitizedPrevPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPage > 1) {
                 currentDesensitizedPage--;
@@ -183,7 +209,7 @@
                 updateDesensitizedPagination();
             }
         });
-        document.getElementById('nextPage').addEventListener('click', function(event) {
+        document.getElementById('nextPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPage < PageCount) {
                 currentPage++;
@@ -191,7 +217,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedNextPage').addEventListener('click', function(event) {
+        document.getElementById('desensitizedNextPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPage < desensitizedPageCount) {
                 currentDesensitizedPage++;
@@ -199,7 +225,7 @@
                 updateDesensitizedPagination();
             }
         });
-        document.getElementById('pageInputEntropy').addEventListener('input', function(event) {
+        document.getElementById('pageInputEntropy').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= PageCount) {
                 currentPage = page;
@@ -207,7 +233,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedPageInput').addEventListener('input', function(event) {
+        document.getElementById('desensitizedPageInput').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= desensitizedPageCount) {
                 currentDesensitizedPage = page;
@@ -232,7 +258,7 @@
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const text = e.target.result;
                 processCSV(text);
             };
@@ -242,7 +268,7 @@
 
     function processCSV(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 csvData = results.data; // Get all rows including header
                 PageCount = Math.ceil((csvData.length - 1) / rowsPerPage); // Exclude header row
                 displayTablePage(1);
@@ -255,7 +281,7 @@
 
     function parseDesensitizedCSV(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 desensitizedData = results.data;
                 desensitizedPageCount = Math.ceil((desensitizedData.length - 1) / rowsPerPage);
                 displayDesensitizedTablePage(1);
@@ -374,7 +400,6 @@
     }
 
 
-
     function handleSubmit(event) {
         event.preventDefault(); // Call preventDefault if needed
         const tableBody = document.getElementById('attributesTable').querySelector('tbody');
@@ -386,38 +411,48 @@
             const fileInput = row.querySelector('input[type="file"]');
             const file = fileInput.files[0];
             if (file) {
-                formData.append(attribute, file);
+                formData.set(attribute, file);
             }
         });
 
         const csvFileInput = document.getElementById('k_anonymity_fileUpload');
         const csvFile = csvFileInput.files[0];
         if (csvFile) {
-            formData.append('csvFile', csvFile);
+            formData.set('csvFile', csvFile);
         }
 
-        formData.append("params", document.getElementById("k_anonymity_privacyLevel").value);
+        formData.set("params", document.getElementById("k_anonymity_privacyLevel").value);
 
         const attribute = document.querySelector('input[name="sensitive_attribute"]:checked');
-        formData.append('attribute', attribute.value);
+        formData.set('attribute', attribute.value);
 
-        // Replace 'YOUR_SERVER_ENDPOINT' with your actual server endpoint
         fetch('/KAnonymity/KAnonymity', {
             method: 'POST',
             body: formData
-        }).then(response => response.blob()).then(blob => {
-            parseDesensitizedCSV(blob);
-            displayDesensitizedTablePage(1);
-            document.getElementById('paginationContainerOutput').style.display = 'flex';
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = "output_" + csvFile.name;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }).catch(error => {
+        })
+            .then(response => {
+                if (response.status === 500) {
+                    // Handle server error
+                    return response.text().then(failedMsg => {
+                        alert(failedMsg);
+                        throw new Error(failedMsg); // Throw an error to stop further processing
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                parseDesensitizedCSV(blob);
+                displayDesensitizedTablePage(1);
+                document.getElementById('paginationContainerOutput').style.display = 'flex';
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = "output_" + csvFile.name;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }).catch(error => {
             console.error('Error:', error);
         });
     }
@@ -426,8 +461,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">1. K 匿名</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                1. K 匿名</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对csv文件进行 K 匿名处理
@@ -441,8 +478,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class="<#--col-sm-5 m-b-xs d-flex--> align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="k_anonymity_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="k_anonymity_fileUpload" style="display: none;">
                                 <label for="k_anonymity_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -450,15 +487,15 @@
                         </div>
                     </div>
                     <!--文件上传信息-->
-                    <div id = "fileInfo">
+                    <div id="fileInfo">
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;  margin-bottom: 20px;">
-                        <div style="margin: auto; font-size: 20px" >
+                        <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="k_anonymity_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -483,7 +520,8 @@
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="pageInputEntropy" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="pageInputEntropy" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="nextPage">
@@ -530,7 +568,8 @@
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="desensitizedPageInput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="desensitizedPageInput" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="desensitizedNextPage">
@@ -609,15 +648,6 @@
                             <div class="text-center">
                                 <label for="CirDummy_outputText"
                                        style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="CirDummy_outputText" rows="4" cols="100" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="text-center">
-                                <label for="CirDummy_outputText"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="CirDummy_outputText" rows="4" cols="100" readonly
                                               style="margin-top: 10px;"></textarea>
@@ -964,6 +994,7 @@
         display: inline-block;
         margin: 30px;
     }
+
     #k_anonymity_submit {
         background-color: #347aa9;
         color: white;
@@ -974,21 +1005,26 @@
         display: inline-block;
         margin: 30px;
     }
+
     table, th, td {
         border: 1px solid black;
         border-collapse: collapse;
     }
+
     th, td {
         padding: 8px;
         text-align: left;
     }
+
     .fixed-width {
         width: 200px;
     }
+
     .table-container {
         display: flex;
         justify-content: center;
     }
+
     .pagination-container {
         display: none;
         justify-content: center;

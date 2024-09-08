@@ -3,11 +3,9 @@ package com.lu.gademo.utils.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.lu.gademo.utils.Util;
+import freemarker.template.SimpleDate;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -23,6 +21,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -312,6 +311,89 @@ public class UtilImpl implements Util {
         return Base64.getDecoder().decode(byteString);
     }
 
+    public <T> void write2Excel(Sheet originalSheet, Sheet newSheet, int lastRowNum, int columnIndex, List<T> datas) {
+        // 遍历原始Sheet的每一行
+        for (int j = 0; j <= lastRowNum; j++) {
+            Row originalRow = originalSheet.getRow(j);
+            // 检查目标Sheet的行是否已经存在，如果存在则复用，否则创建新行
+            Row newRow = newSheet.getRow(j);
+            if (newRow == null) {
+                newRow = newSheet.createRow(j);
+            }
+
+            if (originalRow != null) {
+                // 遍历每个单元格并复制到新Sheet中（只针对指定列写脱敏值或原始值）
+                Cell originalCell = originalRow.getCell(columnIndex);
+                Cell newCell = newRow.createCell(columnIndex);
+
+                if (j > 0) { // 检查是否为指定列并忽略标题行
+                    T element = datas.get(j - 1);  // 获取脱敏后的数据
+                    if (element == null) {
+                        // 脱敏数据为null时，写入原始值
+                        writeOriginalValueToCell(originalCell, newCell);
+                    } else {
+                        // 否则写入脱敏数据
+                        writeDesensitizedValueToCell(newCell, element);
+                    }
+//                    } else if (originalCell != null) {
+//                        // 复制非脱敏列的原始值
+//                        writeOriginalValueToCell(originalCell, newCell);
+//                    }
+                } else if (j == 0) {
+//                        // 复制非脱敏列的原始值
+                    writeOriginalValueToCell(originalCell, newCell);
+                }
+
+            }
+        }
+    }
+
+    // 方法：写入原始值
+    private void writeOriginalValueToCell(Cell originalCell, Cell newCell) {
+        // 检查 originalCell 是否为 null
+        if (originalCell == null) {
+            newCell.setBlank();  // 如果原始单元格为空，设置新单元格为空
+            return;
+        }
+        switch (originalCell.getCellType()) {
+            case STRING:
+                newCell.setCellValue(originalCell.getStringCellValue());
+                break;
+            case NUMERIC:
+                newCell.setCellValue(originalCell.getNumericCellValue());
+                break;
+            case BOOLEAN:
+                newCell.setCellValue(originalCell.getBooleanCellValue());
+                break;
+            case FORMULA:
+                newCell.setCellFormula(originalCell.getCellFormula());
+                break;
+            case BLANK:
+                newCell.setBlank();
+                break;
+            default:
+                break;
+        }
+        // 复制原单元格的样式
+//        CellStyle newCellStyle = newCell.getSheet().getWorkbook().createCellStyle();
+//        newCellStyle.cloneStyleFrom(originalCell.getCellStyle());
+//        newCell.setCellStyle(newCellStyle);
+    }
+
+    // 方法：写入脱敏数据
+    private <T> void writeDesensitizedValueToCell(Cell newCell, T element) {
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (element instanceof Double) {
+            newCell.setCellValue((Double) element);
+        } else if (element instanceof Integer) {
+            newCell.setCellValue((Integer) element);
+        } else if (element instanceof String) {
+            newCell.setCellValue((String) element);
+        } else if (element instanceof java.util.Date) {
+            newCell.setCellValue(fmt.format(element));
+        }
+    }
+
     @Override
     /**
      *
@@ -343,6 +425,78 @@ public class UtilImpl implements Util {
 
             }
         }
+    }
+
+    public void copySheet(Sheet sourceSheet, Sheet targetSheet) {
+        for (int i = 0; i <= sourceSheet.getLastRowNum(); i++) {
+            Row sourceRow = sourceSheet.getRow(i);
+            Row targetRow = targetSheet.createRow(i);
+
+            if (sourceRow != null) {
+                for (int j = 0; j < sourceRow.getLastCellNum(); j++) {
+                    Cell sourceCell = sourceRow.getCell(j);
+                    Cell targetCell = targetRow.createCell(j);
+
+                    if (sourceCell != null) {
+                        // 复制单元格的类型和内容
+                        switch (sourceCell.getCellType()) {
+                            case STRING:
+                                targetCell.setCellValue(sourceCell.getStringCellValue());
+                                break;
+                            case NUMERIC:
+                                targetCell.setCellValue(sourceCell.getNumericCellValue());
+                                break;
+                            case BOOLEAN:
+                                targetCell.setCellValue(sourceCell.getBooleanCellValue());
+                                break;
+                            case FORMULA:
+                                targetCell.setCellFormula(sourceCell.getCellFormula());
+                                break;
+                            case BLANK:
+                                targetCell.setBlank();
+                                break;
+                            default:
+                                break;
+                        }
+
+                        // 复制单元格样式
+                        CellStyle newCellStyle = targetSheet.getWorkbook().createCellStyle();
+                        newCellStyle.cloneStyleFrom(sourceCell.getCellStyle());
+                        targetCell.setCellStyle(newCellStyle);
+                    }
+                }
+            }
+        }
+    }
+
+    public <T> Sheet writeDataToClonedSheet(Workbook workbook, Sheet originalSheet, int columnIndex, List<T> datas) {
+        // 使用 Workbook.cloneSheet 方法快速复制原始的 Sheet
+        Sheet clonedSheet = workbook.cloneSheet(workbook.getSheetIndex(originalSheet));
+
+        // 在克隆的 Sheet 中插入脱敏数据
+        for (int j = 1; j <= clonedSheet.getLastRowNum(); j++) {
+            Row row = clonedSheet.getRow(j);
+            if (row != null) {
+                Cell cell = row.getCell(columnIndex);
+                if (cell == null) {
+                    cell = row.createCell(columnIndex);
+                }
+                T element = datas.get(j - 1);
+                // 如果脱敏后的数据列表中该元素不为null则更改当前单元格中的元素
+                if (element != null) {
+                    if (element instanceof Double) {
+                        cell.setCellValue((Double) element);
+                    } else if (element instanceof Integer) {
+                        cell.setCellValue((Integer) element);
+                    } else if (element instanceof String) {
+                        cell.setCellValue((String) element);
+                    } else if (element instanceof java.util.Date) {
+                        cell.setCellValue(element.toString());
+                    }
+                }
+            }
+        }
+        return clonedSheet;
     }
 
     @Override

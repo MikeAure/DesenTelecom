@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -19,6 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
 </head>
+
 <body>
 <!-- 全局js -->
 <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
@@ -38,76 +40,71 @@
 
 <script src="${ctx!}/js/plugins/layer/layer.min.js"></script>
 <script src="${ctx!}/js/multiple-select.min.js"></script>
+<!-- 自定义js -->
+<script src="${ctx!}/js/content.js?v=1.0.0"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        document.getElementById("Hilbert_submitBtn").addEventListener("click", function () {
+            let position = $("#Hilbert_position").val();
+            let k = $("#Hilbert_k").val();
 
+            if (position === "") {
+                alert("请输入文本");
+                return; // Stop further execution if the text input is empty
+            }
 
-    <!-- 自定义js -->
-    <script src="${ctx!}/js/content.js?v=1.0.0"></script>
-    <script type="text/javascript">
-        window.onload = function () {
-
-            document.getElementById("Hilbert_submitBtn").addEventListener("click", function () {
-                let position = $("#Hilbert_position").val();
-                let k = $("#Hilbert_k").val();
-
-                if (position === "") {
-                    alert("请输入文本");
-                    return; // Stop further execution if the text input is empty
-                }
-
-                fetch("/Location/Hilbert", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body:
-                        '&rawData=' + encodeURIComponent(position) +
-                        '&k=' + encodeURIComponent(k)
-                })
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById("Hilbert_outputText").value = data;
-                    })
-                    .catch(error => console.error('Error:', error));
+            fetch("/Location/Hilbert", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body:
+                    '&rawData=' + encodeURIComponent(position) +
+                    '&k=' + encodeURIComponent(k)
             })
-
-            document.getElementById("SpaceTwist_submitBtn").addEventListener("click", function () {
-                let position = $("#SpaceTwist_position").val();
-                let k = $("#SpaceTwist_k").val();
-                let poi = $("#SpaceTwist_poi").val();
-
-                if (position === "") {
-                    alert("请输入文本");
-                    return; // Stop further execution if the text input is empty
-                }
-
-                fetch("/Location/SpaceTwist", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body:
-                        '&rawData=' + encodeURIComponent(position) +
-                        '&k=' + encodeURIComponent(k) +
-                        '&poi=' + encodeURIComponent(poi)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("Hilbert_outputText").value = data;
                 })
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById("SpaceTwist_outputText").value = data;
-                    })
-                    .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error:', error));
+        })
+
+        document.getElementById("SpaceTwist_submitBtn").addEventListener("click", function () {
+            let position = $("#SpaceTwist_position").val();
+            let k = $("#SpaceTwist_k").val();
+            let poi = $("#SpaceTwist_poi").val();
+
+            if (position === "") {
+                alert("请输入文本");
+                return; // Stop further execution if the text input is empty
+            }
+
+            fetch("/Location/SpaceTwist", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body:
+                    '&rawData=' + encodeURIComponent(position) +
+                    '&k=' + encodeURIComponent(k) +
+                    '&poi=' + encodeURIComponent(poi)
             })
-        }
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("SpaceTwist_outputText").value = data;
+                })
+                .catch(error => console.error('Error:', error));
+        })
+    }
 
-    </script>
-
+</script>
 </head>
 <body>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('t_closeness_fileUpload').addEventListener('change', handleFileSelect, {passive: false});
         document.getElementById('t_closeness_submit').addEventListener('click', handleSubmit);
-        document.getElementById('prevPage').addEventListener('click', function(event) {
+        document.getElementById('prevPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPage > 1) {
                 currentPage--;
@@ -115,7 +112,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedPrevPage').addEventListener('click', function(event) {
+        document.getElementById('desensitizedPrevPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPage > 1) {
                 currentDesensitizedPage--;
@@ -123,7 +120,7 @@
                 updateDesensitizedPagination();
             }
         });
-        document.getElementById('nextPage').addEventListener('click', function(event) {
+        document.getElementById('nextPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPage < PageCount) {
                 currentPage++;
@@ -131,7 +128,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedNextPage').addEventListener('click', function(event) {
+        document.getElementById('desensitizedNextPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPage < desensitizedPageCount) {
                 currentDesensitizedPage++;
@@ -139,7 +136,7 @@
                 updateDesensitizedPagination();
             }
         });
-        document.getElementById('pageInputEntropy').addEventListener('input', function(event) {
+        document.getElementById('pageInputEntropy').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= PageCount) {
                 currentPage = page;
@@ -147,7 +144,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedPageInput').addEventListener('input', function(event) {
+        document.getElementById('desensitizedPageInput').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= desensitizedPageCount) {
                 currentDesensitizedPage = page;
@@ -172,7 +169,7 @@
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const text = e.target.result;
                 processCSV(text);
             };
@@ -182,7 +179,7 @@
 
     function processCSV(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 csvData = results.data; // Get all rows including header
                 PageCount = Math.ceil((csvData.length - 1) / rowsPerPage); // Exclude header row
                 displayTablePage(1);
@@ -195,7 +192,7 @@
 
     function parseDesensitizedCSV(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 desensitizedData = results.data;
                 desensitizedPageCount = Math.ceil((desensitizedData.length - 1) / rowsPerPage);
                 displayDesensitizedTablePage(1);
@@ -314,7 +311,6 @@
     }
 
 
-
     function handleSubmit(event) {
         event.preventDefault(); // Call preventDefault if needed
         const tableBody = document.getElementById('attributesTable').querySelector('tbody');
@@ -345,7 +341,16 @@
         fetch('/KAnonymity/TCloseness', {
             method: 'POST',
             body: formData
-        }).then(response => response.blob()).then(blob => {
+        }).then(response => {
+            if (response.status === 500) {
+                // Handle server error
+                return response.text().then(failedMsg => {
+                    alert(failedMsg);
+                    throw new Error(failedMsg); // Throw an error to stop further processing
+                });
+            }
+            return response.blob();
+        }).then(blob => {
             parseDesensitizedCSV(blob);
             displayDesensitizedTablePage(1);
             document.getElementById('paginationContainerOutput').style.display = 'flex';
@@ -362,12 +367,13 @@
         });
     }
 </script>
-
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">1. T 接近</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                1. T 接近</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对csv文件进行 T 接近处理
@@ -381,8 +387,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class="<#--col-sm-5 m-b-xs d-flex--> align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="t_closeness_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="t_closeness_fileUpload" style="display: none;">
                                 <label for="t_closeness_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -390,15 +396,15 @@
                         </div>
                     </div>
                     <!--文件上传信息-->
-                    <div id = "fileInfo">
+                    <div id="fileInfo">
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;  margin-bottom: 20px;">
-                        <div style="margin: auto; font-size: 20px" >
+                        <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="t_closeness_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -423,7 +429,8 @@
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="pageInputEntropy" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="pageInputEntropy" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="nextPage">
@@ -470,7 +477,8 @@
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="desensitizedPageInput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="desensitizedPageInput" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="desensitizedNextPage">
@@ -490,11 +498,10 @@
         </div>
     </div>
 </div>
-
 <div class="panel panel-default">
-<#--    <div class="panel-heading" style="text-align: center;">-->
-<#--        <h1 class="panel-title"><b style="font-size: 2em">t-接近性</b></h1>-->
-<#--    </div>-->
+    <#--    <div class="panel-heading" style="text-align: center;">-->
+    <#--        <h1 class="panel-title"><b style="font-size: 2em">t-接近性</b></h1>-->
+    <#--    </div>-->
     <div class="container mt-5">
         <div id="dataTableContainer">
             <table id="dataTable" class="table table-bordered">
@@ -654,8 +661,6 @@
     </div>
 
 </div>
-
-
 </body>
 <style>
     /* 设置表格样式 */
@@ -715,17 +720,21 @@
         border: 1px solid black;
         border-collapse: collapse;
     }
+
     th, td {
         padding: 8px;
         text-align: left;
     }
+
     .fixed-width {
         width: 200px;
     }
+
     .table-container {
         display: flex;
         justify-content: center;
     }
+
     .pagination-container {
         display: none;
         justify-content: center;

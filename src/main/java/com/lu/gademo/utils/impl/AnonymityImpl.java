@@ -1,6 +1,7 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -8,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class AnonymityImpl implements Anonymity {
     public DSObject service(DSObject object, Integer alg, Number... params) {
@@ -18,7 +20,8 @@ public class AnonymityImpl implements Anonymity {
         String currentPath = directory.getAbsolutePath();
         String locationPrivacy = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
         String path = Paths.get(currentPath, locationPrivacy).toString();
-        System.out.println(path);
+//        System.out.println(path);
+        log.info("调用匿名算法统一接口");
 
         switch (alg) {
 
@@ -40,6 +43,7 @@ public class AnonymityImpl implements Anonymity {
                 try {
                     result = kAnonymityUtil.kAnonymity(baseName, dir, param, attribute, object.getIntVal());
                 } catch (Exception e) {
+                    log.error(e.getMessage());
                     return null;
                 }
                 return new DSObject(result);
@@ -63,6 +67,7 @@ public class AnonymityImpl implements Anonymity {
                 String position = object.getStringVal();
                 String[] s = position.split(",");
                 String cmd = path + " 2 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString() + " " + params[2].toString();
+                System.out.println(cmd);
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 
@@ -83,6 +88,7 @@ public class AnonymityImpl implements Anonymity {
                 String position = object.getStringVal();
                 String[] s = position.split(",");
                 String cmd = path + " 3 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString();
+                System.out.println(cmd);
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 
@@ -130,8 +136,9 @@ public class AnonymityImpl implements Anonymity {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
                 String param = "9 " + s[0] + " " + s[1] + " " + params[0].toString();
-                System.out.println(param);
+//                System.out.println(param);
                 String cmd = path + " " + param;
+                System.out.println(cmd);
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 
@@ -147,6 +154,7 @@ public class AnonymityImpl implements Anonymity {
                 String[] s = object.getStringVal().split(",");
                 String param = "1 " + s[0] + " " + s[1] + " " + params[0].toString();
                 String cmd = path + " " + param;
+                System.out.println(cmd);
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 
@@ -169,6 +177,7 @@ public class AnonymityImpl implements Anonymity {
                 try {
                     result = kAnonymityUtil.lDistinctDiversity(baseName, dir, param, attribute, length);
                 } catch (Exception e) {
+                    log.error(e.getMessage());
                     return null;
                 }
                 return new DSObject(result);
@@ -194,6 +203,7 @@ public class AnonymityImpl implements Anonymity {
                 try {
                     result = kAnonymityUtil.lEntropyDiversity(baseName, dir, param, attribute, length);
                 } catch (Exception e) {
+                    log.error(e.getMessage());
                     return null;
                 }
                 return new DSObject(result);
@@ -260,6 +270,7 @@ public class AnonymityImpl implements Anonymity {
                 String[] s = object.getStringVal().split(",");
                 String param = "8 " + s[0] + " " + s[1] + " " + params[0].toString();
                 String cmd = path + " " + param;
+                System.out.println(cmd);
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 
@@ -283,7 +294,9 @@ public class AnonymityImpl implements Anonymity {
                     String[] temp = point.toString().split(",");
                     param.append(" ").append(temp[0]).append(" ").append(temp[1]);
                 }
+
                 String cmd = path + " " + param;
+                System.out.println(cmd);
                 return new DSObject(CommandExecutor.openExe(cmd));
             }
 

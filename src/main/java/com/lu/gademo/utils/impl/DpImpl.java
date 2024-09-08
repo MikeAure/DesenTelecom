@@ -4,6 +4,7 @@ import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 import com.lu.gademo.utils.DpUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class DpImpl implements Dp {
 
@@ -28,6 +30,7 @@ public class DpImpl implements Dp {
     }
 
     public DSObject service(DSObject object, Integer alg, Number... params) {
+        log.info("调用差分隐私算法统一接口");
 
         if (object == null) return null;
 
@@ -73,8 +76,8 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<Object> value = new ArrayList<>(object.getList());
                 List<Integer> result = new ArrayList<>();
-                for (int i = 0; i < params[1].intValue(); i++) {
-                    List<Double> data = dpUtil.laplaceToValue(value, params[0].intValue());
+                for (int i = 0; i < params[0].intValue(); i++) {
+                    List<Double> data = dpUtil.laplaceToValue(value, params[1].intValue());
                     result.add(data.indexOf(Collections.max(data)));
                 }
                 return new DSObject(result);
@@ -82,7 +85,7 @@ public class DpImpl implements Dp {
 
             /*
                 Report Noisy Max3
-                随机添加拉普拉斯噪声后返回最大值的下标
+                随机添加拉普拉斯噪声后返回最大值
                 输入：数值列表、算法标识符 -> 3、隐私预算、采样次数 n
                 输出：最大值下标
             */
@@ -90,8 +93,8 @@ public class DpImpl implements Dp {
                 if (params.length != 2) return null;
                 List<Object> value = new ArrayList<>(object.getList());
                 List<Double> result = new ArrayList<>();
-                for (int i = 0; i < params[1].intValue(); i++) {
-                    result.add(Collections.max(dpUtil.laplaceToValue(value, params[0].intValue())));
+                for (int i = 0; i < params[0].intValue(); i++) {
+                    result.add(Collections.max(dpUtil.laplaceToValue(value, params[1].intValue())));
                 }
                 return new DSObject(result);
             }
@@ -103,11 +106,20 @@ public class DpImpl implements Dp {
                 输出：数值一维数组 length = n
             */
             case 4: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> result = CommandExecutor.executePython(array, "snapping", path1, params[0].toString());
-                return new DSObject(result);
+                List<String> results = CommandExecutor.executePython(array, "snapping", path1, params[0].toString(), params[1].toString());
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
+                    }
+                }
+
+                return new DSObject(s);
             }
 
             /*
@@ -165,11 +177,18 @@ public class DpImpl implements Dp {
                 输出：数值一维数组（长度为 n）
             */
             case 8: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "exponential", path1, params[0].toString());
-                String s = results.get(0);
+                List<String> results = CommandExecutor.executePython(array, "exponential", path1, params[0].toString(), params[1].toString());
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
+                    }
+                }
                 s = s.replace("[", "");
                 s = s.replace("]", "");
                 List<Double> list = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
@@ -184,11 +203,18 @@ public class DpImpl implements Dp {
                 输出：数值一维数组（长度为 n）
             */
             case 9: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "report_noisy_max2", path1, params[0].toString());
-                String s = results.get(0);
+                List<String> results = CommandExecutor.executePython(array, "report_noisy_max2", path1, params[0].toString(), params[1].toString());
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
+                    }
+                }
                 s = s.replace("[", "");
                 s = s.replace("]", "");
                 List<Double> list = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
@@ -203,11 +229,19 @@ public class DpImpl implements Dp {
                 输出：数值一维数组（长度为 n）
             */
             case 10: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "report_noisy_max4", path2, params[0].toString());
-                String s = results.get(0);
+                List<String> results = CommandExecutor.executePython(array, "report_noisy_max4",
+                        path2, params[0].toString(), params[1].toString());
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
+                    }
+                }
                 s = s.replace("[", "");
                 s = s.replace("]", "");
                 List<Double> list = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
@@ -222,19 +256,36 @@ public class DpImpl implements Dp {
                 输出：数值 n 维数组（大小为 n × 输入数组长度）
             */
             case 11: {
-                if (params.length != 2) return null;
+                if (params.length != 3) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique1", path1, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique1", path1,
+                        params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty())
+//                            .map(Integer::parseInt).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -246,19 +297,35 @@ public class DpImpl implements Dp {
                 输出：数值 n 维数组（大小为 n × 输入数组长度）
             */
             case 12: {
-                if (params.length != 2) return null;
+                if (params.length != 3) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique2", path1, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique2",
+                        path1, params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -270,15 +337,17 @@ public class DpImpl implements Dp {
                 输出：数值 n 维数组（大小为 n × 输入数组长度）
             */
             case 13: {
-                if (params.length != 2) return null;
+                if (params.length != 3) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique3", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique3", path2,
+                        params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Double>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
                     s = s.replace("]", "");
-                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
+                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty())
+                            .map(Double::parseDouble).collect(Collectors.toList());
                     if (!newList.isEmpty()) {
                         lists.add(newList);
                     }
@@ -294,10 +363,11 @@ public class DpImpl implements Dp {
                 输出：数值 n 维数组（大小为 n × 输入数组长度）
             */
             case 14: {
-                if (params.length != 2) return null;
+                if (params.length != 3) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique4", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique4",
+                        path2, params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
@@ -318,10 +388,11 @@ public class DpImpl implements Dp {
                 输出：数值 n 维数组（大小为 n × 输入数组长度）
             */
             case 15: {
-                if (params.length != 2) return null;
+                if (params.length != 3) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique5", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique5",
+                        path2, params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
@@ -342,10 +413,11 @@ public class DpImpl implements Dp {
                 输出：数值 n 维数组（大小为 n × 输入数组长度）
             */
             case 16: {
-                if (params.length != 2) return null;
+                if (params.length != 3) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique6", path2, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique6", path2,
+                        params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
@@ -366,10 +438,11 @@ public class DpImpl implements Dp {
                 输出：数值 n 维数组（大小为 n × 输入数组长度）
             */
             case 17: {
-                if (params.length != 2) return null;
+                if (params.length != 3) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique_numerical", path1, params[0].toString(), params[1].toString());
+                List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique_numerical",
+                        path1, params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Double>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
@@ -390,9 +463,10 @@ public class DpImpl implements Dp {
                 输出：n 维二进制数组（大小为 n × k）
             */
             case 18: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 Double value = object.getDoubleVal();
-                List<String> results = CommandExecutor.executePython(value.toString(), "rappor", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.toString(), "rappor", path1,
+                        params[0].toString(), params[1].toString());
                 List<List<Integer>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
@@ -414,9 +488,9 @@ public class DpImpl implements Dp {
                 输出：n 维二进制数组（大小为 n × k）
             */
             case 19: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 Double value = object.getDoubleVal();
-                List<String> results = CommandExecutor.executePython(value.toString(), "onetimerappor", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(value.toString(), "onetimerappor", path1, params[0].toString(), params[1].toString());
                 System.out.println(results);
                 List<List<Integer>> lists = new ArrayList<>();
                 for (String s : results) {
@@ -493,10 +567,10 @@ public class DpImpl implements Dp {
                 输出：数值n维数组（大小为n × 直方图长度）
             */
             case 24: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "noisy_hist1", path1, params[0].toString());
+                List<String> results = CommandExecutor.executePython(array, "noisy_hist1", path1, params[0].toString(), params[1].toString());
                 List<List<Double>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");
@@ -518,10 +592,10 @@ public class DpImpl implements Dp {
                 输出：数值n维数组（大小为n × 直方图长度）
             */
             case 25: {
-                if (params.length != 1) return null;
+                if (params.length != 2) return null;
                 List<?> value = object.getList();
                 String array = StringUtils.join(value, ",");
-                List<String> results = CommandExecutor.executePython(array, "noisy_hist2", path2, params[0].toString());
+                List<String> results = CommandExecutor.executePython(array, "noisy_hist2", path2, params[0].toString(), params[1].toString());
                 List<List<Double>> lists = new ArrayList<>();
                 for (String s : results) {
                     s = s.replace("[", "");

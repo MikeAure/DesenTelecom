@@ -5,7 +5,9 @@ import org.springframework.context.ApplicationEvent;
 
 import java.util.Objects;
 
-// 发送给拆分重构系统的请求事件
+/**
+ * 发送给拆分重构系统的请求事件
+ */
 public class SendSplitRequestEvent extends ApplicationEvent {
     private final SendSplitDesenData sendSplitDesenData;
 

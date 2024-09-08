@@ -29,10 +29,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DpTest {
 
     private final Dp dp;
+    private final DateParseUtil dateParseUtil;
 
     @Autowired
-    public DpTest(Dp dp) {
+    public DpTest(Dp dp, DateParseUtil dateParseUtil) {
         this.dp = dp;
+        this.dateParseUtil = dateParseUtil;
     }
     @Test
     public void testLaplaceMechanism()  {
@@ -488,7 +490,7 @@ public class DpTest {
                             case STRING:
                                 // 如果单元格是字符串类型，尝试解析为日期
                                 String dateString = cell.getStringCellValue();
-                                java.util.Date date = DateParseUtil.parseDate(dateString);
+                                java.util.Date date = dateParseUtil.parseDate(dateString);
                                 if (date != null) {
                                     String formattedDate = sdf.format(date);
                                     objs.add(formattedDate);
@@ -510,7 +512,7 @@ public class DpTest {
                                     part1Total += part1End - part1Start;
 
                                     Long part2Start = System.currentTimeMillis();
-                                    java.util.Date date2 = DateParseUtil.parseDate(formatCellValue);
+                                    java.util.Date date2 = dateParseUtil.parseDate(formatCellValue);
                                     Long part2End = System.currentTimeMillis();
                                     part2Total += part2End - part2Start;
 
@@ -538,6 +540,20 @@ public class DpTest {
             System.out.println("Part1 total: " + part1Total);
             System.out.println("Part2 total: " + part2Total);
             System.out.println("Part3 total: " + part3Total);
+        }
+
+    }
+
+    @Test
+    void testDateUtil() {
+        List<String> dateString = Arrays.asList("2016-03-19 2:1:14", "2020-09-08 4:4:41", "2022-11-16 16:36:6", "2020-08-12 23:29:5", "2020-11-00 1:49:37");
+        for(String date : dateString) {
+            java.util.Date date2 = dateParseUtil.parseDate(date);
+            if (date2 != null) {
+                System.out.println(date2);
+            } else {
+                System.out.println("Invalid Date String: " + date);
+            }
         }
 
     }

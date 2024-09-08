@@ -211,8 +211,8 @@ from funcs import *
 # accuracy = 200 * result.item() / 37720
 # print('attackermodel2:{:.2f}%'.format(accuracy))
 
-filename_e = '/AttackSample/zzl1.wav'
-filename_a = '/AttackSample/liqi&&0.wav'
+filename_e = './AttackSample/zzl1.wav'
+filename_a = './AttackSample/liqi&&0.wav'
 y1,sr = librosa.load(filename_e,sr=16000,mono=True)
 y2,sr = librosa.load(filename_a,sr=16000,mono=True)
 print('y1:',len(y1))
@@ -225,13 +225,13 @@ print('y2:',len(y2))
 #    voiceprint_a = extraction.ertract_voiceprint(filename_a,sr=16000)
 #print(voiceprint_e)
 
-Euclideandist = PairwiseDistance(2)
+Euclideandist = PairwiseDistance()
 distance = 0
 for i in range(20):
-    voiceprint_e = extraction.ertract_voiceprint(filename_e, sr=16000)
-    voiceprint_a = extraction.ertract_voiceprint(filename_a, sr=16000)
-    distance += Euclideandist(voiceprint_e, voiceprint_a).item()
-print("distance:",distance/20)
+    voiceprint_e = extraction.extract_voiceprint(filename_e, sr=16000)
+    voiceprint_a = extraction.extract_voiceprint(filename_a, sr=16000)
+    distance += Euclideandist.apply(voiceprint_e, voiceprint_a, 2).item()
+print("distance:", distance/20)
 #fake_noise = attacker(voiceprint_e).squeeze()
 
 #while len(y2)>len(fake_noise):

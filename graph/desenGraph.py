@@ -128,6 +128,7 @@ def getGraph(trjs, budget, attribute1, attribute2, attribute3):
                 category2[attribute2.index(last_attribute[:4]), attribute2.index(attribute[:4])] = category2[ attribute2.index(last_attribute[:4]), attribute2.index(attribute[:4])] + 1
                 category3[attribute3.index(last_attribute[:2]), attribute3.index(attribute[:2])] = category3[attribute3.index(last_attribute[:2]), attribute3.index(attribute[:2])] + 1
             last_attribute = attribute
+    print(f"GetGraph: {budget}")
     noise1 = np.random.laplace(0, 1 / budget, len(start))
     start = start + noise1
     start = np.maximum(start, 0)
@@ -169,6 +170,7 @@ def getCorrMatrix(trjs, budget, poiId, pois, attribute1ToPoi, input_file):
                 corrMatrix[poiId.index(poi[j]), poiId.index(poi[i])] = corrMatrix[poiId.index(poi[j]), poiId.index(
                     poi[i])] + 1 / m
     # print(corrMatrix)
+    print(f"CorrMatrixBudget: {budget}")
     noise = np.random.laplace(0, budget, (len(poiId), len(poiId)))
     corrMatrix = corrMatrix + noise
     corrMatrix = np.maximum(corrMatrix, 0)
@@ -202,6 +204,8 @@ def getLenDistribution(trjs, budget):
         points = trj.split(";")[:-1]
         l = len(points)
         length[l] = length[l] + 1
+
+    print(f"LenDistribution Budget: {budget}")
     noise = np.random.laplace(0, 1 / budget, (21,))
     length = length + noise
     length = np.maximum(length, 0)
@@ -237,7 +241,9 @@ def main(input_file, newFilePath, param):
             attribute3.append(_attribute[:2])
     close_db(db)
     # budgets = [0.5,1,1.5,2]
+
     budget = param
+    print(f"User select epsilon: {budget}")
     # 读取文件
     # file = open("./preprocessed_trajectory0", 'r')
     file = open(input_file, 'r')

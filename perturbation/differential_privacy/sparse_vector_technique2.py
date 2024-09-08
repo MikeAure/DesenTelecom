@@ -32,12 +32,15 @@ class SparseVectorTechnique2(Mechanism):
         # columns: queries
         # rows: samples
         x = np.atleast_2d(a)
+        print(f"x: {x}")
         n_queries = a.shape[0]
 
         rho = np.random.laplace(scale=self.c / self.eps1, size=(n_samples,))
+        print(f"rho: {rho}")
         nu = np.random.laplace(
             scale=2 * self.c / self.eps2, size=(n_samples, n_queries)
         )
+        print(f"nu: {nu}")
 
         m = nu + x  # broadcasts x vertically
 
@@ -55,4 +58,5 @@ class SparseVectorTechnique2(Mechanism):
             rho[cmp] = new_rho[cmp]
 
             aborted = np.logical_or(aborted, count == self.c)
+        # print(res)
         return res

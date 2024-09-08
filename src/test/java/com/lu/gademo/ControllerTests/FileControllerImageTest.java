@@ -26,6 +26,7 @@ public class FileControllerImageTest {
     private static final String PARAMS = "1";
     private static final String SHEET = "yourSheet";
     private static final String IMAGE_FILE_PATH = "src/test/resources/test_data/image/test.png";
+    private static final String IMAGE_FILE_PATH2 = "src/test/resources/test_data/image/square.jpg";
     private static final String IMAGE_FILE_NAME = "test.png";
     private static final String IMAGE_FILE_TYPE = String.valueOf(MediaType.IMAGE_PNG);
 
@@ -51,24 +52,6 @@ public class FileControllerImageTest {
 
     }
 
-
-    // 基于差分隐私的图像加噪方法
-    @Test
-    public void imageControllerDpImageTest() throws Exception {
-        // 模拟multipart/form-data请求
-        for (int i = 0; i < 3; i++) {
-            mvc.perform(multipart(URL) // 使用你的实际请求路径
-                            .file(imageFile)
-                            .param("params", String.valueOf(i))
-                            .param("algName", "dpImage")
-                            .param("sheet", SHEET))
-                    .andExpect(status().isOk())
-                    .andDo(MockMvcResultHandlers.print())
-                    .andReturn();
-        }
-
-    }
-
     // 基于均值滤波器的图像加噪方法
     @Test
     public void imageControllerMeanValueImageTest() throws Exception {
@@ -78,24 +61,6 @@ public class FileControllerImageTest {
                             .file(imageFile)
                             .param("params", String.valueOf(i))
                             .param("algName", "meanValueImage")
-                            .param("sheet", SHEET))
-                    .andExpect(status().isOk())
-                    .andDo(MockMvcResultHandlers.print())
-                    .andReturn();
-        }
-
-    }
-
-
-    // 基于像素化滤波器的图像加噪方法
-    @Test
-    public void imageControllerPixelateImageTest() throws Exception {
-        // 模拟multipart/form-data请求
-        for (int i = 0; i < 3; i++) {
-            mvc.perform(multipart(URL) // 使用你的实际请求路径
-                            .file(imageFile)
-                            .param("params", String.valueOf(i))
-                            .param("algName", "pixelate")
                             .param("sheet", SHEET))
                     .andExpect(status().isOk())
                     .andDo(MockMvcResultHandlers.print())
@@ -121,18 +86,73 @@ public class FileControllerImageTest {
 
     }
 
+    // 基于像素化滤波器的图像加噪方法
+    @Test
+    public void imageControllerPixelateImageTest() throws Exception {
+        // 模拟multipart/form-data请求
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "pixelate")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
+
+    }
+
     // 基于盒式滤波器的图像加噪方法
     @Test
     public void imageControllerBoxBlurImageTest() throws Exception {
         // 模拟multipart/form-data请求
-        mvc.perform(multipart(URL) // 使用你的实际请求路径
-                        .file(imageFile)
-                        .param("params", PARAMS)
-                        .param("algName", "box_blur")
-                        .param("sheet", SHEET))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andReturn();
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "box_blur")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
+
+    }
+
+    // 基于差分隐私的图像加噪方法
+    @Test
+    public void imageControllerDpImageTest() throws Exception {
+        // 模拟multipart/form-data请求
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(imageFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "dpImage")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
+
+    }
+
+    // imcoder2
+    @Test
+    public void imageControllerDpImage2Test() throws Exception {
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(RAW_FORM_FIELD, IMAGE_FILE_NAME, IMAGE_FILE_TYPE,
+                Files.readAllBytes(Paths.get(IMAGE_FILE_PATH2)));
+        // 模拟multipart/form-data请求
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(mockMultipartFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "im_coder2")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
 
     }
 
@@ -151,7 +171,6 @@ public class FileControllerImageTest {
         }
 
     }
-
 
     // 图像颜色随机替换方法
     @Test

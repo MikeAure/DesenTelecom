@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class CommandExecutor {
@@ -20,6 +21,10 @@ public class CommandExecutor {
     }
 
     public static List<String> openExe(String cmd, String context) {
+        return openExe(cmd, context, 60);
+    }
+
+    public static List<String> openExe(String cmd, String context, int waitTime) {
         BufferedReader bufferReader = null;
         BufferedReader bufferReaderError;
         List<String> result = new LinkedList<>();
@@ -48,12 +53,12 @@ public class CommandExecutor {
             errorGobbler.start();
 
             // 等待脚本执行完毕，阻塞
-            int exitCode = p.waitFor();
+            boolean exitStatus = p.waitFor(waitTime, TimeUnit.MINUTES);
             outputGobbler.join();
             errorGobbler.join();
 
-            if (exitCode != 0) {
-                log.error("Process exited with code: " + exitCode);
+            if (!exitStatus) {
+                log.error("Process exited with error");
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -69,8 +74,6 @@ public class CommandExecutor {
         return result;
     }
 
-
-
     /**
      * Execute a Python script with specified parameters.
      *
@@ -82,8 +85,6 @@ public class CommandExecutor {
      */
 
     public static List<String> executePython(String rawData, String algName, String path, String... params) {
-
-
 //        String python = util.isLinux() ? "python3" : "python";
         String python;
         python = getPythonCommand();
@@ -141,9 +142,9 @@ public class CommandExecutor {
                     synchronized (outputList) {
                         outputList.add(line);
                     }
-                    if (line.contains("Error") || line.contains("Traceback")) {
-                        // You can set a flag or handle error output here if needed
-                    }
+//                    if (line.contains("Error") || line.contains("Traceback")) {
+//                        // You can set a flag or handle error output here if needed
+//                    }
                 }
             } catch (Exception e) {
                 log.error(e.getMessage());

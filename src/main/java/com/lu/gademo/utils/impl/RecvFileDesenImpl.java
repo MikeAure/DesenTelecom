@@ -251,7 +251,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                             if (shapeText.contains(rawContent)) {
                                 String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
                                 String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
-                                String desenResult = desenData(rawContent, replacement, 3, privacyLevel).getList().get(0).toString();
+                                String desenResult = desenData(rawContent, generalization, 1, privacyLevel).getList().get(0).toString();
                                 String stringBuilder = preString +
                                         desenResult +
                                         afterString;

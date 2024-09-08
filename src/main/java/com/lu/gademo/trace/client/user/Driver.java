@@ -85,7 +85,6 @@ public class Driver {
 
 
     public boolean sendLoginInfo(TraceUser user) {
-
         connSocket = new Socket();
         logger.info("ip address: " + ADDRESS);
 

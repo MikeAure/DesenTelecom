@@ -85,34 +85,4 @@ public class CustomerDesenMsg {
         return Objects.equals(getId(), that.getId()) && Objects.equals(getCustAddr(), that.getCustAddr()) && Objects.equals(getCustAreaGrade(), that.getCustAreaGrade()) && Objects.equals(getCustControlLevel(), that.getCustControlLevel()) && Objects.equals(getCustName(), that.getCustName()) && Objects.equals(getCustType(), that.getCustType()) && Objects.equals(getCustGroup(), that.getCustGroup()) && Objects.equals(getMobilePhone(), that.getMobilePhone()) && Objects.equals(getCertType(), that.getCertType()) && Objects.equals(getCertNum(), that.getCertNum()) && Objects.equals(getFax(), that.getFax()) && Objects.equals(eMail, that.eMail) && Objects.equals(getPostCode(), that.getPostCode()) && Objects.equals(getCreateStaff(), that.getCreateStaff()) && Objects.equals(getCreateDate(), that.getCreateDate()) && Objects.equals(getUpdateStaff(), that.getUpdateStaff()) && Objects.equals(getUpdateDate(), that.getUpdateDate()) && Objects.equals(getStatusDate(), that.getStatusDate()) && Objects.equals(getStatusCd(), that.getStatusCd()) && Objects.equals(getRemark(), that.getRemark());
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getCustAddr(), getCustAreaGrade(), getCustControlLevel(), getCustName(), getCustType(), getCustGroup(), getMobilePhone(), getCertType(), getCertNum(), getFax(), eMail, getPostCode(), getCreateStaff(), getCreateDate(), getUpdateStaff(), getUpdateDate(), getStatusDate(), getStatusCd(), getRemark());
-    }
-
-    @Override
-    public String toString() {
-        return "CustomerDesenMsg{" +
-                "id=" + id +
-                ", custAddr='" + custAddr + '\'' +
-                ", custAreaGrade='" + custAreaGrade + '\'' +
-                ", custControlLevel='" + custControlLevel + '\'' +
-                ", custName='" + custName + '\'' +
-                ", custType='" + custType + '\'' +
-                ", custGroup='" + custGroup + '\'' +
-                ", mobilePhone='" + mobilePhone + '\'' +
-                ", certType='" + certType + '\'' +
-                ", certNum='" + certNum + '\'' +
-                ", fax='" + fax + '\'' +
-                ", eMail='" + eMail + '\'' +
-                ", postCode='" + postCode + '\'' +
-                ", createStaff='" + createStaff + '\'' +
-                ", createDate=" + createDate +
-                ", updateStaff='" + updateStaff + '\'' +
-                ", updateDate=" + updateDate +
-                ", statusDate=" + statusDate +
-                ", statusCd='" + statusCd + '\'' +
-                ", remark='" + remark + '\'' +
-                '}';
-    }
 }

@@ -1,7 +1,7 @@
 package com.lu.gademo.service.impl;
 
 import com.lu.gademo.entity.ExcelParam;
-import com.lu.gademo.mapper.ExcelParamDao;
+import com.lu.gademo.mapper.ga.ExcelParamDao;
 import com.lu.gademo.service.ExcelParamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

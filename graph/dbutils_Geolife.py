@@ -24,7 +24,7 @@ dbconn = None
 # 连接db
 def connect_db():
     try:
-        db = pymysql.connect(host="localhost", user="root", passwd="123456QWer!!", db="ga")
+        db = pymysql.connect(host="localhost", user="root", passwd="BRysj0725HhRhL##", db="ga")
         
         # db = pymysql.connect(host="localhost", user="root", passwd="123456", db="ga", port=3211)
 

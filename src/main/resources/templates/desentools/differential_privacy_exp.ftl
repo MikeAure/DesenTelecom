@@ -31,7 +31,7 @@
                 .getElementById("exponential_submitBtn")
                 .addEventListener("click", function () {
                     let textInput = $("#exponential_textInput").val();
-                    /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                    let privacyLevel = document.getElementById("exponential_privacyLevel").value
                     let algName = "exponential";
                     if (textInput === "") {
                         alert("请输入文本");
@@ -49,8 +49,8 @@
                             /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                             "&samples=" +
                             encodeURIComponent(1) +
-                            "&algName=" +
-                            encodeURIComponent(algName),
+                            "&algName=" + encodeURIComponent(algName) +
+                            "&params=" + encodeURIComponent(privacyLevel)
                     })
                         .then((response) => response.text())
                         .then((data) => {
@@ -63,7 +63,7 @@
                 .getElementById("report_noisy_max2_submitBtn")
                 .addEventListener("click", function () {
                     let textInput = $("#report_noisy_max2_textInput").val();
-                    /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                    let privacyLevel = document.getElementById("report_noisy_max2_privacyLevel").value
                     let algName = "report_noisy_max2";
                     if (textInput === "") {
                         alert("请输入文本");
@@ -82,7 +82,9 @@
                             "&samples=" +
                             encodeURIComponent(1) +
                             "&algName=" +
-                            encodeURIComponent(algName),
+                            encodeURIComponent(algName) +
+                            "&params=" +
+                            encodeURIComponent(privacyLevel),
                     })
                         .then((response) => response.text())
                         .then((data) => {
@@ -95,7 +97,7 @@
                 .getElementById("report_noisy_max4_submitBtn")
                 .addEventListener("click", function () {
                     let textInput = $("#report_noisy_max4_textInput").val();
-                    /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                    let privacyLevel = document.getElementById("report_noisy_max4_privacyLevel").value
                     let algName = "report_noisy_max4";
                     if (textInput === "") {
                         alert("请输入文本");
@@ -114,7 +116,8 @@
                             "&samples=" +
                             encodeURIComponent(1) +
                             "&algName=" +
-                            encodeURIComponent(algName),
+                            encodeURIComponent(algName) +
+                            "&params=" + encodeURIComponent(privacyLevel)
                     })
                         .then((response) => response.text())
                         .then((data) => {
@@ -189,6 +192,21 @@
                 <p class="text-center" style="font-size: 1.5em">
                     <strong>算法测试</strong>
                 </p>
+                <label for="exponential_privacyLevel"
+                       class="col-sm-offset-4 col-sm-3"
+                       style="font-size: 1.5em;">
+                    请选择隐私预算
+                </label>
+
+                <div class="col-sm-5">
+                    <select class="text-center"
+                            id="exponential_privacyLevel"
+                            style="font-size: 1.5em;">
+                        <option value="0">epsilon=10</option>
+                        <option value="1">epsilon=1</option>
+                        <option value="2">epsilon=0.1</option>
+                    </select>
+                </div>
 
                 <div class="input-group col-sm-8 col-sm-offset-2">
                     <input
@@ -255,6 +273,21 @@
                 <p class="text-center" style="font-size: 1.5em">
                     <strong>算法测试</strong>
                 </p>
+                <label for="report_noisy_max2_privacyLevel"
+                       class="col-sm-offset-4 col-sm-3"
+                       style="font-size: 1.5em;">
+                    请选择隐私预算
+                </label>
+
+                <div class="col-sm-5">
+                    <select class="text-center"
+                            id="report_noisy_max2_privacyLevel"
+                            style="font-size: 1.5em;">
+                        <option value="0">epsilon=10</option>
+                        <option value="1">epsilon=1</option>
+                        <option value="2">epsilon=0.1</option>
+                    </select>
+                </div>
 
                 <div class="input-group col-sm-8 col-sm-offset-2">
                     <input
@@ -356,6 +389,22 @@
                 <p class="text-center" style="font-size: 1.5em">
                     <strong>算法测试</strong>
                 </p>
+
+                <label for="report_noisy_max4_privacyLevel"
+                       class="col-sm-offset-4 col-sm-3"
+                       style="font-size: 1.5em;">
+                    请选择隐私预算
+                </label>
+
+                <div class="col-sm-5">
+                    <select class="text-center"
+                            id="report_noisy_max4_privacyLevel"
+                            style="font-size: 1.5em;">
+                        <option value="1">epsilon=10</option>
+                        <option value="2">epsilon=1</option>
+                        <option value="3">epsilon=0.1</option>
+                    </select>
+                </div>
 
                 <div class="input-group col-sm-8 col-sm-offset-2">
                     <input

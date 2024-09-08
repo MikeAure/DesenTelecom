@@ -31,7 +31,7 @@
             font-size: 50px;
         }
 
-        #submit {
+        .btn2 > button {
             background-color: #347aa9;
             padding: 5px 20px;
             cursor: pointer;
@@ -254,22 +254,204 @@
     <!-- 自定义js -->
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
     <script type="text/javascript">
+        let defaultOption = 'dpAudio'; // 预设的默认选项
+        document.addEventListener('DOMContentLoaded', function() {
+            let selectElement = document.getElementById('distortionAudioAlgName');
+            fetch('/toolset/getDefaultSelection?toolsetName=' + 'audio')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to fetch');
+                    }
+                })
+                .then(data => {
+                    if (data.code === 200 && data.data) {
+                        setDefaultOption(data.data);
+                        defaultOption = data.data;
+                        if (defaultOption === "voice_replace") {
+                            document.getElementById("privacyLevel").style.display = "none";
+                        } else {
+                            document.getElementById("privacyLevel").style.display = "block";
+                        }
+                    } else {
+                        setDefaultOption(defaultOption);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setDefaultOption(defaultOption);
+                });
+
+            function setDefaultOption(value) {
+                selectElement.value = value;
+            }
+
+            // 初始化时禁用注册和登录按钮
+            document.getElementById('register-button').disabled = true;
+            document.getElementById('login-button').disabled = true;
+
+            // 注册文件选择器的change事件监听器
+            document.getElementById('registerFileSelector').addEventListener('change', function () {
+                // 当文件被选择时，启用注册按钮
+                if (this.files.length > 0) {
+                    document.getElementById('register-button').disabled = false;
+                } else {
+                    document.getElementById('register-button').disabled = true;
+                }
+            });
+
+            // 登录文件选择器的change事件监听器
+            document.getElementById('loginFileSelector').addEventListener('change', function () {
+                // 当文件被选择时，启用登录按钮
+                if (this.files.length > 0) {
+                    document.getElementById('login-button').disabled = false;
+                } else {
+                    document.getElementById('login-button').disabled = true;
+                }
+            });
+        });
+
         window.onload = function () {
-            document.getElementById("fileUpload").addEventListener("change", chooseFile)
-            // 更改算法选项
-            document.getElementById("distortionaudio_algName").addEventListener("change", function () {
-                // 清空after
-                let after = document.getElementById("after");
-                after.innerHTML = "";
-                // 失真算法名
-                let distortionaudio_algName = document.getElementById("distortionaudio_algName").value;
-                if (distortionaudio_algName === "voice_replace") {
+            document.getElementById("fileUpload").addEventListener("change", chooseFile);
+            // 切换选项卡时实现恢复到选择的默认算法，并清空脱敏算法部分的文件控件文件和预览部分的内容
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                // 清空文件预览部分中的内容
+                document.getElementById("after").innerHTML = "";
+                document.getElementById("pre").innerHTML = "";
+                // 清空文件控件中的文件
+                document.getElementById("fileUpload").value = "";
+
+                document.getElementById("distortionAudioAlgName").value = defaultOption;
+                if (defaultOption === "voice_replace") {
                     document.getElementById("privacyLevel").style.display = "none";
                 } else {
                     document.getElementById("privacyLevel").style.display = "block";
                 }
-            })
+            });
+            // 更改算法选项
+            document.getElementById("distortionAudioAlgName").addEventListener("change", function () {
+                // 清空文件预览部分中的内容
+                document.getElementById("after").innerHTML = "";
+                document.getElementById("pre").innerHTML = "";
+                // 清空文件控件中的文件
+                document.getElementById("fileUpload").value = "";
+
+                // 失真算法名
+                let distortionAudioAlgName = document.getElementById("distortionAudioAlgName").value;
+                if (distortionAudioAlgName === "voice_replace") {
+                    document.getElementById("privacyLevel").style.display = "none";
+                } else {
+                    document.getElementById("privacyLevel").style.display = "block";
+                }
+            });
+            // 设置默认算法
+            $("#setDefaultAlgorithm").on("click", function (e) {
+                let postData = new URLSearchParams();
+                postData.set("toolsetName", "audio");
+                postData.set("defaultAlgName", $("#distortionAudioAlgName").val());
+                console.log("postData: " + postData);
+
+                fetch ("/toolset/setDefaultToolset", {
+                    method: "POST",
+                    body: postData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert("设置默认算法成功！");
+                            defaultOption = $("#distortionAudioAlgName").val();
+                        } else {
+                            throw new Error("设置默认算法失败！");
+                        }
+                    })
+                    .catch((error) => {
+                        alert(error);
+                        console.log(error);
+                    })
+            });
             document.getElementById("submit").addEventListener("click", originalSubmit);
+
+            let registerBtn = document.getElementById("register-button");
+            let loginBtn = document.getElementById("login-button");
+            let startServerBtn = document.getElementById("startServer");
+            let stopServerBtn = document.getElementById("stopServer");
+            let signUpMessage = document.getElementById("registrationMessage");
+            let signInMessage = document.getElementById("loginMessage");
+            let downloadFileBtn = document.getElementById("download-encrypted-voice");
+
+            let choose_audio_file = function (e, fileElementId, nameElementId, backendInterface) {
+                // e.preventDefault(); // 阻止表单的默认提交行为
+
+                const fileInput = document.getElementById(fileElementId);
+                console.log("file name: " + fileInput.files[0].name);
+                const name = document.getElementById(nameElementId);
+                console.log("user name: " + name.value);
+                const formData = new FormData();
+                formData.set('file', fileInput.files[0]);
+                formData.set("name", name.value);
+
+                fetch(backendInterface, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        let messageArea = signUpMessage;
+                        let success = "注册成功\n";
+                        if (nameElementId.includes("login")) {
+                            messageArea = signInMessage;
+                            success = "登录成功\n";
+                        }
+                        if (data.status === "ok") {
+                            messageArea.value += success;
+                        } else {
+                            messageArea.value += "失败："
+                            messageArea.value += data.message + "\n"
+                        }
+                    }) // 处理响应数据
+                    .catch(error => console.error(error)); // 处理错误情况
+
+            }
+            registerBtn.onclick = (e) => {
+                choose_audio_file(e, "registerFileSelector", "registerUsername", "/audioMatch/signUp");
+            };
+
+            loginBtn.onclick = (e) => {
+                choose_audio_file(e, "loginFileSelector", "loginUsername", "/audioMatch/signIn");
+            };
+
+            downloadFileBtn.onclick = (e) => {
+                let registerUserName = document.getElementById("registerUsername").value;
+                console.log(registerUserName);
+                const params = new URLSearchParams({
+                    name: registerUserName,
+                });
+                fetch("/audioMatch/downloadEncryptedVoice", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params.toString()
+                }).then(response => {
+                    if (response.status === 500) {
+                        // Handle server error
+                        return response.text().then(failedMsg => {
+                            alert(failedMsg);
+                            throw new Error(failedMsg); // Throw an error to stop further processing
+                        });
+                    }
+                    return response.blob();
+                }) .then (blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = registerUserName + '_encrypted_voice_template.txt';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                }).catch(error => console.error('Error:', error));
+
+            }
         }
 
         function originalSubmit() {
@@ -290,9 +472,8 @@
             let privacyLevelTable = document.getElementById("privacyLevel");
             let privacyLevel = document.getElementById("distortionaudio_privacyLevel").value;
             if (idx === 0) {
-                let distortionAudioAlgName = document.getElementById("distortionaudio_algName").value;
+                let distortionAudioAlgName = document.getElementById("distortionAudioAlgName").value;
                 switch (distortionAudioAlgName) {
-
                     case "voice_replace":
                         formData.set("sheet", distortionAudioAlgName);
                         formData.set("params", "1");
@@ -313,7 +494,16 @@
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.blob())
+                .then(response => {
+                    if (response.status === 500) {
+                        // Handle server error
+                        return response.text().then(failedMsg => {
+                            alert(failedMsg);
+                            throw new Error(failedMsg); // Throw an error to stop further processing
+                        });
+                    }
+                    return response.blob();
+                })
                 .then(blob => {
                     // 创建音频标签
                     const audioElement = document.createElement('audio');
@@ -324,7 +514,6 @@
                     after.appendChild(audioElement);
                 })
                 .catch(error => console.error('Error:', error));
-
         }
 
         function chooseFile(event) {
@@ -343,6 +532,11 @@
                 console.log(fileExtension)
 
                 if (audioType.includes(fileExtension)) {
+                    // 文件名，扩展名
+                    let fileInfo = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                        "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
+                    document.getElementById("fileInfo").innerHTML = fileInfo;
+                    const fileExtension = fileName.split(".").pop().toLowerCase();
                     displayAudio()
                 } else {
                     alert("请选择音频文件");
@@ -399,8 +593,8 @@
                                 </thead>
                                 <tbody id="table1">
                                 <tr>
-                                    <td><select id="distortionaudio_algName">
-                                            <option value="dpAudio" selected>差分-基于差分隐私的声纹特征脱敏算法
+                                    <td><select id="distortionAudioAlgName">
+                                            <option value="dpAudio">差分-基于差分隐私的声纹特征脱敏算法
                                             </option>
                                             <option value="voice_replace">置换-声纹替换算法</option>
                                             <option value="apply_audio_effects">置换-音频变形</option>
@@ -435,16 +629,16 @@
                                 </table>
                             </div>
                         </div>
-                        <div <#--class="ibox-content"--> id="audioTime" style="text-align: center; display: none">
-                            <div style=" font-size: 20px">
-                                <form>
-                                    <label for="start">开始时间:</label>
-                                    <input type="text" id="start" name="input1" placeholder="单位：秒">
-                                    <label for="chixu">持续时间:</label>
-                                    <input type="text" id="chixu" name="input2" placeholder="单位：秒">
-                                </form>
-                            </div>
-                        </div>
+<#--                        <div &lt;#&ndash;class="ibox-content"&ndash;&gt; id="audioTime" style="text-align: center; display: none">-->
+<#--                            <div style=" font-size: 20px">-->
+<#--                                <form>-->
+<#--                                    <label for="start">开始时间:</label>-->
+<#--                                    <input type="text" id="start" name="input1" placeholder="单位：秒">-->
+<#--                                    <label for="chixu">持续时间:</label>-->
+<#--                                    <input type="text" id="chixu" name="input2" placeholder="单位：秒">-->
+<#--                                </form>-->
+<#--                            </div>-->
+<#--                        </div>-->
 
                         <div class="midtile">
                             <div class="col-sm-5 m-b-xs">
@@ -456,6 +650,7 @@
                                 </form>
                             </div>
                         </div>
+                        <div id="fileInfo"></div>
 
                         <div class="showFile">
                             <!--前后文件-->
@@ -467,6 +662,8 @@
 
                         <div class="btn2">
                             <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                            <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm"> 设置当前算法为默认算法</button>
+
                         </div>
                     </div>
                     <div id="tab-2" class="tab-pane" style="text-align: center;">
@@ -506,6 +703,8 @@
                                         <button type="button" class="audio-match-button"
                                                 onclick="document.getElementById('registerFileSelector').click();">选择文件
                                         </button>
+
+                                        <button class="m-l" type="button" id="download-encrypted-voice">下载加密后的声纹模板</button>
                                     </div>
 
                                 </div>
@@ -541,79 +740,10 @@
 
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        // 初始化时禁用注册和登录按钮
-        document.getElementById('register-button').disabled = true;
-        document.getElementById('login-button').disabled = true;
 
-        // 注册文件选择器的change事件监听器
-        document.getElementById('registerFileSelector').addEventListener('change', function () {
-            // 当文件被选择时，启用注册按钮
-            if (this.files.length > 0) {
-                document.getElementById('register-button').disabled = false;
-            } else {
-                document.getElementById('register-button').disabled = true;
-            }
-        });
-
-        // 登录文件选择器的change事件监听器
-        document.getElementById('loginFileSelector').addEventListener('change', function () {
-            // 当文件被选择时，启用登录按钮
-            if (this.files.length > 0) {
-                document.getElementById('login-button').disabled = false;
-            } else {
-                document.getElementById('login-button').disabled = true;
-            }
-        });
     });
 
-    let registerBtn = document.getElementById("register-button");
-    let loginBtn = document.getElementById("login-button");
-    let startServerBtn = document.getElementById("startServer");
-    let stopServerBtn = document.getElementById("stopServer");
-    let signUpMessage = document.getElementById("registrationMessage");
-    let signInMessage = document.getElementById("loginMessage");
 
-
-    let choose_audio_file = function (e, fileElementId, nameElementId, backendInterface) {
-        // e.preventDefault(); // 阻止表单的默认提交行为
-
-        const fileInput = document.getElementById(fileElementId);
-        console.log("file name: " + fileInput.files[0].name);
-        const name = document.getElementById(nameElementId);
-        console.log("user name: " + name.value);
-        const formData = new FormData();
-        formData.set('file', fileInput.files[0]);
-        formData.set("name", name.value);
-
-        fetch(backendInterface, {
-            method: 'POST',
-            body: formData,
-        })
-            .then(response => response.json())
-            .then(data => {
-                let messageArea = signUpMessage;
-                let success = "注册成功\n";
-                if (nameElementId.includes("login")) {
-                    messageArea = signInMessage;
-                    success = "登录成功\n";
-                }
-                if (data.status === "ok") {
-                    messageArea.value += success;
-                } else {
-                    messageArea.value += "失败："
-                    messageArea.value += data.message + "\n"
-                }
-            }) // 处理响应数据
-            .catch(error => console.error(error)); // 处理错误情况
-
-    }
-    registerBtn.addEventListener("click", (e) => {
-        choose_audio_file(e, "registerFileSelector", "registerUsername", "/audioMatch/signUp");
-    });
-
-    loginBtn.addEventListener("click", (e) => {
-        choose_audio_file(e, "loginFileSelector", "loginUsername", "/audioMatch/signIn");
-    })
 
 </script>
 </body>

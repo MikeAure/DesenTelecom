@@ -36,7 +36,7 @@
                 let textInput = $("#sparse_vector_technique1_textInput").val();
                 let c = $("#sparse_vector_technique1_c").val()
                 let t = $("#sparse_vector_technique1_t").val()
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let privacyLevel = document.getElementById("sparse_vector_technique1_privacyLevel").value
                 let algName = "sparse_vector_technique1"
                 if (textInput === "") {
                     alert("请输入数据");
@@ -53,19 +53,22 @@
                         '&samples=' + encodeURIComponent(1) +
                         '&algName=' + encodeURIComponent(algName) +
                         '&c=' + encodeURIComponent(c) +
-                        '&t=' + encodeURIComponent(t)
+                        '&t=' + encodeURIComponent(t) +
+                        '&params=' + encodeURIComponent(privacyLevel)
+
                 })
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById("sparse_vector_technique1_outputText").value = data;
                     })
                     .catch(error => console.error('Error:', error));
-            })
+            });
+
             document.getElementById("sparse_vector_technique2_submitBtn").addEventListener("click", function () {
                 let textInput = $("#sparse_vector_technique2_textInput").val();
-                let c = $("#sparse_vector_technique2_c").val()
-                let t = $("#sparse_vector_technique2_t").val()
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let c = $("#sparse_vector_technique2_c").val();
+                let t = $("#sparse_vector_technique2_t").val();
+                let privacyLevel = document.getElementById("sparse_vector_technique2_privacyLevel").value;
                 let algName = "sparse_vector_technique2"
                 if (textInput === "") {
                     alert("请输入数据");
@@ -82,48 +85,21 @@
                         '&samples=' + encodeURIComponent(1) +
                         '&algName=' + encodeURIComponent(algName) +
                         '&c=' + encodeURIComponent(c) +
-                        '&t=' + encodeURIComponent(t)
+                        '&t=' + encodeURIComponent(t)+
+                        '&params=' + encodeURIComponent(privacyLevel)
                 })
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById("sparse_vector_technique2_outputText").value = data;
                     })
                     .catch(error => console.error('Error:', error));
-            })
-            document.getElementById("sparse_vector_technique_numerical_submitBtn").addEventListener("click", function () {
-                let textInput = $("#sparse_vector_technique_numerical_textInput").val();
-                let c = $("#sparse_vector_technique_numerical_c").val()
-                let t = $("#sparse_vector_technique_numerical_t").val()
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
-                let algName = "sparse_vector_technique_numerical"
-                if (textInput === "") {
-                    alert("请输入数据");
-                    return; // Stop further execution if the text input is empty
-                }
+            });
 
-                fetch("/DP/desenValue2", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: '&rawData=' + encodeURIComponent(textInput) +
-                        /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
-                        '&samples=' + encodeURIComponent(1) +
-                        '&algName=' + encodeURIComponent(algName) +
-                        '&c=' + encodeURIComponent(c) +
-                        '&t=' + encodeURIComponent(t)
-                })
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById("sparse_vector_technique_numerical_outputText").value = data;
-                    })
-                    .catch(error => console.error('Error:', error));
-            })
             document.getElementById("sparse_vector_technique3_submitBtn").addEventListener("click", function () {
                 let textInput = $("#sparse_vector_technique3_textInput").val();
                 let c = $("#sparse_vector_technique3_c").val()
                 let t = $("#sparse_vector_technique3_t").val()
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let privacyLevel = document.getElementById("sparse_vector_technique3_privacyLevel").value;
                 let algName = "sparse_vector_technique3"
                 if (textInput === "") {
                     alert("请输入数据");
@@ -140,19 +116,21 @@
                         '&samples=' + encodeURIComponent(1) +
                         '&algName=' + encodeURIComponent(algName) +
                         '&c=' + encodeURIComponent(c) +
-                        '&t=' + encodeURIComponent(t)
+                        '&t=' + encodeURIComponent(t) +
+                        '&params=' + encodeURIComponent(privacyLevel)
                 })
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById("sparse_vector_technique3_outputText").value = data;
                     })
                     .catch(error => console.error('Error:', error));
-            })
+            });
+
             document.getElementById("sparse_vector_technique4_submitBtn").addEventListener("click", function () {
                 let textInput = $("#sparse_vector_technique4_textInput").val();
                 let c = $("#sparse_vector_technique4_c").val()
                 let t = $("#sparse_vector_technique4_t").val()
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let privacyLevel = document.getElementById("sparse_vector_technique4_privacyLevel").value;
                 let algName = "sparse_vector_technique4"
                 if (textInput === "") {
                     alert("请输入数据");
@@ -169,19 +147,21 @@
                         '&samples=' + encodeURIComponent(1) +
                         '&algName=' + encodeURIComponent(algName) +
                         '&c=' + encodeURIComponent(c) +
-                        '&t=' + encodeURIComponent(t)
+                        '&t=' + encodeURIComponent(t) +
+                        '&params=' + encodeURIComponent(privacyLevel)
                 })
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById("sparse_vector_technique4_outputText").value = data;
                     })
                     .catch(error => console.error('Error:', error));
-            })
+            });
+
             document.getElementById("sparse_vector_technique5_submitBtn").addEventListener("click", function () {
                 let textInput = $("#sparse_vector_technique5_textInput").val();
                 let c = $("#sparse_vector_technique5_c").val()
                 let t = $("#sparse_vector_technique5_t").val()
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let privacyLevel = document.getElementById("sparse_vector_technique5_privacyLevel").value;
                 let algName = "sparse_vector_technique5"
                 if (textInput === "") {
                     alert("请输入数据");
@@ -198,20 +178,22 @@
                         '&samples=' + encodeURIComponent(1) +
                         '&algName=' + encodeURIComponent(algName) +
                         '&c=' + encodeURIComponent(c) +
-                        '&t=' + encodeURIComponent(t)
+                        '&t=' + encodeURIComponent(t) +
+                        '&params=' + encodeURIComponent(privacyLevel)
                 })
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById("sparse_vector_technique5_outputText").value = data;
                     })
                     .catch(error => console.error('Error:', error));
-            })
+            });
+
             document.getElementById("sparse_vector_technique6_submitBtn").addEventListener("click", function () {
                 let textInput = $("#sparse_vector_technique6_textInput").val();
-                let c = $("#sparse_vector_technique6_c").val()
-                let t = $("#sparse_vector_technique6_t").val()
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
-                let algName = "sparse_vector_technique6"
+                let c = $("#sparse_vector_technique6_c").val();
+                let t = $("#sparse_vector_technique6_t").val();
+                let privacyLevel = document.getElementById("sparse_vector_technique6_privacyLevel").value;
+                let algName = "sparse_vector_technique6";
                 if (textInput === "") {
                     alert("请输入数据");
                     return; // Stop further execution if the text input is empty
@@ -227,14 +209,46 @@
                         '&samples=' + encodeURIComponent(1) +
                         '&algName=' + encodeURIComponent(algName) +
                         '&c=' + encodeURIComponent(c) +
-                        '&t=' + encodeURIComponent(t)
+                        '&t=' + encodeURIComponent(t) +
+                        '&params=' + encodeURIComponent(privacyLevel)
                 })
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById("sparse_vector_technique6_outputText").value = data;
                     })
                     .catch(error => console.error('Error:', error));
-            })
+            });
+
+            document.getElementById("sparse_vector_technique_numerical_submitBtn").addEventListener("click", function () {
+                let textInput = $("#sparse_vector_technique_numerical_textInput").val();
+                let c = $("#sparse_vector_technique_numerical_c").val()
+                let t = $("#sparse_vector_technique_numerical_t").val()
+                let privacyLevel = document.getElementById("sparse_vector_technique_numerical_privacyLevel").value;
+                let algName = "sparse_vector_technique_numerical"
+                if (textInput === "") {
+                    alert("请输入数据");
+                    return; // Stop further execution if the text input is empty
+                }
+
+                fetch("/DP/desenValue2", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: '&rawData=' + encodeURIComponent(textInput) +
+                        /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
+                        '&samples=' + encodeURIComponent(1) +
+                        '&algName=' + encodeURIComponent(algName) +
+                        '&c=' + encodeURIComponent(c) +
+                        '&t=' + encodeURIComponent(t) +
+                        '&params=' + encodeURIComponent(privacyLevel)
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById("sparse_vector_technique_numerical_outputText").value = data;
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
         }
     </script>
 </head>
@@ -269,6 +283,21 @@
             <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-8">
+                    <label for="sparse_vector_technique1_privacyLevel"
+                           class="col-sm-offset-4 col-sm-3"
+                           style="font-size: 1.5em;">
+                        请选择隐私预算
+                    </label>
+
+                    <div class="col-sm-5">
+                        <select class="text-center"
+                                id="sparse_vector_technique1_privacyLevel"
+                                style="font-size: 1.5em;">
+                            <option value="0">epsilon=10</option>
+                            <option value="1">epsilon=1</option>
+                            <option value="2">epsilon=0.1</option>
+                        </select>
+                    </div>
                     <input type="text" id="sparse_vector_technique1_t" class="form-control m-b input-lg"
                            placeholder="请输入阈值t" style="font-size: 20px">
 
@@ -338,6 +367,21 @@
         <div class="row">
             <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
             <div class="form-group">
+                <label for="sparse_vector_technique2_privacyLevel"
+                       class="col-sm-offset-4 col-sm-3"
+                       style="font-size: 1.5em;">
+                    请选择隐私预算
+                </label>
+
+                <div class="col-sm-5">
+                    <select class="text-center"
+                            id="sparse_vector_technique2_privacyLevel"
+                            style="font-size: 1.5em;">
+                        <option value="0">epsilon=10</option>
+                        <option value="1">epsilon=1</option>
+                        <option value="2">epsilon=0.1</option>
+                    </select>
+                </div>
                 <div class="col-sm-offset-2 col-sm-8">
                     <input type="text" id="sparse_vector_technique2_t" class="form-control m-b input-lg"
                            placeholder="请输入阈值t" style="font-size: 20px">
@@ -408,6 +452,21 @@
             <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-8">
+                    <label for="sparse_vector_technique3_privacyLevel"
+                           class="col-sm-offset-4 col-sm-3"
+                           style="font-size: 1.5em;">
+                        请选择隐私预算
+                    </label>
+
+                    <div class="col-sm-5">
+                        <select class="text-center"
+                                id="sparse_vector_technique3_privacyLevel"
+                                style="font-size: 1.5em;">
+                            <option value="0">epsilon=10</option>
+                            <option value="1">epsilon=1</option>
+                            <option value="2">epsilon=0.1</option>
+                        </select>
+                    </div>
                     <input type="text" id="sparse_vector_technique3_t" class="form-control m-b input-lg"
                            placeholder="请输入阈值t" style="font-size: 20px">
 
@@ -479,6 +538,21 @@
         <div class="row">
             <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
             <div class="form-group">
+                <label for="sparse_vector_technique4_privacyLevel"
+                       class="col-sm-offset-4 col-sm-3"
+                       style="font-size: 1.5em;">
+                    请选择隐私预算
+                </label>
+
+                <div class="col-sm-5">
+                    <select class="text-center"
+                            id="sparse_vector_technique4_privacyLevel"
+                            style="font-size: 1.5em;">
+                        <option value="0">epsilon=10</option>
+                        <option value="1">epsilon=1</option>
+                        <option value="2">epsilon=0.1</option>
+                    </select>
+                </div>
                 <div class="col-sm-offset-2 col-sm-8">
                     <input type="text" id="sparse_vector_technique4_t" class="form-control m-b input-lg"
                            placeholder="请输入阈值t" style="font-size: 20px">
@@ -552,6 +626,21 @@
         <div class="row">
             <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
             <div class="form-group">
+                <label for="sparse_vector_technique5_privacyLevel"
+                       class="col-sm-offset-4 col-sm-3"
+                       style="font-size: 1.5em;">
+                    请选择隐私预算
+                </label>
+
+                <div class="col-sm-5">
+                    <select class="text-center"
+                            id="sparse_vector_technique5_privacyLevel"
+                            style="font-size: 1.5em;">
+                        <option value="0">epsilon=10</option>
+                        <option value="1">epsilon=1</option>
+                        <option value="2">epsilon=0.1</option>
+                    </select>
+                </div>
                 <div class="col-sm-offset-2 col-sm-8">
                     <input type="text" id="sparse_vector_technique5_t" class="form-control m-b input-lg"
                            placeholder="请输入阈值t" style="font-size: 20px">
@@ -625,6 +714,21 @@
             <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-8">
+                    <label for="sparse_vector_technique6_privacyLevel"
+                           class="col-sm-offset-4 col-sm-3"
+                           style="font-size: 1.5em;">
+                        请选择隐私预算
+                    </label>
+
+                    <div class="col-sm-5">
+                        <select class="text-center"
+                                id="sparse_vector_technique6_privacyLevel"
+                                style="font-size: 1.5em;">
+                            <option value="0">epsilon=10</option>
+                            <option value="1">epsilon=1</option>
+                            <option value="2">epsilon=0.1</option>
+                        </select>
+                    </div>
                     <input type="text" id="sparse_vector_technique6_t" class="form-control m-b input-lg"
                            placeholder="请输入阈值t" style="font-size: 20px">
 
@@ -694,6 +798,21 @@
             <p style="font-size: 1.5em;text-align: center;"><strong>算法测试</strong></p>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-8">
+                    <label for="sparse_vector_technique_numerical_privacyLevel"
+                           class="col-sm-offset-4 col-sm-3"
+                           style="font-size: 1.5em;">
+                        请选择隐私预算
+                    </label>
+
+                    <div class="col-sm-5">
+                        <select class="text-center"
+                                id="sparse_vector_technique_numerical_privacyLevel"
+                                style="font-size: 1.5em;">
+                            <option value="0">epsilon=10</option>
+                            <option value="1">epsilon=1</option>
+                            <option value="2">epsilon=0.1</option>
+                        </select>
+                    </div>
                     <input type="text" id="sparse_vector_technique_numerical_t" class="form-control m-b input-lg"
                            placeholder="请输入阈值t" style="font-size: 20px">
 

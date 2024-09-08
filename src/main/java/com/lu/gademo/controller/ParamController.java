@@ -1,6 +1,6 @@
 package com.lu.gademo.controller;
 
-import com.lu.gademo.mapper.ExcelParamDao;
+import com.lu.gademo.mapper.ga.ExcelParamDao;
 import com.lu.gademo.entity.ExcelParam;
 
 import lombok.extern.slf4j.Slf4j;

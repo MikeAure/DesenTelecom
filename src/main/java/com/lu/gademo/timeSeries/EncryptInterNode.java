@@ -1,8 +1,10 @@
 package com.lu.gademo.timeSeries;
 
+import lombok.ToString;
+
 import java.math.BigInteger;
 
-
+@ToString
 public class EncryptInterNode extends EncryptNode {
 
     public BigInteger[] cipherL;

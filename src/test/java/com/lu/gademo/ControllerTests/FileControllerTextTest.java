@@ -27,17 +27,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FileControllerTextTest {
     public static final String FILE_PATH = "src/test/resources/test_data/text/";
 
-    public static final String DATE_PATH = FILE_PATH + "date.xlsx";
-    public static final String ADDRESS_PATH = FILE_PATH + "address.xlsx";
-    public static final String EMAIL_PATH = FILE_PATH + "email.xlsx";
-    public static final String TIME_PATH = FILE_PATH + "random_times.xlsx";
-    public static final String IP_ADDRESS_PATH = FILE_PATH + "ip_address.xlsx";
-    public static final String NAME_PATH = FILE_PATH + "name.xlsx";
-    public static final String NUMBER_PATH = FILE_PATH + "number.xlsx";
-    public static final String ENCODING_PATH = FILE_PATH + "encodings.xlsx";
-    public static final String SERIAL_NUMBER_PATH = FILE_PATH + "serial_number.xlsx";
+    public static final String DATE_PATH = FILE_PATH + "date.txt";
+    public static final String ADDRESS_PATH = FILE_PATH + "address.txt";
+    public static final String EMAIL_PATH = FILE_PATH + "email.txt";
+    public static final String TIME_PATH = FILE_PATH + "time.txt";
+    public static final String IP_ADDRESS_PATH = FILE_PATH + "ip_address.txt";
+    public static final String NAME_PATH = FILE_PATH + "name.txt";
+    public static final String NUMBER_PATH = FILE_PATH + "number.txt";
+    public static final String ENCODING_PATH = FILE_PATH + "encoding.txt";
+    public static final String SERIAL_NUMBER_PATH = FILE_PATH + "serial_number.txt";
 
-    public static final String url = "/File/desenSingleExcel";
+    public static final String url = "/File/desenSingleColumn";
     private final MockMvc mvc;
     private final HashMap<String,Path> pathMapper;
 
@@ -65,7 +65,7 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
         List<String> algNames = Arrays.asList("dpDate", "SHA512");
         for (int i = 1; i <= 3; i++) {
@@ -88,7 +88,7 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
         List<String> algNames = Arrays.asList("floorTime", "SHA512");
         for (int i = 1; i <= 3; i++) {
@@ -111,7 +111,7 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
         List<String> algNames = Arrays.asList("addressHide", "SHA512","truncation", "value_hide");
 
@@ -135,7 +135,7 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
         List<String> algNames = Arrays.asList("numberHide", "SHA512","truncation",
                 "value_hide", "passReplace");
@@ -160,9 +160,9 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
-        List<String> algNames = Arrays.asList("gaussianToValue", "laplaceToValue","randomUniformToValue",
+        List<String> algNames = Arrays.asList("laplaceToValue","randomUniformToValue",
                 "randomLaplaceToValue", "randomGaussianToValue", "valueShift",
                 "SHA512", "floor", "valueMapping");
 
@@ -186,7 +186,7 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
         List<String> algNames = Arrays.asList("nameHide", "SHA512");
 
@@ -210,7 +210,7 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
         List<String> algNames = Arrays.asList("nameHide", "SHA512", "suppressEmail", "numberHide");
 
@@ -234,7 +234,7 @@ public class FileControllerTextTest {
         String fileName = filePath.getFileName().toString();
         System.out.println(fileName);
         MockMultipartFile file = new MockMultipartFile("file", fileName,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "text/plain",
                 Files.readAllBytes(filePath));
         List<String> algNames = Collections.singletonList("dpCode");
 

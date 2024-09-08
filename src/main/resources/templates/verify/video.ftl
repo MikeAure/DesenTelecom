@@ -31,7 +31,7 @@
             font-size: 50px;
         }
 
-        #submit {
+        .btn2 > button {
             background-color: #347aa9;
             padding: 5px 20px;
             cursor: pointer;
@@ -40,7 +40,6 @@
             display: inline-block;
             text-align: center;
             /*margin-right: 50px;*/
-
         }
 
         .btn2 {
@@ -136,27 +135,77 @@
     <!-- 自定义js -->
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
     <script type="text/javascript">
+        let defaultOption = 'meanValueVideo'; // 预设的默认选项
 
+        document.addEventListener('DOMContentLoaded', function() {
+            let defaultBtns = document.getElementById("default-choosefile-btn");
+            let videoBgBtns = document.getElementById("video-bg-sub-btns");
+            let videoFaceSubBtns = document.getElementById("video-face-sub-btns");
+            let privacyLevel = document.getElementById("privacyLevel");
+            let submitBtn = $('#submit');
+
+            let selectElement = document.getElementById('distortion-types');
+            fetch('/toolset/getDefaultSelection?toolsetName=' + 'video')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to fetch');
+                    }
+                })
+                .then(data => {
+                    if (data.code === 200 && data.data) {
+                        setDefaultOption(data.data);
+                        defaultOption = data.data;
+
+                        switch (defaultOption) {
+                            case "video_remove_bg":
+                                defaultBtns.style.display = "none";
+                                videoBgBtns.style.display = "flex";
+                                videoFaceSubBtns.style.display = "none"
+                                privacyLevel.style.display = "block";
+                                // submitBtn.removeEventListener("click", originalSubmit);
+                                // submitBtn.removeEventListener("click", faceSubSubmit);
+                                submitBtn.off('click').on("click", removeBgSubmit);
+                                break;
+
+                            case "video_face_sub":
+                                defaultBtns.style.display = "none";
+                                videoBgBtns.style.display = "none";
+                                videoFaceSubBtns.style.display = "flex"
+                                privacyLevel.style.display = "none";
+                                // submitBtn.removeEventListener("click", originalSubmit);
+                                // submitBtn.removeEventListener("click", removeBgSubmit);
+                                submitBtn.off('click').on("click", faceSubSubmit);
+                                break;
+
+                            default:
+                                defaultBtns.style.display = "flex";
+                                videoBgBtns.style.display = "none";
+                                videoFaceSubBtns.style.display = "none"
+                                privacyLevel.style.display = "block";
+                                // submitBtn.addEventListener("click", originalSubmit);
+                                // submitBtn.removeEventListener("click", removeBgSubmit);
+                                submitBtn.off('click').on("click", originalSubmit);
+                                break;
+                        }
+                    } else {
+                        setDefaultOption(defaultOption);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setDefaultOption(defaultOption);
+                });
+
+            function setDefaultOption(value) {
+                selectElement.value = value;
+            }
+        });
         window.onload = function () {
-            document.getElementById("nodistortionAlg").addEventListener("change", function () {
-                let selection = document.getElementById("nodistortionAlg").value;
-
-                const videoAesEncryptModule = document.getElementById("videoAesEncrypt");
-                const defaultModule = document.getElementById("default-module");
-                // const voiceprint_module = document.getElementById("voiceprint-module");
-
-                if (selection === "trace") {
-                    // voiceprint_module.style.visibility = "hidden";
-                    videoAesEncryptModule.style.visibility = "visible";
-                    defaultModule.style.visibility = "hidden";
-                } else {
-                    // voiceprint_module.style.visibility = "hidden";
-                    videoAesEncryptModule.style.visibility = "hidden";
-                    defaultModule.style.visibility = "visible";
-                }
-            });
             let submitButton = document.getElementById("submit");
             let fileUpload = document.getElementById("fileUpload");
+            // 非失真脱敏算法
             let distortionTypes = document.getElementById("distortion-types");
             let preArea = document.getElementById("pre");
             let afterArea = document.getElementById("after");
@@ -165,6 +214,28 @@
             let videoBgBtns = document.getElementById("video-bg-sub-btns");
             let videoFaceSubBtns = document.getElementById("video-face-sub-btns");
             let privacyLevel = document.getElementById("privacyLevel");
+
+            const originalFile = document.getElementById("fileUpload");
+            const bgVideoFile = document.getElementById("video_remove_bg_fileupload");
+            const bgImageFile = document.getElementById("video_remove_bg_img_fileupload");
+            const faceVideoSrcFile = document.getElementById("video_face_sub_src_fileupload");
+            const faceVideoTargetFile = document.getElementById("video_face_sub_target_fileupload");
+            const nonDistortionSelectedRawVideo = document.getElementById("selectRawVideo");
+            const nonDistortionSelectedEncryptedVideo = document.getElementById("selectEncryptedVideo");
+
+            // 非失真算法
+            document.getElementById("nodistortionAlg").addEventListener("change", function () {
+                let selection = document.getElementById("nodistortionAlg").value;
+                const videoAesEncryptModule = document.getElementById("videoAesEncrypt");
+                const defaultModule = document.getElementById("default-module");
+                if (selection === "trace") {
+                    videoAesEncryptModule.style.visibility = "visible";
+                    defaultModule.style.visibility = "hidden";
+                } else {
+                    videoAesEncryptModule.style.visibility = "hidden";
+                    defaultModule.style.visibility = "visible";
+                }
+            });
 
             distortionTypes.addEventListener("change", displacePart)
 
@@ -175,17 +246,49 @@
             // document.getElementById("selectEncryptedVideo").addEventListener("change", (event) => {
             //     nonDistortionVideoShowFile(event, "selectEncryptedVideo", "showDecryptedVideo")
             // });
-
+            // 监测标签的切换事件
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 preArea.innerHTML = "";
                 afterArea.innerHTML = "";
                 midImageArea.innerHTML = "";
-                defaultBtns.style.display = "flex";
-                videoBgBtns.style.display = "none";
-                videoFaceSubBtns.style.display = "none"
-                privacyLevel.style.display = "block";
-                $("#distortion-types").val("meanValueVideo");
-            })
+
+                originalFile.value = "";
+                bgVideoFile.value = "";
+                bgImageFile.value = "";
+                faceVideoSrcFile.value = "";
+                faceVideoTargetFile.value = "";
+                nonDistortionSelectedRawVideo.value = "";
+                nonDistortionSelectedRawVideo.value = "";
+
+                let submitBtn = $('#submit');
+
+                $("#distortion-types").val(defaultOption);
+                switch (defaultOption) {
+                    case "video_remove_bg":
+                        defaultBtns.style.display = "none";
+                        videoBgBtns.style.display = "flex";
+                        videoFaceSubBtns.style.display = "none"
+                        privacyLevel.style.display = "block";
+                        submitBtn.off('click').on("click", removeBgSubmit);
+                        break;
+
+                    case "video_face_sub":
+                        defaultBtns.style.display = "none";
+                        videoBgBtns.style.display = "none";
+                        videoFaceSubBtns.style.display = "flex"
+                        privacyLevel.style.display = "none";
+                        submitBtn.off('click').on("click", faceSubSubmit);
+                        break;
+
+                    default:
+                        defaultBtns.style.display = "flex";
+                        videoBgBtns.style.display = "none";
+                        videoFaceSubBtns.style.display = "none"
+                        privacyLevel.style.display = "block";
+                        submitBtn.off('click').on("click", originalSubmit);
+                        break;
+                }
+            });
             //提交脱敏参数，请求脱敏
 
             // 视频移除背景
@@ -221,6 +324,7 @@
                     }
                 }
             });
+
             document.getElementById("video_remove_bg_img_fileupload").addEventListener("change", function (event) {
                 // 清空
                 document.getElementById("mid-image").innerHTML = "";
@@ -309,8 +413,33 @@
                 }
             });
 
-            // 非失真脱敏，为选择待加密视频文件绑定事件
-            document.getElementById("selectRawVideo").addEventListener("change", (event) => {
+            // 设置默认算法
+            $("#setDefaultAlgorithm").on("click", function (e) {
+                let postData = new URLSearchParams();
+                postData.set("toolsetName", "video");
+                postData.set("defaultAlgName", $("#distortion-types").val());
+                console.log("postData: " + postData);
+
+                fetch ("/toolset/setDefaultToolset", {
+                    method: "POST",
+                    body: postData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert("设置默认算法成功！");
+                            defaultOption = $("#distortion-types").val();
+                        } else {
+                            throw new Error("设置默认算法失败！");
+                        }
+                    })
+                    .catch((error) => {
+                        alert(error);
+                        console.log(error);
+                    })
+            });
+            // 非失真脱敏部分，为选择待加密视频文件绑定事件
+            nonDistortionSelectedRawVideo.addEventListener("change", (event) => {
                 // 清空
                 document.getElementById("aesRawVideoInfo").innerHTML = "";
                 //读取文件
@@ -325,8 +454,8 @@
 
             document.getElementById("encryptVideo").onclick = function () {
                 let encryptKey = document.getElementById("encryptKey").value;
-                let file = document.getElementById("selectRawVideo").files[0];
-                if (!file) {
+                let selectRawVideo = nonDistortionSelectedRawVideo.files[0];
+                if (!selectRawVideo) {
                     alert("未选择待加密文件");
                     return;
                 }
@@ -335,14 +464,23 @@
                     return;
                 }
                 let formData = new FormData();
-                formData.set("file", file);
+                formData.set("file", selectRawVideo);
                 formData.set("password", encryptKey);
 
                 fetch('/Encrypt/aesVideoEnc', {
                     method: 'POST',
                     body: formData
                 })
-                    .then(response => response.blob())
+                    .then((response) => {
+                        if (response.status === 500) {
+                            // Handle server error
+                            return response.text().then(failedMsg => {
+                                alert(failedMsg);
+                                throw new Error(failedMsg); // Throw an error to stop further processing
+                            });
+                        }
+                        return response.blob();
+                    })
                     .then(data => {
                         const downloadLink = document.createElement('a');
                         downloadLink.href = URL.createObjectURL(data);
@@ -354,7 +492,7 @@
                     })
             }
 
-            document.getElementById("selectEncryptedVideo").addEventListener("change", (event) => {
+            nonDistortionSelectedEncryptedVideo.addEventListener("change", (event) => {
                 // 清空
                 document.getElementById("aesDecryptedVideoInfo").innerHTML = "";
                 //读取文件
@@ -370,7 +508,7 @@
                 let showDecryptedVideo = document.getElementById("showDecryptedVideo");
                 showDecryptedVideo.innerHTML = "";
                 let decryptKey = document.getElementById("decryptKey").value;
-                let file = document.getElementById("selectEncryptedVideo").files[0];
+                let file = nonDistortionSelectedEncryptedVideo.files[0];
 
                 if (!file) {
                     alert("未选择待解密文件");
@@ -388,7 +526,16 @@
                     method: 'POST',
                     body: formData
                 })
-                    .then(response => response.blob())
+                    .then((response) => {
+                        if (response.status === 500) {
+                            // Handle server error
+                            return response.text().then(failedMsg => {
+                                alert(failedMsg);
+                                throw new Error(failedMsg); // Throw an error to stop further processing
+                            });
+                        }
+                        return response.blob();
+                    })
                     .then(data => {
                         const video = document.createElement("video");
                         //console.log(data)
@@ -406,12 +553,9 @@
 
         function faceSubSubmit() {
             document.getElementById("after").innerHTML = "";
-            // debugger
             // 清空
-            const imgSrcFile = document.getElementById("video_face_sub_src_fileupload").files[0];
+            const videoSrcFile = document.getElementById("video_face_sub_src_fileupload").files[0];
             const videoTargetFile = document.getElementById("video_face_sub_target_fileupload").files[0];
-
-            // document.getElementById("video_remove_bg_img").innerHTML = "";
             // 视频格式
             const videoType = ['mp4']
             const imageType = ['jpg', 'jpeg', 'png'];
@@ -419,8 +563,8 @@
             // const videoFile = event.target.files[0]
             // const imageFile =
             // 文件名，扩展名
-            if (imgSrcFile && videoTargetFile) {
-                const imgSrcFileName = imgSrcFile.name;
+            if (videoSrcFile && videoTargetFile) {
+                const imgSrcFileName = videoSrcFile.name;
                 const imgSrcFileNameExtension = imgSrcFileName.split('.').pop().toLowerCase();
                 const videoTargetFileName = videoTargetFile.name;
                 const videoTargetFileNameExtension = videoTargetFileName.split('.').pop().toLowerCase();
@@ -439,18 +583,21 @@
                     formData.set("file", videoTargetFile);
                     formData.set("params", param);
                     formData.set("algName", "video_face_sub");
-                    formData.set("sheet", imgSrcFile);
+                    formData.set("sheet", videoSrcFile);
 
                     fetch('/File/replaceFaceVideo', {
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => {
-                            if (response.status === 200) {
-                                return response.blob();
-                            } else {
-                                throw new Error("Python script executes failed");
+                        .then((response) => {
+                            if (response.status === 500) {
+                                // Handle server error
+                                return response.text().then(failedMsg => {
+                                    alert(failedMsg);
+                                    throw new Error(failedMsg); // Throw an error to stop further processing
+                                });
                             }
+                            return response.blob();
                         })
                         .then(blob => {
                             let video = document.createElement("video");
@@ -467,7 +614,7 @@
                             alert(error)
                         });
                 } else {
-                    alert("请选择视频文件");
+                    alert("视频文件或图片文件格式不符合要求");
                 }
             }
         }
@@ -478,7 +625,7 @@
             const imageFile = document.getElementById("video_remove_bg_img_fileupload").files[0];
             // document.getElementById("video_remove_bg_img").innerHTML = "";
             // 视频格式
-            const videoType = ['mp4', 'avi']
+            const videoType = ['mp4']
             const imageType = ['jpg', 'jpeg', 'png'];
             //读取文件
             // const videoFile = event.target.files[0]
@@ -510,7 +657,16 @@
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => response.blob())
+                        .then((response) => {
+                            if (response.status === 500) {
+                                // Handle server error
+                                return response.text().then(failedMsg => {
+                                    alert(failedMsg);
+                                    throw new Error(failedMsg); // Throw an error to stop further processing
+                                });
+                            }
+                            return response.blob();
+                        })
                         .then(blob => {
                             const video = document.createElement("video");
                             //console.log(data)
@@ -521,7 +677,7 @@
                         })
                         .catch(error => console.error('Error:', error));
                 } else {
-                    alert("请选择视频文件");
+                    alert("视频文件或图片文件格式不符合要求");
                 }
             }
         }
@@ -533,7 +689,7 @@
             document.getElementById("mid-image").innerHTML = "";
 
             // 视频格式
-            const videoType = ['mp4', 'avi']
+            const videoType = ['mp4']
             //读取文件
             const file = event.target.files[0]
             // 文件名，扩展名
@@ -553,11 +709,9 @@
 
         function nonDistortionVideoShowFile(event, inputElement, showVideoArea) {
             // 清空
-
             document.getElementById(showVideoArea).innerHTML = "";
-
             // 视频格式
-            const videoType = ['mp4', 'avi']
+            const videoType = ['mp4']
             //读取文件
             const file = event.target.files[0]
             // 文件名，扩展名
@@ -577,10 +731,32 @@
         function displacePart(event) {
             let algoName = event.target.value;
             console.log("Selected algoName: " + algoName);
+
+            document.getElementById("pre").innerHTML = "";
+            document.getElementById("after").innerHTML = "";
+            document.getElementById("mid-image").innerHTML = "";
+
             let defaultBtns = document.getElementById("default-choosefile-btn");
             let videoBgBtns = document.getElementById("video-bg-sub-btns");
             let videoFaceSubBtns = document.getElementById("video-face-sub-btns");
             let privacyLevel = document.getElementById("privacyLevel");
+
+            const originalFile = document.getElementById("fileUpload");
+            const bgVideoFile = document.getElementById("video_remove_bg_fileupload");
+            const bgImageFile = document.getElementById("video_remove_bg_img_fileupload");
+            const faceVideoSrcFile = document.getElementById("video_face_sub_src_fileupload");
+            const faceVideoTargetFile = document.getElementById("video_face_sub_target_fileupload");
+            const nonDistortionSelectedRawVideo = document.getElementById("selectRawVideo");
+            const nonDistortionSelectedEncryptedVideo = document.getElementById("selectEncryptedVideo");
+
+            originalFile.value = "";
+            bgVideoFile.value = "";
+            bgImageFile.value = "";
+            faceVideoSrcFile.value = "";
+            faceVideoTargetFile.value = "";
+            nonDistortionSelectedRawVideo.value = "";
+            nonDistortionSelectedEncryptedVideo.value = "";
+
             let submitBtn = $('#submit');
 
             switch (algoName) {
@@ -589,10 +765,7 @@
                     videoBgBtns.style.display = "flex";
                     videoFaceSubBtns.style.display = "none"
                     privacyLevel.style.display = "block";
-                    // submitBtn.removeEventListener("click", originalSubmit);
-                    // submitBtn.removeEventListener("click", faceSubSubmit);
                     submitBtn.off('click').on("click", removeBgSubmit);
-
                     break;
 
                 case "video_face_sub":
@@ -600,8 +773,6 @@
                     videoBgBtns.style.display = "none";
                     videoFaceSubBtns.style.display = "flex"
                     privacyLevel.style.display = "none";
-                    // submitBtn.removeEventListener("click", originalSubmit);
-                    // submitBtn.removeEventListener("click", removeBgSubmit);
                     submitBtn.off('click').on("click", faceSubSubmit);
                     break;
 
@@ -610,8 +781,6 @@
                     videoBgBtns.style.display = "none";
                     videoFaceSubBtns.style.display = "none"
                     privacyLevel.style.display = "block";
-                    // submitBtn.addEventListener("click", originalSubmit);
-                    // submitBtn.removeEventListener("click", removeBgSubmit);
                     submitBtn.off('click').on("click", originalSubmit);
                     break;
             }
@@ -658,18 +827,22 @@
                 let type1 = distortionTypes.value;
                 formData.set("sheet", type1);
                 formData.set("algName", type1);
-            } else {
-                let nondistortionTypes = document.getElementById("nondistortion-types")
-                let type2 = nondistortionTypes.value;
-                formData.set("sheet", type2);
-                formData.set("algName", type1);
             }
             // 获取算法类型
             fetch('/File/desenFile', {
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.blob())
+                .then((response) => {
+                    if (response.status === 500) {
+                        // Handle server error
+                        return response.text().then(failedMsg => {
+                            alert(failedMsg);
+                            throw new Error(failedMsg); // Throw an error to stop further processing
+                        });
+                    }
+                    return response.blob();
+                })
                 .then(data => {
                     let video = document.createElement("video");
                     console.log(data)
@@ -770,15 +943,15 @@
                         <div id="video-bg-sub-btns" class="midtile" style="display: none">
                             <div class="align-items-center">
                                 <form id="uploadForm" enctype="multipart/form-data">
-                                    <input type="file" id="video_remove_bg_fileupload" style="display: none;"
-                                           accept=".mp4">
-                                    <label for="video_remove_bg_fileupload" class="upload-btn">
-                                        选择视频文件
-                                    </label>
                                     <input type="file" id="video_remove_bg_img_fileupload" style="display: none;"
                                            accept=".jpg, .jpeg, .png">
                                     <label for="video_remove_bg_img_fileupload" class="upload-btn">
                                         选择背景图片
+                                    </label>
+                                    <input type="file" id="video_remove_bg_fileupload" style="display: none;"
+                                           accept=".mp4">
+                                    <label for="video_remove_bg_fileupload" class="upload-btn">
+                                        选择视频文件
                                     </label>
                                 </form>
                             </div>
@@ -787,12 +960,12 @@
                         <div id="video-face-sub-btns" class="midtile" style="display: none">
                             <div class="align-items-center">
                                 <form id="uploadForm" enctype="multipart/form-data">
-                                    <input type="file" id="video_face_sub_src_fileupload" style="display: none;">
+                                    <input type="file" id="video_face_sub_src_fileupload" accept=".jpg, .jpeg, .png" style="display: none;">
                                     <label for="video_face_sub_src_fileupload" class="upload-btn">
                                         选择换脸源文件（图片）
                                     </label>
-                                    <input type="file" id="video_face_sub_target_fileupload" style="display: none;">
-                                    <label for="video_face_sub_target_fileupload" class="upload-btn">
+                                    <input type="file" id="video_face_sub_target_fileupload" accept=".mp4" style="display: none;">
+                                    <label for="video_face_sub_target_fileupload"  class="upload-btn">
                                         选择目标视频
                                     </label>
                                 </form>
@@ -803,7 +976,9 @@
 
                         <div class="btn2">
                             <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                            <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm"> 设置当前算法为默认算法</button>
                         </div>
+
                         <!--文件上传信息-->
 
                         <div class="showFile">

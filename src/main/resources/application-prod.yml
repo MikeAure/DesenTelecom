@@ -10,10 +10,12 @@ spring:
             driver-class-name: com.mysql.cj.jdbc.Driver
 
         crm:
-            jdbc-url: jdbc:mysql://localhost:3306/crm?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-            password: BRysj0725HhRhL##
+            jdbc-url: jdbc:mysql://172.28.72.223:3306/crmdb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: LOOK@MYSQL
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
+
+
     jpa:
         hibernate:
             ddl-auto: update
@@ -62,6 +64,7 @@ logging:
 
 effectEva:
     address: 172.28.72.223
+#    address: 127.0.0.1
     port: 10005
 evidence:
     localAddress: 172.28.72.214
@@ -100,5 +103,7 @@ systemId:
     ruleCheckSystemId: '0x33000000'
 
 logSenderManager:
-    ifSendToEvaFirst: false
-    ifSaveToDatabase: false
+    ifSendToEvaFirst: true
+    ifSaveToDatabase: true
+    ifSendFile: true
+    ifPerformenceTest: false

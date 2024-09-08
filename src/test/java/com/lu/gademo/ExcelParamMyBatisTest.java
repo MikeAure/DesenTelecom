@@ -1,6 +1,6 @@
 package com.lu.gademo;
 
-import com.lu.gademo.mapper.ExcelParamDao;
+import com.lu.gademo.mapper.ga.ExcelParamDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

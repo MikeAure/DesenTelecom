@@ -45,6 +45,14 @@ public class QueryDesenLevelController {
         List<SendEvaReq> resultList = sendEvaReqDao.findByFileTypeContains(sceneName, Sort.by(Sort.Direction.DESC,
                 "desenPerformEndTime"));
         SendEvaReq newestResult = resultList.get(0);
+        // 找到一个脱敏等级最低的策略返回
+        for (SendEvaReq item : resultList) {
+            log.info("获取到的记录的脱敏完成时间: {}", item.getDesenPerformEndTime());
+            if (item.getFileType().contains("low")) {
+                newestResult = item;
+                break;
+            }
+        }
         log.info("获取到的记录的脱敏完成时间: {}", newestResult.getDesenPerformEndTime());
         if (resultList.isEmpty()) {
             return new Result<>(500, "Find no result", "");

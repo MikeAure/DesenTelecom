@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 
 /**
- * 结构化数据脱敏等级信息
+ * 用于课题四传输数据，结构化数据脱敏等级信息
  */
 @Data
 @Slf4j

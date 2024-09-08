@@ -255,6 +255,7 @@ def add_noise2(image_1, k=7, epsilon=10):
         image_1[x1, y1] = image_1[x1, y1] + noise_x[np.array(noise_x_index)[i]]
     image_noise = cv2.normalize(image_1, None, 0, 255, cv2.NORM_MINMAX)
     image_noise = image_noise.astype(np.uint8)
+    print(f"image_noise: {image_noise}")
     return image_noise
 
 

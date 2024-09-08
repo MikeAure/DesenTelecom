@@ -6,10 +6,7 @@ import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.FileStorageService;
-import com.lu.gademo.utils.AlgorithmsFactory;
-import com.lu.gademo.utils.RecvFileDesen;
-import com.lu.gademo.utils.RecvFiles;
-import com.lu.gademo.utils.Result;
+import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;
 import com.sun.istack.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +15,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.bytedeco.opencv.presets.opencv_core;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,6 +25,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -69,10 +69,11 @@ public class FileController extends BaseController {
     private ExcelParamService excelParamService;
 
     private FileStorageService fileStorageService;
+    private LogCollectUtil logCollectUtil;
 
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
-                          ExcelParamService excelParamService, FileStorageService fileStorageService) {
+                          ExcelParamService excelParamService, FileStorageService fileStorageService, LogCollectUtil logCollectUtil) {
         this.algorithmsFactory = algorithmsFactory;
         this.officeFileDesen = officeFileDesen;
         this.fileService = fileService;
@@ -84,7 +85,7 @@ public class FileController extends BaseController {
         this.imageType = Arrays.asList("jpg", "jpeg", "png");
         this.videoType = Arrays.asList("mp4", "avi");
         this.audioType = Arrays.asList("mp3", "wav");
-
+        this.logCollectUtil = logCollectUtil;
     }
 
     private String getFileSuffix(String fileName) {
@@ -112,28 +113,33 @@ public class FileController extends BaseController {
         String fileType = getFileSuffix(fileName);
         log.info("File Type: " + fileType);
         log.info("AlgName: " + algName);
+        log.info("Params: {}", params);
+        log.info("Sheet: {}", sheet);
 
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
             return fileService.dealExcel(fileStorageDetails, params, sheet, true);
         } else if (imageType.contains(fileType)) {
-            return fileService.dealImage(file, params, algName);
+            return fileService.dealImage(fileStorageDetails, params, algName);
         } else if (videoType.contains(fileType)) {
-            return fileService.dealVideo(file, params, algName);
+            return fileService.dealVideo(fileStorageDetails, params, algName);
         } else if (audioType.contains(fileType)) {
-            return fileService.dealAudio(file, params, algName);
+            return fileService.dealAudio(fileStorageDetails, params, algName);
         }  else {
-            return fileService.dealGraph(file, params);
+            return fileService.dealGraph(fileStorageDetails, params);
         }
 
     }
 
-    @PostMapping("desenSingleExcel")
+    @PostMapping("desenSingleColumn")
     public ResponseEntity<byte[]> desenSingleColumnExcel(@RequestPart("file") MultipartFile file,
                                                          @RequestParam("params") String params,
                                                          @RequestParam("algName") String algName) throws IOException, ParseException {
-
-        return fileService.dealSingleExcel(file, params, algName);
+        log.info("Params: {}", params);
+        log.info("AlgName: {}", algName);
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+//        return fileService.dealSingleExcel(fileStorageDetails, params, algName);
+        return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, true);
     }
 
 
@@ -143,18 +149,20 @@ public class FileController extends BaseController {
                                                    @RequestParam("algName") String algName,
                                                    @RequestPart("sheet") MultipartFile sheet
     ) throws IOException, InterruptedException, SQLException {
+        log.info("Params: {}", params);
+        log.info("Sheet: {}", sheet);
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
         FileStorageDetails sheetStorageDetails = fileStorageService.saveRawFile(sheet);
 
         switch (algName) {
             case "video_face_sub": {
-                return fileService.replaceFaceVideo(file, params, algName, sheet);
+                return fileService.replaceFaceVideo(fileStorageDetails, params, algName, sheetStorageDetails);
             }
             case "image_face_sub": {
-                return fileService.replaceFace(file, params, algName, sheet);
+                return fileService.replaceFace(fileStorageDetails, params, algName, sheetStorageDetails);
             }
             case "video_remove_bg": {
-                return fileService.replaceVideoBackground(file, params, algName, sheet);
+                return fileService.replaceVideoBackground(fileStorageDetails, params, algName, sheetStorageDetails);
             }
             default:
                 throw new RuntimeException("algName error");
@@ -168,10 +176,82 @@ public class FileController extends BaseController {
                             @RequestParam String textType,
                             @RequestParam String privacyLevel,
                             @RequestParam String algName) throws ParseException {
+        log.info("PrivacyLevel: {}", privacyLevel);
+        log.info("AlgName: {}", algName);
         return fileService.desenText(textInput, textType, privacyLevel, algName);
 
     }
 
+    @ResponseBody
+    @RequestMapping(value = "generateTextTestData", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<byte[]> generateTextTestData(HttpServletRequest request, @RequestParam("totalNumber") Integer totalNumber) {
+        log.info("开始生成失真文本算法测试文件");
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            FileStorageDetails fileStorageDetails = fileService.generateTextTestFile(totalNumber);
+            log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
+//            HttpSession httpSession = request.getSession();
+//            httpSession.setAttribute("testTextFileName", fileStorageDetails.getRawFileName());
+            headers.setContentDispositionFormData("attachment", fileStorageDetails.getRawFileName());
+            return ResponseEntity.ok().headers(headers).body(fileStorageDetails.getRawFileBytes());
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Failed to generate file.".getBytes());
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "downloadTextTestFile", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<byte[]> downloadTextTestFile(HttpServletRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        HttpSession httpSession = request.getSession();
+        String fileName = httpSession.getAttribute("testTextFileName").toString();
+        log.info("Download eigen vector file: " + fileName);
+        Path filePath = fileStorageService.getRawFileDirectory().resolve(fileName);
+        try {
+            byte[] fileContent = Files.readAllBytes(filePath);
+            headers.setContentDispositionFormData("attachment", fileName);
+            return ResponseEntity.ok().headers(headers).body(fileContent);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(500).body("Failed to read file.".getBytes());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping(value = "textFilePerformenceTest")
+    public ResponseEntity<byte[]> textFilePerformenceTest(@RequestPart("file") MultipartFile file,
+                                                          @RequestParam("params") String params,
+                                                          @RequestParam("algName") String algName) {
+//        HttpHeaders headers = new HttpHeaders();
+//        HttpSession httpSession = request.getSession();
+//        String fileName = httpSession.getAttribute("testTextFileName").toString();
+        try {
+            FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+            return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, false);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(500).body("Failed to read file.".getBytes());
+        } catch (ParseException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(500).body("Failed to parse file.".getBytes());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping(value = "saveExcelParams")
+    public Result<String> saveExcelParams(@RequestPart("tableName") String tableName,
+                                          @RequestPart("params") String params) {
+
+        try {
+            List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
+            excelParamService.deleteAll(tableName + "_param");
+            excelParamService.insertAll(tableName + "_param", excelParamList);
+            return new Result<>(200, "ok", "Success");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new Result<>(400, "error", e.getMessage());
+        }
+    }
 
     // 接收信工所Office文档
     @PostMapping(value = "recvFileDesen", produces = "application/json;charset=UTF-8")

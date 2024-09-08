@@ -25,6 +25,9 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import com.lu.gademo.service.RuleCheckSystemLogSender;
 
+/**
+ * 合规检测系统日志传输模块
+ */
 @Slf4j
 @Data
 @Service

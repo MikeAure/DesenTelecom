@@ -9,7 +9,6 @@ class SparseVectorTechnique3(Mechanism):
         M. Lyu, D. Su, and N. Li. 2017.
         Understanding the Sparse Vector Technique for Differential Privacy.
         Proceedings of the VLDB Endowment.
-    INCORRECT
     """
 
     def __init__(self, eps: float = 0.1, c: int = 2, t: float = 1.0):
@@ -34,6 +33,7 @@ class SparseVectorTechnique3(Mechanism):
         x = np.atleast_2d(a)
 
         rho = np.random.laplace(scale=1 / self.eps1, size=(n_samples, 1))
+        print("")
         nu = np.random.laplace(scale=self.c / self.eps2, size=(n_samples, a.shape[0]))
 
         m = nu + x  # broadcasts x vertically

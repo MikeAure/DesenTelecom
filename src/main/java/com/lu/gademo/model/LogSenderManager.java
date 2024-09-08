@@ -161,6 +161,8 @@ public class LogSenderManager {
 
     @Value("${logSenderManager.ifSaveToDatabase}")
     private Boolean ifSaveToDatabase;
+    @Value("${logSenderManager.ifSendFile}")
+    private Boolean ifSaveFile;
     @Autowired
     private LogCollectUtil logCollectUtil;
 
@@ -186,8 +188,8 @@ public class LogSenderManager {
         log.info("fileSuffix: {}", fileSuffix);
 
         // TODO: 测试，最后需要改成发送文件
-        EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(sendEvaReq,
-                rawFileBytes, desenFileBytes, true);
+        EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(
+                sendEvaReq, rawFileBytes, desenFileBytes, ifSaveFile);
         if (evaluationSystemReturnResult != null) {
             RecEvaResult recEvaResult = evaluationSystemReturnResult.getRecEvaResult();
             RecEvaResultInv recEvaResultInv = evaluationSystemReturnResult.getRecEvaResultInv();
@@ -215,9 +217,10 @@ public class LogSenderManager {
 
                 // 向其他系统发送日志信息
                 eventPublisher.publishEvent(new ThreeSystemsEvent(this, submitEvidenceLocal, reqEvidenceSave, sendRuleReq, sendSplitDesenData, desenFileBytes));
+                String entityName = sendEvaReq.getFileType();
                 // 将脱敏后的表格文件内容保存到数据库表中
-                if (ifSaveToDatabase) {
-                    String entityName = sendEvaReq.getFileType();
+                if (ifSaveToDatabase && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
+
                     eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails, responseEntityCompletableFuture, responseEntityResult));
                 } else {
                     responseEntityCompletableFuture.complete(responseEntityResult);
@@ -1028,7 +1031,7 @@ public class LogSenderManager {
                                                    String startTime, String endTime) {
         ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
         SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
@@ -1036,12 +1039,12 @@ public class LogSenderManager {
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
                 fileType, rawFileSuffix, desenCom);
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes,
+        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileName, rawFileBytes, desenFileName, desenFileBytes,
                 infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         SendSplitDesenData sendSplitDesenData = logCollectUtil.buildSendSplitReq(infoBuilders.desenInfoAfterIden, infoBuilders.desenAlg,
-                rawFileBytes, desenFileBytes, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                rawFileName, rawFileBytes, desenFileName, desenFileBytes, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
 
         return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, sendEvaReq, sendRuleReq, sendSplitDesenData);

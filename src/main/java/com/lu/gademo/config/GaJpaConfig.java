@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(entityManagerFactoryRef = "gaEntityManagerFactory",
-        transactionManagerRef = "gaTransactionManager",
+        transactionManagerRef = "gaJpaTransactionManager",
         basePackages = {"com.lu.gademo.dao.ga"})
 public class GaJpaConfig {
 
@@ -35,8 +35,8 @@ public class GaJpaConfig {
     }
 
     @Primary
-    @Bean(name = "gaTransactionManager")
-    public PlatformTransactionManager gaTransactionManager(
+    @Bean(name = "gaJpaTransactionManager")
+    public PlatformTransactionManager gaJpaTransactionManager(
             @Qualifier("gaEntityManagerFactory") EntityManagerFactory gaEntityManagerFactory
     ) {
         return new JpaTransactionManager(gaEntityManagerFactory);

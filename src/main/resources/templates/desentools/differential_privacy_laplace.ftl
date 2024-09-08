@@ -361,6 +361,7 @@
             });
             document.getElementById("report_noisy_max1_submitBtn").addEventListener("click", function () {
                 let textInput = $("#report_noisy_max1_textInput").val();
+                let privacyLevel = document.getElementById("report_noisy_max1_privacyLevel").value
                 /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
                 let algName = "report_noisy_max1"
                 if (textInput === "") {
@@ -376,7 +377,9 @@
                     body: '&rawData=' + encodeURIComponent(textInput) +
                         /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                         '&samples=' + encodeURIComponent(1) +
-                        '&algName=' + encodeURIComponent(algName)
+                        '&algName=' + encodeURIComponent(algName) +
+                        '&params=' + encodeURIComponent(privacyLevel)
+
                 })
                     .then(response => response.text())
                     .then(data => {
@@ -386,7 +389,7 @@
             });
             document.getElementById("report_noisy_max3_submitBtn").addEventListener("click", function () {
                 let textInput = $("#report_noisy_max3_textInput").val();
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let privacyLevel = document.getElementById("report_noisy_max3_privacyLevel").value
                 let algName = "report_noisy_max3"
                 if (textInput === "") {
                     alert("请输入文本");
@@ -401,7 +404,8 @@
                     body: '&rawData=' + encodeURIComponent(textInput) +
                         /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                         '&samples=' + encodeURIComponent(1) +
-                        '&algName=' + encodeURIComponent(algName)
+                        '&algName=' + encodeURIComponent(algName) +
+                        '&params=' + encodeURIComponent(privacyLevel)
                 })
                     .then(response => response.text())
                     .then(data => {
@@ -411,7 +415,7 @@
             })
             document.getElementById("snapping_submitBtn").addEventListener("click", function () {
                 let textInput = $("#snapping_textInput").val();
-                /*let privacyLevel = document.getElementById("noisy_hist1_privacyLevel").value*/
+                let privacyLevel = document.getElementById("snapping_privacyLevel").value
                 let algName = "snapping"
                 if (textInput === "") {
                     alert("请输入文本");
@@ -426,7 +430,8 @@
                     body: '&rawData=' + encodeURIComponent(textInput) +
                         /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                         '&samples=' + encodeURIComponent(1) +
-                        '&algName=' + encodeURIComponent(algName)
+                        '&algName=' + encodeURIComponent(algName) +
+                        '&params=' + encodeURIComponent(privacyLevel)
                 })
                     .then(response => response.text())
                     .then(data => {
@@ -451,10 +456,10 @@
                         说明：向数值中加入满足差分隐私的拉普拉斯噪声
                     </p>
                     <p>
-                        输入：数值
+                        输入：一维数组
                     </p>
                     <p>
-                        输出：数值
+                        输出：一维数组
                     </p>
                 </div>
             </div>
@@ -552,6 +557,21 @@
                        style="font-size: 1.5em;
                     text-align: center;">算法测试</label>
             </div>
+            <label for="report_noisy_max1_privacyLevel"
+                   class="col-sm-offset-4 col-sm-3"
+                   style="font-size: 1.5em;">
+                请选择隐私预算
+            </label>
+
+            <div class="col-sm-5">
+                <select class="text-center"
+                        id="report_noisy_max1_privacyLevel"
+                        style="font-size: 1.5em;">
+                    <option value="1">epsilon=10</option>
+                    <option value="2">epsilon=1</option>
+                    <option value="3">epsilon=0.1</option>
+                </select>
+            </div>
             <div class="col-sm-offset-2 col-sm-8 input-group">
                 <input type="text" id="report_noisy_max1_textInput" class="form-control"
                        placeholder="请输入，以,分隔数字"
@@ -613,9 +633,24 @@
 
         <div class="row m-t">
             <div class="text-center">
-                <label for="laplaceToValue_privacyLevel"
+                <label for="report_noisy_max3_privacyLevel"
                        style="font-size: 1.5em;
                     text-align: center;">算法测试</label>
+            </div>
+            <label for="report_noisy_max3_privacyLevel"
+                         class="col-sm-offset-4 col-sm-3"
+                         style="font-size: 1.5em;">
+                请选择隐私预算
+            </label>
+
+            <div class="col-sm-5">
+                <select class="text-center"
+                        id="report_noisy_max3_privacyLevel"
+                        style="font-size: 1.5em;">
+                    <option value="1">epsilon=10</option>
+                    <option value="2">epsilon=1</option>
+                    <option value="3">epsilon=0.1</option>
+                </select>
             </div>
             <div class="col-sm-offset-2 col-sm-8 input-group">
                 <input type="text" id="report_noisy_max3_textInput" class="form-control"
@@ -680,6 +715,21 @@
                 <label for="snapping_textInput"
                        style="font-size: 1.5em;
                     text-align: center;">算法测试</label>
+            </div>
+            <label for="snapping_privacyLevel"
+                   class="col-sm-offset-4 col-sm-3"
+                   style="font-size: 1.5em;">
+                请选择隐私预算
+            </label>
+
+            <div class="col-sm-5">
+                <select class="text-center"
+                        id="snapping_privacyLevel"
+                        style="font-size: 1.5em;">
+                    <option value="0">epsilon=10</option>
+                    <option value="1">epsilon=1</option>
+                    <option value="2">epsilon=0.1</option>
+                </select>
             </div>
             <div class="col-sm-offset-2 col-sm-8 input-group">
                 <input type="text" id="snapping_textInput" class="form-control"
@@ -750,11 +800,11 @@
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;">
                         <div style="margin: auto; font-size: 20px">
-                            <label for="dpImage_privacyLevel">请选择隐私保护等级</label>
+                            <label for="dpImage_privacyLevel">请选择隐私预算</label>
                             <select id="dpImage_privacyLevel">
-                                <option value="0"> 低程度</option>
-                                <option value="1" selected> 中程度</option>
-                                <option value="2"> 高程度</option>
+                                <option value="0">epsilon=1.0</option>
+                                <option value="1" selected>epsilon=0.5</option>
+                                <option value="2">epsilon=0.1</option>
                             </select>
                         </div>
                     </div>
@@ -814,11 +864,11 @@
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;">
                         <div style="margin: auto; font-size: 20px">
-                            <label for="imCoder2_privacyLevel">请选择隐私保护等级</label>
+                            <label for="imCoder2_privacyLevel">请选择隐私预算</label>
                             <select id="imCoder2_privacyLevel">
-                                <option value="0"> 低程度</option>
-                                <option value="1" selected> 中程度</option>
-                                <option value="2"> 高程度</option>
+                                <option value="0">epsilon=10</option>
+                                <option value="1" selected>epsilon=1.0</option>
+                                <option value="2">epsilon=0.1</option>
                             </select>
                         </div>
                     </div>
@@ -880,11 +930,11 @@
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;">
                         <div style=" font-size: 20px">
-                            <label for="dpAudio_privacyLevel">请选择隐私保护等级</label>
+                            <label for="dpAudio_privacyLevel">请选择隐私预算</label>
                             <select id="dpAudio_privacyLevel">
-                                <option value="0"> 低程度</option>
-                                <option value="1" selected> 中程度</option>
-                                <option value="2"> 高程度</option>
+                                <option value="0">epsilon=5</option>
+                                <option value="1" selected>epsilon=1</option>
+                                <option value="2">epsilon=0.2</option>
                             </select>
                         </div>
                     </div>
@@ -938,11 +988,11 @@
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;">
                         <div style="margin: auto; font-size: 20px">
-                            <label for="dpGraph_privacyLevel">请选择隐私保护等级</label>
+                            <label for="dpGraph_privacyLevel">请选择隐私预算</label>
                             <select id="dpGraph_privacyLevel">
-                                <option value="0"> 低程度</option>
-                                <option value="1" selected> 中程度</option>
-                                <option value="2"> 高程度</option>
+                                <option value="0">epsilon=5</option>
+                                <option value="1" selected>epsilon=1</option>
+                                <option value="2">epsilon=0.2</option>
                             </select>
                         </div>
                     </div>
@@ -1000,16 +1050,16 @@
             <label for="dpDate_privacyLevel"
                    class="col-sm-offset-4 col-sm-3"
                    style="font-size: 1.5em;">
-                请选择隐私保护等级
+                请选择隐私预算
             </label>
 
             <div class="col-sm-5">
                 <select class="text-center"
                         id="dpDate_privacyLevel"
                         style="font-size: 1.5em;">
-                    <option value="1">低程度</option>
-                    <option value="2">中程度</option>
-                    <option value="3">高程度</option>
+                    <option value="1">epsilon=0.1</option>
+                    <option value="2">epsilon=0.01</option>
+                    <option value="3">epsilon=0.001</option>
                 </select>
             </div>
 

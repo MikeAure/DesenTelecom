@@ -199,21 +199,24 @@ public class Customer {
         return loginFlag;
     }
 
-    public void sendEncryptedMapData(double latitude, double longitude) {
+    public String sendEncryptedMapData(double latitude, double longitude) {
         ObjectOutputStream oos = null;
+        TMessage tMessage = new TMessage();
         try {
             oos = new ObjectOutputStream(connSocket.getOutputStream());
-            TMessage tMessage = new TMessage();
             tMessage.setMsgType(1);
             MapData mapData = new MapData();
             mapData.setEncryptedMap(encryptedCalculatedData(latitude, longitude));
             mapData.setDataType(MapData.ECPM);
             tMessage.setMapData(mapData);
+            log.info("用户发送的tMessage: {}", tMessage.getMapData().toString());
             oos.writeObject(tMessage);
             logger.info("sendEncryptedMapData: 写入数据完成！");
+
         } catch (IOException e) {
             logger.info("ccst init: 读取输出流失败！");
         }
+        return tMessage.getMapData().toString();
 
     }
 
@@ -286,7 +289,7 @@ public class Customer {
                 +latLngTopCenter.latitude + "," + latLngRightCenter.longitude + ";"
                 + latLngBottomCenter.latitude + "," + latLngRightCenter.longitude + ";"
                 + latLngBottomCenter.latitude + "," + latLngLeftCenter.longitude);
-        //*****************************************************************下面为发送的圆形数据，通过服务器发送给所有范围内的车主
+        //****************下面为发送的圆形数据，通过服务器发送给所有范围内的车主
         StringBuffer stringBufferCircle = encryptedCircleData(distance, startLatitude, startLongitude);
         sendEncryptedData(stringBufferCircle, 2);
     }

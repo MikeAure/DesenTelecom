@@ -1,6 +1,7 @@
 package com.lu.gademo.timeSeries;
 
 import Jama.Matrix;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -8,13 +9,15 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+@Slf4j
 public class MainTest {
 
     public static String SecretKeyS1 = "qwerasdfqwerasds";
     public static String SecretKeyS2 = "uiophjklbnmtyuig";
     public static int upBoundLeafNode = 1;
     public static int lamda = 0;
+    public static StringBuilder kdTreeStringBuilder = new StringBuilder();
+    public static String encryptedKDTreeString = "";
 
     public static double Outsourcing(String filename, String split, SHSParamters filterParam, SHSParamters verifyParam, Matrix A, int n, int d, int k, int cycle) throws Exception {
 
@@ -57,7 +60,8 @@ public class MainTest {
         NaiveToken naiveToken = NaiveSolution.tokenGeneration(q, delta, verifyParam);
 
         // token generation by our scheme
-        Token token = Token.generateToken(q, pivotsList, lamda, delta, A, filterParam, verifyParam, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero);
+        Token token = Token.generateToken(q, pivotsList, lamda, delta, A, filterParam, verifyParam, FilterCipherOne,
+                FilterCipherZero, VerifyCipherOne, VerifyCipherZero);
 
         double[] t = new double[2];
         // query processing with our scheme
@@ -71,7 +75,10 @@ public class MainTest {
     }
 
 
-    public static int QueryProcessing(ArrayList<Integer> q, String filename, String split, SHSParamters filterParam, SHSParamters verifyParam, Matrix A, int n, int d, int k, int delta, int cycle, BigInteger FilterCipherOne, BigInteger FilterCipherZero, BigInteger VerifyCipherOne, BigInteger VerifyCipherZero, BigInteger VerifycipherMiunsOne) throws Exception {
+    public static int QueryProcessing(ArrayList<Integer> q, String filename, String split, SHSParamters filterParam,
+                                      SHSParamters verifyParam, Matrix A, int n, int d, int k, int delta, int cycle,
+                                      BigInteger FilterCipherOne, BigInteger FilterCipherZero, BigInteger VerifyCipherOne,
+                                      BigInteger VerifyCipherZero, BigInteger VerifycipherMiunsOne) throws Exception {
 
         HashMap<Integer, ArrayList<Double>> doubleDataList = Data.ReadFixNumData(filename, split, n, d);
         HashMap<Integer, ArrayList<Integer>> intDataList = Data.TransformDoubleToInt(doubleDataList, 100);
@@ -95,11 +102,69 @@ public class MainTest {
         //for (int i = 0; i < cycle; i++) {
 
         // encryption by our scheme
-        HashMap<Integer, ArrayList<Integer>> pivotsList = PreCompute.ChoosePivots(intDataList, k);
+//        HashMap<Integer, ArrayList<Integer>> pivotsList = PreCompute.ChoosePivots(intDataList, k);
+//        HashMap<Integer, ArrayList<Integer>> pivotsList = {0=[-72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -2, 191, -34, -72, -72, -72, -72, 152, 178, 146, 146, -34, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72, -72], 1=[-61, -61, 237, 44, -61, -61, -61, -61, 184, 79, -61, -61, -61, -61, 114, 149, -61, -61, -61, -61, -25, 255, -25, -61, -61, -61, -61, 149, 114, -61, -61, -61, -61, 44, 255, -61, -61, -61, -61, -61, 202, 61, -61, -61, -61, -61, 114], 2=[-24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, 633, -24, -24, 335, 12, -24, -24, -24, -24, 277, -24, -24, -24, 161, -24], 3=[-18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, 584, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, 600, -18]};
+        HashMap<Integer, ArrayList<Integer>> pivotsList = new HashMap<>();
+
+        ArrayList<Integer> list0 = new ArrayList<>();
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-2); list0.add(191); list0.add(-34); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(152); list0.add(178);
+        list0.add(146); list0.add(146); list0.add(-34); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+
+        ArrayList<Integer> list1 = new ArrayList<>();
+        list1.add(-61); list1.add(-61); list1.add(237); list1.add(44); list1.add(-61);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(184); list1.add(79);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(114);
+        list1.add(149); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61);
+        list1.add(-25); list1.add(255); list1.add(-25); list1.add(-61); list1.add(-61);
+        list1.add(-61); list1.add(-61); list1.add(149); list1.add(114); list1.add(-61);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(44); list1.add(255);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(202);
+        list1.add(61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61);
+        list1.add(114);
+
+        ArrayList<Integer> list2 = new ArrayList<>();
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(633);
+        list2.add(-24); list2.add(-24); list2.add(335); list2.add(12); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(277); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(161); list2.add(-24);
+
+        ArrayList<Integer> list3 = new ArrayList<>();
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(584); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(600);
+        list3.add(-18);
+
+        pivotsList.put(0, list0);
+        pivotsList.put(1, list1);
+        pivotsList.put(2, list2);
+        pivotsList.put(3, list3);
+
+        System.out.println("pivotsList: " + pivotsList.toString());
         HashMap<Integer, int[]> distanceList = PreCompute.PreComputeDistance(intDataList, pivotsList, lamda);
         Node T = KDTree.TreeBuild(distanceList, upBoundLeafNode, k);
+        System.out.println("KDTree: ");
+        kdTreeStringBuilder = KDTree.stringOfKdTree(T);
+//        System.out.println(kdTreeStringBuilder.toString());
         EncryptNode encryptT = KDTree.encryptTree(intDataList, T, k, filterParam, verifyParam, A);
-
+        encryptedKDTreeString = encryptT.toString();
+        System.out.println("encryptT: " + encryptT.toString().substring(0, 100) + "...");
         //for (int j = 0; j < 20; j++) {
 
         //int loc = (int) (Math.random() * n);
@@ -151,7 +216,8 @@ public class MainTest {
             double t1 = System.nanoTime();
             int loc = (int) (Math.random() * n);
             ArrayList<Integer> q = intDataList.get(loc);
-            Token token = Token.generateToken(q, pivotsList, lamda, delta, A, filterParam, verifyParam, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero);
+            Token token = Token.generateToken(q, pivotsList, lamda, delta, A, filterParam, verifyParam, FilterCipherOne,
+                    FilterCipherZero, VerifyCipherOne, VerifyCipherZero);
             double t2 = System.nanoTime();
 
             if (i > cycle / 2) {
@@ -240,7 +306,9 @@ public class MainTest {
     }
 
     // QueryProcessing with N
-    public static int QueryProcessingN(ArrayList<Integer> q, String filename, String split, SHSParamters filterParam, SHSParamters verifyParam, BigInteger FilterCipherOne, BigInteger FilterCipherZero, BigInteger VerifyCipherOne, BigInteger VerifyCipherZero, BigInteger VerifycipherMiunsOne) throws Exception {
+    public static int QueryProcessingN(ArrayList<Integer> q, String filename, String split, SHSParamters filterParam,
+                                       SHSParamters verifyParam, BigInteger FilterCipherOne, BigInteger FilterCipherZero,
+                                       BigInteger VerifyCipherOne, BigInteger VerifyCipherZero, BigInteger VerifycipherMiunsOne) throws Exception {
 
        /* int[] n = {2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000};
         int d = 96;
@@ -252,7 +320,8 @@ public class MainTest {
         int[] n = {2000};
         int d = 48;
         int[] k = {4};
-        int delta = 350;
+        int delta = 50;
+//        int delta = 350;
         int cycle = 1;
 
 
@@ -267,7 +336,8 @@ public class MainTest {
         for (int i = 0; i < k.length; i++) {
             A = Matrix.identity(2 * k[i] + 1, 2 * k[i] + 1);
             for (int j = 0; j < n.length; j++) {
-                operationTimes[i][j] = QueryProcessing(q, filename, split, filterParam, verifyParam, A, n[j], d, k[i], delta, cycle, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifycipherMiunsOne);
+                operationTimes[i][j] = QueryProcessing(q, filename, split, filterParam, verifyParam, A, n[j], d, k[i],
+                        delta, cycle, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifycipherMiunsOne);
                 index = (int) operationTimes[i][j];
             }
         }
@@ -485,11 +555,8 @@ public class MainTest {
     }
 
     public static String encryptGraph(String rawData) throws Exception {
-
-
         // 创建 ArrayList
         ArrayList<Integer> q = new ArrayList<>();
-
         // 将字符串分割为数值数组
         String[] numericArray = rawData.split(",");
 
@@ -500,7 +567,7 @@ public class MainTest {
                 q.add(value);
             } catch (NumberFormatException e) {
                 // 处理无法解析为整数的情况，可以选择忽略或进行其他处理
-                System.out.println("无法解析为整数: " + numericValue);
+                log.error("无法解析为整数: " + numericValue);
             }
         }
 
@@ -511,9 +578,7 @@ public class MainTest {
         String filename = Paths.get(currentPath, "ElectricDevices_TEST.tsv").toString();
         String split = "\\s+";
 
-
         // filtration parameters
-
         int filter_k1 = 20;
         int filter_k2 = 80;
         int filter_k0 = 1024;
@@ -536,11 +601,11 @@ public class MainTest {
         BigInteger VerifyCipherOne = SymHomSch.EncBiginteger(BigInteger.ONE, verifyParam);
         BigInteger VerifyCipherZero = SymHomSch.EncBiginteger(BigInteger.ZERO, verifyParam);
 
-
 //		OutsourcingN(filename, split, filterParam, verifyParam);
 //		OutsourcingD(filename, split, filterParam, verifyParam);
 
-        return String.valueOf(QueryProcessingN(q, filename, split, filterParam, verifyParam, FilterCipherOne, FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifycipherMinusOne));
+        return String.valueOf(QueryProcessingN(q, filename, split, filterParam, verifyParam, FilterCipherOne,
+                FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifycipherMinusOne));
 
     }
 

@@ -51,6 +51,7 @@ def get_similar_image(res_model, path, image, eigen_vector_file_name="encrypted_
     pca_features = pca.fit_transform(features)
     p = PMDC.PMDC(pca_features)
     e_wave, e_bar = p.oldDataEnc(pca_features)
+    # 加密后的图片特征向量
     eq_wave, eq_bar = p.TrapGen(pca_features[-1])
     
     print(type(eq_wave[0]))

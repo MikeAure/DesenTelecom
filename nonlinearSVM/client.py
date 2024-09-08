@@ -15,7 +15,7 @@ random.seed(42)
 tolerance = 1e-10
 scaling_factor = 1e10
 k1, k2, k3, k4 = 512, 200, 128, 128
-test_features_path = 'test_features_part_2.csv'
+# test_features_path = 'test_features_part_2.csv'
 # test_labels_path = 'test_labels_part_2.csv'
 
 def recv_all(sock, length):
@@ -36,6 +36,7 @@ def load_csv_data(path: str) -> Tuple[list, list]:
 
 
 def encrypt_query(query: list, modulus: int, s: int) -> Tuple[int, int, list]:
+    print("加密查询信息")
     A = sum(x ** 2 for x in query)
     alpha = number.getPrime(k2)
     query.extend([0, 0, 1])
@@ -77,16 +78,22 @@ def first_round_receive(sock: socket, modulus: int, s: int, inv_s: int, alpha: i
     epsilon = response['epsilon']
 
     paraE, paraF, paraK, paraU = [], [], [], []
+    print("解除可逆加扰")
     for x in paraD:
         e = (inv_s * x) % modulus
         paraE.append(e)
+    print(f"paraE[0:10]: {paraE[0:10]}")
+    print(f"length of paraE: {len(paraE)}")
 
     square_alpha = int(pow(alpha, 2))
     for i in range(len(paraB)):
         tmp1 = paraB[i]
         tmp2 = (paraE[i] - (paraE[i] % square_alpha)) / (square_alpha * epsilon)
         paraF.append(tmp1 - tmp2)
+    print(f"paraF[0:10]: {paraF[0:10]}")
+    print(f"length of paraF: {len(paraF)}")
 
+    # t_j != 0
     for x in paraF:
         t = random.randint(10000, int(scaling_factor))
         z = number.getRandomNBitInteger(k3)
@@ -94,7 +101,7 @@ def first_round_receive(sock: socket, modulus: int, s: int, inv_s: int, alpha: i
         paraK.append(k)
         u = (s * (t * alpha + z)) % modulus
         paraU.append(u)
-
+    # t_j == 0
     for _ in range(4):
         z = number.getRandomNBitInteger(k3)
         paraU.append((s * z) % modulus)
@@ -111,6 +118,7 @@ def send_intermediate_data(sock: socket, paraK: list, paraU: list):
     sock.sendall(response_bytes)
 
 
+# 获取最终结果
 def get_result(sock: socket, modulus: int, inv_s: int, alpha: int) -> Tuple[int, float, float, int, int, float]:
     result_length_bytes = sock.recv(16)
     result_length = int.from_bytes(result_length_bytes, 'big')
@@ -135,7 +143,7 @@ if __name__ == '__main__':
         exit(-1)
         
     input_file_path = sys.argv[1]
-    csv_output_path =  sys.argv[2]
+    csv_output_path = sys.argv[2]
 
     test_features_df = pd.read_csv(input_file_path)
     test_features = test_features_df.values.tolist()
@@ -157,6 +165,7 @@ if __name__ == '__main__':
     for idx, query_list in enumerate(test_features):
         p = number.getPrime(k1)
         paraS = random.randint(int(1e10), p - 1)
+        # p的逆元
         inverse_s = pow(paraS, -1, p)
         paraA, para_alpha, encrypt_list = encrypt_query(query_list, p, paraS)
         send_ciphertext_query(client_socket, paraA, para_alpha, p, encrypt_list, encryptor)

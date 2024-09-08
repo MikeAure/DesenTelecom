@@ -118,7 +118,7 @@ public class ReplaceTest {
     @Test
     public void testNumberHide()  {
         // Replace replace = new ReplaceImpl();
-        List<String> rawData = Arrays.asList("19929384529", "7654321", "17789012345", "1992938452977654321");
+        List<String> rawData = Arrays.asList("19929384529", "7654321", "17789012345", "1992938452977654321", "1", "2", "22", "333", "4444");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 7, 0);
         DSObject result1 = replace.service(dsObject, 7, 1);

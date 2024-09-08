@@ -35,16 +35,16 @@ class SparseVectorTechnique1(Mechanism):
         # columns: queries
         # rows: samples
         x = np.atleast_2d(a)
-
+        print(f"x: {x}")
         rho = np.random.laplace(scale=1 / self.eps1, size=(n_samples, 1))
-        # print(f"rho: {rho}")
+        print(f"rho: {rho}")
         nu = np.random.laplace(
             scale=2 * self.c / self.eps2, size=(n_samples, a.shape[0])
         )
-        # print(f"nu: {nu}")
+        print(f"nu: {nu}")
 
         m = nu + x  # broadcasts x vertically
-        # print(f"m: {m}")
+        print(f"m: {m}")
         cmp = m >= (rho + self.t)  # broadcasts rho horizontally
         count = np.zeros(n_samples)
         aborted = np.full(n_samples, False)

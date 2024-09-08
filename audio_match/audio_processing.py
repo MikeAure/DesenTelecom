@@ -10,14 +10,7 @@ def mk_MFB(filename, sample_rate=c.SAMPLE_RATE,use_delta = c.USE_DELTA,use_scale
     audio, sr = librosa.load(filename, sr=sample_rate, mono=True)
     #audio = audio.flatten()
 
-
-
     filter_banks, energies = fbank(audio, samplerate=sample_rate, nfilt=c.FILTER_BANK, winlen=0.025)
-
-
-
-
-
 
     if use_logscale:
         filter_banks = 20 * np.log10(np.maximum(filter_banks,1e-5))

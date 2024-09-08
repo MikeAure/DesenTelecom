@@ -82,7 +82,6 @@ public class ImageRetrievalController {
         String objectMode = "image";
         // 设置文件时间戳
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
-
         // 设置原文件信息
         if (file.getOriginalFilename() == null) {
             throw new IOException("Input file name is null");
@@ -108,11 +107,6 @@ public class ImageRetrievalController {
 
         HttpSession httpSession = request.getSession();
         httpSession.setAttribute("eigenVectorFileName", eigenVectorFileName);
-        // 脱敏参数处理
-        Integer desenParam = Integer.valueOf(params);
-
-        // 调用脱敏程序处理
-        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
 
         log.info("Start image desen");
         // 脱敏开始时间
@@ -123,9 +117,7 @@ public class ImageRetrievalController {
         Path desenApp = desenAppPath.resolve("FUNC.py");
         CommandExecutor.executePython(rawFilePathString + " " + desenFilePathString + " " + eigenVectorFilePathString, "",
                 desenApp.toAbsolutePath().toString());
-        infoBuilders.desenAlg.append("103");
-        infoBuilders.desenAlgParam.append("非失真图像脱敏算法");
-        infoBuilders.desenLevel.append(0);
+
         // 脱敏后收集信息
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -142,6 +134,9 @@ public class ImageRetrievalController {
         // 脱敏后文件字节流
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        infoBuilders.desenAlg.append("103");
+        infoBuilders.desenAlgParam.append("非失真图像脱敏算法");
+        infoBuilders.desenLevel.append(0);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("image");
         // 脱敏后类型
@@ -152,50 +147,13 @@ public class ImageRetrievalController {
         infoBuilders.desenRequirements.append("对图像非失真脱敏");
         // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
-        // 脱敏算法信息
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        // 本地存证
         // 存证系统
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg,
-                rawFileName, rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(), infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlgParam, startTime, endTime,
-                infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix,
+                startTime, endTime);
 
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
-                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes,
-                    desenFileBytes);
-        });
-
-        // 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-        // 关闭线程池
-        executorService.shutdown();
         // 读取文件返回
         HttpHeaders headers = new HttpHeaders();
         if ((rawFileSuffix.equals("png"))) {
@@ -260,9 +218,7 @@ public class ImageRetrievalController {
         Path desenApp = desenAppPath.resolve("FUNC.py");
         CommandExecutor.executePython(rawFilePathString + " " + desenFilePathString + " " + eigenVectorFilePathString, "",
                 desenApp.toAbsolutePath().toString());
-        infoBuilders.desenAlg.append("103");
-        infoBuilders.desenAlgParam.append("非失真图像脱敏算法");
-        infoBuilders.desenLevel.append(0);
+
         // 脱敏后收集信息
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -279,6 +235,9 @@ public class ImageRetrievalController {
         // 脱敏后文件字节流
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
+        infoBuilders.desenAlg.append("103");
+        infoBuilders.desenAlgParam.append("非失真图像脱敏算法");
+        infoBuilders.desenLevel.append(0);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("image");
         // 脱敏后类型
@@ -289,50 +248,15 @@ public class ImageRetrievalController {
         infoBuilders.desenRequirements.append("对图像非失真脱敏");
         // 脱敏数据类型
         infoBuilders.fileDataType.append(rawFileSuffix);
-        // 脱敏算法信息
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        // 线程池
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
         // 本地存证
         // 存证系统
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
-        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
-        // 上报本地存证内容
-        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg,
-                rawFileName, rawFileBytes, rawFileSize, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(), infoBuilders.desenIntention,
-                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlgParam, startTime, endTime,
-                infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-        // 发送方法
-        executorService.submit(() -> {
-            logSenderManager.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
-        });
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix,
+                startTime, endTime);
 
-        // 效果评测系统
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
-                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, objectMode, rawFileSuffix, desenCom);
-
-        executorService.submit(() -> {
-            logSenderManager.send2EffectEva(sendEvaReq, rawFileBytes,
-                    desenFileBytes);
-        });
-
-        // 拆分重构系统
-
-        // 合规检查系统
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileBytes, desenFileBytes, infoBuilders.desenInfoAfterIden,
-                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-
-        executorService.submit(() -> {
-            logSenderManager.send2RuleCheck(sendRuleReq);
-        });
-        // 关闭线程池
-        executorService.shutdown();
         // 读取文件返回
         HttpHeaders headers = new HttpHeaders();
         if ((rawFileSuffix.equals("png"))) {
@@ -360,7 +284,6 @@ public class ImageRetrievalController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
     }
 
     @GetMapping("downloadEigenVector")

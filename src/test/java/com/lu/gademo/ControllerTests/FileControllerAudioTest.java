@@ -44,7 +44,8 @@ public class FileControllerAudioTest {
     }
 
     @Test
-    public void audioDpAudio () throws Exception {
+    // 基于差分隐私的声纹特征脱敏算法
+    public void testDpAudio () throws Exception {
         mvc.perform(multipart(URL)
                 .file(audioFile)
                     .param("params", PARAMS)
@@ -56,7 +57,8 @@ public class FileControllerAudioTest {
     }
 
     @Test
-    public void audioVoiceReplace() throws Exception {
+    // 声纹替换算法
+    public void testVoiceReplace() throws Exception {
         mvc.perform(multipart(URL)
                         .file(audioFile)
                         .param("params", PARAMS)
@@ -68,7 +70,8 @@ public class FileControllerAudioTest {
     }
 
     @Test
-    public void audioApplyAudioEffects() throws Exception {
+    // 音频变形
+    public void testApplyAudioEffects() throws Exception {
         mvc.perform(multipart(URL)
                         .file(audioFile)
                         .param("params", PARAMS)
@@ -80,11 +83,64 @@ public class FileControllerAudioTest {
     }
 
     @Test
-    public void audioAudioReshuffle() throws Exception {
+    // 音频重排
+    public void testAudioReshuffle() throws Exception {
         mvc.perform(multipart(URL)
                         .file(audioFile)
                         .param("params", PARAMS)
                         .param("algName", "audio_reshuffle")
+                        .param("sheet", SHEET))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    // 音频取整
+    public void testAudioFloor() throws Exception {
+        mvc.perform(multipart(URL)
+                        .file(audioFile)
+                        .param("params", PARAMS)
+                        .param("algName", "audio_floor")
+                        .param("sheet", SHEET))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    // 频域遮掩
+    public void testAudioSpec() throws Exception {
+        mvc.perform(multipart(URL)
+                        .file(audioFile)
+                        .param("params", PARAMS)
+                        .param("algName", "audio_spec")
+                        .param("sheet", SHEET))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    // 音频失真
+    public void testAudioAugmentation() throws Exception {
+        mvc.perform(multipart(URL)
+                        .file(audioFile)
+                        .param("params", PARAMS)
+                        .param("algName", "audio_augmentation")
+                        .param("sheet", SHEET))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    // 基于均值的采样点替换
+    public void testAudioMedian() throws Exception {
+        mvc.perform(multipart(URL)
+                        .file(audioFile)
+                        .param("params", PARAMS)
+                        .param("algName", "audio_median")
                         .param("sheet", SHEET))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link rel="shortcut icon" href="favicon.ico"> <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
     <link href="${ctx!}/css/animate.css" rel="stylesheet">
@@ -43,10 +44,10 @@
 <!-- 自定义js -->
 <script src="${ctx!}/js/content.js?v=1.0.0"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('l_diversity_distinct_fileUpload').addEventListener('change', handleFileSelectOfDistinct, {passive: false});
         document.getElementById('l_diversity_Distinct_submit').addEventListener('click', handleSubmitOfDistinct);
-        document.getElementById('prevPageOfDistinctInput').addEventListener('click', function(event) {
+        document.getElementById('prevPageOfDistinctInput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPageOfDistinct > 1) {
                 currentPageOfDistinct--;
@@ -54,7 +55,7 @@
                 updatePaginationOfDistinct();
             }
         });
-        document.getElementById('desensitizedPrevPageOfDistinctOutput').addEventListener('click', function(event) {
+        document.getElementById('desensitizedPrevPageOfDistinctOutput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPageOfDistinct > 1) {
                 currentDesensitizedPageOfDistinct--;
@@ -62,7 +63,7 @@
                 updateDesensitizedPaginationOfDistinct();
             }
         });
-        document.getElementById('nextPageOfDistinctInput').addEventListener('click', function(event) {
+        document.getElementById('nextPageOfDistinctInput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPageOfDistinct < PageCountOfDistinct) {
                 currentPageOfDistinct++;
@@ -70,7 +71,7 @@
                 updatePaginationOfDistinct();
             }
         });
-        document.getElementById('desensitizedNextPageOfDistinctOutput').addEventListener('click', function(event) {
+        document.getElementById('desensitizedNextPageOfDistinctOutput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPageOfDistinct < desensitizedPageCountOfDistinct) {
                 currentDesensitizedPageOfDistinct++;
@@ -78,7 +79,7 @@
                 updateDesensitizedPaginationOfDistinct();
             }
         });
-        document.getElementById('pageInputOfDistinctInput').addEventListener('input', function(event) {
+        document.getElementById('pageInputOfDistinctInput').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= PageCountOfDistinct) {
                 currentPageOfDistinct = page;
@@ -86,7 +87,7 @@
                 updatePaginationOfDistinct();
             }
         });
-        document.getElementById('desensitizedPageInputOfDistinctOutput').addEventListener('input', function(event) {
+        document.getElementById('desensitizedPageInputOfDistinctOutput').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= desensitizedPageCount) {
                 currentDesensitizedPage = page;
@@ -103,7 +104,7 @@
     let attributesOfDistinct = [];
     let PageCountOfDistinct = 1;
 
-    let currentDesensitizedPageOfDistinct= 1;
+    let currentDesensitizedPageOfDistinct = 1;
     let desensitizedDataOfDistinct = [];
     let desensitizedPageCountOfDistinct = 1;
 
@@ -111,7 +112,7 @@
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const text = e.target.result;
                 processCSVOfDistinct(text);
             };
@@ -121,7 +122,7 @@
 
     function processCSVOfDistinct(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 csvDataOfDistinct = results.data; // Get all rows including header
                 PageCountOfDistinct = Math.ceil((csvDataOfDistinct.length - 1) / rowsPerPageOfDistinct); // Exclude header row
                 displayTablePageOfDistinct(1);
@@ -134,7 +135,7 @@
 
     function parseDesensitizedCSVOfDistinct(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 desensitizedDataOfDistinct = results.data;
                 desensitizedPageCountOfDistinct = Math.ceil((desensitizedDataOfDistinct.length - 1) / rowsPerPageOfDistinct);
                 displayDesensitizedTablePageOfDistinct(1);
@@ -253,7 +254,6 @@
     }
 
 
-
     function handleSubmitOfDistinct(event) {
         event.preventDefault(); // Call preventDefault if needed
         const tableBody = document.getElementById('attributesTableOfDistinctInput').querySelector('tbody');
@@ -284,7 +284,16 @@
         fetch('/KAnonymity/LDiversity/Distinct', {
             method: 'POST',
             body: formData
-        }).then(response => response.blob()).then(blob => {
+        }).then(response => {
+            if (response.status === 500) {
+                // Handle server error
+                return response.text().then(failedMsg => {
+                    alert(failedMsg);
+                    throw new Error(failedMsg); // Throw an error to stop further processing
+                });
+            }
+            return response.blob();
+        }).then(blob => {
             parseDesensitizedCSVOfDistinct(blob);
             displayDesensitizedTablePageOfDistinct(1);
             document.getElementById('paginationContainerOfDistinctOutput').style.display = 'flex';
@@ -302,10 +311,10 @@
     }
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('l_diversity_entropy_fileUpload').addEventListener('change', handleFileSelect, {passive: false});
         document.getElementById('l_diversity_entropy_submit').addEventListener('click', handleSubmit);
-        document.getElementById('prevPage').addEventListener('click', function(event) {
+        document.getElementById('prevPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPage > 1) {
                 currentPage--;
@@ -313,7 +322,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedPrevPage').addEventListener('click', function(event) {
+        document.getElementById('desensitizedPrevPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPage > 1) {
                 currentDesensitizedPage--;
@@ -321,7 +330,7 @@
                 updateDesensitizedPagination();
             }
         });
-        document.getElementById('nextPage').addEventListener('click', function(event) {
+        document.getElementById('nextPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPage < PageCount) {
                 currentPage++;
@@ -329,7 +338,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedNextPage').addEventListener('click', function(event) {
+        document.getElementById('desensitizedNextPage').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPage < desensitizedPageCount) {
                 currentDesensitizedPage++;
@@ -337,7 +346,7 @@
                 updateDesensitizedPagination();
             }
         });
-        document.getElementById('pageInputEntropy').addEventListener('input', function(event) {
+        document.getElementById('pageInputEntropy').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= PageCount) {
                 currentPage = page;
@@ -345,7 +354,7 @@
                 updatePagination();
             }
         });
-        document.getElementById('desensitizedPageInput').addEventListener('input', function(event) {
+        document.getElementById('desensitizedPageInput').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= desensitizedPageCount) {
                 currentDesensitizedPage = page;
@@ -370,7 +379,7 @@
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const text = e.target.result;
                 processCSV(text);
             };
@@ -380,7 +389,7 @@
 
     function processCSV(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 csvData = results.data; // Get all rows including header
                 PageCount = Math.ceil((csvData.length - 1) / rowsPerPage); // Exclude header row
                 displayTablePage(1);
@@ -393,7 +402,7 @@
 
     function parseDesensitizedCSV(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 desensitizedData = results.data;
                 desensitizedPageCount = Math.ceil((desensitizedData.length - 1) / rowsPerPage);
                 displayDesensitizedTablePage(1);
@@ -512,7 +521,6 @@
     }
 
 
-
     function handleSubmit(event) {
         event.preventDefault(); // Call preventDefault if needed
         const tableBody = document.getElementById('attributesTable').querySelector('tbody');
@@ -543,11 +551,20 @@
         fetch('/KAnonymity/LDiversity/Entropy', {
             method: 'POST',
             body: formData
-        }).then(response => response.blob()).then(blob => {
-            parseDesensitizedCSV(blob);
-            displayDesensitizedTablePage(1);
-            document.getElementById('paginationContainerOutput').style.display = 'flex';
-            const url = window.URL.createObjectURL(blob);
+        }).then(response => {
+            if (response.status === 500) {
+                // Handle server error
+                return response.text().then(failedMsg => {
+                    alert(failedMsg);
+                    throw new Error(failedMsg); // Throw an error to stop further processing
+                });
+            }
+            return response.blob();
+        }).then(blob => {
+                parseDesensitizedCSV(blob);
+                displayDesensitizedTablePage(1);
+                document.getElementById('paginationContainerOutput').style.display = 'flex';
+                const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
@@ -558,14 +575,14 @@
             }).catch(error => {
                 console.error('Error:', error);
             });
-    }
+        }
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('l_diversity_RecursiveC_fileUpload').addEventListener('change', handleFileSelectOfRecursiveC, {passive: false});
         document.getElementById('l_diversity_RecursiveC_submit').addEventListener('click', handleSubmitOfRecursiveC);
-        document.getElementById('prevPageOfRecursiveCInput').addEventListener('click', function(event) {
+        document.getElementById('prevPageOfRecursiveCInput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPageOfRecursiveC > 1) {
                 currentPageOfRecursiveC--;
@@ -573,7 +590,7 @@
                 updatePaginationOfRecursiveC();
             }
         });
-        document.getElementById('desensitizedPrevPageOfRecursiveCOutput').addEventListener('click', function(event) {
+        document.getElementById('desensitizedPrevPageOfRecursiveCOutput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPageOfRecursiveC > 1) {
                 currentDesensitizedPageOfRecursiveC--;
@@ -581,7 +598,7 @@
                 updateDesensitizedPaginationOfRecursiveC();
             }
         });
-        document.getElementById('nextPageOfRecursiveCInput').addEventListener('click', function(event) {
+        document.getElementById('nextPageOfRecursiveCInput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentPageOfRecursiveC < PageCountOfRecursiveC) {
                 currentPageOfRecursiveC++;
@@ -589,7 +606,7 @@
                 updatePaginationOfRecursiveC();
             }
         });
-        document.getElementById('desensitizedNextPageOfRecursiveCOutput').addEventListener('click', function(event) {
+        document.getElementById('desensitizedNextPageOfRecursiveCOutput').addEventListener('click', function (event) {
             event.preventDefault();
             if (currentDesensitizedPageOfRecursiveC < desensitizedPageCountOfRecursiveC) {
                 currentDesensitizedPageOfRecursiveC++;
@@ -597,7 +614,7 @@
                 updateDesensitizedPaginationOfRecursiveC();
             }
         });
-        document.getElementById('pageInputOfRecursiveCInput').addEventListener('input', function(event) {
+        document.getElementById('pageInputOfRecursiveCInput').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= PageCountOfRecursiveC) {
                 currentPageOfRecursiveC = page;
@@ -605,7 +622,7 @@
                 updatePaginationOfRecursiveC();
             }
         });
-        document.getElementById('desensitizedPageInputOfRecursiveCOutput').addEventListener('input', function(event) {
+        document.getElementById('desensitizedPageInputOfRecursiveCOutput').addEventListener('input', function (event) {
             const page = parseInt(event.target.value);
             if (!isNaN(page) && page >= 1 && page <= desensitizedPageCount) {
                 currentDesensitizedPage = page;
@@ -630,7 +647,7 @@
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const text = e.target.result;
                 processCSVOfRecursiveC(text);
             };
@@ -640,7 +657,7 @@
 
     function processCSVOfRecursiveC(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 csvDataOfRecursiveC = results.data; // Get all rows including header
                 PageCountOfRecursiveC = Math.ceil((csvDataOfRecursiveC.length - 1) / rowsPerPageOfRecursiveC); // Exclude header row
                 displayTablePageOfRecursiveC(1);
@@ -653,7 +670,7 @@
 
     function parseDesensitizedCSVOfRecursiveC(csvText) {
         Papa.parse(csvText, {
-            complete: function(results) {
+            complete: function (results) {
                 desensitizedDataOfRecursiveC = results.data;
                 desensitizedPageCountOfRecursiveC = Math.ceil((desensitizedDataOfRecursiveC.length - 1) / rowsPerPageOfRecursiveC);
                 displayDesensitizedTablePageOfRecursiveC(1);
@@ -772,7 +789,6 @@
     }
 
 
-
     function handleSubmitOfRecursiveC(event) {
         event.preventDefault(); // Call preventDefault if needed
         const tableBody = document.getElementById('attributesTableOfRecursiveCInput').querySelector('tbody');
@@ -803,7 +819,16 @@
         fetch('/KAnonymity/LDiversity/RecursiveC', {
             method: 'POST',
             body: formData
-        }).then(response => response.blob()).then(blob => {
+        }).then(response => {
+            if (response.status === 500) {
+                // Handle server error
+                return response.text().then(failedMsg => {
+                    alert(failedMsg);
+                    throw new Error(failedMsg); // Throw an error to stop further processing
+                });
+            }
+            return response.blob();
+        }).then(blob => {
             parseDesensitizedCSVOfRecursiveC(blob);
             displayDesensitizedTablePageOfRecursiveC(1);
             document.getElementById('paginationContainerOfRecursiveCOutput').style.display = 'flex';
@@ -824,8 +849,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">7. L-多样性 Distinct-L-diversity</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                7. L-多样性 Distinct-L-diversity</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对csv文件进行l-多样性 Distinct-l-diversity 处理
@@ -839,8 +866,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class="<#--col-sm-5 m-b-xs d-flex--> align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="l_diversity_distinct_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="l_diversity_distinct_fileUpload" style="display: none;">
                                 <label for="l_diversity_distinct_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -848,15 +875,15 @@
                         </div>
                     </div>
                     <!--文件上传信息-->
-                    <div id = "fileInfo">
+                    <div id="fileInfo">
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;  margin-bottom: 20px;">
-                        <div style="margin: auto; font-size: 20px" >
+                        <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="l_diversity_distinct_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -876,12 +903,14 @@
                             <nav aria-label="Page navigation">
                                 <ul class="pagination justify-content-center" id="paginationOfDistinctInput">
                                     <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Previous" id="prevPageOfDistinctInput">
+                                        <a class="page-link" href="#" aria-label="Previous"
+                                           id="prevPageOfDistinctInput">
                                             <span aria-hidden="true">&laquo;</span>
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="pageInputOfDistinctInput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="pageInputOfDistinctInput" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="nextPageOfDistinctInput">
@@ -923,15 +952,18 @@
                             <nav aria-label="Page navigation">
                                 <ul class="pagination" id="desensitizedPaginationOfDistinctOutput">
                                     <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Previous" id="desensitizedPrevPageOfDistinctOutput">
+                                        <a class="page-link" href="#" aria-label="Previous"
+                                           id="desensitizedPrevPageOfDistinctOutput">
                                             <span aria-hidden="true">&laquo;</span>
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="desensitizedPageInputOfDistinctOutput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="desensitizedPageInputOfDistinctOutput"
+                                               class="form-control" style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Next" id="desensitizedNextPageOfDistinctOutput">
+                                        <a class="page-link" href="#" aria-label="Next"
+                                           id="desensitizedNextPageOfDistinctOutput">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>
@@ -941,7 +973,8 @@
                     </div>
 
                     <div class="btn2" style="text-align: center;">
-                        <button type="button" class="btn btn-sm btn-primary" id="l_diversity_Distinct_submit">提交脱敏</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="l_diversity_Distinct_submit">提交脱敏
+                        </button>
                     </div>
                 </div>
             </div>
@@ -954,8 +987,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">8. L-多样性 Entropy-L-diversity</p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                8. L-多样性 Entropy-L-diversity</p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对csv文件进行l-多样性 Entropy-l-diversity 处理
@@ -969,8 +1004,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class="<#--col-sm-5 m-b-xs d-flex--> align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="l_diversity_entropy_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="l_diversity_entropy_fileUpload" style="display: none;">
                                 <label for="l_diversity_entropy_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -978,15 +1013,15 @@
                         </div>
                     </div>
                     <!--文件上传信息-->
-                    <div id = "fileInfo">
+                    <div id="fileInfo">
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;  margin-bottom: 20px;">
-                        <div style="margin: auto; font-size: 20px" >
+                        <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="l_diversity_entropy_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -1011,7 +1046,8 @@
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="pageInputEntropy" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="pageInputEntropy" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="nextPage">
@@ -1058,7 +1094,8 @@
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="desensitizedPageInput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="desensitizedPageInput" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="desensitizedNextPage">
@@ -1071,7 +1108,8 @@
                     </div>
 
                     <div class="btn2" style="text-align: center;">
-                        <button type="button" class="btn btn-sm btn-primary" id="l_diversity_entropy_submit"> 提交脱敏</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="l_diversity_entropy_submit"> 提交脱敏
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1084,8 +1122,10 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">9 L-多样性 Recursive-C- l-diversity </p>
-            <div <#--class="col-sm-6"--> style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
+            <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
+                9 L-多样性 Recursive-C- l-diversity </p>
+            <div <#--class="col-sm-6"-->
+                    style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
                         说明：对csv文件进行l-多样性 Recursive-C- l-diversity 处理
@@ -1099,8 +1139,8 @@
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
                     <div class="midtile">
                         <div class="<#--col-sm-5 m-b-xs d-flex--> align-items-center">
-                            <form id = "uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                <input type="file" id="l_diversity_RecursiveC_fileUpload"  style="display: none;">
+                            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                                <input type="file" id="l_diversity_RecursiveC_fileUpload" style="display: none;">
                                 <label for="l_diversity_RecursiveC_fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
@@ -1108,15 +1148,15 @@
                         </div>
                     </div>
                     <!--文件上传信息-->
-                    <div id = "fileInfo">
+                    <div id="fileInfo">
                     </div>
                     <div <#--class="ibox-content"--> style="text-align: center;  margin-bottom: 20px;">
-                        <div style="margin: auto; font-size: 20px" >
+                        <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="l_diversity_RecursiveC_privacyLevel">
-                                <option value="0"> 低程度 </option>
-                                <option value="1" selected> 中程度 </option>
-                                <option value="2"> 高程度 </option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -1136,12 +1176,14 @@
                             <nav aria-label="Page navigation">
                                 <ul class="pagination justify-content-center" id="paginationOfRecursiveCInput">
                                     <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Previous" id="prevPageOfRecursiveCInput">
+                                        <a class="page-link" href="#" aria-label="Previous"
+                                           id="prevPageOfRecursiveCInput">
                                             <span aria-hidden="true">&laquo;</span>
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="pageInputOfRecursiveCInput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="pageInputOfRecursiveCInput" class="form-control"
+                                               style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
                                         <a class="page-link" href="#" aria-label="Next" id="nextPageOfRecursiveCInput">
@@ -1183,15 +1225,18 @@
                             <nav aria-label="Page navigation">
                                 <ul class="pagination" id="desensitizedPaginationOfRecursiveCOutput">
                                     <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Previous" id="desensitizedPrevPageOfRecursiveCOutput">
+                                        <a class="page-link" href="#" aria-label="Previous"
+                                           id="desensitizedPrevPageOfRecursiveCOutput">
                                             <span aria-hidden="true">&laquo;</span>
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <input type="number" id="desensitizedPageInputOfRecursiveCOutput" class="form-control" style="width: 70px; display: inline-block;" min="1">
+                                        <input type="number" id="desensitizedPageInputOfRecursiveCOutput"
+                                               class="form-control" style="width: 70px; display: inline-block;" min="1">
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Next" id="desensitizedNextPageOfRecursiveCOutput">
+                                        <a class="page-link" href="#" aria-label="Next"
+                                           id="desensitizedNextPageOfRecursiveCOutput">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>
@@ -1201,7 +1246,9 @@
                     </div>
 
                     <div class="btn2" style="text-align: center;">
-                        <button type="button" class="btn btn-sm btn-primary" id="l_diversity_RecursiveC_submit">提交脱敏</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="l_diversity_RecursiveC_submit">
+                            提交脱敏
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1219,37 +1266,45 @@
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable {
         width: max-content;
         margin: 0 auto;
     }
+
     #paginationInfo {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo input {
         width: 5em;
         text-align: center;
     }
+
     /* 设置表格样式 */
     #dataTableContainer1 {
         width: 100%;
         overflow-x: auto;
     }
+
     #dataTable1 {
         width: max-content;
         margin: 0 auto;
     }
+
     #paginationInfo1 {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     #paginationInfo1 input {
         width: 5em;
         text-align: center;
     }
+
     /*标题*/
     .ibox-title {
         height: 200px;
@@ -1262,14 +1317,15 @@
     }
 
     /*选择框居中*/
-    .midtile{
+    .midtile {
         line-height: 30px;
         text-align: center;
-        display:flex;
+        display: flex;
         justify-content: center;
     }
+
     /*上传按钮*/
-    .upload-btn, #l_diversity_Distinct_submit, #l_diversity_entropy_submit, #l_diversity_RecursiveC_submit{
+    .upload-btn, #l_diversity_Distinct_submit, #l_diversity_entropy_submit, #l_diversity_RecursiveC_submit {
         background-color: #347aa9;
         color: white;
         cursor: pointer;
@@ -1279,21 +1335,26 @@
         display: inline-block;
         margin: 30px;
     }
+
     table, th, td {
         border: 1px solid black;
         border-collapse: collapse;
     }
+
     th, td {
         padding: 8px;
         text-align: left;
     }
+
     .fixed-width {
         width: 200px;
     }
+
     .table-container {
         display: flex;
         justify-content: center;
     }
+
     .pagination-container {
         display: none;
         justify-content: center;

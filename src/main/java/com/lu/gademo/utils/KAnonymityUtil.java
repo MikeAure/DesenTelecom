@@ -7,13 +7,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
 import org.deidentifier.arx.*;
 import org.deidentifier.arx.AttributeType.Hierarchy;
 import org.deidentifier.arx.criteria.*;
 import org.deidentifier.arx.io.CSVHierarchyInput;
 import org.deidentifier.arx.metric.Metric;
 
-
+@Slf4j
 public class KAnonymityUtil {
 
     public static Data createData(final String dataset, String dir) throws IOException {
@@ -56,7 +57,10 @@ public class KAnonymityUtil {
                 break;
             }
         }
-        config.addPrivacyModel(new KAnonymity(level * length / 10));
+
+        int k = (level * length / 10) <= 1 ? 2 : level * length / 10;
+        log.info("k = {}", k);
+        config.addPrivacyModel(new KAnonymity(k));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
@@ -70,18 +74,21 @@ public class KAnonymityUtil {
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        int level = 2;
+        int level = 8;
         switch (params) {
             case "1": {
-                level = 4;
+                level = 10;
                 break;
             }
             case "2": {
-                level = 8;
+                level = 16;
                 break;
             }
         }
-        config.addPrivacyModel(new DistinctLDiversity(attribute, length * level / 10));
+
+        int l = length * level / 10;
+        log.info("l = {}", l);
+        config.addPrivacyModel(new DistinctLDiversity(attribute, l));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
@@ -95,18 +102,20 @@ public class KAnonymityUtil {
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        double level = 2;
+        double level = 8;
         switch (params) {
             case "1": {
-                level = 4;
+                level = 10;
                 break;
             }
             case "2": {
-                level = 8;
+                level = 16;
                 break;
             }
         }
-        config.addPrivacyModel(new EntropyLDiversity(attribute, length * level / 10));
+        double l = length * level / 10;
+        log.info("l = {}", l);
+        config.addPrivacyModel(new EntropyLDiversity(attribute, l));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
@@ -120,18 +129,20 @@ public class KAnonymityUtil {
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        double level = 2;
+        double level = 8;
         switch (params) {
             case "1": {
-                level = 4;
+                level = 10;
                 break;
             }
             case "2": {
-                level = 8;
+                level = 16;
                 break;
             }
         }
-        config.addPrivacyModel(new RecursiveCLDiversity(attribute, length * level / 10, 2));
+        double c = length * level / 10;
+        log.info("c = {}, l = 2", c);
+        config.addPrivacyModel(new RecursiveCLDiversity(attribute, c, 2));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
@@ -145,18 +156,21 @@ public class KAnonymityUtil {
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        int level = 2;
+        double level = 0.4;
         switch (params) {
             case "1": {
-                level = 4;
+                level = 0.2;
                 break;
             }
             case "2": {
-                level = 8;
+                level = 0.1;
                 break;
             }
         }
-        config.addPrivacyModel(new EqualDistanceTCloseness(attribute, length * (1 - level / 10.0)));
+//        double t = length * (1 - level / 10.0);
+        double t = level;
+        log.info("t = {}", t);
+        config.addPrivacyModel(new EqualDistanceTCloseness(attribute, t));
         config.setSuppressionLimit(0.04d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);

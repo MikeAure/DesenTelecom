@@ -34,9 +34,9 @@
         window.onload = function () {
             document.getElementById("passReplace_submitBtn").addEventListener("click", function () {
                 let textInput = $("#passReplace_textInput").val();
-                var textType = "name"
-                var algName = "passReplace"
-                var privacyLevel = 1
+                let textType = "name"
+                let algName = "passReplace"
+                let privacyLevel = $("#passReplace_privacyLevel").val();
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -86,9 +86,9 @@
             })
             document.getElementById("SHA512_submitBtn").addEventListener("click", function () {
                 let textInput = $("#SHA512_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "SHA512"
+                let privacyLevel = $("#SHA512_privacyLevel").val();
+                let textType = "password";
+                let algName = "SHA512";
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -112,9 +112,9 @@
             })
             document.getElementById("value_hide_submitBtn").addEventListener("click", function () {
                 let textInput = $("#value_hide_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "value_hide"
+                let privacyLevel = $("#value_hide_privacyLevel").val();
+                let textType = "address";
+                let algName = "value_hide";
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -138,7 +138,7 @@
             })
             document.getElementById("valueMapping_submitBtn").addEventListener("click", function () {
                 let textInput = $("#valueMapping_input").val();
-                var privacyLevel = 1
+                var privacyLevel = $("#valueMapping_privacyLevel").val();
                 var textType = "address"
                 var algName = "valueMapping"
                 if (textInput === "") {
@@ -164,7 +164,7 @@
             })
             document.getElementById("numberHide_submitBtn").addEventListener("click", function () {
                 let textInput = $("#numberHide_textInput").val();
-                let privacyLevel = 1
+                let privacyLevel = $("#numberHide_privacyLevel").val();
                 let textType = "number"
                 let algName = "numberHide"
                 if (textInput === "") {
@@ -192,7 +192,7 @@
                 let textInput = $("#nameHide_textInput").val();
                 let textType = "name"
                 let algName = "nameHide"
-                let privacyLevel = 1
+                let privacyLevel = $("#nameHide_privacyLevel").val();
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -216,9 +216,9 @@
             })
             document.getElementById("suppressEmail_submitBtn").addEventListener("click", function () {
                 let textInput = $("#suppressEmail_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "suppressEmail"
+                let privacyLevel = $("#suppressEmail_privacyLevel").val();
+                let textType = "email";
+                let algName = "suppressEmail";
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -242,9 +242,9 @@
             })
             document.getElementById("suppressAllIp_submitBtn").addEventListener("click", function () {
                 let textInput = $("#suppressAllIp_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "suppressAllIp"
+                let privacyLevel = $("#suppressAllIp_privacyLevel").val();
+                let textType = "ip"
+                let algName = "suppressAllIp"
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -268,9 +268,9 @@
             })
             document.getElementById("suppressIpRandomParts_submitBtn").addEventListener("click", function () {
                 let textInput = $("#suppressIpRandomParts_input").val();
-                var privacyLevel = 1
-                var textType = "address"
-                var algName = "suppressIpRandomParts"
+                let privacyLevel = $("#suppressIpRandomParts_privacyLevel").val();
+                let textType = "address"
+                let algName = "suppressIpRandomParts"
                 if (textInput === "") {
                     alert("请输入文本");
                     return; // Stop further execution if the text input is empty
@@ -318,6 +318,16 @@
                         输出：字符串
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="value_hide_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
@@ -438,6 +448,16 @@
                         输出：字符串
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="SHA512_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
@@ -492,6 +512,16 @@
                         输出：数值
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="valueMapping_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
@@ -539,6 +569,16 @@
                         输出：字符串
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="passReplace_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="container">
@@ -586,6 +626,16 @@
                         输出：字符串
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="nameHide_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="container">
@@ -632,8 +682,17 @@
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：字符串
                     </p>
-
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="numberHide_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="container">
@@ -680,6 +739,16 @@
                         输出：邮箱地址
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="suppressEmail_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
@@ -726,6 +795,16 @@
                         输出：IP地址
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="suppressAllIp_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
@@ -772,6 +851,16 @@
                         输出：IP地址
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            请选择隐私保护等级
+                            <select id="suppressIpRandomParts_privacyLevel">
+                                <option value="1"> 低程度</option>
+                                <option value="2" selected> 中程度</option>
+                                <option value="3"> 高程度</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">

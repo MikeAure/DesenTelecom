@@ -2,6 +2,7 @@ package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.DpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -18,11 +19,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Component
@@ -128,7 +127,7 @@ public class DpUtilImpl implements DpUtil {
             int start = i * k;
             int end = Math.min((i + 1) * k, array.size());
             int nextEnd = Math.min((i + 2) * k, array.size());
-            if ((nextEnd - end) < k ) {
+            if ((nextEnd - end) < k) {
                 end = nextEnd;
             }
             Double min = entries.get(start).getValue();
@@ -632,132 +631,191 @@ public class DpUtilImpl implements DpUtil {
         return newAddrs;
     }
 
-    private String dealAddress(String addr, int privacyLevel) {
-        if (addr != null && !addr.isEmpty()) {
-            int length = addr.length();
-            StringBuilder newAddr = new StringBuilder();
+//    private String dealAddress(String addr, int privacyLevel) {
+////        log.info("Address: {}", addr);
+//        if (addr != null && !addr.isEmpty()) {
+//            int length = addr.length();
+//            StringBuilder newAddr = new StringBuilder();
+//
+//            if (addr.contains("省")) {
+//                int index = addr.indexOf("省");
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 3) {
+//                    return newAddr.toString();
+//                }
+//                index = addr.indexOf("市");
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 2) {
+//                    return newAddr.toString();
+//                }
+//                index = addr.indexOf("区");
+//                if (index == -1) {
+//                    index = addr.indexOf("县");
+//                }
+//                if (index == -1) {
+//                    index = addr.indexOf("市");
+//                }
+//                newAddr.append(addr, 0, index + 1);
+//                return newAddr.toString();
+//
+//            } else if (addr.contains("自治区")) {
+//                int index = addr.indexOf("自治区") + 2;
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 3) {
+//                    return newAddr.toString();
+//                }
+//                index = addr.indexOf("市");
+//                if (index == -1) {
+//                    index = addr.indexOf("盟");
+//                }
+//                if (index == -1) {
+//                    if (addr.contains("地区")) {
+//                        index = addr.indexOf("地区") + 1;
+//                    } else if (addr.contains("自治州")) {
+//                        index = addr.indexOf("自治州") + 2;
+//                    }
+//                }
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 2) {
+//                    return newAddr.toString();
+//                }
+//                index = addr.indexOf("县");
+//                if (index == -1) {
+//                    index = addr.indexOf("旗");
+//                }
+//                if (index == -1) {
+//                    index = addr.indexOf("区");
+//                }
+//                if (index == -1) {
+//                    index = addr.indexOf("市");
+//                }
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 1) {
+//                    return newAddr.toString();
+//                }
+//            } else if (addr.contains("北京") || addr.contains("上海") || addr.contains("重庆") || addr.contains("天津")) {
+//                int index = addr.indexOf("市");
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 3) {
+//                    return newAddr.toString();
+//                }
+//                index = addr.indexOf("县");
+//                if (index == -1) {
+//                    index = addr.indexOf("区");
+//                }
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 2) {
+//                    return newAddr.toString();
+//                }
+//                index = addr.indexOf("道");
+//                if (index == -1) {
+//                    index = addr.indexOf("镇");
+//                }
+//                if (index == -1) {
+//                    index = addr.indexOf("乡");
+//                }
+//                newAddr.append(addr, 0, index + 1);
+//                return newAddr.toString();
+//            } else if (addr.contains("特别行政区") || addr.contains("香港") || addr.contains("澳门")) {
+//                int index = -1;
+//                if (addr.contains("特别行政区")) {
+//                    index = addr.indexOf("特别行政区") + 4;
+//                } else if (addr.contains("香港")) {
+//                    index = addr.indexOf("香港") + 1;
+//                } else if (addr.contains("澳门")) {
+//                    index = addr.indexOf("澳门") + 1;
+//                }
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 3) {
+//                    return newAddr.toString();
+//                }
+//                index = addr.indexOf("区");
+//                newAddr.append(addr, 0, index + 1);
+//                addr = addr.substring(index + 1);
+//                if (privacyLevel == 2) {
+//                    return newAddr.toString();
+//                }
+//                if (addr.contains("街道")) {
+//                    index = addr.indexOf("街道") + 1;
+//                } else if (addr.contains("道")) {
+//                    index = addr.indexOf("道");
+//                } else {
+//                    index = -1;
+//                }
+//                newAddr.append(addr, 0, index + 1);
+//                if (privacyLevel == 1) {
+//                    return newAddr.toString();
+//                }
+//            }
+//            return newAddr.toString();
+//        }
+//        return addr;
+//    }
+private String dealAddress(String addr, int privacyLevel) {
+//        log.info("Address: {}", addr);
+    String regex = "(?<province>[^省市]+省|[^自治区]+自治区|[^澳门]+澳门|[^香港]+香港|[^特别行政区]+特别行政区)?" +
+            "(?<city>[^自治州特别行政区]+自治州|[^市地区行政单位]+市|[^道]+地区|[^道]+行政单位|[^盟]+盟|[^县]+县)?" +
+            "(?<county>[^县市镇区乡]+县|[^市镇区]+市|[^镇区]+镇|[^区]+区|[^乡]+乡|[^场]+场|[^旗]+旗|[^海域]+海域|[^岛]+岛|[^道]+道|[^街道]+街道)?(?<address>.*)";
+    Matcher m = Pattern.compile(regex).matcher(addr);
+    String province;
+    String city;
+    String county;
+    String detailAddress;
+    Map<String,String> map = new LinkedHashMap<>(16);
 
-            if (addr.contains("省")) {
-                int index = addr.indexOf("省");
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 3) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("市");
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 2) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("区");
-                if (index == -1) {
-                    index = addr.indexOf("县");
-                }
-                if (index == -1) {
-                    index = addr.indexOf("市");
-                }
-                newAddr.append(addr, 0, index + 1);
-                return newAddr.toString();
-
-            } else if (addr.contains("自治区")) {
-                int index = addr.indexOf("自治区") + 2;
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 3) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("市");
-                if (index == -1) {
-                    index = addr.indexOf("盟");
-                }
-                if (index == -1) {
-                    if (addr.contains("地区")) {
-                        index = addr.indexOf("地区") + 1;
-                    } else if (addr.contains("自治州")) {
-                        index = addr.indexOf("自治州") + 2;
-                    }
-                }
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 2) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("县");
-                if (index == -1) {
-                    index = addr.indexOf("旗");
-                }
-                if (index == -1) {
-                    index = addr.indexOf("区");
-                }
-                if (index == -1) {
-                    index = addr.indexOf("市");
-                }
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 1) {
-                    return newAddr.toString();
-                }
-            } else if (addr.contains("特别行政区") || addr.contains("香港") || addr.contains("澳门")) {
-                int index = -1;
-                if (addr.contains("特别行政区")) {
-                    index = addr.indexOf("特别行政区") + 4;
-                } else if (addr.contains("香港")) {
-                    index = addr.indexOf("香港") + 1;
-                } else if (addr.contains("澳门")) {
-                    index = addr.indexOf("澳门") + 1;
-                }
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 3) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("区");
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 2) {
-                    return newAddr.toString();
-                }
-                if (addr.contains("街道")) {
-                    index = addr.indexOf("街道") + 1;
-                } else if (addr.contains("道")) {
-                    index = addr.indexOf("道");
-                }
-                newAddr.append(addr, 0, index + 1);
-                if (privacyLevel == 1) {
-                    return newAddr.toString();
-                }
-            } else if (addr.contains("北京") || addr.contains("上海") || addr.contains("重庆") || addr.contains("天津")) {
-                int index = addr.indexOf("市");
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 3) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("县");
-                if (index == -1) {
-                    index = addr.indexOf("区");
-                }
-                newAddr.append(addr, 0, index + 1);
-                addr = addr.substring(index + 1);
-                if (privacyLevel == 2) {
-                    return newAddr.toString();
-                }
-                index = addr.indexOf("道");
-                if (index == -1) {
-                    index = addr.indexOf("镇");
-                }
-                if (index == -1) {
-                    index = addr.indexOf("乡");
-                }
-                newAddr.append(addr, 0, index + 1);
-                return newAddr.toString();
-            }
-            return newAddr.toString();
-        }
-        return addr;
+    if (m.matches()) {
+        //加入省
+        province = m.group("province");
+        map.put("province", province == null ? "" : province.trim());
+        //加入市
+        city = m.group("city");
+        map.put("city", city == null ? "" : city.trim());
+        //加入区
+        county = m.group("county");
+        map.put("county", county == null ? "" : county.trim());
+        //详细地址
+        detailAddress = m.group("address");
+        map.put("address", detailAddress == null ? "" : detailAddress.trim());
+    } else {
+        return "";
     }
+//    System.out.println(map);
+    int count = 0;
+    int total = 0;
+    for (Map.Entry<String, String> item : map.entrySet()) {
+        if (StringUtils.isNotBlank(item.getValue())) {
+            total ++;
+        }
+    }
+//    System.out.println("Total: " + total);
+    if (privacyLevel == 3) {
+        count = Math.max(total - 3, 1);
+    } else if (privacyLevel == 2) {
+        count = Math.max(total - 2, 1);
+    } else if (privacyLevel == 1) {
+        count = Math.max(total - 1, 1);
+    }
+    StringBuilder resultBuilder = new StringBuilder();
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+        if (StringUtils.isNotBlank(entry.getValue())) {
+            resultBuilder.append(entry.getValue());
+            count --;
+        }
+        if (count == 0) {
+            break;
+        }
+    }
+    return resultBuilder.toString();
 
+}
     @Override
     public List<String> desenAddressName(List<Object> addrs, Integer privacyLevel, String name) {
         // 取数据
@@ -941,7 +999,10 @@ public class DpUtilImpl implements DpUtil {
                 newDate.add(null);
             } else {
                 double noise = ld.sample();//随机采样一个拉普拉斯分布值
-                double noiseTuncation = Math.round(noise * 1000) / 1000.0;
+                double noiseTruncation = Math.round(noise * 1000) / 1000.0;
+                if (i < 10) {
+                    log.info("Element {} Noise: {}", i, noiseTruncation);
+                }
                 Long scaledNoise = (long) (noise * 86400000);
                 String[] s = String.valueOf(noise).split("\\.");
                 String day = s[0];

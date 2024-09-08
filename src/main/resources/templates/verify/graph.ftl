@@ -32,6 +32,7 @@
             background-color: #25A5F7;
             border-radius: 3px;
         }
+
         /*标题*/
         /*.ibox-title {*/
         /*    height: 200px;*/
@@ -113,11 +114,11 @@
             justify-content: center;
         }
     </style>
-<#--    <script type="text/javascript">-->
-<#--        window._AMapSecurityConfig = {-->
-<#--            securityJsCode: "919c4ab28e79692cb9fac5abcb3ae1b0",-->
-<#--        };-->
-<#--    </script>-->
+    <#--    <script type="text/javascript">-->
+    <#--        window._AMapSecurityConfig = {-->
+    <#--            securityJsCode: "919c4ab28e79692cb9fac5abcb3ae1b0",-->
+    <#--        };-->
+    <#--    </script>-->
 
     <script type="text/javascript">
         window._AMapSecurityConfig = {
@@ -128,8 +129,8 @@
     <script src="${ctx!}/js/jquery.min.js?v=2.1.4"></script>
     <script src="${ctx!}/js/bootstrap.min.js?v=3.3.6"></script>
     <script src="${ctx!}/js/xlsx.full.min.js"></script>
-<#--    <script type="text/javascript"-->
-<#--            src="https://webapi.amap.com/maps?v=1.4.15&key=9017e2042639d8873323dcd7d7539611&plugin=AMap.PlaceSearch"></script>-->
+    <#--    <script type="text/javascript"-->
+    <#--            src="https://webapi.amap.com/maps?v=1.4.15&key=9017e2042639d8873323dcd7d7539611&plugin=AMap.PlaceSearch"></script>-->
     <script type="text/javascript"
             src="https://webapi.amap.com/maps?v=1.4.15&key=3ec301cfc0baed14e8a4c2d1b61b1706&plugin=AMap.PlaceSearch"></script>
     <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
@@ -164,9 +165,31 @@
                     body: '&rawData=' + encodeURIComponent(inputText)
 
                 })
-                    .then(response => response.text())
+                    .then(response => {
+                        if (response.status === 500) {
+                            // Handle server error
+                            return response.text().then(failedMsg => {
+                                alert(failedMsg);
+                                throw new Error(failedMsg); // Throw an error to stop further processing
+                            });
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        document.getElementById("outputText").value = data;
+                        document.getElementById("outputText").value = data.message.result;
+                        // 获取data.message中的值
+                        let encryptedMessage = data.message.kdTree;
+                        // 创建一个blob对象，将数据存入blob
+                        let blob = new Blob([encryptedMessage], {type: 'text/plain'});
+                        // 创建一个链接对象
+                        let link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        // 设置下载文件的名字
+                        link.download = Date.now() + 'KDTree.txt';
+                        // 触发点击事件下载文件
+                        link.click();
+                        // 释放URL对象
+                        window.URL.revokeObjectURL(link.href);
                     })
                     .catch(error => console.error('Error:', error));
 
@@ -192,139 +215,225 @@
             return map;
         }
 
-        function displayTrack(e, map, outlineColor = '#f50b0b', strokeColor = 'red', markerImage = default_marker_image, windowContent="原始轨迹") {
+        // function displayTrack(e, map, outlineColor = '#f50b0b', strokeColor = 'red', markerImage = default_marker_image, windowContent = "原始轨迹") {
+        //     const content = e.target.result;
+        //
+        //     // 使用PlaceSearch类来获取POI信息
+        //     const placeSearch = new AMap.PlaceSearch({
+        //         /* city: 'beijing', // 兴趣点城市*/
+        //         pageSize: 1,
+        //         pageIndex: 1,
+        //         children: 0, //不展示子节点数据
+        //         extensions: 'base' //返回基本地址信息
+        //         //map: map
+        //     });
+        //     // 将文件内容分割成行
+        //     const lines = content.split('\n');
+        //     console.log("Total line number:" + lines.length);
+        //     let index = Math.floor(Math.random() * lines.length);
+        //     console.log("Line index: " + index);
+        //     // 随机获取一行数据
+        //     let raw_line = lines[index];
+        //     console.log("Line:", raw_line);
+        //     // 分割原始轨迹每个点
+        //     let raw_points = raw_line.split(';');
+        //     // 去除数组中的空字符串元素
+        //     raw_points = raw_points.filter(item => item.trim() !== '');
+        //     console.log("raw_points length: " + raw_points.length);
+        //     // 保存原路径节点经纬度
+        //     let raw_path = []
+        //
+        //     let promises = raw_points.map(point => {
+        //         return new Promise((resolve, reject) => {
+        //             let [poiId, attributes] = point.split(',');
+        //             placeSearch.getDetails(poiId, function (status, result) {
+        //                 if (status === 'complete' && result.info === 'OK') {
+        //                     // if (result.poiList.pois && result.poiList.pois.length > 0) {
+        //                     //     let location = result.poiList.pois[0].location;
+        //                     //     console.log(result.poiList.pois[0])
+        //                     //     console.log(location.lng + " " + location.lat)
+        //                     //     resolve([location.lng, location.lat]);
+        //                     // } else {
+        //                     //     console.log("选取的该行POI没有位置数据");
+        //                     //     reject("选取的该行POI没有位置数据");
+        //                     // }
+        //                     let location = result.poiList.pois[0].location;
+        //                     console.log(result.poiList.pois[0])
+        //                     console.log(location.lng + " " + location.lat)
+        //                     resolve([location.lng, location.lat]);
+        //
+        //                 } else {
+        //                     console.log("获取POI信息失败，POI ID:" + poiId);
+        //                 }
+        //             });
+        //         });
+        //     });
+        //
+        //     // 使用Promise.all等待所有的Promise都完成
+        //     Promise.all(promises).then(raw_path => {
+        //         for (let [lng, lat] of raw_path) {
+        //             let marker = new AMap.Marker({
+        //                 icon: markerImage,
+        //                 position: [lng, lat],
+        //                 offset: new AMap.Pixel(-13, -30)
+        //             });
+        //             marker.setMap(map)
+        //         }
+        //
+        //         // 创建折线实例
+        //         let polyline = new AMap.Polyline({
+        //             path: raw_path,         // 折线的路径，`desen_path` 应该是包含经纬度坐标的数组
+        //             isOutline: true,         // 是否显示折线的轮廓线
+        //             outlineColor: outlineColor, // 轮廓线颜色
+        //             borderWeight: 1,         // 轮廓线宽度
+        //             strokeColor: strokeColor,     // 折线颜色
+        //             strokeOpacity: 1,        // 折线透明度，范围 [0, 1]
+        //             strokeWeight: 6,         // 折线宽度
+        //             strokeStyle: "solid",    // 折线样式，可选值："solid"（实线）、"dashed"（虚线）、"dotted"（点线）
+        //             strokeDasharray: [10, 5], // 虚线样式，数组中的数字表示虚线和空白段的长度
+        //             lineJoin: 'round',       // 折线交汇处的连接方式，可选值："round"、"bevel"、"miter"
+        //             lineCap: 'round',        // 折线两端的线帽样式，可选值："butt"、"round"、"square"
+        //             zIndex: 50,              // 折线的层级
+        //         });
+        //
+        //         // 将折线添加至地图实例
+        //         polyline.setMap(map);
+        //         // 选择折线的第一个点作为信息窗体的位置
+        //         let infoWindowPosition = raw_path[0];
+        //         // 创建信息窗体
+        //         let infoWindow = new AMap.InfoWindow({
+        //             content: windowContent,
+        //             position: infoWindowPosition,
+        //             isCustom: true,
+        //             autoMove: true,
+        //         });
+        //
+        //         // 打开信息窗体
+        //         infoWindow.open(map, infoWindowPosition);
+        //
+        //         // ...其他代码
+        //     }).catch(error => console.error('Error:', error));
+        // }
+
+        function displayTrack(e, map, outlineColor = '#f50b0b', strokeColor = 'red', markerImage = default_marker_image, windowContent = "原始轨迹") {
             const content = e.target.result;
+            const maxAttempts = 50; // 设置最大查询次数
+            let attemptCount = 0; // 记录当前查询次数
 
             // 使用PlaceSearch类来获取POI信息
             const placeSearch = new AMap.PlaceSearch({
-                /* city: 'beijing', // 兴趣点城市*/
                 pageSize: 1,
                 pageIndex: 1,
-                children: 0, //不展示子节点数据
-                extensions: 'base' //返回基本地址信息
-                //map: map
+                children: 0, // 不展示子节点数据
+                extensions: 'base' // 返回基本地址信息
             });
+
             // 将文件内容分割成行
             const lines = content.split('\n');
             console.log("Total line number:" + lines.length);
-            let index = Math.floor(Math.random() * lines.length);
-            console.log("Line index: " + index);
-            // 获取第二行数据
-            let raw_line = lines[index];
-            console.log("Line:", raw_line);
-            // 分割原始轨迹每个点
-            let raw_points = raw_line.split(';');
-            // 去除数组中的空字符串元素
-            raw_points = raw_points.filter(item => item.trim() !== '');
-            console.log("raw_points length: " + raw_points.length);
-            // 保存原路径节点经纬度
-            let raw_path = []
 
-            let promises = raw_points.map(point => {
-                return new Promise((resolve, reject) => {
-                    let [poiId, attributes] = point.split(',');
-                    placeSearch.getDetails(poiId, function (status, result) {
-                        if (status === 'complete' && result.info === 'OK') {
-                            // if (result.poiList.pois && result.poiList.pois.length > 0) {
-                            //     let location = result.poiList.pois[0].location;
-                            //     console.log(result.poiList.pois[0])
-                            //     console.log(location.lng + " " + location.lat)
-                            //     resolve([location.lng, location.lat]);
-                            // } else {
-                            //     console.log("选取的该行POI没有位置数据");
-                            //     reject("选取的该行POI没有位置数据");
-                            // }
-                                let location = result.poiList.pois[0].location;
-                                console.log(result.poiList.pois[0])
-                                console.log(location.lng + " " + location.lat)
-                                resolve([location.lng, location.lat]);
+            function processRandomLine() {
+                attemptCount++; // 每次调用时增加一次计数
 
-                        } else {
-                            console.log("获取POI信息失败，POI ID:" + poiId);
-                        }
-                    });
-                });
-            });
-
-            // 使用Promise.all等待所有的Promise都完成
-            Promise.all(promises).then(raw_path => {
-                for (let [lng, lat] of raw_path) {
-                    let marker = new AMap.Marker({
-                        icon: markerImage,
-                        position: [lng, lat],
-                        offset: new AMap.Pixel(-13, -30)
-                    });
-                    marker.setMap(map)
+                if (attemptCount > maxAttempts) {
+                    // 达到最大尝试次数时，弹窗提示用户
+                    alert("已超过最大尝试次数，无法找到合适的POI数据。");
+                    return; // 超过最大尝试次数时停止递归
                 }
 
-                // 创建折线实例
-                let polyline = new AMap.Polyline({
-                    path: raw_path,         // 折线的路径，`desen_path` 应该是包含经纬度坐标的数组
-                    isOutline: true,         // 是否显示折线的轮廓线
-                    outlineColor: outlineColor, // 轮廓线颜色
-                    borderWeight: 1,         // 轮廓线宽度
-                    strokeColor: strokeColor,     // 折线颜色
-                    strokeOpacity: 1,        // 折线透明度，范围 [0, 1]
-                    strokeWeight: 6,         // 折线宽度
-                    strokeStyle: "solid",    // 折线样式，可选值："solid"（实线）、"dashed"（虚线）、"dotted"（点线）
-                    strokeDasharray: [10, 5], // 虚线样式，数组中的数字表示虚线和空白段的长度
-                    lineJoin: 'round',       // 折线交汇处的连接方式，可选值："round"、"bevel"、"miter"
-                    lineCap: 'round',        // 折线两端的线帽样式，可选值："butt"、"round"、"square"
-                    zIndex: 50,              // 折线的层级
+                let index = Math.floor(Math.random() * lines.length);
+                console.log("Line index: " + index);
+
+                // 随机获取一行数据
+                let raw_line = lines[index];
+                console.log("Line:", raw_line);
+
+                // 分割原始轨迹每个点
+                let raw_points = raw_line.split(';').filter(item => item.trim() !== '');
+                console.log("raw_points length: " + raw_points.length);
+
+                // 保存原路径节点经纬度
+                let raw_path = [];
+
+                // 使用 Promise.all 来检查所有 POI 点是否都能解析
+                let promises = raw_points.map(point => {
+                    return new Promise((resolve, reject) => {
+                        let [poiId, attributes] = point.split(',');
+                        placeSearch.getDetails(poiId, function (status, result) {
+                            if (status === 'complete' && result.info === 'OK') {
+
+                                // let location = result.poiList.pois[0].location;
+                                // console.log(result.poiList.pois[0]);
+                                // console.log(location.lng + " " + location.lat);
+                                // resolve([location.lng, location.lat]);
+                                if (result.poiList.pois && result.poiList.pois.length > 0) {
+                                    let location = result.poiList.pois[0].location;
+                                    console.log(result.poiList.pois[0])
+                                    console.log(location.lng + " " + location.lat)
+                                    resolve([location.lng, location.lat]);
+                                } else {
+                                    console.log("选取的该行POI没有位置数据");
+                                    reject("选取的该行POI没有位置数据");
+                                }
+                            } else {
+                                console.log("获取POI信息失败，POI ID:" + poiId);
+                                reject("选取的POI没有位置数据"); // 如果失败，reject
+                            }
+                        });
+                    });
                 });
 
-                // 将折线添加至地图实例
-                polyline.setMap(map);
-                // 选择折线的第一个点作为信息窗体的位置
-                let infoWindowPosition = raw_path[0];
-                // 创建信息窗体
-                let infoWindow = new AMap.InfoWindow({
-                    content: windowContent,
-                    position: infoWindowPosition,
-                    isCustom: true,
-                    autoMove: true,
+                // 处理所有的 Promise
+                Promise.all(promises).then(raw_path => {
+                    // 所有 POI 点都解析成功，开始在地图上绘制
+                    for (let [lng, lat] of raw_path) {
+                        let marker = new AMap.Marker({
+                            icon: markerImage,
+                            position: [lng, lat],
+                            offset: new AMap.Pixel(-13, -30)
+                        });
+                        marker.setMap(map);
+                    }
+
+                    // 创建折线实例
+                    let polyline = new AMap.Polyline({
+                        path: raw_path,         // 折线的路径
+                        isOutline: true,        // 是否显示折线的轮廓线
+                        outlineColor: outlineColor, // 轮廓线颜色
+                        borderWeight: 1,        // 轮廓线宽度
+                        strokeColor: strokeColor,   // 折线颜色
+                        strokeOpacity: 1,       // 折线透明度
+                        strokeWeight: 6,        // 折线宽度
+                        strokeStyle: "solid",   // 折线样式
+                        strokeDasharray: [10, 5], // 虚线样式
+                        lineJoin: 'round',      // 折线交汇处的连接方式
+                        lineCap: 'round',       // 折线两端的线帽样式
+                        zIndex: 50,             // 折线的层级
+                    });
+
+                    // 将折线添加至地图实例
+                    polyline.setMap(map);
+
+                    // 选择折线的第一个点作为信息窗体的位置
+                    let infoWindowPosition = raw_path[0];
+                    let infoWindow = new AMap.InfoWindow({
+                        content: windowContent,
+                        position: infoWindowPosition,
+                        isCustom: true,
+                        autoMove: true,
+                    });
+
+                    // 打开信息窗体
+                    infoWindow.open(map, infoWindowPosition);
+                }).catch(error => {
+                    // 如果解析失败，递归重新选择一行数据
+                    console.error('Error:', error);
+                    processRandomLine(); // 重新选择一行数据
                 });
+            }
 
-                // 打开信息窗体
-                infoWindow.open(map, infoWindowPosition);
-
-                // ...其他代码
-            }).catch(error => console.error('Error:', error));
-            // // 遍历每个点
-            // for (let point of raw_points) {
-            //     // 分割每个点的ID和属性
-            //     let [poiId, attributes] = point.split(',');
-            //
-            //     // 根据POI ID进行POI搜索
-            //     placeSearch.getDetails(poiId, function (status, result) {
-            //         if (status === 'complete' && result.info === 'OK') {
-            //             // 获取POI的经纬度
-            //             let location = result.poiList.pois[0].location;
-            //             console.log(result.poiList.pois[0])
-            //             console.log(location.lng + " " + location.lat)
-            //             // 节点
-            //             //let point_lnglat = new AMap.LngLat(location.lng, location.lat)
-            //             raw_path.push([location.lng, location.lat])
-            //
-            //         } else {
-            //             console.log(`获取POI信息失败，POI ID:` + poiId);
-            //         }
-            //     });
-            // }
-
-            // for (let [lng, lat] of raw_path) {
-            //     console.log(lng + " " + lat);
-            //
-            //     let marker = new AMap.Marker({
-            //         icon: "https//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png",
-            //         position: [lng, lat],
-            //         offset: new AMap.Pixel(-13, -30)
-            //     });
-            //     marker.setMap(map)
-            //
-            // }
-
-
+            // 初始调用
+            processRandomLine();
         }
 
         function choose_file(event, map) {
@@ -337,9 +446,7 @@
             if (file) {
                 const fileName = file.name;
                 let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                    "<strong>" + fileName + "文件</strong>已选择"
-                "</span>" +
-                "</div>";
+                    "<strong>" + fileName + "文件</strong>已选择" + "</span>" + "</div>";
                 console.log(fileName)
                 document.getElementById("fileInfo").innerHTML = fileLoad
                 const fileExtension = fileName.split('.').pop().toLowerCase();
@@ -389,7 +496,21 @@
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => response.blob())
+                        .then(response => {
+                            if (response.status === 500) {
+                                // Handle server error
+                                return response.text().then(failedMsg => {
+                                    alert(failedMsg);
+                                    throw new Error(failedMsg); // Throw an error to stop further processing
+                                });
+                            }
+                            // console.log(response.headers.get('Content-Disposition'));
+                            // let fileName = response.headers.get('Content-Disposition').split('filename=')[1].split(';')[0];
+                            // fileName = fileName.replaceAll('"', '')
+                            // console.log(fileName);
+                            // return response.blob().then(blob => ({ blob, fileName }));  // If the status is not 500, proceed to handle the file blob
+                            return response.blob();
+                        })
                         .then(blob => {
                             // 创建一个新的FileReader对象
                             const desen_reader = new FileReader();
@@ -399,14 +520,13 @@
                             desen_reader.onload = function (e) {
                                 displayTrack(e, map, '#49ff00', 'green', default_marker_image, "脱敏后轨迹")
                             };
-
                             // 将Blob数据传递给FileReader
                             desen_reader.readAsText(blob);
 
                             // 创建一个下载链接
                             const downloadLink = document.createElement('a');
                             downloadLink.href = URL.createObjectURL(blob);
-                            downloadLink.download = "graph" + Date.now().toString(); // 下载的文件名
+                            downloadLink.download = "graph" + Date.now().toString() + ".txt"; // 下载的文件名
                             downloadLink.click();
                             // 释放URL对象
                             URL.revokeObjectURL(downloadLink.href);
@@ -427,7 +547,6 @@
         <div class="ibox float-e-margins">
             <div class="ibox-title">
             </div>
-
 
 
             <div class="tabs-container">
@@ -479,7 +598,7 @@
                             <div class="midtile">
                                 <div class="col-sm-5 m-b-xs">
                                     <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-                                        <input type="file" id="fileUpload" style="display: none;">
+                                        <input type="file" id="fileUpload" accept=".txt" style="display: none;">
                                         <label for="fileUpload" class="upload-btn">
                                             选择文件
                                         </label>

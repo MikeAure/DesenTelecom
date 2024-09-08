@@ -66,6 +66,23 @@ public class FileControllerVideoTest {
 
     }
 
+    // 基于高斯滤波器的视频帧像素替换方法
+    @Test
+    public void imageControllerGaussianBlurVideoTest() throws Exception {
+
+        // 模拟multipart/form-data请求
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(multipart(URL) // 使用你的实际请求路径
+                            .file(videoFile)
+                            .param("params", String.valueOf(i))
+                            .param("algName", "gaussian_blur_video")
+                            .param("sheet", SHEET))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        }
+    }
+
     // 基于像素化滤波器的视频帧像素替换方法
     @Test
     public void imageControllerPixelateVideoTest() throws Exception {
@@ -83,23 +100,7 @@ public class FileControllerVideoTest {
 
     }
 
-    // 基于高斯滤波器的视频帧像素替换方法
-    @Test
-    public void imageControllerGaussianBlurVideoTest() throws Exception {
 
-        // 模拟multipart/form-data请求
-        for (int i = 0; i < 3; i++) {
-            mvc.perform(multipart(URL) // 使用你的实际请求路径
-                            .file(videoFile)
-                            .param("params", String.valueOf(i))
-                            .param("algName", "gaussian_blur_video")
-                            .param("sheet", SHEET))
-                    .andExpect(status().isOk())
-                    .andDo(MockMvcResultHandlers.print())
-                    .andReturn();
-        }
-
-    }
 
     // 基于盒式滤波器的视频帧像素替换方法
     @Test

@@ -1,7 +1,10 @@
 package com.lu.gademo.trace.model;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 @SuppressWarnings("serial")
 public class MapData implements Serializable {
 

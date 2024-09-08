@@ -30,7 +30,8 @@ public class DPController {
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String desenValue(@RequestParam String rawData,
                              @RequestParam String samples,
-                             @RequestParam String algName) {
+                             @RequestParam String algName,
+                             @RequestParam String params) {
         String[] types = algName.split(",");
         algName = types[types.length - 1];
         log.info(algName);
@@ -41,6 +42,7 @@ public class DPController {
                 algNum = 4;
                 break;
             }
+            //
             case "exponential": {
                 algNum = 8;
                 break;
@@ -77,16 +79,23 @@ public class DPController {
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject resultDS = null;
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        if (algName.equals("report_noisy_max1")) {
-            resultDS = dp.service(rawObject, algNum, 1, Integer.parseInt(samples));
-        } else {
-            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples));
-        }
+//        if (algName.equals("report_noisy_max1")) {
+            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples), Integer.parseInt(params));
+//        } else {
+//            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples));
+//        }
         StringBuilder resultString = new StringBuilder();
-        for (Object s : resultDS.getList()) {
-            resultString.append(s).append("\n");
+        if (resultDS.getList() != null && !resultDS.getList().isEmpty()) {
+            for (Object s : resultDS.getList()) {
+                resultString.append(s).append("\n");
+            }
+            return resultString.toString();
+        } else if (resultDS.getStringVal() != null) {
+            return resultDS.getStringVal();
+        } else {
+            return "Error";
         }
-        return resultString.toString();
+
     }
 
     @ResponseBody
@@ -95,7 +104,8 @@ public class DPController {
                               @RequestParam String samples,
                               @RequestParam String algName,
                               @RequestParam String c,
-                              @RequestParam String t) {
+                              @RequestParam String t,
+                              @RequestParam String params) {
 
         String[] types = algName.split(",");
         algName = types[types.length - 1];
@@ -117,7 +127,7 @@ public class DPController {
         }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        DSObject result = dp.service(rawObject, algNum, Integer.parseInt(c), Integer.parseInt(t));
+        DSObject result = dp.service(rawObject, algNum, Integer.parseInt(c), Integer.parseInt(t), Integer.parseInt(params));
         StringBuilder resultString = new StringBuilder();
         for (Object s : result.getList()) {
             resultString.append(s).append("\n");

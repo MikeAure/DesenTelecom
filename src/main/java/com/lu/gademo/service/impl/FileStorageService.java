@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 
@@ -41,11 +42,12 @@ public class FileStorageService {
             throw new IOException("Input file name is null");
         }
 
-        String originalFileName = file.getOriginalFilename();
+        String originalFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
         String fileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
         String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
         String rawFileNameTemp = fileTimeStamp + "_" + fileName;
         String rawFileName = fileTimeStamp + "_" + originalFileName;
+        log.info("RawFileName: {}", rawFileName);
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
@@ -74,6 +76,53 @@ public class FileStorageService {
                 .build();
     }
 
+    public FileStorageDetails saveRawFileWithDesenInfo(Path file) throws IOException {
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        if (!Files.exists(file)) {
+            throw new IOException("Input file is wrong");
+        }
+
+        String originalFileName = file.getFileName().toString();
+        String fileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+        String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        String rawFileNameTemp = fileTimeStamp + "_" + fileName;
+        String rawFileName = fileTimeStamp + "_" + originalFileName;
+        log.info("RawFileName: {}", rawFileName);
+        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        byte[] rawFileBytes = Files.readAllBytes(file);
+        Long rawFileSize = Files.size(file);
+
+        // Path for the desensitized file
+        String desenFileTimeStamp = String.valueOf(System.currentTimeMillis());
+        String desenFileName = rawFileNameTemp + "_" + desenFileTimeStamp + "." + rawFileSuffix;
+        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+
+        // Save the original file
+        Files.copy(file, rawFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .rawFileBytes(rawFileBytes)
+                .rawFileSize(rawFileSize)
+                .desenFileName(desenFileName)
+                .desenFileSuffix(rawFileSuffix)
+                .desenFilePath(desenFilePath)
+                .desenFilePathString(desenFilePathString)
+                .build();
+    }
+
+    /**
+     * 保存MultipartFile并仅生成原始文件相关的信息
+     * @param file 上传的文件
+     * @return 仅包含原始文件信息的FileStorageDetails
+     * @throws IOException
+     */
     public FileStorageDetails saveRawFile(MultipartFile file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -140,14 +189,24 @@ public class FileStorageService {
                 .build();
     }
 
-    public void saveRawFileWithDesenInfo(String fileName, byte[] rawFileBytes) throws IOException {
-        // 确保父目录存在
-        Path filePath = rawFileDirectory.resolve(fileName);
-//        if (Files.notExists(rawFilePath.getParent())) {
-//            Files.createDirectories(rawFilePath.getParent());
-//        }
-        // 使用Files.write来保存文件
-        Files.write(filePath, rawFileBytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+    public FileStorageDetails saveRawFile(String fileName, byte[] rawFileBytes) throws IOException {
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        String rawFileSuffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+        String rawFileName = fileTimeStamp + "_" + fileName;
+        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        Files.write(rawFilePath, rawFileBytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        Long rawFileSize = Files.size(rawFilePath);
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .rawFileBytes(rawFileBytes)
+                .rawFileSize(rawFileSize)
+                .build();
     }
 
     public void saveDesenFile(Path desenFilePath, byte[] desenFileBytes) throws IOException {

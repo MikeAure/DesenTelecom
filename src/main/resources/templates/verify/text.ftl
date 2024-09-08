@@ -7,7 +7,6 @@
 
     <title>Insert title here</title>
 
-
     <link href="${ctx!}/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="${ctx!}/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="${ctx!}/css/plugins/iCheck/custom.css" rel="stylesheet">
@@ -78,7 +77,7 @@
         /*    !*margin-right: 50px;*!*/
         /*}*/
 
-        #submitBtn {
+        .btn2 > button {
             background-color: #347aa9;
             color: white;
             cursor: pointer;
@@ -230,8 +229,152 @@
     <!-- 自定义js -->
     <script src="${ctx!}/js/content.js?v=1.0.0"></script>
     <script type="text/javascript">
+        let allAlgorithms = {
+            "date": [
+                {value: "dpDate", label: "基于差分隐私的日期加噪算法"},
+                {value: "SHA512", label: "假名化-哈希"},
+            ],
+            "time": [
+                {value: "floorTime", label: "时间取整"},
+                {value: "SHA512", label: "假名化-哈希"},
+            ],
+            "address": [
+                {value: "addressHide", label: "地址抑制算法"},
+                {value: "SHA512", label: "假名化-哈希"},
+                {value: "truncation", label: "尾部截断"},
+                {value: "value_hide", label: "数值替换"},
+            ],
+            "number": [
+                {value: "numberHide", label: "编号抑制算法"},
+                {value: "SHA512", label: "假名化-哈希"},
+                {value: "truncation", label: "尾部截断"},
+                {value: "value_hide", label: "数值替换"},
+                {value: "passReplace", label: "随机置换"},
+            ],
+            "value": [
+                {value: "laplaceToValue", label: "基于拉普拉斯差分隐私的数值加噪算法"},
+                {value: "randomUniformToValue", label: "基于随机均匀噪声的数值加噪算法"},
+                {value: "randomLaplaceToValue", label: "基于随机拉普拉斯噪声的数值加噪算法"},
+                {value: "randomGaussianToValue", label: "基于随机高斯噪声的数值加噪算法"},
+                {value: "valueShift", label: "数值偏移"},
+                {value: "SHA512", label: "假名化-哈希"},
+                {value: "floor", label: "数值取整"},
+                {value: "valueMapping", label: "数值映射"},
+            ],
+            "name": [
+                {value: "nameHide", label: "名称抑制算法"},
+                {value: "SHA512", label: "假名化-哈希"},
+            ],
+            "email": [
+                {value: "nameHide", label: "名称抑制算法"},
+                {value: "SHA512", label: "假名化-哈希"},
+                {value: "suppressEmail", label: "邮箱抑制算法"},
+                {value: "numberHide", label: "编号抑制算法"},
+            ],
+            "code": [
+                {value: "dpCode", label: "编码型数据差分隐私脱敏算法"},
+            ],
+            "ip": [
+                {value: "suppressAllIp", label: "IP地址全抑制"},
+                {value: "suppressIpRandomParts", label: "IP地址随机替换"},
+                {value: "SHA512", label: "假名化-哈希"},
+            ],
+        }
+
+        // 更新下拉列表函数
+        function updateDistortionAlgList(textType, defaultValue) {
+            const distortion_alg_list = document.getElementById("distortionAlg");
+            distortion_alg_list.innerHTML = "";
+
+            if (allAlgorithms[textType]) {
+                allAlgorithms[textType].forEach(alg => {
+                    const option = new Option(alg.label, alg.value);
+                    distortion_alg_list.options.add(option);
+
+                    // 如果当前选项是默认值，设置为选中
+                    if (alg.value === defaultValue) {
+                        distortion_alg_list.value = defaultValue;
+                    }
+                });
+            } else {
+                distortion_alg_list.options.add(new Option("请选择文本类型", "default"));
+            }
+        }
+        // 获得键值对中值对应的键
+        function getKeyByValue(value) {
+            for (const key in allAlgorithms) {
+                // 遍历数组中的每一个对象
+                if (allAlgorithms[key].some(alg => alg.value === value)) {
+                    return key; // 返回匹配value的键
+                }
+            }
+            return null; // 如果没有找到匹配的键，返回null
+        }
+
+        let defaultOption = "nameHide_name"; // 预设的默认选项
+
+        // 设置算法默认选项
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/toolset/getDefaultSelection?toolsetName=' + 'text')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Failed to fetch');
+                    }
+                })
+                .then(data => {
+                    if (data.code === 200 && data.message) {
+                        defaultOption = data.data;
+                        console.log("defaultOption: " +  defaultOption);
+                        let defaultOptionParts = defaultOption.split("_");
+                        let textAlgo = defaultOptionParts[0];
+                        let textType = defaultOptionParts[1];
+
+                        setDefaultOption(textType, textAlgo);
+
+                    } else {
+                        let defaultOptionParts = defaultOption.split("_");
+                        let textAlgo = defaultOptionParts[0];
+                        let textType = defaultOptionParts[1];
+                        setDefaultOption(textType, textAlgo);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("获取默认算法失败");
+                    let defaultOptionParts = defaultOption.split("_");
+                    let textAlgo = defaultOptionParts[0];
+                    let textType = defaultOptionParts[1];
+                    setDefaultOption(textType, textAlgo);
+                });
+
+            function setDefaultOption(type, algo) {
+                // const defaultOptionTextType = getKeyByValue(value);
+                const text_type = document.getElementById("textType");
+                // const textAlgo = document.getElementById("distortionAlg");
+                // 设置默认类型
+                text_type.value = type;
+                // textAlgo.value = algo;
+                console.log("type: " + type);
+                console.log("algo: " + algo);
+                updateDistortionAlgList(type, algo);
+            }
+        });
+
+
         window.onload = function () {
-            // debugger
+            // 在切换选项卡之后保持非失真算法的默认选项不变
+            $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+                let defaultOptionParts = defaultOption.split("_");
+                let textAlgo = defaultOptionParts[0];
+                let textType = defaultOptionParts[1];
+                const text_type = document.getElementById("textType");
+                // 设置默认类型
+                text_type.value = textType;
+                updateDistortionAlgList(textType, textAlgo);
+            });
+            // 非失真算法
             document.getElementById("nodistortionAlg").addEventListener("change", function () {
                 let selection = document.getElementById("nodistortionAlg").value;
 
@@ -250,79 +393,155 @@
                 }
             });
 
+            // document.getElementById("textType").addEventListener("change", function () {
+            //     // 获取文本类型和算法列表
+            //     let text_type = document.getElementById("textType").value;
+            //     let distortion_alg_list = document.getElementById("distortionAlg");
+            //     // 清空算法列表
+            //     distortion_alg_list.innerHTML = "";
+            //
+            //     // Check if the selected text type is in the allAlgorithms mapping
+            //     if (allAlgorithms[text_type]) {
+            //         // Add each algorithm option corresponding to the text type
+            //         allAlgorithms[text_type].forEach(alg => {
+            //             distortion_alg_list.options.add(new Option(alg.label, alg.value));
+            //         });
+            //     } else {
+            //         // If no mapping exists, add a default prompt
+            //         distortion_alg_list.options.add(new Option("请选择文本类型", "default"));
+            //     }
+            // });
+
+            // 事件监听器，当文本类型改变时更新算法列表
             document.getElementById("textType").addEventListener("change", function () {
-                // 获取文本类型和算法列表
-                let text_type = document.getElementById("textType").value;
-                let distortion_alg_list = document.getElementById("distortionAlg");
-
-                // 清空算法列表
-                distortion_alg_list.innerHTML = "";
-
-                if (text_type === "date") {
-                    distortion_alg_list.options.add(new Option("基于差分隐私的日期加噪算法", "dpDate"));
-                    distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
-                } else if (text_type === "time") {
-                    distortion_alg_list.options.add(new Option("时间取整", "floorTime"));
-                    distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
-
-                } else if (text_type === "address") {
-                    distortion_alg_list.options.add(new Option("地址抑制算法", "addressHide"));
-                    distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
-                    distortion_alg_list.options.add(new Option("尾部截断", "truncation"));
-                    distortion_alg_list.options.add(new Option("数值替换", "value_hide"));
-
-                } else if (text_type === "number") {
-                    distortion_alg_list.options.add(new Option("编号抑制算法", "numberHide"));
-                    distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
-                    distortion_alg_list.options.add(new Option("尾部截断", "truncation"));
-                    distortion_alg_list.options.add(new Option("数值替换", "value_hide"));
-                    distortion_alg_list.options.add(new Option("随机置换", "passReplace"));
-
-                } else if (text_type === "value") {
-                    // distortion_alg_list.options.add(new Option("基于高斯机制差分隐私的数值加噪算法", "gaussianToValue"));
-                    distortion_alg_list.options.add(new Option("基于拉普拉斯差分隐私的数值加噪算法", "laplaceToValue"));
-                    distortion_alg_list.options.add(new Option("基于随机均匀噪声的数值加噪算法", "randomUniformToValue"));
-                    distortion_alg_list.options.add(new Option("基于随机拉普拉斯噪声的数值加噪算法", "randomLaplaceToValue"));
-                    distortion_alg_list.options.add(new Option("基于随机高斯噪声的数值加噪算法", "randomGaussianToValue"));
-                    distortion_alg_list.options.add(new Option("数值偏移", "valueShift"));
-                    distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
-                    distortion_alg_list.options.add(new Option("数值取整", "floor"));
-                    distortion_alg_list.options.add(new Option("数值映射", "valueMapping"));
-
-
-                } else if (text_type === "name") {
-                    distortion_alg_list.options.add(new Option("名称抑制算法", "nameHide"));
-                    distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
-
-                } else if (text_type === "email") {
-                    distortion_alg_list.options.add(new Option("名称抑制算法", "nameHide"));
-                    distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
-                    distortion_alg_list.options.add(new Option("邮箱抑制算法", "suppressEmail"));
-                    distortion_alg_list.options.add(new Option("编号抑制算法", "numberHide"));
-
-                } else if (text_type === "code") {
-                    distortion_alg_list.options.add(new Option("编码型数据差分隐私脱敏算法", "dpCode"));
-
-                } else {
-                    distortion_alg_list.options.add(new Option("请选择文本类型", "default"))
-                }
-
+                const textType = this.value;
+                document.getElementById("fileUpload").value = "";
+                document.getElementById("fileInfo").innerHTML = "";
+                updateDistortionAlgList(textType);
             });
-            document.getElementById("fileUpload").addEventListener("change", choose_file);
 
+            document.getElementById("fileUpload").addEventListener("change", choose_file);
+            // 获取非失真脱敏的测试文件
             document.getElementById('generateTestData').addEventListener('click', function () {
+                let fileName = Date.now() + "testData.txt";
                 fetch('/Encrypt/generateTestData')
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'ok') {
                             const message = data.message;
-                            downloadTestFile(message, 'testData.txt', 'text/plain');
+                            downloadTestFile(message, fileName, 'text/plain');
                         } else {
                             console.error('Failed to generate test data:', data.message);
                         }
                     })
                     .catch(error => console.error('Error:', error));
             });
+
+            // document.getElementById('generateDistortionTestData').addEventListener('click', function () {
+            //     let fileName = Date.now() + "testData.txt";
+            //     let totalNumber = 500000;
+            //     fetch('/File/generateTextTestData?totalNumber=' + totalNumber)
+            //         .then(response => {
+            //             if (response.status === 500) {
+            //                 // Handle server error
+            //                 return response.text().then(failedMsg => {
+            //                     alert(failedMsg);
+            //                     throw new Error(failedMsg); // Throw an error to stop further processing
+            //                 });
+            //             }
+            //             // console.log(response.headers.get('Content-Disposition'));
+            //             // let fileName = response.headers.get('Content-Disposition').split('filename=')[1].split(';')[0];
+            //             // fileName = fileName.replaceAll('"', '')
+            //             // console.log(fileName);
+            //             // return response.blob().then(blob => ({ blob, fileName }));  // If the status is not 500, proceed to handle the file blob
+            //             return response.blob();
+            //         })
+            //         .then(blob => {
+            //             const url = URL.createObjectURL(blob);
+            //
+            //             // 创建一个隐藏的a标签并点击它来触发下载
+            //             const a = document.createElement('a');
+            //             a.style.display = 'none';
+            //             a.href = url;
+            //             a.download = fileName;
+            //
+            //             // 将a标签添加到DOM并触发点击
+            //             document.body.appendChild(a);
+            //             a.click();
+            //
+            //             // 下载完成后移除a标签和URL对象
+            //             document.body.removeChild(a);
+            //             URL.revokeObjectURL(url);
+            //         })
+            //         .catch(error => console.error('Error:', error));
+            // });
+
+            // 获取失真脱敏的测试文件
+            // document.getElementById('selectDistortionTestData').addEventListener('change', function (event) {
+            //     const file = event.target.files[0];
+            //     if (file && file.type === 'text/plain') {
+            //         const reader = new FileReader();
+            //         reader.onload = function (e) {
+            //             // const textArea = document.getElementById('testData');
+            //             // textArea.value = e.target.result;
+            //             document.getElementById('selectDistortionTestData').textContent = file.name + '已选择';
+            //         };
+            //         reader.readAsText(file);
+            //     } else {
+            //         alert('请选择一个txt格式的文件');
+            //     }
+            // });
+
+            // document.getElementById('startDistortionPerformanceTest').addEventListener('click', function () {
+            //     const fileInput = document.getElementById('selectDistortionTestData');
+            //     const file = fileInput.files[0];
+            //     let formData = new FormData();
+            //     let privacyLevel = document.getElementById("distortionPrivacyLevel").value;
+            //     // 算法名
+            //     let algName = document.getElementById("distortionAlg").value;
+            //     // formData.append("params", privacyLevel)
+            //     // 保证params字段唯一值唯一
+            //     formData.set("params", privacyLevel);
+            //     formData.set("algName", algName);
+            //     formData.set("file", file);
+            //
+            //     if (!file) {
+            //         alert('请先选择一个测试文件。');
+            //         return;
+            //     }
+            //     fetch('/File/textFilePerformenceTest', {
+            //         method: 'POST',
+            //         body: formData,
+            //     })
+            //         .then(response => response.blob())
+            //         .then(blob => {
+            //             const fileName = Date.now() + 'desenResult.txt';
+            //             const fileSizeInBytes = blob.size;
+            //             const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
+            //
+            //             // 输出文件大小（以字节为单位）
+            //             console.log("File size: " + fileSizeInBytes + " bytes");
+            //             console.log("File size: " + fileSizeInMegabytes.toFixed(2) + " MB");
+            //
+            //             const url = URL.createObjectURL(blob);
+            //
+            //             // 创建一个隐藏的a标签并点击它来触发下载
+            //             const a = document.createElement('a');
+            //             a.style.display = 'none';
+            //             a.href = url;
+            //             a.download = fileName;
+            //
+            //             // 将a标签添加到DOM并触发点击
+            //             document.body.appendChild(a);
+            //             a.click();
+            //
+            //             // 下载完成后移除a标签和URL对象
+            //             document.body.removeChild(a);
+            //             URL.revokeObjectURL(url);
+            //
+            //         })
+            //         .catch(error => console.error('Error:', error));
+            // });
 
             function downloadTestFile(content, fileName, contentType) {
                 const blob = new Blob([content], {type: contentType});
@@ -338,6 +557,7 @@
                 }, 0);
             }
 
+            // 获取非失真脱敏的测试文件
             document.getElementById('selectTestData').addEventListener('change', function (event) {
                 const file = event.target.files[0];
                 if (file && file.type === 'text/plain') {
@@ -376,16 +596,41 @@
                     })
                         .then(response => response.blob())
                         .then(blob => {
-                            // 使用 FileReader 读取 blob 内容
-                            const fileReader = new FileReader();
-                            fileReader.onload = function (event) {
-                                // 显示文件内容在 textarea 中
-                                document.getElementById('desenTestData').value = event.target.result;
+                            const fileSizeInBytes = blob.size;
+                            const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
 
-                                // 保存blob用于下载
+                            // 输出文件大小（以字节为单位）
+                            console.log("File size: " + fileSizeInBytes + " bytes");
+                            console.log("File size: " + fileSizeInBytes.toFixed(2) + " MB");
+
+                            // 判断文件大小以执行不同的操作
+                            if (fileSizeInMegabytes > 100) {
+                                // 如果文件大于100M，仅保存文件内容，不显示
+                                alert('文件过大 (>100MB)，仅保存文件内容，不显示。');
                                 window.downloadBlob = blob;
-                            };
-                            fileReader.readAsText(blob);
+                            } else if (fileSizeInMegabytes > 10) {
+                                // 如果文件大于10M但小于等于100M，只显示前100行
+                                const fileReader = new FileReader();
+                                fileReader.onload = function (event) {
+                                    const content = event.target.result;
+                                    const lines = content.split('\n');
+                                    const first100Lines = lines.slice(0, 100).join('\n');
+                                    document.getElementById('desenTestData').value = first100Lines;
+
+                                    // 保存blob用于下载
+                                    window.downloadBlob = blob;
+                                };
+                                fileReader.readAsText(blob);
+                            } else {
+                                // 文件小于等于10M，完整显示内容（或者根据需求调整显示方式）
+                                const fileReader = new FileReader();
+                                fileReader.onload = function (event) {
+                                    document.getElementById('desenTestData').value = event.target.result;
+                                    // 保存blob用于下载
+                                    window.downloadBlob = blob;
+                                };
+                                fileReader.readAsText(blob);
+                            }
                         })
                         .catch(error => console.error('Error:', error));
                 };
@@ -410,10 +655,39 @@
                 }
             });
 
+            // 设置默认算法
+            $("#setDefaultAlgorithm").on("click", function (e) {
+                let postData = new URLSearchParams();
+                let textType = $("#textType").val();
+                let textAlgo = $("#distortionAlg").val();
+
+                postData.set("toolsetName", "text");
+                postData.set("defaultAlgName", textAlgo + "_" + textType);
+                console.log("postData: " + postData);
+
+                fetch ("/toolset/setDefaultToolset", {
+                    method: "POST",
+                    body: postData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert("设置默认算法成功！");
+                            defaultOption = textAlgo + "_" + textType;
+                        } else {
+                            throw new Error("设置默认算法失败！");
+                        }
+                    })
+                    .catch((error) => {
+                        alert(error);
+                        console.log(error);
+                    })
+            });
+
             window._AMapSecurityConfig = {
                 securityJsCode: "dd8ae1e880d8bcf447281c3bed5f3c91",
             };
-        }
+        };
 
         let choose_file = function (event) {
             // 清空
@@ -425,10 +699,10 @@
             const fileName = file.name;
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (file) {
-                if ("xlsx" === fileExtension) {
+                if ("txt" === fileExtension) {
                     let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
                         "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
-                    document.getElementById("fileInfo").innerHTML = fileLoad
+                    document.getElementById("fileInfo").innerHTML = fileLoad;
                     //console.log(fileExtension)
                     //构建formData,发送给后端
                     let formData = new FormData();
@@ -441,9 +715,7 @@
                         let tr = table_body.rows[0];
                         console.log(tr);
                         //let privacyLevel = tr.childNodes[0].firstChild.value;
-                        let privacyLevel = document.getElementById("table3-selections").value;
-
-                        // formData.append("params", privacyLevel)
+                        let privacyLevel = document.getElementById("distortionPrivacyLevel").value;
                         // 保证params字段唯一值唯一
                         formData.set("params", privacyLevel)
 
@@ -452,41 +724,57 @@
                         let idx = $("ul .active").index();
                         if (idx === 0) {
                             //formData.append("distortion", "distortion");
-                            let selections = document.getElementById("distortionAlg")
+                            let selections = document.getElementById("distortionAlg");
                             alg_name = selections.value;
                             //formData.append("sheet", type1);
                         }
 
                         // 发送算法名、隐私保护等级、脱敏文件
                         formData.set("algName", alg_name)
-                        fetch('/File/desenSingleExcel', {
+                        fetch('/File/desenSingleColumn', {
                             method: 'POST',
                             body: formData
                         })
-                            .then(response => response.blob())
+                            .then(response => {
+                                if (response.status === 500) {
+                                    // Handle server error
+                                    return response.text().then(failedMsg => {
+                                        alert(failedMsg);
+                                        throw new Error(failedMsg); // Throw an error to stop further processing
+                                    });
+                                }
+                                return response.blob();
+                            })
                             .then(blob => {
                                 // 脱敏前
                                 /*  document.getElementById("preData").innerHTML="脱敏前数据"*/
                                 let reader = new FileReader();
                                 reader.onload = function (e) {
-                                    let data = new Uint8Array(e.target.result);
-                                    let workbook = XLSX.read(data, {type: 'array'});
-
-                                    let sheetName = workbook.SheetNames[0];
-                                    let sheet = workbook.Sheets[sheetName];
-
-                                    let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-
+                                    // let data = new Uint8Array(e.target.result);
+                                    // let workbook = XLSX.read(data, {type: 'array'});
+                                    //
+                                    // let sheetName = workbook.SheetNames[0];
+                                    // let sheet = workbook.Sheets[sheetName];
+                                    //
+                                    // let lines = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                                    let data = e.target.result;
+                                    if (typeof data !== 'string') {
+                                        data = new TextDecoder('utf-8').decode(new Uint8Array(data));
+                                    }
+                                    let lines = data.split("\n").map(line => line.split("\t")); // 假设以制表符分隔列
+                                    for (let i = 0; i < 10; i ++) {
+                                        console.log(lines[i]);
+                                    }
                                     let pageSize = 10;
-                                    let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                                    let pageCount = Math.ceil((lines.length - 1) / pageSize);
                                     let currentPage = 1;
 
                                     function displayTable(page) {
                                         let startIndex = (page - 1) * pageSize + 1; // 跳过表头
-                                        let endIndex = Math.min(startIndex + pageSize, jsonData.length);
+                                        let endIndex = Math.min(startIndex + pageSize, lines.length);
 
                                         let tableContent = '<thead><tr>';
-                                        let headers = jsonData[0];
+                                        let headers = lines[0];
                                         headers.forEach(function (header) {
                                             tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
                                         });
@@ -495,7 +783,7 @@
                                         for (let i = startIndex; i < endIndex; i++) {
                                             tableContent += '<tr>';
                                             for (let j = 0; j < headers.length; j++) {
-                                                let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                                let cellValue = (lines[i][j] !== undefined) ? lines[i][j] : '';
                                                 tableContent += '<td>' + cellValue + '</td>';
                                             }
                                             tableContent += '</tr>';
@@ -552,21 +840,25 @@
                                 /* document.getElementById("afterData").innerHTML="脱敏后数据"*/
                                 const reader1 = new FileReader();
                                 reader1.onload = function (event) {
-                                    const data = event.target.result;
-                                    const workbook = XLSX.read(data, {type: 'binary'});
-                                    const sheetName = workbook.SheetNames[0];
-                                    const sheet = workbook.Sheets[sheetName];
-                                    const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                                    let data = event.target.result;
+                                    // const workbook = XLSX.read(data, {type: 'binary'});
+                                    // const sheetName = workbook.SheetNames[0];
+                                    // const sheet = workbook.Sheets[sheetName];
+                                    if (typeof data !== 'string') {
+                                        data = new TextDecoder('utf-8').decode(new Uint8Array(data));
+                                    }
+                                    // const lines = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                                    let lines = data.split("\n").map(line => line.split("\t"));
                                     let pageSize = 10;
-                                    let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
+                                    let pageCount = Math.ceil((lines.length - 1) / pageSize);
                                     let currentPage1 = 1;
 
                                     function displayTable1(page1) {
                                         let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
-                                        let endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
+                                        let endIndex = Math.min(startIndex1 + pageSize, lines.length);
 
                                         let tableContent1 = '<thead><tr>';
-                                        let headers1 = jsonData[0];
+                                        let headers1 = lines[0];
                                         headers1.forEach(function (header1) {
                                             tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
                                         });
@@ -575,7 +867,7 @@
                                         for (let i = startIndex1; i < endIndex; i++) {
                                             tableContent1 += '<tr>';
                                             for (let j = 0; j < headers1.length; j++) {
-                                                let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
+                                                let cellValue = (lines[i][j] !== undefined) ? lines[i][j] : '';
                                                 tableContent1 += '<td>' + cellValue + '</td>';
                                             }
                                             tableContent1 += '</tr>';
@@ -626,20 +918,22 @@
                                         }
                                     });
                                 };
-                                reader1.readAsBinaryString(blob);
+                                reader1.readAsText(blob);
 
                                 // 创建一个下载链接
                                 const downloadLink = document.createElement('a');
                                 downloadLink.href = URL.createObjectURL(blob);
-                                downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
+                                downloadLink.download = Date.now().toString() + ".txt"; // 下载的文件名
                                 downloadLink.click();
                                 // after.appendChild(downloadLink);
                             })
                             .catch(error => console.error('Error:', error));
                     }
                 } else {
-                    alert("请提交excel文件")
+                    alert("请提交txt类型文件")
                 }
+            } else {
+                alert("请提交脱敏文件");
             }
 
         }
@@ -665,10 +959,8 @@
                     <div class="tab-content">
                         <div id="tab-1" class="tab-pane active" style="text-align: center;">
                             <div class="form-group">
-
                                 <label class="control-label block" for="textType"
                                        style="font-size: 20px">请选择文本类型</label>
-
                                 <select name="type" id="textType"
                                         style="font-size: 20px">
                                     <option value="111" selected>请选择文本类型</option>
@@ -680,8 +972,8 @@
                                     <option value="name">名称</option>
                                     <option value="email">邮箱</option>
                                     <option value="code">编码</option>
+                                    <option value="ip">IP地址</option>
                                 </select>
-
                             </div>
 
                             <div class="form-group">
@@ -714,8 +1006,8 @@
                                         <tbody id="table3">
                                         <tr>
                                             <td>
-                                                <label for="table3-selections"></label>
-                                                <select id="table3-selections">
+                                                <label for="distortionPrivacyLevel"></label>
+                                                <select id="distortionPrivacyLevel">
                                                     <option value="1"> 低程度</option>
                                                     <option value="2" selected> 中程度</option>
                                                     <option value="3"> 高程度</option>
@@ -730,16 +1022,38 @@
                             <div id="fileInfo"></div>
 
                             <div class="btn1">
-                                <input type="file" accept=".xlsx" id="fileUpload" style="display: none;">
+                                <input type="file" accept=".txt" id="fileUpload" style="display: none;">
                                 <label for="fileUpload" class="btn btn-sm btn-primary upload-btn">
                                     选择文件
                                 </label>
                             </div>
 
                             <div class="btn2">
-                                <button type="button" class="btn btn-sm btn-primary" id="submitBtn">提交脱敏
-                                </button>
+                                <button type="button" class="btn btn-sm btn-primary" id="submitBtn">提交脱敏</button>
+                                <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm"> 设置当前算法为默认算法</button>
                             </div>
+
+<#--                            <div class="row m-t">-->
+<#--                                <p>-->
+<#--                                    <button type="button" id="generateDistortionTestData"-->
+<#--                                            class="btn btn-sm btn-primary">-->
+<#--                                        生成测试文件-->
+<#--                                    </button>-->
+<#--                                    <input type="file" accept=".txt" id="selectDistortionTestData"-->
+<#--                                           style="display: none;">-->
+<#--                                    <label for="selectDistortionTestData" class="btn btn-sm btn-primary">-->
+<#--                                        选择测试文件-->
+<#--                                    </label>-->
+<#--                                    <button type="button" id="startDistortionPerformanceTest"-->
+<#--                                            class="btn btn-sm btn-primary"> 进行性能测试-->
+<#--                                    </button>-->
+<#--                                    <button type="button" id="downloadDistortionTestResult"-->
+<#--                                            class="btn btn-sm btn-primary"> 下载测试结果-->
+<#--                                    </button>-->
+
+<#--                                </p>-->
+<#--                                <p id="distortionTestFileName" class="text-success"></p>-->
+<#--                            </div>-->
 
                             <div style="display: flex; flex-wrap: wrap; justify-content: center;">
                                 <!-- 第一个表格 -->
@@ -982,7 +1296,7 @@
     let driver1Marker;
     let driver2Marker;
     let endMarker;
-
+    let encryptedMessage = "";
 
     document.addEventListener("DOMContentLoaded", (event) => {
         // 初始化乘客地图
@@ -1326,6 +1640,25 @@
                 if (data.status === 'ok') { // 假设返回的JSON对象包含一个名为status的字段
                     logArea.value += "customer成功发送打车请求\n";
                     logArea.scrollTop = logArea.scrollHeight;
+                    // 获取data.message中的值
+                    let encryptedMessage = data.message;
+
+                    // 创建一个blob对象，将数据存入blob
+                    let blob = new Blob([encryptedMessage], { type: 'text/plain' });
+
+                    // 创建一个链接对象
+                    let link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+
+                    // 设置下载文件的名字
+                    link.download = Date.now() + 'message.txt';
+
+                    // 触发点击事件下载文件
+                    link.click();
+
+                    // 释放URL对象
+                    window.URL.revokeObjectURL(link.href);
+
 
                 } else if (data.status === 'error') {
                     logArea.value += "customer发送打车请求失败\n"; // 添加一行日志

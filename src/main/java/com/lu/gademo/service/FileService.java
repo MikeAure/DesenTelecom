@@ -19,6 +19,13 @@ public interface FileService {
      * params 脱敏参数
      */
     void redesenExcel(ReDesensitizeEvent event) throws Exception;
+    void redesenSingleExcel(ReDesensitizeEvent event) throws Exception;
+    void redesenGraph(ReDesensitizeEvent event) throws Exception;
+    void redesenImage(ReDesensitizeEvent event) throws Exception;
+    void redesenVideo(ReDesensitizeEvent event) throws Exception;
+    void redesenAudio(ReDesensitizeEvent event) throws Exception;
+
+    FileStorageDetails generateTextTestFile(int totalNumber) throws IOException;
 
     ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
 
@@ -43,6 +50,8 @@ public interface FileService {
 //    ResponseEntity<byte[]> dealCsv(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException;
 //
 //    ResponseEntity<byte[]> dealCsv(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException;
+
+    ResponseEntity<byte[]> dealSingleColumnTextFile(FileStorageDetails fileStorageDetails, String params, String algName, boolean ifSkipFirstRow) throws IOException, ParseException;
 
     ResponseEntity<byte[]> dealSingleExcel(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ParseException;
 

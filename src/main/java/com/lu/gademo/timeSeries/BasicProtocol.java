@@ -37,7 +37,6 @@ public class BasicProtocol {
 
 
     public static BigInteger minimumComputeProtocol(BigInteger c1, BigInteger c2, BigInteger cipherMiunsOne, BigInteger cipherOne, SHSParamters Param) {
-
         int k1 = Param.k1;
         int k2 = Param.k2;
         BigInteger L = Param.L;

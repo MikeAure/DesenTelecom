@@ -13,6 +13,7 @@ class ExponentialMechanism(Mechanism):
 
     def m(self, a, n_samples: int = 1):
         """返回选择该元素的概率"""
+        # exp(epsilon * a / (2 * sensitivity)), 此时打分函数u = 1
         probabilities = np.array([np.e ** (self.eps * a / (2 * self.sensitivity))] * n_samples)
         probabilities_length = probabilities.shape[0]
         # print(probabilities_length)

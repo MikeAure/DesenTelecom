@@ -72,23 +72,23 @@
                     <ul class="nav nav-second-level">
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/map" style="font-size: 15px;">地图导航类</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/map" style="font-size: 15px;">地图导航类场景</a>
                         </li>
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi"
-                               style="font-size: 15px;">网络约车类</a>
+                               style="font-size: 15px;">网络约车类场景</a>
                         </li>
 
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/communication" style="font-size: 15px;">即时通信类</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/communication" style="font-size: 15px;">即时通信类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/community"
-                               style="font-size: 15px;">网络社区类</a>
+                               style="font-size: 15px;">网络社区类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinepayment" style="font-size: 15px;">网络支付类</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinepayment" style="font-size: 15px;">网络支付类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlineshopping" style="font-size: 15px;">网上购物类场景</a>
@@ -101,36 +101,36 @@
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/express"
-                               style="font-size: 15px;">邮件快件寄递场景</a>
+                               style="font-size: 15px;">邮件快件寄递类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/transportationticket"
-                               style="font-size: 15px;">交通票务场景</a>
+                               style="font-size: 15px;">交通票务类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/marry"
-                               style="font-size: 15px;">婚恋相亲场景</a>
+                               style="font-size: 15px;">婚恋相亲类场景</a>
                         </li>
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/employment"
-                               style="font-size: 15px;">求职招聘场景</a>
+                               style="font-size: 15px;">求职招聘类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinelending" style="font-size: 15px;">网络借贷场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinelending" style="font-size: 15px;">网络借贷类场景</a>
                         </li>
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/house"
-                               style="font-size: 15px;">房屋租售场景</a>
+                               style="font-size: 15px;">房屋租售类场景</a>
                         </li>
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/usedcar"
-                               style="font-size: 15px;">二手车交易场景</a>
+                               style="font-size: 15px;">二手车交易类场景</a>
                         </li>
                         <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/consultation" style="font-size: 15px;">问诊挂号场景</a>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/consultation" style="font-size: 15px;">问诊挂号类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/travel"
@@ -219,21 +219,21 @@
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/ebook"
-                               style="font-size: 15px;">电子图书场景</a>
+                               style="font-size: 15px;">电子图书类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/capture"
-                               style="font-size: 15px;">拍摄美化场景</a>
+                               style="font-size: 15px;">拍摄美化类场景</a>
                         </li>
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/appstore"
-                               style="font-size: 15px;">应用商店场景</a>
+                               style="font-size: 15px;">应用商店类场景</a>
                         </li>
 
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/tools"
-                               style="font-size: 15px;">实用工具场景</a>
+                               style="font-size: 15px;">实用工具类场景</a>
                         </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/performanceticket" style="font-size: 15px;">演出票务场景</a>
@@ -429,6 +429,13 @@
                     <a class="J_menuItem" href="${ctx!}/templateManagement" style="font-size: 20px;">
                         <i class="fa fa fa-cog"></i>
                         <span class="nav-label">应用场景模板管理</span>
+
+                    </a>
+                </li>
+                <li>
+                    <a class="J_menuItem" href="${ctx!}/performenceTest" style="font-size: 20px;">
+                        <i class="fa fa fa-cog"></i>
+                        <span class="nav-label">性能测试</span>
 
                     </a>
                 </li>

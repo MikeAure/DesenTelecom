@@ -31,7 +31,7 @@ def recv_all(sock, length):
     return data
 
 
-
+# 解密用户发送的加密查询
 def receive_and_parse(sock: socket) -> Tuple[list, int, int, int]:
     ciphertexts_length_bytes = sock.recv(16)
     ciphertexts_length = int.from_bytes(ciphertexts_length_bytes, 'big')
@@ -112,7 +112,7 @@ def first_round_process(query: list, support_vectors: np.ndarray, modulus: int, 
     paraB, paraD = [], []
     lam, epsilon = quantization(gamma, variance)
     support_vectors = support_vectors.astype(np.int64)
-
+    # 对于每一个支持向量
     for idx, sv in enumerate(support_vectors):
         sv = sv.tolist()
         theta = random.randint(10000, int(scaling_factor))
@@ -123,22 +123,26 @@ def first_round_process(query: list, support_vectors: np.ndarray, modulus: int, 
 
         sum_list = []
         sv.extend([0, 0, theta])
+        # 对于支持向量中的每个元素进行操作
         for i in range(len(sv)):
+            # 判断是否为0
+            # 支持向量中的元素为0
             if sv[i] < tolerance:
                 r = number.getRandomNBitInteger(k4)
                 d = (r * query[i]) % modulus
+            # 到了最后一个支持向量的元素
             elif i == len(sv) - 1:
                 d = (sv[i] * alpha * query[i]) % modulus
             else:
                 d = (2 * lam * sv[i] * alpha * query[i]) % modulus
             sum_list.append(d)
-
+        # 获取D_j
         sumD = sum(sum_list) % modulus
         paraD.append(sumD)
 
     return paraB, paraD, epsilon
 
-
+# 对列表D B 进行加密
 def first_round_respond(sock: socket, paraB: list, paraD: list, epsilon: int) -> None:
     data = {'paraB': paraB, 'paraD': paraD, 'epsilon': epsilon}
     json_data = json.dumps(data)

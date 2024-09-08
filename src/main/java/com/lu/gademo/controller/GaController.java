@@ -1,12 +1,16 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.dao.ga.ToolsetDefaultToolDao;
+import com.lu.gademo.service.impl.ToolsetService;
+import com.lu.gademo.utils.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class GaController extends BaseController {
-
+    @Autowired
+    private ToolsetService toolsetService;
 
     @RequestMapping(value = {"/", "/index"})
     public String index() {
@@ -44,6 +48,30 @@ public class GaController extends BaseController {
     @RequestMapping(value = {"/templateManagement"})
     public String getTemplateManagementView() {
         return "templateManagement/scenario";
+    }
+
+    @RequestMapping(value = {"/performenceTest"})
+    public String getPerformanceTestView() {
+        return "performancetest";
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/toolset/getDefaultSelection")
+    public Result<?> getDefaultSelectionView(String toolsetName) {
+        String defaultAlgName = toolsetService.getDefaultTool(toolsetName);
+        if (defaultAlgName != null) {
+            return new Result<>(200, "success", defaultAlgName);
+        }
+        return new Result<>(500, "failed", null);
+    }
+
+    @ResponseBody
+    @PostMapping(value = {"/toolset/setDefaultToolset"})
+    public Result<?> setDefaultToolset(String toolsetName, String defaultAlgName) {
+        if (toolsetService.setDefaultTool(toolsetName, defaultAlgName)) {
+            return new Result<>(200, "success", null);
+        }
+        return new Result<>(500, "failed", null);
     }
 
 

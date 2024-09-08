@@ -104,7 +104,7 @@ public class GeneralizationTest {
                 "广西壮族自治区玉林市北流市塘岸收费站入口(北海方向)", "广西壮族自治区桂林市七星区施家园路75号附近停车场",
                 "海南省儋州市国营八一总场xxx地址", "海南省三沙市西沙群岛xxx村","广西壮族自治区北海市逢时花园重庆苑a区27号楼",
                 "香港特别行政区7-11-裕旺大厦11号楼", "香港特别行政区中西区金钟添马添美道2号", "香港中西区金钟添马添美道2号",
-                "重庆市江北区建北四支路2号北辰名都8-11层重庆市信息产业局", "黑龙江省哈尔滨市道里区哈尔滨市公安局");
+                "重庆市江北区建北四支路2号北辰名都8-11层重庆市信息产业局", "黑龙江省哈尔滨市道里区哈尔滨市公安局", "香港特别行政区香港特别行政区石芳楼");
         DSObject dsObject = new DSObject(rawData);
         DSObject result0 = generalization.service(dsObject, 4, 0);
         DSObject result1 = generalization.service(dsObject, 4, 1);

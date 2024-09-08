@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+// 时间扭曲编辑距离
 public class TWED {
 
     public static int TWEDComputePlain(ArrayList<Integer> t1, ArrayList<Integer> t2, int lamda) {
@@ -35,25 +35,18 @@ public class TWED {
 
                 d = Math.min(d1, d2);
                 d = Math.min(d, d3);
-
                 distance[i][j] = d;
 
             }
         }
-
-
         return distance[l1 - 1][l2 - 1];
-
     }
 
     public static BigInteger TWEDComputeCipher(ArrayList<BigInteger> t1, ArrayList<BigInteger> t2, BigInteger encryptLamda, BigInteger cipherMiunsOne, BigInteger cipherOne, SHSParamters Param) {
-
-
         BigInteger N = Param.N;
 
         int l1 = t1.size();
         int l2 = t2.size();
-
 
         BigInteger[][] distance = new BigInteger[l1][l2];
         BigInteger absVal;
@@ -84,7 +77,6 @@ public class TWED {
                 absVal = BasicProtocol.absoluteComputeProtocol(t1.get(i), t1.get(i - 1), cipherMiunsOne, cipherOne, Param);
                 d1 = distance[i - 1][j].add(absVal).add(encryptLamda).mod(N);
 
-
                 // match
                 absVal = BasicProtocol.absoluteComputeProtocol(t1.get(i), t2.get(j), cipherMiunsOne, cipherOne, Param);
                 d2 = distance[i - 1][j - 1].add(absVal).mod(N);
@@ -105,8 +97,6 @@ public class TWED {
 //				}
 
                 distance[i][j] = d;
-
-
             }
         }
 

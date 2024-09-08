@@ -46,7 +46,9 @@
                 body: '&rawData=' + encodeURIComponent(textInput) +
                     /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                     '&samples=' + encodeURIComponent(1) +
-                    '&algName=' + encodeURIComponent(algName)
+                    '&algName=' + encodeURIComponent(algName) +
+                    '&params=' + encodeURIComponent(1)
+
             })
                 .then(response => response.text())
                 .then(data => {
@@ -71,7 +73,8 @@
                 body: '&rawData=' + encodeURIComponent(textInput) +
                     /*'&privacyLevel=' + encodeURIComponent(privacyLevel) +*/
                     '&samples=' + encodeURIComponent(1) +
-                    '&algName=' + encodeURIComponent(algName)
+                    '&algName=' + encodeURIComponent(algName) +
+                    '&params=' + encodeURIComponent(1)
             })
                 .then(response => response.text())
                 .then(data => {
@@ -281,9 +284,9 @@
                     <select class="text-center"
                             id="dpCode_privacyLevel"
                             style="font-size: 1.5em;">
-                        <option value="1">低程度</option>
-                        <option value="2" selected>中程度</option>
-                        <option value="3">高程度</option>
+                        <option value="1">epsilon=3.6</option>
+                        <option value="2" selected>epsilon=2</option>
+                        <option value="3">epsilon=0.7</option>
                     </select>
                 </div>
 

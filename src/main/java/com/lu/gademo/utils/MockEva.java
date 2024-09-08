@@ -190,6 +190,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import com.lu.gademo.model.TcpPacket;
 
 import java.io.DataInputStream;
@@ -198,7 +199,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 
 public class MockEva {
 
@@ -206,11 +207,13 @@ public class MockEva {
         int port = 10005;
         ServerSocket serverSocket = new ServerSocket(port);
         System.out.println("服务器启动，监听端口：" + port);
+        int counter = 0;
 
         try {
             while (true) {
                 Socket socket = serverSocket.accept();
-                new Thread(new ClientHandler(socket)).start();
+                new Thread(new ClientHandler(socket, counter)).start();
+                counter ++;
             }
         } finally {
             serverSocket.close();
@@ -219,9 +222,11 @@ public class MockEva {
 
     static class ClientHandler implements Runnable {
         private final Socket socket;
+        private final int counter;
 
-        public ClientHandler(Socket socket) {
+        public ClientHandler(Socket socket, int counter) {
             this.socket = socket;
+            this.counter = counter;
         }
 
         @Override
@@ -232,18 +237,22 @@ public class MockEva {
 
                 // 读取客户端数据
                 ByteArrayBuilder byteArrayBuilder = new ByteArrayBuilder();
-                readRemoteContent(byteArrayBuilder, dataInputStream);
+                Map<String, String> info = readRemoteContent(byteArrayBuilder, dataInputStream);
+
                 // 根据情况发送数据
-                byte[] evaReceiptBytes = getReceiptBytes();
-                byte[] evaResultBytes = getResultBytes();
-                byte[] evaResultInvBytes = getResultInvBytes();
+                byte[] evaReceiptBytes = getReceiptBytes(info);
+                byte[] evaResultBytes = getResultBytes(info);
+                byte[] evaResultInvBytes = getResultInvBytes(info);
 
 //                int chosenNum = ThreadLocalRandom.current().nextInt(2);
 //                if (chosenNum == 0) {
-                sendThirdResponse(dataOutputStream, evaReceiptBytes, evaResultBytes);
+//                sendThirdResponse(dataOutputStream, evaReceiptBytes, evaResultBytes);
 //                } else {
-//                    sendSecondResponse(dataOutputStream, evaReceiptBytes, evaResultInvBytes);
-//                }
+                if (counter % 2 == 0) {
+                    sendSecondResponse(dataOutputStream, evaReceiptBytes, evaResultInvBytes);
+                } else {
+                    sendThirdResponse(dataOutputStream, evaReceiptBytes, evaResultBytes);
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -278,76 +287,391 @@ public class MockEva {
         }
     }
 
-    public static void readRemoteContent(ByteArrayBuilder byteArrayBuilder, DataInputStream dataInputStream) throws IOException {
+    public static Map<String, String> readRemoteContent(ByteArrayBuilder byteArrayBuilder, DataInputStream dataInputStream) throws IOException {
+        Map<String, String> result = new HashMap<>();
         byte[] header = new byte[14];
         dataInputStream.readFully(header);
         int dataLength = dataInputStream.readInt();
         byte[] dataBytes = new byte[dataLength - 34];
         dataInputStream.readFully(dataBytes);
         byteArrayBuilder.write(dataBytes);
+        JsonNode jsonNodes = new ObjectMapper().readTree(dataBytes);
+        System.out.println(jsonNodes.toPrettyString());
+//        SendEvaReq sendEvaReq = new ObjectMapper().treeToValue(jsonNodes.get("data").get("content"), SendEvaReq.class);
+//        System.out.println(sendEvaReq.toString());
+        List<String> desenInfoPreIden = Arrays.asList(jsonNodes.get("data").get("content").get("desenInfoPreIden").asText().split(","));
+        Collections.shuffle(desenInfoPreIden, new Random());
+        int chooseNum = new Random().nextInt(desenInfoPreIden.size());
+        if (chooseNum <= 1) {
+            chooseNum = 2;
+        }
+        List<String> selectedList = new ArrayList<>(desenInfoPreIden.subList(0, chooseNum));
+        if (selectedList.contains("CUST_ID")) {
+            selectedList.remove("CUST_ID");
+        }
+        if (selectedList.contains("sid")) {
+            selectedList.remove("sid");
+        }
+        result.put("desenFailedColName", String.join(",", selectedList));
+        result.put("desenIntention", jsonNodes.get("data").get("content").get("desenIntention").asText());
+        result.put("desenRequirements", jsonNodes.get("data").get("content").get("desenRequirements").asText());
+        result.put("fileType", jsonNodes.get("data").get("content").get("fileType").asText());
+        result.put("evaRequestId", jsonNodes.get("data").get("content").get("evaRequestId").asText());
+        result.put("desenInfoPreId", jsonNodes.get("data").get("content").get("desenInfoPreId").asText());
+        result.put("desenInfoAfterId", jsonNodes.get("data").get("content").get("desenInfoAfterId").asText());
+        System.out.println("fileType" + jsonNodes.get("data").get("content").get("fileType").asText());
+        System.out.println("desenFailedColName" + result.get("desenFailedColName"));
         byte[] auth = new byte[16];
         dataInputStream.readFully(auth);
+        return result;
     }
 
-    public static byte[] getReceiptBytes() throws JsonProcessingException, UnsupportedEncodingException {
+    public static byte[] getReceiptBytes(Map<String, String> info) throws JsonProcessingException, UnsupportedEncodingException {
         // 应该从实际的数据源加载或生成
-        String evaReceipt = "{\"content\":{\"certificateID\":\"1722316999761\"," +
-                "\"evaRequestID\":\"1f19b73a3bb77c7a3b3aed6600209a3420e9fb4887937b69f2412177b244a9a3\"," +
-                "\"hash\":\"-153222702\"}," +
+        String evaReceipt = "";
+        Random random = new Random();
+        String certificateID = System.currentTimeMillis() + String.valueOf((100 + random.nextInt(900)));
+        evaReceipt = "{\"content\":{\"certificateID\":" + "\"" + certificateID + "\"" + "," +
+                "\"evaRequestID\":\"" +
+                info.get("evaRequestId") +
+                "\"," +
+                "\"hash\":\"-15322703\"}," +
                 "\"dataType\":12593}";
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode evaReceiptJson = objectMapper.readTree(evaReceipt);
+        System.out.println(evaReceiptJson.toPrettyString());
         return new TcpPacket(evaReceiptJson.toPrettyString()).buildPacket();
     }
 
-    public static byte[] getResultBytes() throws JsonProcessingException, UnsupportedEncodingException {
+    public static byte[] getResultBytes(Map<String, String> info) throws JsonProcessingException, UnsupportedEncodingException {
         // 应该从实际的数据源加载或生成
-        String evaResult = "{\"content\":" +
-                "{\"evaResultID\":\"1f19b73a3bb77c7a3b3aed6600209a3420e9fb4887937b69f2412177b244a9a3\"," +
-                "\"evaPerformer\":\"脱敏工具集\"," +
-                "\"desenInfoPreID\":\"b0628b1ed1656d69fce19d04abfda0ac357d2945948563c737e31d1fbff0c599\"," +
-                "\"desenInfoAfterID\":\"1f19b73a3bb77c7a3b3aed6600209a3420e9fb4887937b69f2412177b244a9a3\"," +
-                "\"desenIntention\":\"CUST_ID脱敏,CUST_ADDR脱敏,CUST_AREA_GRADE脱敏,CUST_CONTROL_LEVEL脱敏,CUST_NAME脱敏,CUST_TYPE脱敏,CUST_GROUP脱敏,MOBILE_PHONE脱敏,CERT_TYPE脱敏,CERT_NUM脱敏,FAX脱敏,E_MAIL脱敏,POST_CODE脱敏,CREATE_STAFF脱敏,CREATE_DATE脱敏,UPDATE_STAFF脱敏,UPDATE_DATE脱敏,STATUS_DATE脱敏,STATUS_CD脱敏,REMARK脱敏,\"," +
-                "\"desenRequirements\": \"CUST_ID抑制,CUST_ADDR抑制,CUST_AREA_GRADE随机扰动,CUST_CONTROL_LEVEL随机扰动,CUST_NAME置换,CUST_TYPE随机扰动,CUST_GROUP随机扰动,MOBILE_PHONE抑制,CERT_TYPE抑制,CERT_NUM尾部截断,FAX尾部截断,E_MAIL尾部截断,POST_CODE尾部截断,CREATE_STAFF尾部截断,CREATE_DATE日期添加Laplace噪声,UPDATE_STAFF尾部截断,UPDATE_DATE日期添加Laplace噪声,STATUS_DATE日期添加Laplace噪声,STATUS_CD尾部截断,REMARK尾部截断,\"," +
-                "\"desenControlSet\":\"desencontrolset\"," +
-                "\"desenAlg\":\"16,16,2,2,19,2,2,16,16,11,11,11,11,11,1,11,1,1,11,11,\"," +
-                "\"desenAlgParam\" : \"3,3,3.6,3.6,15,3.6,3.6,3,3,3,3,3,3,3,0.001,3,0.1,0.1,3,3,\"," +
-                "\"desenPerformStartTime\" : \"2024-08-08 20:43:33\"," +
-                "\"desenPerformEndTime\" : \"2024-08-08 20:43:46\"," +
-                "\"desenLevel\" : \"0,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,\"," +
-                "\"desenPerformer\":\"脱敏工具集\"," +
-                "\"desenCom\":true," +
-                "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
-                "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+        String fileType = info.get("fileType");
+        String evaResultID = info.get("evaRequestId");
+        String desenInfoPreID = info.get("desenInfoPreId");
+        String desenInfoAfterID = info.get("desenInfoAfterId");
+        String evaResult = "";
+        switch (fileType) {
+            case "image":
+                evaResult = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"desenIntention\":\"对图像脱敏\"," +
+                        "\"desenRequirements\": \"对图像脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"42\"," +
+                        "\"desenAlgParam\" : \"5\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
+                        "\"desenLevel\" : \"1\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
+                        "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+                break;
+            case "audio":
+                evaResult = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"desenIntention\":\"对音频脱敏\"," +
+                        "\"desenRequirements\": \"对声纹脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"70\"," +
+                        "\"desenAlgParam\" : \"1.0\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
+                        "\"desenLevel\" : \"2\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
+                        "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+                break;
+            case "video":
+                evaResult = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"desenIntention\":\"对视频脱敏\"," +
+                        "\"desenRequirements\": \"对视频脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"52\"," +
+                        "\"desenAlgParam\" : \"5\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
+                        "\"desenLevel\" : \"1\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
+                        "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+                break;
+            case "text":
+                evaResult = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"身高脱敏,\"," +
+                        "\"desenRequirements\": \"身高添加差分隐私Laplace噪声,\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"3\"," +
+                        "\"desenAlgParam\" : \"10\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 14:37:24\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 14:37:24\"," +
+                        "\"desenLevel\" : \"1\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
+                        "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+                break;
+            case "graph":
+                evaResult = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"对图形脱敏\"," +
+                        "\"desenRequirements\": \"对图形脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"60\"," +
+                        "\"desenAlgParam\" : \"5\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
+                        "\"desenLevel\" : \"1\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
+                        "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+                break;
+            default:
+                evaResult = "{\"content\":" +
+                        "{\"evaResultID\":\"1f19b73a3bb77c7a3b3aed6600209a3420e9fb4887937b69f2412177b244a9a3\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"b0628b1ed1656d69fce19d04abfda0ac357d2945948563c737e31d1fbff0c599\"," +
+                        "\"desenInfoAfterID\":\"1f19b73a3bb77c7a3b3aed6600209a3420e9fb4887937b69f2412177b244a9a3\"," +
+                        "\"desenIntention\":\"CUST_ID脱敏,CUST_ADDR脱敏,CUST_AREA_GRADE脱敏,CUST_CONTROL_LEVEL脱敏,CUST_NAME脱敏,CUST_TYPE脱敏,CUST_GROUP脱敏,MOBILE_PHONE脱敏,CERT_TYPE脱敏,CERT_NUM脱敏,FAX脱敏,E_MAIL脱敏,POST_CODE脱敏,CREATE_STAFF脱敏,CREATE_DATE脱敏,UPDATE_STAFF脱敏,UPDATE_DATE脱敏,STATUS_DATE脱敏,STATUS_CD脱敏,REMARK脱敏,\"," +
+                        "\"desenRequirements\": \"CUST_ID抑制,CUST_ADDR抑制,CUST_AREA_GRADE随机扰动,CUST_CONTROL_LEVEL随机扰动,CUST_NAME置换,CUST_TYPE随机扰动,CUST_GROUP随机扰动,MOBILE_PHONE抑制,CERT_TYPE抑制,CERT_NUM尾部截断,FAX尾部截断,E_MAIL尾部截断,POST_CODE尾部截断,CREATE_STAFF尾部截断,CREATE_DATE日期添加Laplace噪声,UPDATE_STAFF尾部截断,UPDATE_DATE日期添加Laplace噪声,STATUS_DATE日期添加Laplace噪声,STATUS_CD尾部截断,REMARK尾部截断,\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"16,16,2,2,19,2,2,16,16,11,11,11,11,11,1,11,1,1,11,11,\"," +
+                        "\"desenAlgParam\" : \"3,3,3.6,3.6,15,3.6,3.6,3,3,3,3,3,3,3,0.001,3,0.1,0.1,3,3,\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-08 20:43:33\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-08 20:43:46\"," +
+                        "\"desenLevel\" : \"0,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
+                        "\"desenComplexity\":1,\"desenEffectEvaRet\":true,\"desenBGEffectEvaRet\":true},\"dataType\":12594}";
+                break;
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode evaResultJson = objectMapper.readTree(evaResult);
+        System.out.println(evaResultJson.toPrettyString());
         return new TcpPacket(evaResultJson.toPrettyString()).buildPacket();
-
     }
 
-    public static byte[] getResultInvBytes() throws JsonProcessingException, UnsupportedEncodingException {
-        String evaResultInv = "{\"content\":" +
-                "{\"evaResultID\":\"1f19b73a3bb77c7a3b3aed6600209a3420e9fb4887937b69f2412177b244a9a3\"," +
-                "\"evaPerformer\":\"脱敏工具集\"," +
-                "\"desenInfoPreID\":\"b0628b1ed1656d69fce19d04abfda0ac357d2945948563c737e31d1fbff0c599\"," +
-                "\"desenInfoAfterID\":\"1f19b73a3bb77c7a3b3aed6600209a3420e9fb4887937b69f2412177b244a9a3\"," +
-                "\"desenIntention\":\"CUST_ID脱敏,CUST_ADDR脱敏,CUST_AREA_GRADE脱敏,CUST_CONTROL_LEVEL脱敏,CUST_NAME脱敏,CUST_TYPE脱敏,CUST_GROUP脱敏,MOBILE_PHONE脱敏,CERT_TYPE脱敏,CERT_NUM脱敏,FAX脱敏,E_MAIL脱敏,POST_CODE脱敏,CREATE_STAFF脱敏,CREATE_DATE脱敏,UPDATE_STAFF脱敏,UPDATE_DATE脱敏,STATUS_DATE脱敏,STATUS_CD脱敏,REMARK脱敏,\"," +
-                "\"desenRequirements\": \"CUST_ID抑制,CUST_ADDR抑制,CUST_AREA_GRADE随机扰动,CUST_CONTROL_LEVEL随机扰动,CUST_NAME置换,CUST_TYPE随机扰动,CUST_GROUP随机扰动,MOBILE_PHONE抑制,CERT_TYPE抑制,CERT_NUM尾部截断,FAX尾部截断,E_MAIL尾部截断,POST_CODE尾部截断,CREATE_STAFF尾部截断,CREATE_DATE日期添加Laplace噪声,UPDATE_STAFF尾部截断,UPDATE_DATE日期添加Laplace噪声,STATUS_DATE日期添加Laplace噪声,STATUS_CD尾部截断,REMARK尾部截断,\"," +
-                "\"desenControlSet\":\"desencontrolset\"," +
-                "\"desenAlg\":\"16,16,2,2,19,2,2,16,16,11,11,11,11,11,1,11,1,1,11,11,\"," +
-                "\"desenAlgParam\" : \"3,3,3.6,3.6,15,3.6,3.6,3,3,3,3,3,3,3,0.001,3,0.1,0.1,3,3,\"," +
-                "\"desenPerformStartTime\" : \"2024-08-08 20:43:33\"," +
-                "\"desenPerformEndTime\" : \"2024-08-08 20:43:46\"," +
-                "\"desenLevel\" : \"0,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,\"," +
-                "\"desenPerformer\":\"脱敏工具集\"," +
-                "\"desenCom\":true," +
-                "\"desenFailedColName\" :\"CUST_CONTROL_LEVEL,CUST_AREA_GRADE,\" ," +
-                "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
-                "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
-                "\"dataType\":13313}";
+    public static byte[] getResultInvBytes(Map<String, String> info) throws
+            JsonProcessingException, UnsupportedEncodingException {
+        String fileType = info.get("fileType");
+        String evaResultID = info.get("evaRequestId");
+        String desenInfoPreID = info.get("desenInfoPreId");
+        String desenInfoAfterID = info.get("desenInfoAfterId");
+        String evaResultInv = "";
+
+        switch (fileType) {
+            case "image":
+                evaResultInv = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"对图像脱敏\"," +
+                        "\"desenRequirements\": \"对图像脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"42\"," +
+                        "\"desenAlgParam\" : \"5\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
+                        "\"desenLevel\" : \"1\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenFailedColName\" :\"\" ," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
+                        "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
+                        "\"dataType\":13313}";
+                break;
+            case "audio":
+                evaResultInv = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"对音频脱敏\"," +
+                        "\"desenRequirements\": \"对声纹脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"70\"," +
+                        "\"desenAlgParam\" : \"1.0\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
+                        "\"desenLevel\" : \"2\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenFailedColName\" :\"\" ," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
+                        "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
+                        "\"dataType\":13313}";
+                break;
+            case "video":
+                evaResultInv = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"对视频脱敏\"," +
+                        "\"desenRequirements\": \"对视频脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"52\"," +
+                        "\"desenAlgParam\" : \"5\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
+                        "\"desenLevel\" : \"1\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenFailedColName\" :\"\" ," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
+                        "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
+                        "\"dataType\":13313}";
+                break;
+            case "text":
+                evaResultInv = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"身高脱敏,\"," +
+                        "\"desenRequirements\": \"身高添加差分隐私Laplace噪声,\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"3\"," +
+                        "\"desenAlgParam\" : \"10\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-16 14:37:24\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-16 14:37:24\"," +
+                        "\"desenLevel\" : \"1\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenFailedColName\" :\"\" ," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
+                        "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
+                        "\"dataType\":13313}";
+                break;
+            case "graph":
+                evaResultInv = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"对图形脱敏\"," +
+                        "\"desenRequirements\": \"对图形脱敏\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"16,16,2,2,19,2,2,16,16,11,11,11,11,11,1,11,1,1,11,11,\"," +
+                        "\"desenAlgParam\" : \"3,3,3.6,3.6,15,3.6,3.6,3,3,3,3,3,3,3,0.001,3,0.1,0.1,3,3,\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-08 20:43:33\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-08 20:43:46\"," +
+                        "\"desenLevel\" : \"0,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenFailedColName\" :\"CUST_CONTROL_LEVEL,CUST_AREA_GRADE,\" ," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
+                        "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
+                        "\"dataType\":13313}";
+                break;
+            default:
+                evaResultInv = "{\"content\":" +
+                        "{\"evaResultID\":\"" +
+                        desenInfoAfterID +
+                        "\"," +
+                        "\"evaPerformer\":\"脱敏工具集\"," +
+                        "\"desenInfoPreID\":\"" +
+                        desenInfoPreID +
+                        "\"," +
+                        "\"desenInfoAfterID\":\"" +
+                        desenInfoAfterID +
+                        "\"," + "\"desenIntention\":\"CUST_ID脱敏,CUST_ADDR脱敏,CUST_AREA_GRADE脱敏,CUST_CONTROL_LEVEL脱敏,CUST_NAME脱敏,CUST_TYPE脱敏,CUST_GROUP脱敏,MOBILE_PHONE脱敏,CERT_TYPE脱敏,CERT_NUM脱敏,FAX脱敏,E_MAIL脱敏,POST_CODE脱敏,CREATE_STAFF脱敏,CREATE_DATE脱敏,UPDATE_STAFF脱敏,UPDATE_DATE脱敏,STATUS_DATE脱敏,STATUS_CD脱敏,REMARK脱敏,\"," +
+                        "\"desenRequirements\": \"CUST_ID抑制,CUST_ADDR抑制,CUST_AREA_GRADE随机扰动,CUST_CONTROL_LEVEL随机扰动,CUST_NAME置换,CUST_TYPE随机扰动,CUST_GROUP随机扰动,MOBILE_PHONE抑制,CERT_TYPE抑制,CERT_NUM尾部截断,FAX尾部截断,E_MAIL尾部截断,POST_CODE尾部截断,CREATE_STAFF尾部截断,CREATE_DATE日期添加Laplace噪声,UPDATE_STAFF尾部截断,UPDATE_DATE日期添加Laplace噪声,STATUS_DATE日期添加Laplace噪声,STATUS_CD尾部截断,REMARK尾部截断,\"," +
+                        "\"desenControlSet\":\"desencontrolset\"," +
+                        "\"desenAlg\":\"16,16,2,2,19,2,2,16,16,11,11,11,11,11,1,11,1,1,11,11,\"," +
+                        "\"desenAlgParam\" : \"3,3,3.6,3.6,15,3.6,3.6,3,3,3,3,3,3,3,0.001,3,0.1,0.1,3,3,\"," +
+                        "\"desenPerformStartTime\" : \"2024-08-08 20:43:33\"," +
+                        "\"desenPerformEndTime\" : \"2024-08-08 20:43:46\"," +
+                        "\"desenLevel\" : \"0,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,\"," +
+                        "\"desenPerformer\":\"脱敏工具集\"," +
+                        "\"desenCom\":true," +
+                        "\"desenFailedColName\" :\"" +
+                        info.get("desenFailedColName") +
+                        "\" ," +
+                        "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1," +
+                        "\"desenUsability\":0,\"desenComplexity\":1,\"desenEffectEvaRet\":false}," +
+                        "\"dataType\":13313}";
+
+        }
         // 应该从实际的数据源加载或生成
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode evaResultInvJson = objectMapper.readTree(evaResultInv);
+        System.out.println(evaResultInvJson.toPrettyString());
         return new TcpPacket(evaResultInvJson.toPrettyString()).buildPacket();
     }
 }

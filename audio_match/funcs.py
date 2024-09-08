@@ -1,7 +1,7 @@
 from models import *
 
 def save(identifier,voiceprint,modulus):
-    user = Agreeuser(identifier=identifier,voiceprint=voiceprint,modulus=modulus)
+    user = Agreeuser(identifier=identifier, voiceprint=voiceprint, modulus=modulus)
     session=DBSession()
     session.add(user)
     session.commit()
