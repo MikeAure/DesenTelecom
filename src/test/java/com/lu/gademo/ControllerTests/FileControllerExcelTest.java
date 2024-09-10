@@ -1,5 +1,6 @@
 package com.lu.gademo.ControllerTests;
 
+import com.lu.gademo.utils.Util;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -74,12 +76,14 @@ public class FileControllerExcelTest {
     private final MockMvc mvc;
     Path excelPath;
     Path excelPath1000w;
+    Util util;
 
     @Autowired
-    public FileControllerExcelTest(MockMvc mvc) throws IOException {
+    public FileControllerExcelTest(MockMvc mvc, Util util) throws IOException {
         this.mvc = mvc;
         this.excelPath = Paths.get(EXCEL_FILE_PATH);
         this.excelPath1000w = Paths.get(EXCEL_FILE_PATH_1000w);
+        this.util = util;
     }
 
     // 模板参数获取
@@ -377,6 +381,7 @@ public class FileControllerExcelTest {
     }
 
     @Test
+    // 对大数据平台相关数据表读写进行测试
     public void testBigDataScene() throws Exception {
         Map<String, List<String>> failedResult = new HashMap<>();
         Path currentDirectory = Paths.get("C:\\Users\\Mike\\Desktop");
@@ -425,7 +430,70 @@ public class FileControllerExcelTest {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("failed52_files.txt", true))) {
             for (Map.Entry<String, List<String>> failedRecord : failedResult.entrySet()) {
-                writer.write(failedRecord.getKey() + ": " + failedRecord.getValue().toString());
+                writer.write(util.getTime() + ": " + failedRecord.getKey() + ": " + failedRecord.getValue().toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    // 测试修改字段后的52个场景
+    @Test
+    public void testExcelFilesNew52scenes() throws Exception {
+        Map<String, List<String>> failedResult = new HashMap<>();
+        Path currentDirectory = Paths.get("D:\\52scenesv4100");
+        System.out.println("CurrentDirectory: " + currentDirectory.toString());
+        List<String> failedFileNameList = new ArrayList<>();
+        for (String sceneName : FIFTYTWO_SCENE) {
+            String[] strategy = new String[]{"_low", "_medium", "_high"};
+            for (String elem : strategy) {
+                System.out.println("正在获取：" + sceneName + elem + "参数");
+                String url = "/" + sceneName + elem + "param/list";
+                // 模拟multipart/form-data请求
+                MvcResult excelParam = mvc.perform(get(url))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andDo(MockMvcResultHandlers.print())
+                        .andReturn();
+
+                String params = excelParam.getResponse().getContentAsString(StandardCharsets.UTF_8);
+                System.out.println("Params: " + params);
+                System.out.println("获取" + sceneName + elem + "成功");
+                String fileName = EXCEL_FILE_NAMES_52.stream()
+                        .filter(name -> name.substring(0, name.lastIndexOf("."))
+                                .equalsIgnoreCase(sceneName))
+                        .findFirst().get();
+                System.out.println(fileName);
+                Path testFilePath = currentDirectory.resolve(fileName);
+                System.out.println("正在测试文件：" + testFilePath.toAbsolutePath());
+                byte[] excelBytes = Files.readAllBytes(testFilePath);
+                MockMultipartFile excelFile = new MockMultipartFile("file", fileName,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelBytes);
+
+                try {
+                    mvc.perform(multipart(URL)
+                                    .file(excelFile)
+                                    .param("sheet", sceneName + elem)
+                                    .param("params", params)
+                                    .param("algName", "distortion"))
+                            .andExpect(status().isOk())
+                            .andDo(MockMvcResultHandlers.print())
+                            .andReturn();
+                } catch (Exception e) {
+                    failedFileNameList.add(fileName);
+                }
+
+                failedResult.put(currentDirectory.toAbsolutePath().toString(), failedFileNameList);
+
+            }
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("failed52_files.txt", true))) {
+            for (Map.Entry<String, List<String>> failedRecord : failedResult.entrySet()) {
+                writer.write(util.getTime() + ": " + failedRecord.getKey() + ": " + failedRecord.getValue().toString());
                 writer.newLine();
             }
         } catch (IOException e) {

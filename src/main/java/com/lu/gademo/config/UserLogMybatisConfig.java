@@ -9,34 +9,32 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
 @Configuration
-@EnableTransactionManagement
-@MapperScan(basePackages = "com.lu.gademo.mapper.crm",
-        sqlSessionTemplateRef = "crmSqlSessionTemplate")
-public class CrmMybatisConfig {
-    @Bean(name = "crmSqlSessionFactory")
+@MapperScan(basePackages = "com.lu.gademo.mapper.userlog",
+        sqlSessionTemplateRef = "userLogSqlSessionTemplate")
+public class UserLogMybatisConfig {
+    @Bean(name = "userLogSqlSessionFactory")
     @Primary
-    public SqlSessionFactory crmSqlSessionFactory(@Qualifier("crmDataSource") DataSource crmDataSource) throws Exception {
+    public SqlSessionFactory userLogSqlSessionFactory(@Qualifier("userLogDataSource") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(crmDataSource);
+        sqlSessionFactoryBean.setDataSource(dataSource);
 //        sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
 //                .getResources("classpath:mapper/primary/*.xml"));
         return sqlSessionFactoryBean.getObject();
     }
 
-    @Bean(name = "crmMybatisTransactionManager")
+    @Bean(name = "userLogMybatisTransactionManager")
     @Primary
-    public DataSourceTransactionManager crmMybatisTransactionManager(@Qualifier("crmDataSource")DataSource crmDataSource) {
-        return new DataSourceTransactionManager(crmDataSource);
+    public DataSourceTransactionManager userLogMybatisTransactionManager(@Qualifier("userLogDataSource")DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
-    @Bean(name = "crmSqlSessionTemplate")
+    @Bean(name = "userLogSqlSessionTemplate")
     @Primary
-    public SqlSessionTemplate crmSqlSessionTemplate(@Qualifier("crmSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+    public SqlSessionTemplate userLogSqlSessionTemplate(@Qualifier("userLogSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 }

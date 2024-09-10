@@ -127,4 +127,27 @@ public class DateParseUtil {
         return dateString;
     }
 
+//    // 修正时间部分，标准化为 HH:mm:ss 格式
+//    // 修正时间部分，标准化为 HH:mm:ss 格式
+//    private String fixTime(String dateString) {
+//        // 正则表达式匹配时间部分：HH:mm 或 HH:mm:ss
+//        Pattern timePattern = Pattern.compile("(\\d{1,2}):(\\d{1,2})(?::(\\d{1,2}))?");
+//        Matcher timeMatcher = timePattern.matcher(dateString);
+//
+//        if (timeMatcher.find()) {
+//            // 获取时间部分，并标准化为 HH:mm:ss 格式
+//            String hours = String.format("%02d", Integer.parseInt(timeMatcher.group(1)));
+//            String minutes = String.format("%02d", Integer.parseInt(timeMatcher.group(2)));
+//            String seconds = timeMatcher.group(3) != null ?
+//                    String.format("%02d", Integer.parseInt(timeMatcher.group(3))) : "00"; // 如果秒为空，默认为 00
+//
+//            // 替换原始时间部分为标准化的时间
+//            dateString = dateString.replace(timeMatcher.group(0), hours + ":" + minutes + ":" + seconds);
+//        } else {
+//            // 如果没有时间部分，默认时间为 00:00:00
+//            dateString += " 00:00:00";
+//        }
+//
+//        return dateString;
+//    }
 }

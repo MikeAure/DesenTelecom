@@ -1825,79 +1825,173 @@ private String dealAddress(String addr, int privacyLevel) {
     @Override
     public List<String> suppressIpRandomParts(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
-        String pat = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
-        String[] ip = {"$1", "$2", "$3", "$4"};
+
+        // IPv4正则表达式
+        String ipv4Pattern = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
+        String[] ipv4Parts = {"$1", "$2", "$3", "$4"};
+
+        // IPv6正则表达式
+        String ipv6Pattern = "([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4})";
+        String[] ipv6Parts = {"$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8"};
+
+        // 如果隐私级别为 0，直接返回原数据
         if (privacyLevel == 0)
             return dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
+
+        // 随机选择 IPv4 和 IPv6 的分段
         List<Integer> randomList = new ArrayList<>();
         for (int i = 0; i < dataList.size(); i++) {
-            randomList.add(ThreadLocalRandom.current().nextInt(4));
+            randomList.add(ThreadLocalRandom.current().nextInt(8));  // IPv6 有 8 段，IPv4 有 4 段
         }
 
-
+        // 处理每个数据项
         for (int i = 0; i < dataList.size(); i++) {
-            ArrayList<String> patTemp = new ArrayList<>(Arrays.asList(ip));
-            int random = randomList.get(i);
+            String data = dataList.get(i).toString();
 
-            switch (privacyLevel) {
-                case 1: {
-                    patTemp.set(random, "*");
-                    break;
-                }
-                case 2: {
-                    patTemp.set(random, "*");
-                    patTemp.set((random + 1) % 4, "*");
-                    break;
-                }
-                case 3: {
-                    patTemp.set(random, "*");
-                    patTemp.set((random + 1) % 4, "*");
-                    patTemp.set((random + 2) % 4, "*");
-                    break;
-                }
+            // 检测是否为 IPv4 或 IPv6
+            boolean isIpv4 = data.matches(ipv4Pattern);
+            boolean isIpv6 = data.matches(ipv6Pattern);
+
+            if (isIpv4) {
+                result.add(applyMaskToIp(data, ipv4Pattern, ipv4Parts, privacyLevel, randomList.get(i) % 4, isIpv4, isIpv6));
+            } else if (isIpv6) {
+                result.add(applyMaskToIp(data, ipv6Pattern, ipv6Parts, privacyLevel, randomList.get(i), isIpv4, isIpv6));
+            } else {
+                result.add(data);  // 非 IP 地址，原样返回
             }
-
-            result.add(getString(dataList.get(i), pat, patTemp));
         }
 
         return result;
     }
 
+    // 辅助方法：根据隐私级别和随机索引对IP地址应用掩码
+    private String applyMaskToIp(String ip, String pattern, String[] parts, Integer privacyLevel, int random, boolean isIpv4, boolean isIpv6) {
+        ArrayList<String> patTemp = new ArrayList<>(Arrays.asList(parts));
 
-    @Override
+        switch (privacyLevel) {
+            case 1: {
+                if (isIpv4) {
+                    patTemp.set(random, "*");
+                } else if (isIpv6) {
+                    patTemp.set(random, "*");
+                    patTemp.set((random + 1) % parts.length, "*");
+                }
+                break;
+            }
+            case 2: {
+                if (isIpv4) {
+                    patTemp.set(random, "*");
+                    patTemp.set((random + 1) % parts.length, "*");
+                } else if (isIpv6) {
+                    patTemp.set(random, "*");
+                    patTemp.set((random + 1) % parts.length, "*");
+                    patTemp.set((random + 2) % parts.length, "*");
+                    patTemp.set((random + 3) % parts.length, "*");
+                }
+
+                break;
+            }
+            case 3: {
+                if (isIpv4) {
+                    patTemp.set(random, "*");
+                    patTemp.set((random + 1) % parts.length, "*");
+                    patTemp.set((random + 2) % parts.length, "*");
+                } else if (isIpv6) {
+                    patTemp.set(random, "*");
+                    patTemp.set((random + 1) % parts.length, "*");
+                    patTemp.set((random + 2) % parts.length, "*");
+                    patTemp.set((random + 3) % parts.length, "*");
+                    patTemp.set((random + 4) % parts.length, "*");
+                    patTemp.set((random + 5) % parts.length, "*");
+                }
+
+                break;
+            }
+        }
+
+        return getString(ip, pattern, patTemp);
+    }
+
+
     public List<String> suppressAllIp(List<Object> dataList, Integer privacyLevel) {
         ArrayList<String> result = new ArrayList<>();
-        String pat = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
-        String[] ip = {"$1", "$2", "$3", "$4"};
 
+        // IPv4 正则表达式
+        String ipv4Pattern = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
+        String[] ipv4Parts = {"$1", "$2", "$3", "$4"};
+
+        // IPv6 正则表达式
+        String ipv6Pattern = "([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4}):([\\da-fA-F]{1,4})";
+        String[] ipv6Parts = {"$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8"};
+
+        // 处理每个数据
         for (Object data : dataList) {
-            ArrayList<String> patTemp = new ArrayList<>(Arrays.asList(ip));
-            switch (privacyLevel) {
-                case 0:
-                    result.add(data == null ? null : data.toString()); // 不进行脱敏处理
-                    break;
-                case 1:
-                    patTemp.set(0, "*");
-                    result.add(getString(data, pat, patTemp)); // 第一部分脱敏
-                    break;
-                case 2:
-                    patTemp.set(0, "*");
-                    patTemp.set(1, "*");
-                    result.add(getString(data, pat, patTemp)); // 第一和第二部分脱敏
-                    break;
+            String dataStr = data == null ? null : data.toString();
+            if (dataStr == null) {
+                result.add(null);
+                continue;
+            }
 
-                default:
+            // 检测是否为 IPv4 或 IPv6
+            boolean isIpv4 = dataStr.matches(ipv4Pattern);
+            boolean isIpv6 = dataStr.matches(ipv6Pattern);
+
+            // 根据不同 IP 地址格式，设置不同的隐私级别处理
+            if (isIpv4) {
+                result.add(applyMaskToIp(dataStr, ipv4Pattern, ipv4Parts, privacyLevel, isIpv4, isIpv6));
+            } else if (isIpv6) {
+                result.add(applyMaskToIp(dataStr, ipv6Pattern, ipv6Parts, privacyLevel, isIpv4, isIpv6));
+            } else {
+                result.add(dataStr);  // 不是 IP 地址，原样返回
+            }
+        }
+
+        return result;
+    }
+
+    // 辅助方法：根据隐私级别和随机索引对IP地址应用掩码
+    private String applyMaskToIp(String ip, String pattern, String[] parts, Integer privacyLevel, boolean isIpv4, boolean isIpv6) {
+        ArrayList<String> patTemp = new ArrayList<>(Arrays.asList(parts));
+
+        // 根据隐私级别进行掩码处理
+        switch (privacyLevel) {
+            case 0:
+                return ip; // 不做任何处理
+            case 1:
+                if (isIpv4) {
+                    patTemp.set(0, "*");
+                } else if (isIpv6) {
                     patTemp.set(0, "*");
                     patTemp.set(1, "*");
                     patTemp.set(2, "*");
                     patTemp.set(3, "*");
-                    result.add(getString(data, pat, patTemp)); // 前三部分脱敏
-                    break;
-            }
-        }
-        return result;
+                }
 
+                break;
+            case 2:
+                if (isIpv4) {
+                    patTemp.set(0, "*");
+                    patTemp.set(1, "*");
+                } else if (isIpv6) {
+                    patTemp.set(0, "*");
+                    patTemp.set(1, "*");
+                    patTemp.set(2, "*");
+                    patTemp.set(3, "*");
+                    patTemp.set(4, "*");
+                    patTemp.set(5, "*");
+                }
+                break;
+            default:
+                // 所有部分脱敏
+                for (int i = 0; i < parts.length; i++) {
+                    patTemp.set(i, "*");
+                }
+                break;
+        }
+
+        return getString(ip, pattern, patTemp);
     }
+
 
     // 取字符串
     private String getString(Object data, String pat, ArrayList<String> keepPat) {

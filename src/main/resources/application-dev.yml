@@ -19,6 +19,12 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
+
+        userlog:
+            jdbc-url: jdbc:mysql://localhost:3306/userlog1?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
+            driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         hibernate:
             ddl-auto: update
@@ -113,3 +119,11 @@ logSenderManager:
     ifSaveToDatabase: true
     ifSendFile: false
     ifPerformenceTest: false
+
+
+fetch:
+    database:
+        task:
+            enabled: false
+            initialDelay: 5000   # 初始延迟时间（毫秒）
+            fixedRate: 180000    # 间隔时间（毫秒）

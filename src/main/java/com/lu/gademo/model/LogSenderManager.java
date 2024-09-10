@@ -187,7 +187,6 @@ public class LogSenderManager {
         log.info("fileType: {}", fileType);
         log.info("fileSuffix: {}", fileSuffix);
 
-        // TODO: 测试，最后需要改成发送文件
         EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(
                 sendEvaReq, rawFileBytes, desenFileBytes, ifSaveFile);
         if (evaluationSystemReturnResult != null) {
@@ -220,7 +219,6 @@ public class LogSenderManager {
                 String entityName = sendEvaReq.getFileType();
                 // 将脱敏后的表格文件内容保存到数据库表中
                 if (ifSaveToDatabase && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
-
                     eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails, responseEntityCompletableFuture, responseEntityResult));
                 } else {
                     responseEntityCompletableFuture.complete(responseEntityResult);

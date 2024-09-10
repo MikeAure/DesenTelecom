@@ -15,6 +15,7 @@ public class DataSourceConfig {
     @Bean(name = "gaDataSource")
     @Qualifier("gaDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.ga")
+    // 设置Primary作为默认Bean
     @Primary
     public DataSource gaDataSource() {
         return DataSourceBuilder.create().build();
@@ -31,6 +32,13 @@ public class DataSourceConfig {
     @Qualifier("dataPlatformDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.dataplatform")
     public DataSource dataPlatformDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean(name = "userLogDataSource")
+    @Qualifier("userLogDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.userlog")
+    public DataSource userLogDataSource() {
         return DataSourceBuilder.create().build();
     }
 }

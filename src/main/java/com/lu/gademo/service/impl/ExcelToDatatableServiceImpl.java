@@ -252,6 +252,7 @@ public class ExcelToDatatableServiceImpl {
                 entities.add(entity);
             }
             // 获取对应的repository
+            log.info("正在保存的表名为：{}", tableName);
             dataPlatformDesenService.deleteAndInsert(tableName, entities);
 
         } catch (Exception e) {
@@ -306,6 +307,18 @@ public class ExcelToDatatableServiceImpl {
             }
         }
         return fieldMap;
+    }
+
+    private <T> Map<String, Field> getFieldMap(Map<String, String> fieldMap, Class<T> entityClass) {
+
+        Map<String, Field> fieldMapResult = new HashMap<>();
+        for (Field field : entityClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Column.class)) {
+                Column column = field.getAnnotation(Column.class);
+                fieldMapResult.put(column.name(), field);
+            }
+        }
+        return fieldMapResult;
     }
 
     /**

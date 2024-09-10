@@ -300,6 +300,7 @@ public class MockEva {
 //        SendEvaReq sendEvaReq = new ObjectMapper().treeToValue(jsonNodes.get("data").get("content"), SendEvaReq.class);
 //        System.out.println(sendEvaReq.toString());
         List<String> desenInfoPreIden = Arrays.asList(jsonNodes.get("data").get("content").get("desenInfoPreIden").asText().split(","));
+
         Collections.shuffle(desenInfoPreIden, new Random());
         int chooseNum = new Random().nextInt(desenInfoPreIden.size());
         if (chooseNum <= 1) {
@@ -308,6 +309,10 @@ public class MockEva {
         List<String> selectedList = new ArrayList<>(desenInfoPreIden.subList(0, chooseNum));
         if (selectedList.contains("CUST_ID")) {
             selectedList.remove("CUST_ID");
+        }
+        // 对于大数据平台的测试
+        if (jsonNodes.get("data").get("content").get("fileType").asText().contains("sada")) {
+            selectedList = Arrays.asList("f_srcip", "f_dstip");
         }
         if (selectedList.contains("sid")) {
             selectedList.remove("sid");

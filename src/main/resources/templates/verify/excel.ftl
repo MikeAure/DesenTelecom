@@ -1944,7 +1944,7 @@
                                 设置需求模板
                             </button>
                             <div class="form-group" id="uploadForm">
-                                <input type="file" id="fileUpload" style="display: none"/>
+                                <input type="file" id="fileUpload" accept=".xlsx" style="display: none"/>
                                 <label for="fileUpload" class="upload-btn">
                                     选择文件
                                 </label>

@@ -1381,7 +1381,7 @@ public class FileServiceImpl implements FileService {
         String timeStamp = String.valueOf(System.currentTimeMillis());
 //        System.out.println(rawFileName.split("_")[1]);
         // 构造新的脱敏后文件名
-        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
+        desenFileNameList[desenFileNameList.length - 1] = timeStamp + "." + rawFileSuffix;
         String recFileName = String.join("_", desenFileNameList);
         log.info("recFileName {}", recFileName);
         Path desenFilePath = fileStorageService.getDesenFileDirectory().resolve(recFileName);
@@ -4285,6 +4285,8 @@ public class FileServiceImpl implements FileService {
 
     // 从DSObject获取脱敏结果
     private <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
+        log.info("当前列脱敏算法名称: " + algorithmInfo.getName());
+        log.info("当前列脱敏算法编号: " + algorithmInfo.getId());
         return algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
                 .stream()
                 .map(item -> item != null ? (T) item : null)

@@ -13,8 +13,10 @@ import com.lu.gademo.utils.LogCollectUtil;
 import com.lu.gademo.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "fetch.database.task.enabled", havingValue = "true", matchIfMissing = false)
 public class FetchDatabase {
     @Autowired
     private DataPlatformDesenServiceImpl dataPlatformDesenService;
@@ -39,7 +42,10 @@ public class FetchDatabase {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+//    @Scheduled(initialDelay = 5000, fixedRate = 180000)
+    @Scheduled(initialDelayString = "${fetch.database.task.initialDelay}", fixedRateString = "${fetch.database.task.fixedRate}")
     public boolean fetchDatabaseAndDesen() throws IOException, IllegalAccessException {
+        log.info("定时任务：拉取电信大数据平台数据并脱敏");
         String sheetName = "sada_gdpi_click_dtl";
         // 1. 从目标数据库获取数据
         List<SadaGdpiClickDtl> allRecordsByTableName = dataPlatformDesenService.getAllRecordsByTableName(sheetName);

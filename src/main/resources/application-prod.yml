@@ -15,7 +15,17 @@ spring:
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
 
+        dataplatform:
+            jdbc-url: jdbc:mysql://172.28.160.99:13306/userlogdtl?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: RAkj#7853
+            username: duser
+            driver-class-name: com.mysql.cj.jdbc.Driver
 
+        userlog:
+            jdbc-url: jdbc:mysql://172.28.160.99:13306/userlog1?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: RAkj#7853
+            username: duser
+            driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         hibernate:
             ddl-auto: update
@@ -63,8 +73,8 @@ logging:
             hibernate.SQL: INFO
 
 effectEva:
-    address: 172.28.72.223
-#    address: 127.0.0.1
+#    address: 172.28.72.223
+    address: 127.0.0.1
     port: 10005
 evidence:
     localAddress: 172.28.72.214
@@ -105,5 +115,12 @@ systemId:
 logSenderManager:
     ifSendToEvaFirst: true
     ifSaveToDatabase: true
-    ifSendFile: true
+    ifSendFile: false
     ifPerformenceTest: false
+
+fetch:
+    database:
+        task:
+            enabled: true
+            initialDelay: 5000   # 初始延迟时间（毫秒）
+            fixedRate: 180000    # 间隔时间（毫秒）

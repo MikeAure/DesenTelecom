@@ -155,7 +155,8 @@ public class ReplaceTest {
     @Test
     public void testSuppressAllIPAddress()  {
         // Replace replace = new ReplaceImpl();
-        List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
+        List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1",
+                "2401:3801:4012:1807:1101:1101:1101:1012", "138d:196c:6401:1412:112b:1101:1101:1101");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 9, 0);
         DSObject result1 = replace.service(dsObject, 9, 1);
@@ -172,7 +173,8 @@ public class ReplaceTest {
     @Test
     public void testSupressRandomIPAddress()  {
         // Replace replace = new ReplaceImpl();
-        List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
+        List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1",
+                "2401:3801:4012:1807:1101:1101:1101:1012", "138d:196c:6401:1412:112b:1101:1101:1101");
         DSObject dsObject = new DSObject(rawData);
         DSObject result = replace.service(dsObject, 10, 0);
         DSObject result1 = replace.service(dsObject, 10, 1);

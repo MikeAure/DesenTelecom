@@ -329,14 +329,14 @@
                         console.log("defaultOption: " +  defaultOption);
                         let defaultOptionParts = defaultOption.split("_");
                         let textAlgo = defaultOptionParts[0];
-                        let textType = defaultOptionParts[1];
+                        let textType = defaultOptionParts[defaultOptionParts.length-1];
 
                         setDefaultOption(textType, textAlgo);
 
                     } else {
                         let defaultOptionParts = defaultOption.split("_");
                         let textAlgo = defaultOptionParts[0];
-                        let textType = defaultOptionParts[1];
+                        let textType = defaultOptionParts[defaultOptionParts.length-1];
                         setDefaultOption(textType, textAlgo);
                     }
                 })
@@ -345,7 +345,7 @@
                     alert("获取默认算法失败");
                     let defaultOptionParts = defaultOption.split("_");
                     let textAlgo = defaultOptionParts[0];
-                    let textType = defaultOptionParts[1];
+                    let textType = defaultOptionParts[defaultOptionParts.length-1];
                     setDefaultOption(textType, textAlgo);
                 });
 
@@ -368,7 +368,7 @@
             $('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
                 let defaultOptionParts = defaultOption.split("_");
                 let textAlgo = defaultOptionParts[0];
-                let textType = defaultOptionParts[1];
+                let textType = defaultOptionParts[defaultOptionParts.length-1];
                 const text_type = document.getElementById("textType");
                 // 设置默认类型
                 text_type.value = textType;

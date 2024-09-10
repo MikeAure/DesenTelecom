@@ -2,14 +2,12 @@ package com.lu.gademo;
 
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.DateParseUtil;
+import com.lu.gademo.utils.Dp;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.experimental.theories.suppliers.TestedOn;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import com.lu.gademo.utils.Dp;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +34,9 @@ public class DpTest {
         this.dp = dp;
         this.dateParseUtil = dateParseUtil;
     }
+
     @Test
-    public void testLaplaceMechanism()  {
+    public void testLaplaceMechanism() {
         List<Double> randomFloats = getDoubleList(50000, 10000.0);
 //        // Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(randomFloats);
@@ -69,7 +68,7 @@ public class DpTest {
     }
 
     @Test
-    public void testReportNoisyMax1Laplace()  {
+    public void testReportNoisyMax1Laplace() {
 //        // Dp dp = new DpImpl();
 
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
@@ -81,7 +80,7 @@ public class DpTest {
     }
 
     @Test
-    public void testReportNoisyMax3Laplace()  {
+    public void testReportNoisyMax3Laplace() {
 //        // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -92,7 +91,7 @@ public class DpTest {
     }
 
     @Test
-    public void testSnappingMechanism()  {
+    public void testSnappingMechanism() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -103,7 +102,7 @@ public class DpTest {
     }
 
     @Test
-    public void testDpImage()  {
+    public void testDpImage() {
         // Dp dp = new DpImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
@@ -118,7 +117,7 @@ public class DpTest {
     }
 
     @Test
-    public void testDpAudio()  {
+    public void testDpAudio() {
         // Dp dp = new DpImpl();
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
@@ -145,7 +144,7 @@ public class DpTest {
 //    }
 
     @Test
-    public void testExponentialMechanism()  {
+    public void testExponentialMechanism() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -156,7 +155,7 @@ public class DpTest {
     }
 
     @Test
-    public void testReportNoisyMax2Exponential()  {
+    public void testReportNoisyMax2Exponential() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -167,7 +166,7 @@ public class DpTest {
     }
 
     @Test
-    public void testReportNoisyMax4()  {
+    public void testReportNoisyMax4() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -178,7 +177,7 @@ public class DpTest {
     }
 
     @Test
-    public void testSparseVectorTechnique1()  {
+    public void testSparseVectorTechnique1() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -189,7 +188,7 @@ public class DpTest {
     }
 
     @Test
-    public void testSparseVectorTechnique2()  {
+    public void testSparseVectorTechnique2() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -200,7 +199,7 @@ public class DpTest {
     }
 
     @Test
-    public void testSparseVectorTechnique3()  {
+    public void testSparseVectorTechnique3() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -212,7 +211,7 @@ public class DpTest {
     }
 
     @Test
-    public void testSparseVectorTechnique4()  {
+    public void testSparseVectorTechnique4() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -223,7 +222,7 @@ public class DpTest {
     }
 
     @Test
-    public void testSparseVectorTechnique5()  {
+    public void testSparseVectorTechnique5() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -234,7 +233,7 @@ public class DpTest {
     }
 
     @Test
-    public void testSparseVectorTechnique6()  {
+    public void testSparseVectorTechnique6() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -245,7 +244,7 @@ public class DpTest {
     }
 
     @Test
-    public void testNumericalSparseVectorTechnique()  {
+    public void testNumericalSparseVectorTechnique() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -256,7 +255,7 @@ public class DpTest {
     }
 
     @Test
-    public void testRappor()  {
+    public void testRappor() {
         // Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(8.5);
         DSObject result = dp.service(dsObject, 18, 1);
@@ -266,7 +265,7 @@ public class DpTest {
     }
 
     @Test
-    public void testOneTimeRappor()  {
+    public void testOneTimeRappor() {
         // Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(8.5);
         DSObject result = dp.service(dsObject, 19, 6);
@@ -277,7 +276,7 @@ public class DpTest {
 
     // 信工所
     @Test
-    public void testDpCode()  {
+    public void testDpCode() {
         // Dp dp = new DpImpl();
         Random random = new Random();
         String[] chosenList = new String[]{"A", "B", "C", "D", "E"};
@@ -295,7 +294,7 @@ public class DpTest {
     }
 
     @Test
-    public void testRandomUniformToValue()  {
+    public void testRandomUniformToValue() {
         // Dp dp = new DpImpl();
         List<Double> randomFloats = getDoubleList(100000, 10000.0);
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
@@ -308,7 +307,7 @@ public class DpTest {
 
     // 信工所
     @Test
-    public void testRandomLaplaceToValue()  {
+    public void testRandomLaplaceToValue() {
         // Dp dp = new DpImpl();
 
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
@@ -320,7 +319,7 @@ public class DpTest {
     }
 
     @Test
-    public void testGaussianToValue()  {
+    public void testGaussianToValue() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -331,7 +330,7 @@ public class DpTest {
     }
 
     @Test
-    public void testNoisyHistogram1()  {
+    public void testNoisyHistogram1() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -342,7 +341,7 @@ public class DpTest {
     }
 
     @Test
-    public void testNoisyHistogram2()  {
+    public void testNoisyHistogram2() {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
@@ -486,51 +485,51 @@ public class DpTest {
                     }
                     // 日期类型
 //                        objs.add(dataFormatter.formatCellValue(cell));
-                        switch (cell.getCellType()) {
-                            case STRING:
-                                // 如果单元格是字符串类型，尝试解析为日期
-                                String dateString = cell.getStringCellValue();
-                                java.util.Date date = dateParseUtil.parseDate(dateString);
-                                if (date != null) {
-                                    String formattedDate = sdf.format(date);
-                                    objs.add(formattedDate);
-                                } else {
-                                    System.out.println("Invalid Date String: " + dateString);
-                                }
-                                break;
-                            case NUMERIC:
-                                if (DateUtil.isCellDateFormatted(cell)) {
-                                    // 如果单元格是日期类型
-                                    java.util.Date numericDate = cell.getDateCellValue();
-                                    String formattedDate = sdf.format(numericDate);
+                    switch (cell.getCellType()) {
+                        case STRING:
+                            // 如果单元格是字符串类型，尝试解析为日期
+                            String dateString = cell.getStringCellValue();
+                            java.util.Date date = dateParseUtil.parseDate(dateString);
+                            if (date != null) {
+                                String formattedDate = sdf.format(date);
+                                objs.add(formattedDate);
+                            } else {
+                                System.out.println("Invalid Date String: " + dateString);
+                            }
+                            break;
+                        case NUMERIC:
+                            if (DateUtil.isCellDateFormatted(cell)) {
+                                // 如果单元格是日期类型
+                                java.util.Date numericDate = cell.getDateCellValue();
+                                String formattedDate = sdf.format(numericDate);
 //                                    System.out.println("Formatted Date from Numeric: " + formattedDate);
+                                objs.add(formattedDate);
+                            } else {
+                                Long part1Start = System.currentTimeMillis();
+                                String formatCellValue = dataFormatter.formatCellValue(cell);
+                                Long part1End = System.currentTimeMillis();
+                                part1Total += part1End - part1Start;
+
+                                Long part2Start = System.currentTimeMillis();
+                                java.util.Date date2 = dateParseUtil.parseDate(formatCellValue);
+                                Long part2End = System.currentTimeMillis();
+                                part2Total += part2End - part2Start;
+
+                                Long part3Start = System.currentTimeMillis();
+                                if (date2 != null) {
+                                    String formattedDate = sdf.format(date2);
                                     objs.add(formattedDate);
                                 } else {
-                                    Long part1Start = System.currentTimeMillis();
-                                    String formatCellValue = dataFormatter.formatCellValue(cell);
-                                    Long part1End = System.currentTimeMillis();
-                                    part1Total += part1End - part1Start;
-
-                                    Long part2Start = System.currentTimeMillis();
-                                    java.util.Date date2 = dateParseUtil.parseDate(formatCellValue);
-                                    Long part2End = System.currentTimeMillis();
-                                    part2Total += part2End - part2Start;
-
-                                    Long part3Start = System.currentTimeMillis();
-                                    if (date2 != null) {
-                                        String formattedDate = sdf.format(date2);
-                                        objs.add(formattedDate);
-                                    } else {
-                                        System.out.println("Invalid Date String: " + formatCellValue);
-                                    }
-                                    Long part3End = System.currentTimeMillis();
-                                    part3Total += part3End - part3Start;
+                                    System.out.println("Invalid Date String: " + formatCellValue);
                                 }
-                                break;
-                            default:
-                                System.out.println("Unsupported Cell Type: " + cell.getCellType());
-                                break;
-                        }
+                                Long part3End = System.currentTimeMillis();
+                                part3Total += part3End - part3Start;
+                            }
+                            break;
+                        default:
+                            System.out.println("Unsupported Cell Type: " + cell.getCellType());
+                            break;
+                    }
 
                 }
 
@@ -545,9 +544,15 @@ public class DpTest {
     }
 
     @Test
+        // 日期解析工具测试
     void testDateUtil() {
-        List<String> dateString = Arrays.asList("2016-03-19 2:1:14", "2020-09-08 4:4:41", "2022-11-16 16:36:6", "2020-08-12 23:29:5", "2020-11-00 1:49:37");
-        for(String date : dateString) {
+        List<String> dateString = Arrays.asList("2016-03-19 2:1:14", "2020-09-08 4:4:41", "2022-11-16 16:36:6",
+                "2020-08-12 23:29:5", "2020-11-00 1:49:37", "2021-05-05 3:50",
+                "2023-08-01 0:33",
+                "2020-10-23 22:41",
+                "2023-06-28 12:14",
+                "19890510");
+        for (String date : dateString) {
             java.util.Date date2 = dateParseUtil.parseDate(date);
             if (date2 != null) {
                 System.out.println(date2);

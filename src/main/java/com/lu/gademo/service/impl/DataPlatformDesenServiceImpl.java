@@ -2,7 +2,9 @@ package com.lu.gademo.service.impl;
 
 import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
 import com.lu.gademo.mapper.dataplatform.SadaGdpiClickDtlParamDao;
+import com.lu.gademo.mapper.userlog.SadaGdpiClickDtlParamUserLogDao;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -19,21 +21,24 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Getter
 public class DataPlatformDesenServiceImpl {
+    private SadaGdpiClickDtlParamUserLogDao sadaGdpiClickDtlParamUserLogDao;
     private SadaGdpiClickDtlParamDao sadaDtlDao;
 
     private Map<String, String> columnMapping = new LinkedHashMap<>();
 
     @Autowired
-    public DataPlatformDesenServiceImpl(SadaGdpiClickDtlParamDao sadaGdpiClickDtlParamDao) {
+    public DataPlatformDesenServiceImpl(SadaGdpiClickDtlParamDao sadaGdpiClickDtlParamDao,
+                                        SadaGdpiClickDtlParamUserLogDao sadaGdpiClickDtlParamUserLogDao) {
         this.sadaDtlDao = sadaGdpiClickDtlParamDao;
+        this.sadaGdpiClickDtlParamUserLogDao = sadaGdpiClickDtlParamUserLogDao;
         columnMapping.put("sid", "sid");
         columnMapping.put("f_srcip", "fSrcip");
         columnMapping.put("f_ad", "fAd");
@@ -50,25 +55,43 @@ public class DataPlatformDesenServiceImpl {
     }
 
     public int deleteById(String tableName, Long id) {
-        return sadaDtlDao.deleteById(tableName, id);
+        return sadaGdpiClickDtlParamUserLogDao.deleteById(tableName, id);
     }
 
     public int deleteAll(String tableName) {
-        return sadaDtlDao.deleteAll(tableName);
+        return sadaGdpiClickDtlParamUserLogDao.deleteAll(tableName);
     }
 
+    // 批量插入
+    public void insertListBatch(String tableName, List<SadaGdpiClickDtl> list, int batchSize) {
+        for (int i = 0; i < list.size(); i += batchSize) {
+            List<SadaGdpiClickDtl> batchList = list.subList(i, Math.min(i + batchSize, list.size()));
+            insertList(tableName, batchList);
+        }
+    }
+
+    //    @Transactional(transactionManager = "dataPlatformMybatisTransactionManager")
+//    public void deleteAndInsert(String tableName, List<SadaGdpiClickDtl> list) {
+//        if (sadaDtlDao.getItemTotalNumberByTabelName(tableName) > 0) {
+//            sadaDtlDao.deleteAll(tableName);
+//        }
+//        insertListBatch(tableName, list, 1000);
+//    }
+    // 删除与插入
     @Transactional(transactionManager = "dataPlatformMybatisTransactionManager")
     public void deleteAndInsert(String tableName, List<SadaGdpiClickDtl> list) {
-        if (sadaDtlDao.getItemTotalNumberByTabelName(tableName) > 0) {
-            sadaDtlDao.deleteAll(tableName);
+        if (sadaGdpiClickDtlParamUserLogDao.getItemTotalNumberByTabelName(tableName) > 0) {
+            sadaGdpiClickDtlParamUserLogDao.deleteAll(tableName);
         }
-        sadaDtlDao.insertList(tableName, list);
+        insertListBatch(tableName, list, 1000);
     }
 
+    // 使用指向另一个数据的Dao进行插入
     public int insertList(String tableName, List<SadaGdpiClickDtl> list) {
-        return sadaDtlDao.insertList(tableName, list);
+        return sadaGdpiClickDtlParamUserLogDao.insertList(tableName, list);
     }
 
+    // 从dtl中读取记录
     public List<SadaGdpiClickDtl> getAllRecordsByTableName(String tableName) {
         return sadaDtlDao.getAllRecordsByTableName(tableName);
     }
@@ -78,7 +101,6 @@ public class DataPlatformDesenServiceImpl {
         Workbook workbook = new XSSFWorkbook();
         // 创建一个新的工作表
         Sheet sheet = workbook.createSheet("Data");
-
         // 创建表头行
         Row headerRow = sheet.createRow(0);
 
@@ -117,7 +139,7 @@ public class DataPlatformDesenServiceImpl {
 
         // 写入 Excel 文件
         try (FileOutputStream fileOut = new FileOutputStream(filePath.toAbsolutePath().toString())) {
-            System.out.println(filePath.toAbsolutePath().toString());
+            log.info(filePath.toAbsolutePath().toString());
             workbook.write(fileOut);
         } catch (IOException e) {
             e.printStackTrace();

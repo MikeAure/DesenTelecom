@@ -18,9 +18,9 @@ import javax.sql.DataSource;
 public class DataPlatformMybatisConfig {
     @Bean(name = "dataPlatformSqlSessionFactory")
     @Primary
-    public SqlSessionFactory crmSqlSessionFactory(@Qualifier("dataPlatformDataSource") DataSource crmDataSource) throws Exception {
+    public SqlSessionFactory dataPlatformSqlSessionFactory(@Qualifier("dataPlatformDataSource") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(crmDataSource);
+        sqlSessionFactoryBean.setDataSource(dataSource);
 //        sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
 //                .getResources("classpath:mapper/primary/*.xml"));
         return sqlSessionFactoryBean.getObject();
@@ -28,13 +28,13 @@ public class DataPlatformMybatisConfig {
 
     @Bean(name = "dataPlatformMybatisTransactionManager")
     @Primary
-    public DataSourceTransactionManager crmMybatisTransactionManager(@Qualifier("dataPlatformDataSource")DataSource crmDataSource) {
-        return new DataSourceTransactionManager(crmDataSource);
+    public DataSourceTransactionManager dataPlatformMybatisTransactionManager(@Qualifier("dataPlatformDataSource")DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean(name = "dataPlatformSqlSessionTemplate")
     @Primary
-    public SqlSessionTemplate crmSqlSessionTemplate(@Qualifier("dataPlatformSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+    public SqlSessionTemplate dataPlatformSqlSessionTemplate(@Qualifier("dataPlatformSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 }
