@@ -1,7 +1,6 @@
 package com.lu.gademo.controller;
 
 import com.lu.gademo.model.LogSenderManager;
-import com.lu.gademo.model.Server;
 import com.lu.gademo.service.impl.FileStorageService;
 import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.common.Vertex;
@@ -15,7 +14,10 @@ import com.lu.gademo.utils.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ import javax.crypto.Cipher;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -362,7 +365,7 @@ public class EncryptController {
     @ResponseBody
     @PostMapping(value = "/performenceTest",
             consumes = "application/json;charset=UTF-8")
-    public ResponseEntity<byte[]> performenceTest(@RequestBody double[][] points) throws IOException {
+    public ResponseEntity<Resource> performenceTest(@RequestBody double[][] points) throws IOException {
         log.info("开始非失真类文本算法性能测试");
         Path desenFilePath = Paths.get("desen_files");
         Map<String, String> returnResult = new HashMap<>();
@@ -397,6 +400,7 @@ public class EncryptController {
                 log.error("Error: " + e.getMessage());
             }
         }
+        futures.clear();
         long endTimePoint = System.nanoTime();
         double totalTime = (endTimePoint - startTimePoint) / 1e6;
         log.info("脱敏完成，共耗时：" + Double.toString(totalTime) + "ms");
@@ -404,23 +408,49 @@ public class EncryptController {
         log.info("每秒钟脱敏可脱敏数据：{}", 1000 / (totalTime / points.length) + "条");
         // Shut down the executor
         executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+        }
         String resultString = "脱敏" + points.length + "条数据用时" + totalTime + " ms\n" + resultBuilder.toString();
         String fileName = System.currentTimeMillis() + "test_result.txt";
         try (FileWriter fileWriter = new FileWriter(desenFilePath.resolve(fileName).toFile())) {
             fileWriter.write(resultString);
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
+            return ResponseEntity.badRequest().body(null);
         }
 
         // 准备返回文件
         File tempFile = desenFilePath.resolve(fileName).toFile();
         log.info("脱敏后文件写入完成");
+        points = null;
+        System.gc();
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=result.txt");
-        return ResponseEntity.ok()
+//        return ResponseEntity.ok()
+//                .headers(headers)
+//                .contentLength(tempFile.length())
+//                .body(Files.readAllBytes(tempFile.toPath()));
+        InputStream inputStream = Files.newInputStream(tempFile.toPath());
+        InputStreamResource resource = new InputStreamResource(inputStream);
+
+        ResponseEntity<Resource> responseEntity = ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(tempFile.length())
-                .body(Files.readAllBytes(tempFile.toPath()));
+                .body(resource);
+//        try (InputStreamResource resource = new InputStreamResource(Files.newInputStream(tempFile.toPath()))) {
+//            return ResponseEntity.ok()
+//                    .headers(headers)
+//                    .contentLength(tempFile.length())
+//                    .body(resource);
+//        } catch (IOException e) {
+//            log.error("Error reading file: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+        return responseEntity;
     }
 
     private String simpilifiedOfAlgo(String message, Vertex UF_j) throws Exception {

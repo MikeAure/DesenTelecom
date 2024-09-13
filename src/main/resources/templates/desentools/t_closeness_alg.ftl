@@ -371,7 +371,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                1. T 接近</p>
+                10. T 接近</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content:  center; width: 50%; margin: 0 auto; ">
                 <div>
@@ -545,7 +545,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                2.Hilbert</p>
+                11.Hilbert</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
@@ -605,7 +605,7 @@
     <div class="panel-body">
         <div class="row">
             <p style="font-size: 1.5em;display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
-                3.SpaceTwist</p>
+                12.SpaceTwist</p>
             <div <#--class="col-sm-6"-->
                     style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>

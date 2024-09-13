@@ -58,7 +58,6 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
         sendSplitDesenDataDao.save(sendSplitDesenData);
         // 构造需要发送的Json数据
         ObjectNode splitJsonData = objectMapper.valueToTree(sendSplitDesenData);
-//        System.out.println(splitJsonData.toPrettyString());
         ObjectNode allSplitJsonData = objectMapper.createObjectNode();
         allSplitJsonData.put("DataType", 0x3122);
         allSplitJsonData.set("content", splitJsonData);
@@ -66,7 +65,6 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
         dataJson.set("data", allSplitJsonData);
         log.info("拆分重构请求数据: {}", dataJson.toPrettyString());
         TcpPacketSplit tcpPacketSplit = new TcpPacketSplit(dataJson.toPrettyString());
-//        System.out.println(dataJson.toPrettyString());
         byte[] tcpBytePacket = tcpPacketSplit.buildPacket(desenFileData);
 
         try (
@@ -78,7 +76,6 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
             outputStream.write(tcpBytePacket);
             outputStream.flush();
             log.info("已发送拆分重构请求");
-
         } catch (ConnectException e) {
             log.error("未与拆分重构系统建立连接");
         } catch (UnknownHostException e) {

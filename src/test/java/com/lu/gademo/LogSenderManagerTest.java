@@ -2,6 +2,7 @@ package com.lu.gademo;
 
 import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import com.lu.gademo.model.LogSenderManager;
+import com.lu.gademo.service.SplitSystemLogSender;
 import com.lu.gademo.utils.LogCollectUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class LogSenderManagerTest {
     @Autowired
-    private LogSenderManager logSenderManager;
+    private SplitSystemLogSender logSenderManager;
     @Autowired
     private LogCollectUtil logCollectUtil;
 

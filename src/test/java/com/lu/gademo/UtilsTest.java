@@ -1,12 +1,21 @@
 package com.lu.gademo;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lu.gademo.entity.ClassificationResult;
+import com.lu.gademo.entity.ExcelParam;
+import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.utils.impl.UtilImpl;
 import org.deidentifier.arx.*;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +24,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SpringBootTest
 public class UtilsTest {
+    @Autowired
+    private ExcelParamService excelParamService;
+
     @Test
     public void testConda() {
         UtilImpl util = new UtilImpl();
@@ -61,7 +74,7 @@ public class UtilsTest {
         Path rawFilePath = rawDirectory.resolve(rawFileName);
         byte[] content = new byte[40];
         FileInputStream fileInputStream = new FileInputStream(rawFilePath.toFile());
-        while(fileInputStream.available() > 0) {
+        while (fileInputStream.available() > 0) {
             fileInputStream.read(content);
         }
         System.out.println(new String(content, StandardCharsets.UTF_8));
@@ -168,5 +181,39 @@ public class UtilsTest {
         for (Object item : testArray) {
             System.out.println(item);
         }
+    }
+
+    @Test
+    void testCourseTwo() throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Path path = Paths.get("./dataplatform_config.json");
+        JsonNode columnList = objectMapper.readTree(path.toFile()).get("columnList");
+        List<ClassificationResult> courseTwoList = objectMapper.readValue(columnList.toString(), new TypeReference<List<ClassificationResult>>() {
+        });
+        Map<String, Integer> courseTwoMap = new HashMap<>();
+
+        for (ClassificationResult item : courseTwoList) {
+            courseTwoMap.put("f_" + item.getColumnName(), item.getColumnLevel());
+        }
+
+        List<ExcelParam> lowStrategyConfig = excelParamService.getParamsByTableName("sada_gdpi_click_dtl_low_param");
+        courseTwoList.forEach(System.out::println);
+        lowStrategyConfig.forEach(System.out::println);
+        courseTwoMap.keySet().forEach(System.out::println);
+        for (ExcelParam item : lowStrategyConfig) {
+            System.out.println(item.getColumnName());
+            if (item.getColumnName().equals("sid") || item.getColumnName().equals("f_dataid") || item.getColumnName().equals("f_ts")) {
+                continue;
+            }
+            Integer courseTwoMapTmParam = courseTwoMap.get(item.getColumnName());
+            System.out.println(courseTwoMapTmParam);
+            if (courseTwoMapTmParam == 4) {
+                courseTwoMapTmParam = 3;
+            }
+            item.setTmParam(courseTwoMapTmParam > item.getTmParam() ? courseTwoMapTmParam : item.getTmParam());
+        }
+
+        lowStrategyConfig.forEach(System.out::println);
     }
 }

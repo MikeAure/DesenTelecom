@@ -78,6 +78,8 @@ def first_round_receive(sock: socket, modulus: int, s: int, inv_s: int, alpha: i
     epsilon = response['epsilon']
 
     paraE, paraF, paraK, paraU = [], [], [], []
+    print("解除可逆加扰前")
+    print(f"paraD:{paraD[0:10]}")
     print("解除可逆加扰")
     for x in paraD:
         e = (inv_s * x) % modulus

@@ -40,7 +40,7 @@
             });
 
             document.getElementById("audio_augmentation_fileUpload").addEventListener("change", function(event) {
-                chooseFile(event, "audio_augmentation", false)
+                chooseFile(event, "audio_augmentation", true)
             });
 
             document.getElementById("audio_median_fileUpload").addEventListener("change", function(event) {
@@ -322,6 +322,17 @@
                                     选择文件
                                 </label>
                             </form>
+                        </div>
+                    </div>
+
+                    <div <#--class="ibox-content"--> style="text-align: center;">
+                        <div style="margin: auto; font-size: 20px">
+                            <label for="audio_augmentation_privacyLevel">请选择隐私保护程度：</label>
+                            <select id="audio_augmentation_privacyLevel">
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
+                            </select>
                         </div>
                     </div>
 

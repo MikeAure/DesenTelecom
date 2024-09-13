@@ -270,7 +270,6 @@
                     distortion_alg_list.options.add(new Option("数值取整", "floor"));
                     distortion_alg_list.options.add(new Option("数值映射", "valueMapping"));
 
-
                 } else if (text_type === "name") {
                     distortion_alg_list.options.add(new Option("名称抑制算法", "nameHide"));
                     distortion_alg_list.options.add(new Option("假名化-哈希", "SHA512"));
@@ -433,8 +432,6 @@
                 if (file && file.type === 'text/plain') {
                     const reader = new FileReader();
                     reader.onload = function (e) {
-                        const textArea = document.getElementById('testData');
-                        textArea.value = e.target.result;
                         document.getElementById('fileName').textContent = file.name + '已选择';
                     };
                     reader.readAsText(file);
@@ -466,298 +463,58 @@
                     })
                         .then(response => response.blob())
                         .then(blob => {
+                            const fileName = Date.now() + 'NondistortionTestResult.txt';
                             const fileSizeInBytes = blob.size;
                             const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
 
                             // 输出文件大小（以字节为单位）
                             console.log("File size: " + fileSizeInBytes + " bytes");
-                            console.log("File size: " + fileSizeInBytes.toFixed(2) + " MB");
+                            console.log("File size: " + fileSizeInMegabytes.toFixed(2) + " MB");
 
-                            // 判断文件大小以执行不同的操作
-                            if (fileSizeInMegabytes > 100) {
-                                // 如果文件大于100M，仅保存文件内容，不显示
-                                alert('文件过大 (>100MB)，仅保存文件内容，不显示。');
-                                window.downloadBlob = blob;
-                            } else if (fileSizeInMegabytes > 10) {
-                                // 如果文件大于10M但小于等于100M，只显示前100行
-                                const fileReader = new FileReader();
-                                fileReader.onload = function (event) {
-                                    const content = event.target.result;
-                                    const lines = content.split('\n');
-                                    const first100Lines = lines.slice(0, 100).join('\n');
-                                    document.getElementById('desenTestData').value = first100Lines;
+                            const url = URL.createObjectURL(blob);
 
-                                    // 保存blob用于下载
-                                    window.downloadBlob = blob;
-                                };
-                                fileReader.readAsText(blob);
-                            } else {
-                                // 文件小于等于10M，完整显示内容（或者根据需求调整显示方式）
-                                const fileReader = new FileReader();
-                                fileReader.onload = function (event) {
-                                    document.getElementById('desenTestData').value = event.target.result;
-                                    // 保存blob用于下载
-                                    window.downloadBlob = blob;
-                                };
-                                fileReader.readAsText(blob);
-                            }
+                            // 创建一个隐藏的a标签并点击它来触发下载
+                            const a = document.createElement('a');
+                            a.style.display = 'none';
+                            a.href = url;
+                            a.download = fileName;
+
+                            // 将a标签添加到DOM并触发点击
+                            document.body.appendChild(a);
+                            a.click();
+
+                            // 下载完成后移除a标签和URL对象
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
                         })
                         .catch(error => console.error('Error:', error));
                 };
                 reader.readAsText(file);
             });
 
-            document.getElementById('downloadTestResult').addEventListener('click', function () {
-                if (window.downloadBlob) {
-                    const url = window.URL.createObjectURL(window.downloadBlob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = 'result.txt';
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                    }, 0);
-                } else {
-                    alert('请先进行性能测试以生成结果文件。');
-                }
-            });
+            // document.getElementById('downloadTestResult').addEventListener('click', function () {
+            //     if (window.downloadBlob) {
+            //         const url = window.URL.createObjectURL(window.downloadBlob);
+            //         const a = document.createElement('a');
+            //         a.style.display = 'none';
+            //         a.href = url;
+            //         a.download = 'result.txt';
+            //         document.body.appendChild(a);
+            //         a.click();
+            //         setTimeout(() => {
+            //             document.body.removeChild(a);
+            //             window.URL.revokeObjectURL(url);
+            //         }, 0);
+            //     } else {
+            //         alert('请先进行性能测试以生成结果文件。');
+            //     }
+            // });
 
             window._AMapSecurityConfig = {
                 securityJsCode: "dd8ae1e880d8bcf447281c3bed5f3c91",
             };
         }
 
-        let choose_file = function (event) {
-            // 清空
-            document.getElementById("fileInfo").innerHTML = "";
-
-            //读取文件
-            const file = event.target.files[0]
-            // 文件名，扩展名
-            const fileName = file.name;
-            const fileExtension = fileName.split('.').pop().toLowerCase();
-            if (file) {
-                if ("xlsx" === fileExtension) {
-                    let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                        "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
-                    document.getElementById("fileInfo").innerHTML = fileLoad
-                    //console.log(fileExtension)
-                    //构建formData,发送给后端
-                    let formData = new FormData();
-                    formData.set("file", file);
-
-                    //提交脱敏参数，请求脱敏
-                    document.getElementById("submitBtn").onclick = function () {
-                        // 选择脱敏程度
-                        let table_body = document.getElementById("table3")
-                        let tr = table_body.rows[0];
-                        console.log(tr);
-                        //let privacyLevel = tr.childNodes[0].firstChild.value;
-                        let privacyLevel = document.getElementById("table3-selections").value;
-
-                        // formData.append("params", privacyLevel)
-                        // 保证params字段唯一值唯一
-                        formData.set("params", privacyLevel)
-
-                        // 算法名
-                        let alg_name;
-                        let idx = $("ul .active").index();
-                        if (idx === 0) {
-                            //formData.append("distortion", "distortion");
-                            let selections = document.getElementById("distortionAlg");
-                            alg_name = selections.value;
-                            //formData.append("sheet", type1);
-                        }
-
-                        // 发送算法名、隐私保护等级、脱敏文件
-                        formData.set("algName", alg_name)
-                        fetch('/File/desenSingleColumn', {
-                            method: 'POST',
-                            body: formData
-                        })
-                            .then(response => response.blob())
-                            .then(blob => {
-                                // 脱敏前
-                                /*  document.getElementById("preData").innerHTML="脱敏前数据"*/
-                                let reader = new FileReader();
-                                reader.onload = function (e) {
-                                    let data = new Uint8Array(e.target.result);
-                                    let workbook = XLSX.read(data, {type: 'array'});
-
-                                    let sheetName = workbook.SheetNames[0];
-                                    let sheet = workbook.Sheets[sheetName];
-
-                                    let jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-
-                                    let pageSize = 10;
-                                    let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                                    let currentPage = 1;
-
-                                    function displayTable(page) {
-                                        let startIndex = (page - 1) * pageSize + 1; // 跳过表头
-                                        let endIndex = Math.min(startIndex + pageSize, jsonData.length);
-
-                                        let tableContent = '<thead><tr>';
-                                        let headers = jsonData[0];
-                                        headers.forEach(function (header) {
-                                            tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
-                                        });
-                                        tableContent += '</tr></thead><tbody>';
-
-                                        for (let i = startIndex; i < endIndex; i++) {
-                                            tableContent += '<tr>';
-                                            for (let j = 0; j < headers.length; j++) {
-                                                let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
-                                                tableContent += '<td>' + cellValue + '</td>';
-                                            }
-                                            tableContent += '</tr>';
-                                        }
-
-                                        tableContent += '</tbody>';
-
-                                        $('#dataTable').html(tableContent);
-                                    }
-
-                                    displayTable(currentPage);
-
-                                    function renderPagination() {
-                                        let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
-                                        pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
-
-                                        $('#pagination').html(pagination);
-
-                                        $('#pagination a').off("click").on("click", function (e) {
-                                            e.preventDefault();
-                                            let page = $(this).data('page');
-                                            console.log(page)
-                                            if (page === 'prev') {
-                                                currentPage = Math.max(1, currentPage - 1);
-                                            } else if (page === 'next') {
-                                                currentPage = Math.min(pageCount, currentPage + 1);
-                                            }
-                                            displayTable(currentPage);
-                                            $("#totalPages").text(currentPage + "/" + pageCount);
-                                        });
-
-                                        let info = "共" + pageCount + "页"
-                                        console.log(info)
-                                        $("#totalPages").text(currentPage + "/" + pageCount);
-                                    }
-
-                                    $('#paginationContainer').show();
-                                    renderPagination();
-
-                                    $('#goToPage').off("click").on("click", function () {
-                                        let pageNumber = parseInt($('#pageInput').val());
-                                        if (pageNumber >= 1 && pageNumber <= pageCount) {
-                                            currentPage = pageNumber;
-                                            displayTable(currentPage);
-                                            renderPagination();
-                                        } else {
-                                            alert('请输入有效页数！');
-                                        }
-                                    });
-                                };
-                                reader.readAsArrayBuffer(file);
-
-                                // 脱敏后
-                                /* document.getElementById("afterData").innerHTML="脱敏后数据"*/
-                                const reader1 = new FileReader();
-                                reader1.onload = function (event) {
-                                    const data = event.target.result;
-                                    const workbook = XLSX.read(data, {type: 'binary'});
-                                    const sheetName = workbook.SheetNames[0];
-                                    const sheet = workbook.Sheets[sheetName];
-                                    const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
-                                    let pageSize = 10;
-                                    let pageCount = Math.ceil((jsonData.length - 1) / pageSize);
-                                    let currentPage1 = 1;
-
-                                    function displayTable1(page1) {
-                                        let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
-                                        let endIndex = Math.min(startIndex1 + pageSize, jsonData.length);
-
-                                        let tableContent1 = '<thead><tr>';
-                                        let headers1 = jsonData[0];
-                                        headers1.forEach(function (header1) {
-                                            tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
-                                        });
-                                        tableContent1 += '</tr></thead><tbody>';
-
-                                        for (let i = startIndex1; i < endIndex; i++) {
-                                            tableContent1 += '<tr>';
-                                            for (let j = 0; j < headers1.length; j++) {
-                                                let cellValue = (jsonData[i][j] !== undefined) ? jsonData[i][j] : '';
-                                                tableContent1 += '<td>' + cellValue + '</td>';
-                                            }
-                                            tableContent1 += '</tr>';
-                                        }
-
-                                        tableContent1 += '</tbody>';
-
-                                        $('#dataTable1').html(tableContent1);
-                                    }
-
-                                    displayTable1(currentPage1);
-
-                                    function renderPagination1() {
-                                        let pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
-                                        pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
-
-                                        $('#pagination1').html(pagination1);
-
-                                        $('#pagination1 a').off("click").on("click", function (e) {
-                                            e.preventDefault();
-                                            let page = $(this).data('page');
-                                            console.log(page)
-                                            if (page === 'prev1') {
-                                                currentPage1 = Math.max(1, currentPage1 - 1);
-                                            } else if (page === 'next1') {
-                                                currentPage1 = Math.min(pageCount, currentPage1 + 1);
-                                            }
-                                            displayTable1(currentPage1);
-                                            $("#totalPages1").text(currentPage1 + "/" + pageCount);
-                                        });
-
-                                        let info = "共" + pageCount + "页"
-                                        console.log(info)
-                                        $("#totalPages1").text(currentPage1 + "/" + pageCount);
-                                    }
-
-                                    $('#paginationContainer1').show();
-                                    renderPagination1();
-
-                                    $('#goToPage1').off("click").on("click", function () {
-                                        let pageNumber1 = parseInt($('#pageInput1').val());
-                                        if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
-                                            currentPage1 = pageNumber1;
-                                            displayTable1(currentPage1);
-                                            renderPagination1();
-                                        } else {
-                                            alert('请输入有效页数！');
-                                        }
-                                    });
-                                };
-                                reader1.readAsBinaryString(blob);
-
-                                // 创建一个下载链接
-                                const downloadLink = document.createElement('a');
-                                downloadLink.href = URL.createObjectURL(blob);
-                                downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
-                                downloadLink.click();
-                                // after.appendChild(downloadLink);
-                            })
-                            .catch(error => console.error('Error:', error));
-                    }
-                } else {
-                    alert("请提交excel文件")
-                }
-            }
-
-        }
     </script>
 </head>
 
@@ -928,33 +685,33 @@
                         <div id="tab-2" class="tab-pane">
                             <div id="nondistortion-module-container" class="tab-pane">
                                 <div class="performance-test">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="ibox">
-                                                <div class="ibox-title float-e-margins">
-                                                    <h5>待测试数据</h5>
-                                                </div>
-                                            </div>
-                                            <div class="ibox-content">
-                                                    <textarea id="testData" rows="18" class="col-sm-12"
-                                                              readonly></textarea>
-                                            </div>
-                                        </div>
+<#--                                    <div class="row">-->
+                                    <#--                                        <div class="col-sm-6">-->
+                                    <#--                                            <div class="ibox">-->
+                                    <#--                                                <div class="ibox-title float-e-margins">-->
+                                    <#--                                                    <h5>待测试数据</h5>-->
+                                    <#--                                                </div>-->
+                                    <#--                                            </div>-->
+                                    <#--                                            <div class="ibox-content">-->
+                                    <#--                                                    <textarea id="testData" rows="18" class="col-sm-12"-->
+                                    <#--                                                              readonly></textarea>-->
+                                    <#--                                            </div>-->
+                                    <#--                                        </div>-->
 
-                                        <div class="col-sm-6">
+                                    <#--                                        <div class="col-sm-6">-->
 
-                                            <div class="ibox">
-                                                <div class="ibox-title float-e-margins">
-                                                    <h5>脱敏后的数据</h5>
-                                                </div>
+                                    <#--                                            <div class="ibox">-->
+                                    <#--                                                <div class="ibox-title float-e-margins">-->
+                                    <#--                                                    <h5>脱敏后的数据</h5>-->
+                                    <#--                                                </div>-->
 
-                                            </div>
-                                            <div class="ibox-content">
-                                                <textarea id="desenTestData" rows="18" class="col-sm-12"
-                                                          readonly></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <#--                                            </div>-->
+                                    <#--                                            <div class="ibox-content">-->
+                                    <#--                                                <textarea id="desenTestData" rows="18" class="col-sm-12"-->
+                                    <#--                                                          readonly></textarea>-->
+                                    <#--                                            </div>-->
+                                    <#--                                        </div>-->
+                                    <#--                                    </div>-->
                                     <div class="row m-t">
                                         <p>
                                             <button type="button" id="generateTestData"
@@ -969,9 +726,9 @@
                                             <button type="button" id="startPerformanceTest"
                                                     class="btn btn-sm btn-primary"> 进行性能测试
                                             </button>
-                                            <button type="button" id="downloadTestResult"
-                                                    class="btn btn-sm btn-primary"> 下载测试结果
-                                            </button>
+                                            <#--                                            <button type="button" id="downloadTestResult"-->
+                                            <#--                                                    class="btn btn-sm btn-primary"> 下载测试结果-->
+                                            <#--                                            </button>-->
 
                                         </p>
                                         <p id="fileName" class="text-success"></p>

@@ -73,7 +73,6 @@ public class TcpPacket {
 
 
         log.info("数据包长度: {}", packetLength);
-
         log.info("Json数据字节数: {}", jsonDataBytes.length);
         System.arraycopy(jsonDataBytes, 0, packet, 18, jsonDataBytes.length);
 

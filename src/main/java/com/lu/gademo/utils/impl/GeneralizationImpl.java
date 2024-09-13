@@ -1,7 +1,6 @@
 package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +8,9 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-@Slf4j
 @Component
 public class GeneralizationImpl implements Generalization {
     private final DpUtil dpUtil;
@@ -33,7 +32,6 @@ public class GeneralizationImpl implements Generalization {
         String path2 = Paths.get(currentPath, "image", "dealImage.py").toString();
         String path4 = Paths.get(currentPath, "video", "desenVideo.py").toString();
         String path6 = Paths.get(currentPath, "audio", "audio.py").toString();
-        log.info("调用泛化算法统一接口");
 
         switch (alg) {
             /*
@@ -116,25 +114,60 @@ public class GeneralizationImpl implements Generalization {
                 输入：经度、纬度、用户id、进入区域的时间、区域点集
                 输出：字符串（用户假名id）
             */
+//            case 6: {
+//                if (params.length != 2) return null;
+//
+//                String position = object.getStringVal();
+//                List<?> list = object.getList();
+//                List<Object> value = new ArrayList<>(list);
+//
+//                int id = params[0].intValue();              // 参数 1 表示用户 ID
+//                double time = params[1].doubleValue();      // 参数 2 表示进入时间
+//
+//                String[] s = position.split(",");
+//                String param = "5 " + s[0] + " " + s[1] + " " + id + " " + time;
+//                for (Object point : value) {
+//                    String[] temp = point.toString().split(",");
+//                    param += " " + temp[0] + " " + temp[1];
+//                }
+//                String cmd = path + " " + param;
+//                return new DSObject(CommandExecutor.openExe(cmd));
+//            }
             case 6: {
                 if (params.length != 2) return null;
 
                 String position = object.getStringVal();
+                double x = Double.parseDouble(position.split(",")[0]);
+                double y = Double.parseDouble(position.split(",")[1]);
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
 
-                int id = params[0].intValue();              // 参数 1 表示用户 ID
-                double time = params[1].doubleValue();      // 参数 2 表示进入时间
+                int id = params[0].intValue();              // 用户 ID
+                double time = params[1].doubleValue();      // 进入时间
 
-                String[] s = position.split(",");
-                String param = "5 " + s[0] + " " + s[1] + " " + id + " " + time;
+                // 拆分区域点集并构建点数组
+                List<Double> points = new ArrayList<>();
                 for (Object point : value) {
                     String[] temp = point.toString().split(",");
-                    param += " " + temp[0] + " " + temp[1];
+                    if (temp.length == 2) {
+                        points.add(Double.parseDouble(temp[0]));
+                        points.add(Double.parseDouble(temp[1]));
+                    }
                 }
-                String cmd = path + " " + param;
-                return new DSObject(CommandExecutor.openExe(cmd));
+
+                // 将 List 转换为 double 数组
+                double[] pointsArray = new double[points.size()];
+                for (int i = 0; i < points.size(); i++) {
+                    pointsArray[i] = points.get(i);
+                }
+
+                // 调用混合区域算法
+                LinkedList retFidName = LocationUtil.mixzone1(x, y, id, time, pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7]);
+
+                // 返回结果
+                return new DSObject(retFidName);
             }
+
 
             /*
                 简化版 mixZone_3（已跑通）
@@ -143,24 +176,58 @@ public class GeneralizationImpl implements Generalization {
                 输入：经度、纬度、用户id、进入区域的时间、区域点集
                 输出：字符串（用户假名id）
             */
+//            case 7: {
+//                if (params.length != 2) return null;
+//
+//                String position = object.getStringVal();
+//                List<?> list = object.getList();
+//                List<Object> value = new ArrayList<>(list);
+//
+//                int id = params[0].intValue();              // 参数 1 表示用户 ID
+//                double time = params[1].doubleValue();      // 参数 2 表示进入时间
+//
+//                String[] s = position.split(",");
+//                String param = "6 " + s[0] + " " + s[1] + " " + id + " " + time;
+//                for (Object point : value) {
+//                    String[] temp = point.toString().split(",");
+//                    param += " " + temp[0] + " " + temp[1];
+//                }
+//                String cmd = path + " " + param;
+//                return new DSObject(CommandExecutor.openExe(cmd));
+//            }
             case 7: {
                 if (params.length != 2) return null;
 
                 String position = object.getStringVal();
+                double x = Double.parseDouble(position.split(",")[0]);
+                double y = Double.parseDouble(position.split(",")[1]);
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
 
-                int id = params[0].intValue();              // 参数 1 表示用户 ID
-                double time = params[1].doubleValue();      // 参数 2 表示进入时间
+                int id = params[0].intValue();              // 用户 ID
+                double time = params[1].doubleValue();      // 进入时间
 
-                String[] s = position.split(",");
-                String param = "6 " + s[0] + " " + s[1] + " " + id + " " + time;
+                // 拆分区域点集并构建点数组
+                List<Double> points = new ArrayList<>();
                 for (Object point : value) {
                     String[] temp = point.toString().split(",");
-                    param += " " + temp[0] + " " + temp[1];
+                    if (temp.length == 2) {
+                        points.add(Double.parseDouble(temp[0]));
+                        points.add(Double.parseDouble(temp[1]));
+                    }
                 }
-                String cmd = path + " " + param;
-                return new DSObject(CommandExecutor.openExe(cmd));
+
+                // 将 List 转换为 double 数组
+                double[] pointsArray = new double[points.size()];
+                for (int i = 0; i < points.size(); i++) {
+                    pointsArray[i] = points.get(i);
+                }
+
+                // 调用混合区域算法
+                LinkedList retFidName = LocationUtil.mixzone3(x, y, id, time, pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7]);
+
+                // 返回结果
+                return new DSObject(retFidName);
             }
 
             /*
@@ -170,12 +237,23 @@ public class GeneralizationImpl implements Generalization {
                 输出：处理后的位置
             */
             case 8: {
-                String position = object.getStringVal();
+//                String position = object.getStringVal();
+//
+//                String[] s = position.split(",");
+//                String param = "10 " + s[0] + " " + s[1] + " 1000";
+//                String cmd = path + " " + param;
+//                return new DSObject(CommandExecutor.openExe(cmd));
 
+//                if (params.length != 1) return null;
+//                List<?> value = object.getList();
+                String position = object.getStringVal();
                 String[] s = position.split(",");
-                String param = "10 " + s[0] + " " + s[1] + " 1000";
-                String cmd = path + " " + param;
-                return new DSObject(CommandExecutor.openExe(cmd));
+                double x = Double.parseDouble(s[0]);
+                double y = Double.parseDouble(s[1]);
+                List<String> result = new LinkedList<>();
+                LocationUtil.Point point = LocationUtil.accuracyReduction(x, y, 1000);
+                result.add(point.getX() + "," + point.getY());
+                return new DSObject(result);
             }
 
             /*
@@ -191,6 +269,7 @@ public class GeneralizationImpl implements Generalization {
                 List<String> results = CommandExecutor.executePython(value.get(0).toString() + " " + value.get(1).toString(), "pixelate", path2, params[0].toString());
                 return new DSObject(results);
             }
+
 
             /*
                 基于高斯滤波器的图像像素替换方法

@@ -53,8 +53,9 @@ class SnappingMechanism(Mechanism):
         print(f"After clamp: {loc}")
         sign = 1 - (np.random.randint(2, size=n_samples) * 2)
         u = np.random.uniform(size=n_samples)
+        print()
         assert(u.dtype == np.float64)   # ensure machine epsilon is 2^(-53) as required by Theorem 1 in [1]
-        print(sign * self.scale * np.log(u))
+        print(f"Intermediate Variables: {sign * self.scale * np.log(u)}")
         intermediate = loc + sign * self.scale * np.log(u)
 
         return self.clamp(self.round_to_Lambda(intermediate))

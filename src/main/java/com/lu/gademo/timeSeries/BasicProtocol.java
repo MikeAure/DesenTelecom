@@ -82,9 +82,17 @@ public class BasicProtocol {
 
 
         SecureRandom rnd = new SecureRandom();
-
+        System.out.println("在密文上进行计算：");
         BigInteger c = c1.add(c2.multiply(cipherMiunsOne)).mod(N);
-
+        System.out.println("c1:" + c1);
+        System.out.println("c2:" + c2);
+        System.out.println("c:" + c);
+        System.out.println("解密后的明文：");
+        System.out.println("c1:" + SymHomSch.Dec(c1, Param));
+        BigInteger decC2 = SymHomSch.Dec(c2, Param);
+        BigInteger divided = N.divide(BigInteger.valueOf(2));
+        System.out.println("c2:" + decC2);
+        System.out.println("c:" + SymHomSch.Dec(c, Param));
         int sign = signComputeProtocol(c, Param);
 
         BigInteger result = BigInteger.ONE;

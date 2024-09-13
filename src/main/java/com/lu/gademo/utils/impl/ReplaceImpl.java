@@ -26,7 +26,7 @@ public class ReplaceImpl implements Replace {
         String currentPath = Paths.get("./").normalize().toAbsolutePath().toString();
         String dealImagePath = Paths.get(currentPath, "image", "dealImage.py").toString();
         String path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();
-        log.info("调用替换算法统一接口");
+        log.info("调用数据置换算法统一接口");
         switch (alg) {
 
             /*

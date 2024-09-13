@@ -8,18 +8,19 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
+        #  电信CRM客经系统数据库
         crm:
             jdbc-url: jdbc:mysql://localhost:3306/crm?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-
+        # 电信大数据平台数据库，用于读取脱敏前数据
         dataplatform:
             jdbc-url: jdbc:mysql://localhost:3306/userlogdtl?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-
+        # 电信大数据平台数据库，用于写入脱敏后数据
         userlog:
             jdbc-url: jdbc:mysql://localhost:3306/userlog1?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
@@ -115,8 +116,8 @@ systemId:
     ruleCheckSystemId: '0x33000000'
 
 logSenderManager:
-    ifSendToEvaFirst: true
-    ifSaveToDatabase: true
+    ifSendToEvaFirst: false
+    ifSaveToDatabase: false
     ifSendFile: false
     ifPerformenceTest: false
 

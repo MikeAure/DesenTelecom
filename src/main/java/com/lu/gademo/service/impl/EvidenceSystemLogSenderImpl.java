@@ -56,8 +56,6 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
     ReqEvidenceSaveDao reqEvidenceSaveDao;
     @Autowired
     SubmitEvidenceLocalDao submitEvidenceLocalDao;
-    @Autowired
-    SubmitEvidenceRemoteDao submitEvidenceRemoteDao;
 
     // 向存证系统发起请求时使用的mainCommand和subCommand
     @Value("${evidenceSystem.evidenceRequest.mainCommand}")
@@ -75,7 +73,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
     @EventListener
     @Async
     @Override
-    public void evidenceHandleThressSystemEvent(ThreeSystemsEvent threeSystemsEvent) {
+    public void evidenceHandleThreeSystemEvent(ThreeSystemsEvent threeSystemsEvent) {
         ReqEvidenceSave reqEvidenceSave = threeSystemsEvent.getReqEvidenceSave();
         SubmitEvidenceLocal submitEvidenceLocal = threeSystemsEvent.getSubmitEvidenceLocal();
         send2Evidence(reqEvidenceSave, submitEvidenceLocal);
@@ -115,8 +113,8 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         reqEvidence.set("data", reqData);
         // dataSign: 对data字段的签名
         reqEvidence.put("datasign", reqEvidenceSave.getDatasign());
-        log.info("发送给中心存证系统的请求: {}", String.valueOf(reqEvidenceSave));
-        log.info("发送给本地存证系统的请求: {}", String.valueOf(submitEvidenceLocal));
+        log.info("发送给中心存证系统的请求: {}", reqEvidence.toPrettyString());
+
         // 相关请求信息存储到数据库
         reqEvidenceSaveDao.save(reqEvidenceSave);
 
@@ -262,6 +260,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
 
         localEvidenceData.put("fileDataType", submitEvidenceLocal.getFileDataType());
 
+        log.info("发送给本地存证系统的请求: {}", localEvidenceData.toPrettyString());
         // 整个json
         ObjectNode localEvidenceJson = objectMapper.createObjectNode();
         localEvidenceJson.put("systemID", submitEvidenceLocal.getSystemID());
@@ -284,6 +283,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         localEvidenceJson.put("datasign", evidenceResponse.getDataSign());
         // 密文字段（随机标识），确保存证上报前做过请求应答
         localEvidenceJson.put("randomidentification", evidenceResponse.getRandomIdentification());
+
         submitEvidenceLocal.setDataHash(localEvidenceJson.get("dataHash").asText());
         submitEvidenceLocal.setDatasign(evidenceResponse.getDataSign());
         submitEvidenceLocal.setRandomidentification(evidenceResponse.getRandomIdentification());

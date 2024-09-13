@@ -33,9 +33,9 @@ class SparseVectorTechnique3(Mechanism):
         x = np.atleast_2d(a)
 
         rho = np.random.laplace(scale=1 / self.eps1, size=(n_samples, 1))
-        print("")
+        print(f"noise add to T: {rho}")
         nu = np.random.laplace(scale=self.c / self.eps2, size=(n_samples, a.shape[0]))
-
+        print(f"noise add to array: {nu}")
         m = nu + x  # broadcasts x vertically
         cmp = m >= (rho + self.t)   # broadcasts rho horizontally
         count = np.zeros(n_samples)

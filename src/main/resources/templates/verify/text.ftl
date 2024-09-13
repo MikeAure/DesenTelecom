@@ -257,7 +257,6 @@
                 {value: "randomLaplaceToValue", label: "基于随机拉普拉斯噪声的数值加噪算法"},
                 {value: "randomGaussianToValue", label: "基于随机高斯噪声的数值加噪算法"},
                 {value: "valueShift", label: "数值偏移"},
-                {value: "SHA512", label: "假名化-哈希"},
                 {value: "floor", label: "数值取整"},
                 {value: "valueMapping", label: "数值映射"},
             ],

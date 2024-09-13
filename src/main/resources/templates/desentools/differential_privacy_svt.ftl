@@ -266,7 +266,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：给数组值和阈值t加噪后，返回数组中前c个元素取值是否大于t
+                        说明：给数组值和阈值t加噪后，返回数组中共c个元素的取值是否大于t，大于返回1，否则返回0，若大于t的数组元素数量超过了c个，则返回-1
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：数值一维数组
@@ -350,7 +350,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：给数组值和阈值t加噪后，返回数组中前c个元素取值是否大于t
+                        说明：给数组值和阈值t加噪后，返回数组中共c个元素取值是否大于t,大于返回1，否则返回0，若大于t的数组元素数量超过了c个，则返回-1
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：数值一维数组
@@ -435,7 +435,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：给数组值和阈值t加噪后，返回数组中前c个元素取值是否大于t
+                        说明：给数组值和阈值 t 加噪后，如果数组中元素小于 t 则返回 -1000，大于 t 则返回加噪后的元素值，计数大于 t 的结果超过 c 个后则终止，即后续结果返回 -2000
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：数值一维数组
@@ -521,7 +521,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：给数组值和阈值t加噪后，返回数组中前c个元素取值是否大于t
+                        说明：给数组值和阈值t加噪后，返回数组中共c个元素取值是否大于t,大于返回1，否则返回0，若大于t的数组元素数量超过了c个，则返回-1
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：数值一维数组
@@ -609,7 +609,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：给数组值和阈值t加噪后，返回数组中前c个元素取值是否大于t
+                        说明：只给阈值 t 加噪后，返回数组中所有元素取值是否大于 t（此处输入的c仅用于占位），大于返回1，否则返回0
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：数值一维数组
@@ -696,7 +696,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：给数组值和阈值t加噪后，返回数组中前c个元素取值是否大于t
+                        说明：给数组值和阈值 t 加噪后，返回数组所有元素取值是否大于 t，大于返回1，否则返回0(此处输入的c仅用于占位)
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：数值一维数组
@@ -782,7 +782,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：给数组值和阈值t加噪后，前c个元素如果取值大于t则返回加噪后的值，否则返回False
+                        说明：给数组值和阈值t分别加噪，若噪声数组值大于噪声阈值则给原数组值重新加噪并返回加噪后的结果否则返回0，大于噪声阈值的结果若超过c个，后续返回-1000
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：数值一维数组

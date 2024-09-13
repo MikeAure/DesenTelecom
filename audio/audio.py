@@ -17,52 +17,111 @@ def apply_audio_effects(input_signal, sample_rate):
     return augmented_signal
 
 
+# def audio_augmentation(input_signal, sample_rate, param_chosen=2):
+#     # 定义增广效果列表
+#     augmentations = []
+#
+#     if param_chosen == 0:
+#         print("param_chosen == 0")
+#         augmentations = [
+#             # 低通滤波
+#             LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=1000, p=1),
+#             # 高通滤波
+#             HighPassFilter(min_cutoff_freq=5000, max_cutoff_freq=8000, p=1),
+#
+#         ]
+#     elif param_chosen == 1:
+#         print("param_chosen == 1")
+#         augmentations = [
+#             # 低通滤波
+#             LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=1000, p=1),
+#             # 高通滤波
+#             HighPassFilter(min_cutoff_freq=5000, max_cutoff_freq=8000, p=1),
+#             # 极性反转
+#             PolarityInversion(p=1),
+#             # 反向
+#             Reverse(p=1),
+#
+#         ]
+#     elif param_chosen == 2:
+#         print("param_chosen == 2")
+#         augmentations = [
+#             # 低通滤波
+#             LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=1000, p=1),
+#             # 高通滤波
+#             HighPassFilter(min_cutoff_freq=5000, max_cutoff_freq=8000, p=1),
+#             # 极性反转
+#             PolarityInversion(p=1),
+#             # 反向
+#             Reverse(p=1),
+#             # 归一化
+#             Normalize(p=1),
+#             # 双曲正切失真
+#             TanhDistortion(min_distortion=0.01, max_distortion=0.5, p=1),
+#             TanhDistortion(min_distortion=0.5, max_distortion=1, p=1),
+#         ]
+#     # 创建一个 Compose 实例，包含所有的增广效果
+#     augmenter = Compose(augmentations)
+#     # 应用所有的增广效果
+#     augmented_signal = augmenter(samples=input_signal, sample_rate=sample_rate)
+#     return augmented_signal
+
 def audio_augmentation(input_signal, sample_rate, param_chosen=2):
     # 定义增广效果列表
     augmentations = []
 
     if param_chosen == 0:
+        print("param_chosen == 0")
         augmentations = [
-            # 低通滤波
-            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=1000, p=1),
-            # 高通滤波
-            HighPassFilter(min_cutoff_freq=5000, max_cutoff_freq=8000, p=1),
+            # 低通滤波 (上限频率设置为 3000 Hz)
+            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=3000, p=1),
 
+            # 高通滤波 (下限频率设置为 300 Hz)
+            HighPassFilter(min_cutoff_freq=300, max_cutoff_freq=8000, p=1),
         ]
     elif param_chosen == 1:
+        print("param_chosen == 1")
         augmentations = [
-            # 低通滤波
-            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=1000, p=1),
-            # 高通滤波
-            HighPassFilter(min_cutoff_freq=5000, max_cutoff_freq=8000, p=1),
+            # 低通滤波 (上限频率设置为 4000 Hz)
+            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=4000, p=1),
+
+            # 高通滤波 (下限频率设置为 200 Hz)
+            HighPassFilter(min_cutoff_freq=200, max_cutoff_freq=8000, p=1),
+
             # 极性反转
             PolarityInversion(p=1),
-            # 反向
-            Reverse(p=1),
 
+            # 反向 (控制概率，避免所有音频都反向)
+            Reverse(p=0.5),
         ]
     elif param_chosen == 2:
+        print("param_chosen == 2")
         augmentations = [
-            # 低通滤波
-            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=1000, p=1),
-            # 高通滤波
-            HighPassFilter(min_cutoff_freq=5000, max_cutoff_freq=8000, p=1),
+            # 低通滤波 (上限频率设置为 5000 Hz)
+            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=5000, p=1),
+
+            # 高通滤波 (下限频率设置为 100 Hz)
+            HighPassFilter(min_cutoff_freq=100, max_cutoff_freq=8000, p=1),
+
             # 极性反转
             PolarityInversion(p=1),
-            # 反向
-            Reverse(p=1),
-            # 归一化
-            Normalize(p=1),
-            # 双曲正切失真
-            TanhDistortion(min_distortion=0.01, max_distortion=0.5, p=1),
-            TanhDistortion(min_distortion=0.5, max_distortion=1, p=1),
+
+            # 反向 (控制概率，避免所有音频都反向)
+            Reverse(p=0.5),
+
+            # 归一化 (不适用百分之百的概率，以避免无声的情况)
+            Normalize(p=0.8),
+
+            # 双曲正切失真 (减小失真程度)
+            TanhDistortion(min_distortion=0.01, max_distortion=0.2, p=0.7),
         ]
     # 创建一个 Compose 实例，包含所有的增广效果
     augmenter = Compose(augmentations)
+
     # 应用所有的增广效果
     augmented_signal = augmenter(samples=input_signal, sample_rate=sample_rate)
-    return augmented_signal
 
+    return augmented_signal
 
 def spec_augmentation(input_signal, sample_rate, param_chosen=1):
     params_group = [(0.1, 0.3), (0.3, 0.5), (0.5, 0.7)]

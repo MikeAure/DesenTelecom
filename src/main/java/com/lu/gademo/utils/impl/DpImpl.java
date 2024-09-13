@@ -343,15 +343,31 @@ public class DpImpl implements Dp {
                 List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique3", path2,
                         params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Double>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty())
-                            .map(Double::parseDouble).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty())
+                        .map(Double::parseDouble).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty())
+//                            .map(Double::parseDouble).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -369,14 +385,29 @@ public class DpImpl implements Dp {
                 List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique4",
                         path2, params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -394,14 +425,29 @@ public class DpImpl implements Dp {
                 List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique5",
                         path2, params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -419,14 +465,29 @@ public class DpImpl implements Dp {
                 List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique6", path2,
                         params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Integer>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -444,14 +505,31 @@ public class DpImpl implements Dp {
                 List<String> results = CommandExecutor.executePython(array, "sparse_vector_technique_numerical",
                         path1, params[0].toString(), params[1].toString(), params[2].toString());
                 List<List<Double>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty())
+                        .map(Double::parseDouble).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    List<Double> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Double::parseDouble).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -468,15 +546,30 @@ public class DpImpl implements Dp {
                 List<String> results = CommandExecutor.executePython(value.toString(), "rappor", path1,
                         params[0].toString(), params[1].toString());
                 List<List<Integer>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    s = s.replace(".", "");
-                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
+                String s = "";
+
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
                     }
                 }
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                s = s.replace(".", "");
+                List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    s = s.replace(".", "");
+//                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//                }
                 return new DSObject(lists);
             }
 
@@ -493,16 +586,31 @@ public class DpImpl implements Dp {
                 List<String> results = CommandExecutor.executePython(value.toString(), "onetimerappor", path1, params[0].toString(), params[1].toString());
                 System.out.println(results);
                 List<List<Integer>> lists = new ArrayList<>();
-                for (String s : results) {
-                    s = s.replace("[", "");
-                    s = s.replace("]", "");
-                    s = s.replace(".", "");
-                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
-                    if (!newList.isEmpty()) {
-                        lists.add(newList);
-                    }
+                String s = "";
 
+                for (int i = results.size() - 1; i >= 0; i--) {
+                    if (StringUtils.isNotBlank(results.get(i))) {
+                        s = results.get(i);
+                        break;
+                    }
                 }
+                s = s.replace("[", "");
+                s = s.replace("]", "");
+                s = s.replace(".", "");
+                List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+                if (!newList.isEmpty()) {
+                    lists.add(newList);
+                }
+//                for (String s : results) {
+//                    s = s.replace("[", "");
+//                    s = s.replace("]", "");
+//                    s = s.replace(".", "");
+//                    List<Integer> newList = Arrays.stream(s.split(" ")).filter(string -> !string.isEmpty()).map(Integer::parseInt).collect(Collectors.toList());
+//                    if (!newList.isEmpty()) {
+//                        lists.add(newList);
+//                    }
+//
+//                }
                 return new DSObject(lists);
             }
 

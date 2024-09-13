@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
@@ -21,7 +22,6 @@ public class AnonymityImpl implements Anonymity {
         String locationPrivacy = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
         String path = Paths.get(currentPath, locationPrivacy).toString();
 //        System.out.println(path);
-        log.info("调用匿名算法统一接口");
 
         switch (alg) {
 
@@ -62,13 +62,49 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
+
+//            case 2: {
+//                if (params.length != 3) return null;
+//                String position = object.getStringVal();
+//                String[] s = position.split(",");
+//                String cmd = path + " 2 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString() + " " + params[2].toString();
+//                return new DSObject(CommandExecutor.openExe(cmd));
+//            }
             case 2: {
-                if (params.length != 3) return null;
+                if (object == null || params == null || params.length != 3) return null;
+
                 String position = object.getStringVal();
-                String[] s = position.split(",");
-                String cmd = path + " 2 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString() + " " + params[2].toString();
-                System.out.println(cmd);
-                return new DSObject(CommandExecutor.openExe(cmd));
+                if (position == null || position.isEmpty()) return null;
+
+                try {
+                    String[] s = position.split(",");
+                    if (s.length != 2) return null;
+
+                    double x = Double.parseDouble(s[0]);
+                    double y = Double.parseDouble(s[1]);
+                    int k = params[0].intValue();
+                    double sCd = params[1].doubleValue();
+                    double rho = params[2].doubleValue();
+                    double[] retArrX = new double[k];
+                    double[] retArrY = new double[k];
+
+                    if (kAnonymityUtil == null) {
+                        log.error("kAnonymityUtil is not initialized");
+                        return null;
+                    }
+
+                    kAnonymityUtil.cirDummy(x, y, k, sCd, rho, retArrX, retArrY);
+
+                    List<String> result = new LinkedList<>();
+                    for (int i = 0; i < k; ++i) {
+                        result.add(String.format("%f,%f", retArrX[i], retArrY[i]));
+                    }
+
+                    return new DSObject(result);
+                } catch (Exception e) {
+                    log.error("Error in CirDummy method: ", e);
+                    return null;
+                }
             }
 
             /*
@@ -83,13 +119,44 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
+//            case 3: {
+//                if (params.length != 2) return null;
+//                String position = object.getStringVal();
+//                String[] s = position.split(",");
+//                String cmd = path + " 3 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString();
+//                return new DSObject(CommandExecutor.openExe(cmd));
+//            }
             case 3: {
-                if (params.length != 2) return null;
+                if (object == null || params == null || params.length != 2) return null;
+
                 String position = object.getStringVal();
-                String[] s = position.split(",");
-                String cmd = path + " 3 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + params[1].toString();
-                System.out.println(cmd);
-                return new DSObject(CommandExecutor.openExe(cmd));
+                if (position == null || position.isEmpty()) return null;
+
+                try {
+                    String[] s = position.split(",");
+                    if (s.length != 2) return null;
+
+                    double x = Double.parseDouble(s[0]);
+                    double y = Double.parseDouble(s[1]);
+                    int k = params[0].intValue();
+                    double sCd = params[1].doubleValue();
+                    int len = (int) Math.ceil(Math.sqrt(k)) * (int) Math.ceil(Math.sqrt(k));
+                    double[] retArrX = new double[len];
+                    double[] retArrY = new double[len];
+
+                    // 调用 gridDummy 方法生成虚假位置
+                    kAnonymityUtil.gridDummy(x, y, k, sCd, retArrX, retArrY);
+
+                    List<String> result = new ArrayList<>();
+                    for (int i = 0; i < len; ++i) {
+                        result.add(String.format("%f,%f", retArrX[i], retArrY[i]));
+                    }
+
+                    return new DSObject(result);
+                } catch (Exception e) {
+                    log.error("Error in GridDummy method: ", e);
+                    return null;
+                }
             }
 
             /*
@@ -106,18 +173,48 @@ public class AnonymityImpl implements Anonymity {
                 输出：经度数组、纬度数组
 
             */
+//            case 4: {
+//                if (params.length != 1) return null;
+//                String position = object.getStringVal();
+//                String[] s = position.split(",");
+//                List<?> list = object.getList();
+//                List<Object> value = new ArrayList<>(list);
+//                String[] s1 = value.get(0).toString().split(",");
+//                String[] s2 = value.get(1).toString().split(",");
+//                String cmd = path + " 4 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + s1[0] + " " + s1[1] + " " + s2[0] + " " + s2[1];
+//                return new DSObject(CommandExecutor.openExe(cmd));
+//            }
             case 4: {
-                if (params.length != 1) return null;
                 String position = object.getStringVal();
                 String[] s = position.split(",");
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String[] s1 = value.get(0).toString().split(",");
                 String[] s2 = value.get(1).toString().split(",");
-                String cmd = path + " 4 " + s[0] + " " + s[1] + " " + params[0].toString() + " " + s1[0] + " " + s1[1] + " " + s2[0] + " " + s2[1];
-                System.out.println(cmd);
-                return new DSObject(CommandExecutor.openExe(cmd));
+                try {
+                    double KMin = params[0].doubleValue();
+                    int kMin = (int) Math.ceil(KMin);
+                    double x = Double.parseDouble(s[0]);
+                    double y = Double.parseDouble(s[1]);
+                    double xMin = Double.parseDouble(s1[0]);
+                    double yMin = Double.parseDouble(s1[1]);
+                    double xMax = Double.parseDouble(s2[0]);
+                    double yMax = Double.parseDouble(s2[1]);
+                    double[] retArrX = new double[kMin];
+                    double[] retArrY = new double[kMin];
+                    LinkedList<String> result = new LinkedList<>();
+                    kAnonymityUtil.adaptiveIntervalCloakingWrapper(x, y, kMin, xMin, yMin, xMax, yMax, retArrX, retArrY);
+                    for (int i = 0; i < kMin; ++i) {
+                         result.add(String.format("%f,%f", retArrX[i], retArrY[i]));
+                    }
+                    return new DSObject(result);
+
+                } catch (Exception e) {
+                    log.error("Error in AdaptiveIntervalCloaking method: ", e);
+                    return null;
+                }
             }
+
 
             /*
                 基于缓存信息的虚假位置生成算法 CaDSA
@@ -132,14 +229,31 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度、算法类型(1, 2)
                 输出：经度向量、纬度向量
             */
+//            case 5: {
+//                if (params.length != 1) return null;
+//                String[] s = object.getStringVal().split(",");
+//                String param = "9 " + s[0] + " " + s[1] + " " + params[0].toString();
+//                System.out.println(param);
+//                String cmd = path + " " + param;
+//                return new DSObject(CommandExecutor.openExe(cmd));
+//            }
             case 5: {
                 if (params.length != 1) return null;
-                String[] s = object.getStringVal().split(",");
-                String param = "9 " + s[0] + " " + s[1] + " " + params[0].toString();
-//                System.out.println(param);
-                String cmd = path + " " + param;
-                System.out.println(cmd);
-                return new DSObject(CommandExecutor.openExe(cmd));
+                String position = object.getStringVal();
+                String[] s = position.split(",");
+                int op = params[0].intValue();
+                double x = Double.parseDouble(s[0]);
+                double y = Double.parseDouble(s[1]);
+                List<Double> vecRetArrX = new ArrayList<>();
+                List<Double> vecRetArrY = new ArrayList<>();
+
+                KAnonymityUtil.caDsaAlgorithm(x, y, op, vecRetArrX, vecRetArrY);
+                List<String> result = new ArrayList<>();
+                for (int i = 0; i < vecRetArrX.size(); ++i) {
+                    result.add(String.format("%f,%f", vecRetArrX.get(i), vecRetArrY.get(i)));
+                }
+                return new DSObject(result);
+
             }
 
             /*
@@ -152,10 +266,24 @@ public class AnonymityImpl implements Anonymity {
             case 6: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
-                String param = "1 " + s[0] + " " + s[1] + " " + params[0].toString();
-                String cmd = path + " " + param;
-                System.out.println(cmd);
-                return new DSObject(CommandExecutor.openExe(cmd));
+//                String param = "1 " + s[0] + " " + s[1] + " " + params[0].toString();
+//                String cmd = path + " " + param;
+//                return new DSObject(CommandExecutor.openExe(cmd));
+
+
+                double x = Double.parseDouble(s[0]);
+                double y = Double.parseDouble(s[1]);
+                int k = params[0].intValue();
+                double[] retArrX = new double[k];
+                double[] retArrY = new double[k];
+                KAnonymityUtil.kAnonymityAlgorithm(x, y, k, retArrX, retArrY);
+                List<String> result = new ArrayList<>();
+                for (int i = 0; i < k; ++i) {
+                    result.add(String.format("%f,%f", retArrX[i], retArrY[i]));
+                }
+
+                return new DSObject(result);
+
             }
 
             /*
@@ -268,10 +396,24 @@ public class AnonymityImpl implements Anonymity {
             case 11: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
-                String param = "8 " + s[0] + " " + s[1] + " " + params[0].toString();
-                String cmd = path + " " + param;
-                System.out.println(cmd);
-                return new DSObject(CommandExecutor.openExe(cmd));
+//                String param = "8 " + s[0] + " " + s[1] + " " + params[0].toString();
+//                String cmd = path + " " + param;
+//                return new DSObject(CommandExecutor.openExe(cmd));
+
+
+                double x = Double.parseDouble(s[0]);
+                double y = Double.parseDouble(s[1]);
+                int k = params[0].intValue();
+                double[] retArrX = new double[k];
+                double[] retArrY = new double[k];
+                KAnonymityUtil.hilbertAlgorithm(x, y, k, retArrX, retArrY);
+
+                LinkedList<String> retArrList = new LinkedList<>();
+                for (int i = 0; i < k; i++) {
+                    retArrList.add(retArrX[i] + "," + retArrY[i]);
+                }
+                return new DSObject(retArrList);
+
             }
 
             /*
@@ -286,18 +428,49 @@ public class AnonymityImpl implements Anonymity {
                 输入：经度、纬度
                 输出：经度数组、纬度数组
             */
+//            case 12: {
+//                if (params.length != 1) return null;
+//                String[] s = object.getStringVal().split(",");
+//                StringBuilder param = new StringBuilder("7 " + s[0] + " " + s[1] + " " + params[0].toString());
+//                for (Object point : object.getList()) {
+//                    String[] temp = point.toString().split(",");
+//                    param.append(" ").append(temp[0]).append(" ").append(temp[1]);
+//                }
+//                String cmd = path + " " + param;
+//                return new DSObject(CommandExecutor.openExe(cmd));
+//            }
             case 12: {
                 if (params.length != 1) return null;
                 String[] s = object.getStringVal().split(",");
-                StringBuilder param = new StringBuilder("7 " + s[0] + " " + s[1] + " " + params[0].toString());
-                for (Object point : object.getList()) {
+                double x = Double.parseDouble(s[0]);
+                double y = Double.parseDouble(s[1]);
+
+                int k = params[0].intValue();
+                double[] retArrX = new double[k];
+                double[] retArrY = new double[k];
+
+                List<?> list = object.getList();
+                List<Object> value = new ArrayList<>(list);
+
+                // 拆分区域点集并构建点数组
+                List<KAnonymityUtil.Point> points = new ArrayList<>();
+                for (Object point : value) {
                     String[] temp = point.toString().split(",");
-                    param.append(" ").append(temp[0]).append(" ").append(temp[1]);
+                    if (temp.length == 2) {
+                        points.add(new KAnonymityUtil.Point(Double.parseDouble(temp[0]), Double.parseDouble(temp[1])));
+                    }
                 }
 
-                String cmd = path + " " + param;
-                System.out.println(cmd);
-                return new DSObject(CommandExecutor.openExe(cmd));
+                LinkedList<String> retList = new LinkedList<>();
+                if(KAnonymityUtil.spaceTwistWrapper(points, x, y, k, retArrX, retArrY) == -1){
+                    retList.add("error");
+                    return new DSObject(retList);
+                }
+
+                for (int i = 0; i < k; i++) {
+                    retList.add(retArrX[i] + "," + retArrY[i]);
+                }
+                return new DSObject(retList);
             }
 
             default:

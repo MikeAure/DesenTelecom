@@ -34,6 +34,7 @@ class SparseVectorTechnique5(Mechanism):
         x = np.atleast_2d(a)
 
         rho = np.random.laplace(scale=1 / self.eps1, size=(n_samples, 1))
+        print(f"noise add to T: {rho}")
 
         cmp = x >= (rho + self.t)   # broadcasts rho horizontally, x vertically
         return cmp.astype(int)

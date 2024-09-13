@@ -240,6 +240,7 @@ def add_noise1(dx, dy, image_1):
 
 
 def add_noise2(image_1, k=7, epsilon=10):
+    print(f"epsilon: {epsilon}")
     ave_1 = image_detect(image_1, k)  # 设置k值
     W, H = ave_1.shape
     image_1 = image_1.astype(int)

@@ -456,10 +456,10 @@
                         说明：向数值中加入满足差分隐私的拉普拉斯噪声
                     </p>
                     <p>
-                        输入：一维数组
+                        输入：数值一维数组
                     </p>
                     <p>
-                        输出：一维数组
+                        输出：数值一维数组
                     </p>
                 </div>
             </div>
@@ -495,7 +495,7 @@
 
             <div class="col-sm-offset-2 col-sm-8 input-group">
                 <input type="text" id="laplaceToValue_textInput" class="form-control"
-                       placeholder="请输入文本" style="font-size: 20px"/>
+                       placeholder="请输入数组，以,分隔" style="font-size: 20px"/>
                 <span class="input-group-btn">
                     <button class="btn btn-default"
                             id="laplaceToValue_submitBtn"
@@ -574,7 +574,7 @@
             </div>
             <div class="col-sm-offset-2 col-sm-8 input-group">
                 <input type="text" id="report_noisy_max1_textInput" class="form-control"
-                       placeholder="请输入，以,分隔数字"
+                       placeholder="请输入数组，以,分隔"
                        style="font-size: 20px"/>
                 <span class="input-group-btn">
                     <button class="btn btn-default"
@@ -654,7 +654,7 @@
             </div>
             <div class="col-sm-offset-2 col-sm-8 input-group">
                 <input type="text" id="report_noisy_max3_textInput" class="form-control"
-                       placeholder="请输入，以,分隔数字"
+                       placeholder="请输入数组，以,分隔"
                        style="font-size: 20px"/>
                 <span class="input-group-btn">
                     <button class="btn btn-default"
@@ -698,13 +698,13 @@
             <div class="algo-description">
                 <div class="description-item">
                     <p>
-                        说明：拉普拉斯机制的变体，对数值和结果进行clip处理。
+                        说明：拉普拉斯机制的变体，对数值和结果进行clip处理，避免因计算机浮点数本身的特性而造成差分隐私失效。
                     </p>
                     <p>
-                        输入：数值或一维数组
+                        输入：数值一维数组
                     </p>
                     <p>
-                        输出：一维二进制数组
+                        输出：数值一维数组
                     </p>
                 </div>
             </div>
@@ -1070,7 +1070,7 @@
 
             <div class="col-sm-offset-2 col-sm-8 input-group">
                 <input type="text" id="dpDate_textInput" class="form-control"
-                       placeholder="请输入文本" style="font-size: 20px"/>
+                       placeholder="请输入日期格式的文本，如2001-01-01，以,分隔" style="font-size: 20px"/>
                 <span class="input-group-btn">
                     <button class="btn btn-default"
                             id="dpDate_submitBtn"

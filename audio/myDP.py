@@ -21,6 +21,7 @@ def selectR(n, l):
 def DPfun(x, n, l):
     u = selectU(n)
     r = selectR(n, 1 / l)
+    print(f"select r from gamma distribution: {r}")
     print("半径长度 length: ", r)
     randx = x + u * r
     # randx=randx/np.linalg.norm(randx,keepdims=True)
@@ -88,6 +89,7 @@ def dpVector2(vectorPath, dp_vector_txt_path, budget):
     # print(type(data))
     # data = list[data]
     vector = np.array(list(map(float, data)))
+    print(f"epsilon: {budget}")
     dp_vector = list(DPfun(vector, 512, budget))
     # dp_vector = list(np.around(dp_vector, 7))
     # b = str(dp_vector)

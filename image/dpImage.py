@@ -15,13 +15,16 @@ def coder_distance(eps, x, z):
 
 
 def add_noise(img, eps):
+    print(f"epsilon: {eps}")
     distra = matrix_normal(mean=img)
 
     while True:
         z = np.random.normal(0, 10 / eps, size=img.shape)
+        print(f"noise add to image: {z}")
         noisy_img = img + z
         u = np.random.uniform(0, 1)
         ratio = coder_distance(eps, img, noisy_img) / (2.5 * distra.pdf(noisy_img))
+        print(f"ratio: {ratio}")
         if u <= ratio:
             noisy_img = noisy_img
             break

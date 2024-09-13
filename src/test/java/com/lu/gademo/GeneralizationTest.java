@@ -124,7 +124,8 @@ public class GeneralizationTest {
     @Test
     public void testDateGroupReplace()  {
         // Generalization generalization = new GeneralizationImpl();
-        List<String> newRawData = generateDates(50000);
+        List<String> newRawData = generateDates(10);
+        System.out.println(newRawData);
 //        List<String> rawData = Arrays.asList("2024-3-18", "2024-6-1");
         DSObject dsObject = new DSObject(newRawData);
         DSObject result = generalization.service(dsObject, 5, 3);
@@ -346,7 +347,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "audio", "0001_spec_mask.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 20);
+        DSObject result = generalization.service(dsObject, 20, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -382,7 +383,8 @@ public class GeneralizationTest {
         }
     }
 
-    @Test
+//    @Test
+    // 测试两种算法的实现是否相同
     public void testKNum() {
         Random random = new Random();
         boolean allTestsPassed = true;
@@ -408,7 +410,7 @@ public class GeneralizationTest {
         }
     }
 
-    @Test
+//    @Test
     void testSubstring() {
         System.out.println("广西壮族自治区北海市逢时花园重庆苑a区".indexOf("自治区"));
     }

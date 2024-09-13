@@ -1,7 +1,10 @@
 package com.lu.gademo.task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lu.gademo.entity.ClassificationResult;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
@@ -12,6 +15,7 @@ import com.lu.gademo.service.impl.FileStorageService;
 import com.lu.gademo.utils.LogCollectUtil;
 import com.lu.gademo.utils.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -23,7 +27,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -50,7 +57,6 @@ public class FetchDatabase {
         // 1. 从目标数据库获取数据
         List<SadaGdpiClickDtl> allRecordsByTableName = dataPlatformDesenService.getAllRecordsByTableName(sheetName);
         // 2. 对数据进行脱敏处理并写入文件
-
         Path tempFilePath = Paths.get(sheetName + "_temp.xlsx");
         dataPlatformDesenService.writeToExcel(allRecordsByTableName, dataPlatformDesenService.getColumnMapping(), tempFilePath);
 
@@ -64,11 +70,18 @@ public class FetchDatabase {
         String mediumStrategy = sheetName + "_medium";
         String highStrategy = sheetName + "_high";
 
+        log.info("正在读取课程二脱敏策略");
+        Map<String, Integer> courseTwoMap = readFromCourseTwo();
 
         List<ExcelParam> lowStrategyConfig = excelParamService.getParamsByTableName(lowStrategy + "_param");
         List<ExcelParam> mediumStrategyConfig = excelParamService.getParamsByTableName(mediumStrategy + "_param");
         List<ExcelParam> highStrategyConfig = excelParamService.getParamsByTableName(highStrategy + "_param");
-
+        log.info("正在更新低脱敏策略");
+        updateExcelParam(courseTwoMap, lowStrategyConfig);
+        log.info("正在更新中脱敏策略");
+        updateExcelParam(courseTwoMap, mediumStrategyConfig);
+        log.info("正在更新高脱敏策略");
+        updateExcelParam(courseTwoMap, highStrategyConfig);
 
         String lowStrategyConfigString = objectMapper.writeValueAsString(lowStrategyConfig);
         String mediumStrategyConfigString = objectMapper.writeValueAsString(mediumStrategyConfig);
@@ -136,4 +149,34 @@ public class FetchDatabase {
 
     }
 
+    private Map<String, Integer> readFromCourseTwo() throws IOException {
+        Path path = Paths.get("./dataplatform_config.json");
+        JsonNode columnList = objectMapper.readTree(path.toFile()).get("columnList");
+        List<ClassificationResult> courseTwoList = objectMapper.readValue(columnList.toString(), new TypeReference<List<ClassificationResult>>() {
+        });
+        Map<String, Integer> courseTwoMap = new HashMap<>();
+
+        for (ClassificationResult item : courseTwoList) {
+            courseTwoMap.put("f_" + item.getColumnName(), item.getColumnLevel());
+        }
+        return courseTwoMap;
+
+
+    }
+
+    private void updateExcelParam(Map<String,Integer> courseTwoMap, List<ExcelParam> strategyConfig ) {
+        for (ExcelParam item : strategyConfig) {
+            if (item.getColumnName().equals("sid") || item.getColumnName().equals("f_dataid") || item.getColumnName().equals("f_ts")) {
+                continue;
+            }
+            Integer courseTwoMapTmParam = courseTwoMap.get(item.getColumnName());
+            System.out.println(courseTwoMapTmParam);
+            if (courseTwoMapTmParam == 4) {
+                courseTwoMapTmParam = 3;
+            }
+            item.setTmParam(courseTwoMapTmParam > item.getTmParam() ? courseTwoMapTmParam : item.getTmParam());
+        }
+
+//        strategyConfig.forEach(System.out::println);
+    }
 }

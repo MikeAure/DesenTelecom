@@ -31,16 +31,23 @@ class NumericalSVT(Mechanism):
         x = np.atleast_2d(a)
 
         rho1 = np.random.laplace(scale=3 / self.eps, size=(n_samples, 1))
+        print(f"noise adds to T: {rho1}")
         rho2 = np.random.laplace(
             scale=6 * self.c / self.eps, size=(n_samples, a.shape[0])
         )
+        print(f"noise adds to array: {rho2}")
+
         rho3 = np.random.laplace(
             scale=3 * self.c / self.eps, size=(n_samples, a.shape[0])
         )
+        print(f"new noise adds to array: {rho3}")
 
         m = rho2 + x  # broadcasts x vertically
+        print(f"add noise to array first time: {m}")
         cmp = m >= (self.t + rho1)  # broadcasts rho1 horizontally
         z = rho3 + x  # broadcasts x vertically
+        print(f"add noise to array second time: {z}")
+
 
         count = np.zeros(n_samples)
         aborted = np.full(n_samples, False)
