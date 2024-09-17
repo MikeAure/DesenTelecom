@@ -28,6 +28,7 @@ public class AlgorithmsFactory {
         this.algorithmInfoMap = new HashMap<>();
     }
 
+
     @PostConstruct
     public void init() {
         // 文本/表格

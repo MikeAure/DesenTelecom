@@ -49,13 +49,13 @@ public class FetchDatabase {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-//    @Scheduled(initialDelay = 5000, fixedRate = 180000)
     @Scheduled(initialDelayString = "${fetch.database.task.initialDelay}", fixedRateString = "${fetch.database.task.fixedRate}")
     public boolean fetchDatabaseAndDesen() throws IOException, IllegalAccessException {
         log.info("定时任务：拉取电信大数据平台数据并脱敏");
         String sheetName = "sada_gdpi_click_dtl";
         // 1. 从目标数据库获取数据
         List<SadaGdpiClickDtl> allRecordsByTableName = dataPlatformDesenService.getAllRecordsByTableName(sheetName);
+        log.info("已从电信大数据平台获取数据");
         // 2. 对数据进行脱敏处理并写入文件
         Path tempFilePath = Paths.get(sheetName + "_temp.xlsx");
         dataPlatformDesenService.writeToExcel(allRecordsByTableName, dataPlatformDesenService.getColumnMapping(), tempFilePath);
@@ -86,20 +86,7 @@ public class FetchDatabase {
         String lowStrategyConfigString = objectMapper.writeValueAsString(lowStrategyConfig);
         String mediumStrategyConfigString = objectMapper.writeValueAsString(mediumStrategyConfig);
         String highStrategyConfigString = objectMapper.writeValueAsString(highStrategyConfig);
-//        switch (strategyInt) {
-//            case 2: {
-//                sheetNameWithStrategy = sheetName + "_medium";
-//                break;
-//            }
-//            case 3: {
-//                sheetNameWithStrategy = sheetName + "_high";
-//                break;
-//            }
-//            default: {
-//                sheetNameWithStrategy = sheetName + "_low";
-//                break;
-//            }
-//        }
+
         try {
             fileStorageDetails1 = fileStorageService.saveRawFileWithDesenInfo(tempFilePath);
             fileStorageDetails2 = fileStorageService.saveRawFileWithDesenInfo(tempFilePath);

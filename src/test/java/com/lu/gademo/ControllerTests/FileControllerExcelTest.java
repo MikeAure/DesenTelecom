@@ -1,5 +1,8 @@
 package com.lu.gademo.ControllerTests;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.utils.Util;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -23,6 +26,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -90,17 +95,21 @@ public class FileControllerExcelTest {
     @Test
     public void getExcelParam() throws Exception {
         System.out.println(FIFTY_SCENE.size());
-        for (String sceneName : FIFTY_SCENE) {
+//        for (String sceneName : FIFTY_SCENE) {
 
-            String url = "/" + sceneName + "param/list";
+            String url = "/" + "map" + "param/list";
             // 模拟multipart/form-data请求
             MvcResult result = mvc.perform(get(url))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andDo(MockMvcResultHandlers.print())
                     .andReturn();
-            System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
-        }
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ExcelParam> excelParamList = objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8), new TypeReference<List<ExcelParam>>() {
+            }) ;
+            excelParamList.stream().collect(Collectors.toMap(ExcelParam::getColumnName, Function.identity())).forEach((k, v) -> System.out.println(k + ": " + v));
+//            System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
+//        }
     }
 
     @Test
@@ -444,7 +453,8 @@ public class FileControllerExcelTest {
     @Test
     public void testExcelFilesNew52scenes() throws Exception {
         Map<String, List<String>> failedResult = new HashMap<>();
-        Path currentDirectory = Paths.get("D:\\52scenesv5v3");
+
+        Path currentDirectory = Paths.get("D:\\52scenes1w\\43");
         System.out.println("CurrentDirectory: " + currentDirectory.toString());
         List<String> failedFileNameList = new ArrayList<>();
         for (String sceneName : FIFTYTWO_SCENE) {

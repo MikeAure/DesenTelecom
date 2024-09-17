@@ -109,7 +109,8 @@ public class KAnonymityController {
             log.error(e.getMessage());
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.TEXT_PLAIN);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(e.getMessage());        }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(e.getMessage());
+        }
         return null;
     }
 

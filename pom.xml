@@ -197,17 +197,6 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.5</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.apache.poi</groupId>-->
-<!--			<artifactId>poi</artifactId>-->
-<!--			<version>5.2.5</version>-->
-<!--		</dependency>-->
-
-<!--		<dependency>-->
-<!--			<groupId>org.apache.poi</groupId>-->
-<!--			<artifactId>poi-ooxml</artifactId>-->
-<!--			<version>5.2.5</version>-->
-<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -244,6 +233,12 @@
 			<groupId>org.deidentifier.arx</groupId>
 			<artifactId>arx</artifactId>
 			<version>3.9.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>easyexcel</artifactId>
+			<version>3.3.3</version>
 		</dependency>
 
 	</dependencies>

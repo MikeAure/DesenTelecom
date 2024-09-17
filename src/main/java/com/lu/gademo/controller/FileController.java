@@ -6,6 +6,7 @@ import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.FileStorageService;
+import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;
 import com.sun.istack.NotNull;
@@ -15,22 +16,20 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.bytedeco.opencv.presets.opencv_core;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,14 +38,15 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 文件脱敏controller
  */
 @Slf4j
-@Controller
 @CrossOrigin("*")
-@RequestMapping("/File")
+@RestController
+@RequestMapping("File")
 public class FileController extends BaseController {
     private AlgorithmsFactory algorithmsFactory;
     // 系统id
@@ -70,6 +70,8 @@ public class FileController extends BaseController {
 
     private FileStorageService fileStorageService;
     private LogCollectUtil logCollectUtil;
+
+    private MeetingAnalysisEventListener meetingAnalysisEventListener;
 
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
@@ -100,7 +102,7 @@ public class FileController extends BaseController {
                                             @RequestParam("params") String params,
                                             @RequestParam("algName") String algName,
                                             @RequestParam("sheet") String sheet
-    ) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, ExecutionException {
+    ) throws IOException{
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
         log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
         log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
@@ -125,7 +127,7 @@ public class FileController extends BaseController {
             return fileService.dealVideo(fileStorageDetails, params, algName);
         } else if (audioType.contains(fileType)) {
             return fileService.dealAudio(fileStorageDetails, params, algName);
-        }  else {
+        } else {
             return fileService.dealGraph(fileStorageDetails, params);
         }
 
@@ -170,8 +172,7 @@ public class FileController extends BaseController {
 
     }
 
-    @ResponseBody
-    @RequestMapping(value = "desenText", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "desenText", produces = "application/json;charset=UTF-8")
     public String desenText(@RequestParam String textInput,
                             @RequestParam String textType,
                             @RequestParam String privacyLevel,
@@ -182,25 +183,23 @@ public class FileController extends BaseController {
 
     }
 
-    @ResponseBody
-    @RequestMapping(value = "generateTextTestData", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<byte[]> generateTextTestData(HttpServletRequest request, @RequestParam("totalNumber") Integer totalNumber) {
+    @GetMapping(value = "generateTextTestData")
+    public ResponseEntity<Resource> generateTextTestData(@RequestParam("totalNumber") Integer totalNumber)
+            throws IOException {
         log.info("开始生成失真文本算法测试文件");
         HttpHeaders headers = new HttpHeaders();
-        try {
-            FileStorageDetails fileStorageDetails = fileService.generateTextTestFile(totalNumber);
-            log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
+
+        FileStorageDetails fileStorageDetails = fileService.generateTextTestFile(totalNumber);
+        log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
 //            HttpSession httpSession = request.getSession();
 //            httpSession.setAttribute("testTextFileName", fileStorageDetails.getRawFileName());
-            headers.setContentDispositionFormData("attachment", fileStorageDetails.getRawFileName());
-            return ResponseEntity.ok().headers(headers).body(fileStorageDetails.getRawFileBytes());
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to generate file.".getBytes());
-        }
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        headers.setContentDispositionFormData("attachment", fileStorageDetails.getRawFileName());
+        Resource resource = new InputStreamResource(Files.newInputStream(fileStorageDetails.getRawFilePath()));
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 
-    @ResponseBody
-    @RequestMapping(value = "downloadTextTestFile", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "downloadTextTestFile")
     public ResponseEntity<byte[]> downloadTextTestFile(HttpServletRequest request) {
         HttpHeaders headers = new HttpHeaders();
         HttpSession httpSession = request.getSession();
@@ -217,7 +216,7 @@ public class FileController extends BaseController {
         }
     }
 
-    @ResponseBody
+
     @PostMapping(value = "textFilePerformenceTest")
     public ResponseEntity<byte[]> textFilePerformenceTest(@RequestPart("file") MultipartFile file,
                                                           @RequestParam("params") String params,
@@ -255,26 +254,25 @@ public class FileController extends BaseController {
 
     // 接收信工所Office文档
     @PostMapping(value = "recvFileDesen", produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    ResponseEntity<Result<Object>> recvFileDesen(@NotNull @RequestPart("file") MultipartFile file) {
+    Result<Object> recvFileDesen(@NotNull @RequestPart("file") MultipartFile file) {
 
         String fileName = file.getOriginalFilename();
         if (fileName == null) {
-            return ResponseEntity.ok().body(new Result<>(400, "error", "Request file name is null"));
+            return new Result<>(400, "error", "Request file name is null");
         }
 
         String fileType = getFileSuffix(fileName);
         List<String> officeFileTypes = Arrays.asList("xlsx", "docx", "pptx");
 
         if (!officeFileTypes.contains(fileType)) {
-            return ResponseEntity.ok().body(new Result<>(400, "error", "File type not supported."));
+            return new Result<>(400, "error", "File type not supported.");
         }
         try {
-            return ResponseEntity.ok().body(new Result<>(200, "ok", officeFileDesen.desenRecvFile(file)));
+            return new Result<>(200, "ok", officeFileDesen.desenRecvFile(file));
 
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.ok().body(new Result<>(400, "error", e.getMessage()));
+            return new Result<>(400, "error", e.getMessage());
         }
 
     }
@@ -453,6 +451,28 @@ public class FileController extends BaseController {
         }
 
         return ResponseEntity.ok().body(response);
+    }
+
+    @ExceptionHandler({InterruptedException.class, ExecutionException.class, TimeoutException.class, IOException.class})
+    public ResponseEntity<String> handleFileProcessingExceptions(Exception ex) {
+        String errorMsg = "处理文件时出错: ";
+        if (ex instanceof TimeoutException) {
+            errorMsg += "等待处理结果超时";
+        } else if (ex instanceof InterruptedException) {
+            errorMsg += "处理中断";
+        } else if (ex instanceof ExecutionException) {
+            errorMsg += "执行异常";
+        } else if (ex instanceof  IOException) {
+            errorMsg += "文件读写异常";
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(errorMsg);
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
 //    @PostMapping(value = "fileDesen")

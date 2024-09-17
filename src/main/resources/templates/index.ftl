@@ -275,7 +275,12 @@
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinevoting" style="font-size: 15px;">网上投票类场景</a>
                         </li>
-
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/petcare" style="font-size: 15px;">宠物照顾类场景</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" href="${ctx!}/fifty_scene/homerepair" style="font-size: 15px;">家庭维修类场景</a>
+                        </li>
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/telecomclient" style="font-size: 15px;">电信客户信息数据</a>
                         </li>

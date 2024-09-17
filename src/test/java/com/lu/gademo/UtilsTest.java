@@ -216,4 +216,14 @@ public class UtilsTest {
 
         lowStrategyConfig.forEach(System.out::println);
     }
+
+//    @Test
+//    void testCEntrySets() throws IOException {
+//        Map<String, List<Object>> testMap = new HashMap<>();
+//        testMap.put("key1", Arrays.asList(1, 2, 3));
+//        testMap.put("key2", Arrays.asList(4, 5, 6));
+//        testMap.put("key3", Arrays.asList(7, 8, 9));
+//        testMap.entrySet().;
+//
+//    }
 }

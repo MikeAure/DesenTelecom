@@ -29,21 +29,21 @@ public interface FileService {
 
     ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
 
-    ResponseEntity<byte[]> dealImage(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
+    ResponseEntity<byte[]> dealImage(MultipartFile file, String params, String algName) throws IOException;
 
-    ResponseEntity<byte[]> dealExcel(FileStorageDetails file, String params, String sheet, Boolean ifSaveExcel) throws IOException, SQLException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, ExecutionException;
+    ResponseEntity<byte[]> dealExcel(FileStorageDetails file, String params, String sheet, Boolean ifSaveExcel) throws IOException;
 
     ResponseEntity<byte[]> dealExcel(MultipartFile file, String params, String sheet, Boolean ifSaveExcel) throws IOException;
 
-    ResponseEntity<byte[]> dealVideo(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, SQLException, InterruptedException;
+    ResponseEntity<byte[]> dealVideo(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
 
     ResponseEntity<byte[]> dealVideo(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
 
-    ResponseEntity<byte[]> dealAudio(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, SQLException, InterruptedException;
+    ResponseEntity<byte[]> dealAudio(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
 
     ResponseEntity<byte[]> dealAudio(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
 
-    ResponseEntity<byte[]> dealGraph(FileStorageDetails fileStorageDetails, String params) throws IOException, SQLException, InterruptedException;
+    ResponseEntity<byte[]> dealGraph(FileStorageDetails fileStorageDetails, String params) throws IOException;
 
     ResponseEntity<byte[]> dealGraph(MultipartFile file, String params) throws IOException, SQLException, InterruptedException;
 
@@ -61,13 +61,13 @@ public interface FileService {
 
     ResponseEntity<byte[]> replaceVideoBackground(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException;
 
-    ResponseEntity<byte[]> replaceFace(FileStorageDetails fileStorageDetails, String params, String algName, FileStorageDetails sheetStorageDetails) throws IOException, SQLException, InterruptedException;
+    ResponseEntity<byte[]> replaceFace(FileStorageDetails fileStorageDetails, String params, String algName, FileStorageDetails sheetStorageDetails) throws IOException;
 
     ResponseEntity<byte[]> replaceFace(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException;
 
-    ResponseEntity<byte[]> replaceFaceVideo(FileStorageDetails fileStorageDetails, String params, String algName, FileStorageDetails sheetStorageDetails) throws IOException, SQLException, InterruptedException;
+    ResponseEntity<byte[]> replaceFaceVideo(FileStorageDetails fileStorageDetails, String params, String algName, FileStorageDetails sheetStorageDetails) throws IOException;
 
-    ResponseEntity<byte[]> replaceFaceVideo(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException, SQLException, InterruptedException;
+    ResponseEntity<byte[]> replaceFaceVideo(MultipartFile file, String params, String algName, MultipartFile sheet) throws IOException;
 
     String desenText(String textInput, String textType, String privacyLevel, String algName) throws ParseException;
 }

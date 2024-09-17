@@ -28,19 +28,19 @@ public class GaController extends BaseController {
     }
 
     // 五十场景模板
-    @RequestMapping(value = {"/fifty_scene/{name}"})
+    @GetMapping(value = {"/fifty_scene/{name}"})
     public String getFiftyScenesView(@PathVariable String name) {
         return "fifty_scene/" + name;
     }
 
     // 脱敏算法验证  按照模态分类
-    @RequestMapping(value = {"/verify/{name}"})
+    @GetMapping(value = {"/verify/{name}"})
     public String getVerifyViews(@PathVariable String name) {
         return "verify/" + name;
     }
 
     // 脱敏工具设置
-    @RequestMapping(value = {"/desentools/{toolName}"})
+    @GetMapping(value = {"/desentools/{toolName}"})
     public String getDesenToolsView(@PathVariable String toolName) {
         return "desentools/" + toolName;
     }

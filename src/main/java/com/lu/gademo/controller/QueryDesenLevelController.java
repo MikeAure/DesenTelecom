@@ -28,12 +28,11 @@ public class QueryDesenLevelController {
         this.sendEvaReqDao = sendEvaReqDao;
         this.sceneNameMapper = new HashMap<>();
         this.sceneNameMapper.put("客户资源管理", "customer_desen_msg");
-
+        this.sceneNameMapper.put("电信流转场景", "sada_gdpi_click_dtl");
     }
 
     @PostMapping(value = "structuredQuery", produces = "application/json;charset=UTF-8")
     Result<?> queryDesenLevel(@RequestBody QueryDesenLevel req) {
-        // TODO: 实现对于对方发送的场景名请求的转换
         String rawSceneName = req.getApplicationScene();
         String sceneName = this.sceneNameMapper.get(rawSceneName);
         String fieldName = req.getAttributeName();

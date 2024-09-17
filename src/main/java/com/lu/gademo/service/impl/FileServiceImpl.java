@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,6 +45,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -198,6 +200,7 @@ public class FileServiceImpl implements FileService {
         // 调用脱敏程序处理
         String startTime = util.getTime();
         log.info("开始对表格文件{}进行脱敏", rawFileName);
+
         Map<Integer, List<?>> desenResult = realDealExcel(originalSheet, infoBuilders, excelParamList, totalRowNum, fieldNameRow, columnCount);
         log.info("表格文件脱敏结束");
         String endTime = util.getTime();
@@ -232,7 +235,7 @@ public class FileServiceImpl implements FileService {
         String paramsFilePath = paramDirectory.resolve(paramsFileName).toAbsolutePath().toString();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(paramsFilePath))) {
             for (ExcelParam p : excelParamList) {
-                // 将每个Person对象转换为字符串并写入文件
+                // 将每个ExcelParam对象转换为字符串并写入文件
                 String line = p.toString();
                 writer.write(line);
                 writer.newLine(); // 换行
@@ -1855,12 +1858,13 @@ public class FileServiceImpl implements FileService {
                                                 List<ExcelParam> excelParamList, int totalRowNum,
                                                 Row fieldNameRow, int columnCount) throws IOException {
         //  脱敏，逐列处理
-        Map<String, ExcelParam> excelParamMap = new HashMap<>();
         Map<Integer, List<?>> desenResult = new HashMap<>();
         Map<Integer, List<Object>> preprocessedData = new HashMap<>();
-        for (ExcelParam item : excelParamList) {
-            excelParamMap.put(item.getColumnName().trim(), item);
-        }
+        Map<String, ExcelParam> excelParamMap = excelParamList.parallelStream().collect(Collectors.toMap(
+                param -> param.getColumnName().trim(), Function.identity()));
+//        for (ExcelParam item : excelParamList) {
+//            excelParamMap.put(item.getColumnName().trim(), item);
+//        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DataFormatter dataFormatter = new DataFormatter();
@@ -1991,13 +1995,13 @@ public class FileServiceImpl implements FileService {
             }
 
             int algoNum = excelParam.getK();
+            int columnDataType = excelParam.getDataType();
+
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(algoNum);
             log.info("Excel Param: {}", excelParam);
             addDataTypeAndInfoIden(infoBuilders, excelParam, columnName, algoNum);
             // 取列数据
-            List<Object> objs = new ArrayList<>();
-            objs = preprocessedData.get(columnIndex);
-            int columnDataType = excelParam.getDataType();
+            List<Object> objs = preprocessedData.get(columnIndex);
             // 添加脱敏参数
             infoBuilders.desenAlgParam.append(
                     excelParam.getTmParam() == 0 ? "没有脱敏," :
@@ -2207,7 +2211,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public ResponseEntity<byte[]> dealExcel(FileStorageDetails fileStorageDetails, String params, String sheetName,
-                                            Boolean ifSaveExcelParams) throws IOException, ExecutionException {
+                                            Boolean ifSaveExcelParams) throws IOException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         LogInfo logInfo = processExcel(fileStorageDetails, params, sheetName, ifSaveExcelParams);
@@ -2262,7 +2266,6 @@ public class FileServiceImpl implements FileService {
     @Override
     public ResponseEntity<byte[]> dealExcel(MultipartFile file, String params, String sheetName, Boolean ifSaveExcelParam) throws IOException {
         String sheetTemplate = sheetName.split("_")[0];
-        DecimalFormat df = new DecimalFormat("#");
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "text";
@@ -2711,7 +2714,9 @@ public class FileServiceImpl implements FileService {
         String evidenceID = util.getSM3Hash((new String(newExcelData, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
         // 使用单独方法构建线程池发送日志
-        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName, rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, sheetTemplate, rawFileSuffix, startTime, endTime);
+        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, sheetTemplate, rawFileSuffix,
+                startTime, endTime);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
@@ -2855,7 +2860,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> dealAudio(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, SQLException, InterruptedException {
+    public ResponseEntity<byte[]> dealAudio(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         LogInfo logInfo = processAudio(fileStorageDetails, params, algName);
@@ -2990,7 +2995,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> dealGraph(FileStorageDetails fileStorageDetails, String params) throws IOException, SQLException, InterruptedException {
+    public ResponseEntity<byte[]> dealGraph(FileStorageDetails fileStorageDetails, String params) throws IOException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         LogInfo logInfo = processGraph(fileStorageDetails, params);
@@ -3872,7 +3877,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> replaceFace(FileStorageDetails fileStorageDetails, String params, String algName, FileStorageDetails sheetStorageDetails) throws IOException {
+    public ResponseEntity<byte[]> replaceFace(FileStorageDetails fileStorageDetails, String params, String algName,
+                                              FileStorageDetails sheetStorageDetails) throws IOException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         // 处理图片
@@ -4235,9 +4241,10 @@ public class FileServiceImpl implements FileService {
 
         // 使用随机数生成器生成数值数据
         Random random = new Random();
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        OutputStreamWriter writer = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8);
+        FileStorageDetails rawFileStorageDetails = fileStorageService.saveRawFile(fileName);
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(rawFileStorageDetails.getRawFilePath()),
+                StandardCharsets.UTF_8);
 
         for (int i = 0; i < totalNumber; i++) {
             double randomNumber = 10000 * random.nextDouble(); // 生成随机浮点数
@@ -4246,10 +4253,9 @@ public class FileServiceImpl implements FileService {
         }
 
         writer.flush();  // 确保所有数据都写入到ByteArrayOutputStream中
-        byte[] byteArray = byteArrayOutputStream.toByteArray(); // 获取字节数组
-        log.info("生成的数据的字节数组大小为: " + byteArray.length + " 字节");
-        return fileStorageService.saveRawFile(fileName, byteArray); // 保存文件到文件系统
+        writer.close();
 
+        return rawFileStorageDetails; // 保存文件到文件系统
 
     }
 
@@ -4284,7 +4290,7 @@ public class FileServiceImpl implements FileService {
     }
 
     // 从DSObject获取脱敏结果
-    private <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
+    public static <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
         log.info("当前列脱敏算法名称: " + algorithmInfo.getName());
         log.info("当前列脱敏算法编号: " + algorithmInfo.getId());
         return algorithmInfo.execute(rawData, excelParam.getTmParam()).getList()
@@ -4293,7 +4299,7 @@ public class FileServiceImpl implements FileService {
                 .collect(Collectors.toList());
     }
 
-    private <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, int param) {
+    public static <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, int param) {
         return algorithmInfo.execute(rawData, param).getList()
                 .stream()
                 .map(item -> item != null ? (T) item : null)

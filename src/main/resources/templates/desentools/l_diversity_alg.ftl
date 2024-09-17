@@ -259,26 +259,26 @@
         const tableBody = document.getElementById('attributesTableOfDistinctInput').querySelector('tbody');
         const rows = tableBody.querySelectorAll('tr');
         const formData = new FormData();
-
+        // const attributeMap = new Map();
         rows.forEach(row => {
             const attribute = row.querySelector('td').textContent;
             const fileInput = row.querySelector('input[type="file"]');
             const file = fileInput.files[0];
             if (file) {
-                formData.append(attribute, file);
+                formData.set(attribute, file);
             }
         });
 
         const csvFileInput = document.getElementById('l_diversity_distinct_fileUpload');
         const csvFile = csvFileInput.files[0];
         if (csvFile) {
-            formData.append('csvFile', csvFile);
+            formData.set('csvFile', csvFile);
         }
 
-        formData.append("params", document.getElementById("l_diversity_distinct_privacyLevel").value);
+        formData.set("params", document.getElementById("l_diversity_distinct_privacyLevel").value);
 
         const attribute = document.querySelector('input[name="sensitive_attribute_c"]:checked');
-        formData.append('attribute', attribute.value);
+        formData.set('attribute', attribute.value);
 
         // Replace 'YOUR_SERVER_ENDPOINT' with your actual server endpoint
         fetch('/KAnonymity/LDiversity/Distinct', {
@@ -532,20 +532,20 @@
             const fileInput = row.querySelector('input[type="file"]');
             const file = fileInput.files[0];
             if (file) {
-                formData.append(attribute, file);
+                formData.set(attribute, file);
             }
         });
 
         const csvFileInput = document.getElementById('l_diversity_entropy_fileUpload');
         const csvFile = csvFileInput.files[0];
         if (csvFile) {
-            formData.append('csvFile', csvFile);
+            formData.set('csvFile', csvFile);
         }
 
-        formData.append("params", document.getElementById("l_diversity_entropy_privacyLevel").value);
+        formData.set("params", document.getElementById("l_diversity_entropy_privacyLevel").value);
 
         const attribute = document.querySelector('input[name="sensitive_attribute"]:checked');
-        formData.append('attribute', attribute.value);
+        formData.set('attribute', attribute.value);
 
         // Replace 'YOUR_SERVER_ENDPOINT' with your actual server endpoint
         fetch('/KAnonymity/LDiversity/Entropy', {
@@ -800,20 +800,20 @@
             const fileInput = row.querySelector('input[type="file"]');
             const file = fileInput.files[0];
             if (file) {
-                formData.append(attribute, file);
+                formData.set(attribute, file);
             }
         });
 
         const csvFileInput = document.getElementById('l_diversity_RecursiveC_fileUpload');
         const csvFile = csvFileInput.files[0];
         if (csvFile) {
-            formData.append('csvFile', csvFile);
+            formData.set('csvFile', csvFile);
         }
 
-        formData.append("params", document.getElementById("l_diversity_RecursiveC_privacyLevel").value);
+        formData.set("params", document.getElementById("l_diversity_RecursiveC_privacyLevel").value);
 
         const attribute = document.querySelector('input[name="sensitive_attribute_c"]:checked');
-        formData.append('attribute', attribute.value);
+        formData.set('attribute', attribute.value);
 
         // Replace 'YOUR_SERVER_ENDPOINT' with your actual server endpoint
         fetch('/KAnonymity/LDiversity/RecursiveC', {

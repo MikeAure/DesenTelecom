@@ -73,8 +73,8 @@ logging:
             hibernate.SQL: INFO
 
 effectEva:
-#    address: 172.28.72.223
-    address: 127.0.0.1
+    address: 172.28.72.223
+#    address: 127.0.0.1
     port: 10005
 evidence:
     localAddress: 172.28.72.214

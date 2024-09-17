@@ -1925,6 +1925,8 @@
                                     <option value="telemedicine">远程诊疗类场景</option>
                                     <option value="vr">虚拟现实类场景</option>
                                     <option value="onlinevoting">网上投票类场景</option>
+                                    <option value="homerepair">家庭维修类场景</option>
+                                    <option value="petcare">宠物照顾类场景</option>
 <#--                                    <option value="telecomclient">电信客户信息类数据</option>-->
 
                                 </select>

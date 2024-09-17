@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 
@@ -24,17 +23,23 @@ public class FileStorageService {
         this.desenFileDirectory = Paths.get("desen_files");
 
         try {
-        if (!Files.exists(rawFileDirectory)) {
-            Files.createDirectory(rawFileDirectory);
-        }
-        if (!Files.exists(desenFileDirectory)) {
-            Files.createDirectory(desenFileDirectory);
-        }
+            if (!Files.exists(rawFileDirectory)) {
+                Files.createDirectory(rawFileDirectory);
+            }
+            if (!Files.exists(desenFileDirectory)) {
+                Files.createDirectory(desenFileDirectory);
+            }
         } catch (IOException e) {
             log.error("创建原始文件和脱敏后文件保存目录失败：{}", e.getMessage());
         }
     }
 
+    /**
+     *
+     * @param file 保存MultipartFile并生成原始文件和脱敏文件相关的信息
+     * @return 包含原始文件路径信息和文件内容、脱敏文件路径信息的FileStorageDetails
+     * @throws IOException
+     */
     public FileStorageDetails saveRawFileWithDesenInfo(MultipartFile file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -76,6 +81,12 @@ public class FileStorageService {
                 .build();
     }
 
+    /**
+     * 将原始文件复制到raw_files，并设置脱敏文件路径信息
+     * @param file
+     * @return 包含原始文件路径信息和文件内容、脱敏后文件路径信息的FileStorageDetails
+     * @throws IOException
+     */
     public FileStorageDetails saveRawFileWithDesenInfo(Path file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -119,6 +130,7 @@ public class FileStorageService {
 
     /**
      * 保存MultipartFile并仅生成原始文件相关的信息
+     *
      * @param file 上传的文件
      * @return 仅包含原始文件信息的FileStorageDetails
      * @throws IOException
@@ -150,45 +162,14 @@ public class FileStorageService {
                 .rawFileSize(rawFileSize)
                 .build();
     }
-    public FileStorageDetails getRawFileStorageDetails(Path file) throws IOException {
-        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
-        if (!Files.isRegularFile(file)) {
-            throw new IOException("Input file is not regular file");
-        }
-
-        String originalFileName = file.getFileName().toString();
-        System.out.println(originalFileName);
-        String fileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
-        String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
-        String rawFileNameTemp = fileTimeStamp + "_" + fileName;
-        String rawFileName = fileTimeStamp + "_" + originalFileName;
-        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
-        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
-        byte[] rawFileBytes = Files.readAllBytes(file);
-        Long rawFileSize = Files.size(file);
-
-        Files.copy(file, rawFilePath, StandardCopyOption.REPLACE_EXISTING);
-        // Path for the desensitized file
-        String desenFileTimeStamp = String.valueOf(System.currentTimeMillis());
-        String desenFileName = rawFileNameTemp + "_" + desenFileTimeStamp + "." + rawFileSuffix;
-        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
-        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
-
-        return FileStorageDetails.builder()
-                .rawFileName(rawFileName)
-                .rawFileSuffix(rawFileSuffix)
-                .rawFilePath(rawFilePath)
-                .rawFilePathString(rawFilePathString)
-                .rawFileBytes(rawFileBytes)
-                .rawFileSize(rawFileSize)
-                .desenFileName(desenFileName)
-                .desenFileSuffix(rawFileSuffix)
-                .desenFilePath(desenFilePath)
-                .desenFilePathString(desenFilePathString)
-                .build();
-    }
-
+    /**
+     * 将字节数组的内容保存到原始文件中并返回原始文件信息
+     * @param fileName 文件名
+     * @param rawFileBytes 文件的字节数组
+     * @return 仅包含原始文件信息的FileStorageDetails
+     * @throws IOException
+     */
     public FileStorageDetails saveRawFile(String fileName, byte[] rawFileBytes) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -208,6 +189,29 @@ public class FileStorageService {
                 .rawFileSize(rawFileSize)
                 .build();
     }
+
+    /**
+     * 返回仅包含原始文件存储路径信息的FileStorageDetails，文件内容为空
+     * @param fileName 文件名
+     * @return 仅包含原始文件存储路径信息的FileStorageDetails
+     * @throws IOException
+     */
+    public FileStorageDetails saveRawFile(String fileName) throws IOException {
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        String rawFileSuffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+        String rawFileName = fileTimeStamp + "_" + fileName;
+        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .build();
+    }
+
 
     public void saveDesenFile(Path desenFilePath, byte[] desenFileBytes) throws IOException {
         // 确保父目录存在

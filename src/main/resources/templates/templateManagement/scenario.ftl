@@ -581,6 +581,8 @@
                                 <option value="vr">虚拟现实类场景</option>
                                 <option value="webcast">网络直播类场景</option>
                                 <option value="woman">女性健康类场景</option>
+                                <option value="homerepair">家庭维修类场景</option>
+                                <option value="petcare">宠物照顾类场景</option>
                             </select>
                         </div>
                         <div class="form-group m-b">

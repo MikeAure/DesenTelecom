@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.Cipher;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -339,7 +336,7 @@ public class EncryptController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/generateTestData", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "/generateTestData", produces = "application/json;charset=UTF-8")
     public ServerResponse<String> generateTestData() {
         generateRandomGeoPoints(minLat, maxLat, minLon, maxLon, numberOfPoints);
         StringBuilder sb = new StringBuilder();
@@ -368,16 +365,13 @@ public class EncryptController {
     public ResponseEntity<Resource> performenceTest(@RequestBody double[][] points) throws IOException {
         log.info("开始非失真类文本算法性能测试");
         Path desenFilePath = Paths.get("desen_files");
-        Map<String, String> returnResult = new HashMap<>();
-        StringBuilder resultBuilder = new StringBuilder();
         MapUtils mapUtils = new MapUtils();
+        List<String> result = new ArrayList<>();
         CoordinateConversion coor = new CoordinateConversion();
         String[] mapDatum = MapUtils.mapData;
         int numThreads = Runtime.getRuntime().availableProcessors();
         // Create a thread pool with the number of available processors
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-//        System.out.println(numThreads);
-//        System.out.println("points.length: " + points.length);
         List<Future<String>> futures = new ArrayList<>();
         if (points.length == 0) {
             return ResponseEntity.badRequest().body(null);
@@ -390,12 +384,11 @@ public class EncryptController {
             Callable<String> task = getStringCallable(i, mapDatum, vertex);
             futures.add(executor.submit(task));
         }
-
-        // Process the results of each task
+        // 处理脱敏任务，记录时间
         for (Future<String> future : futures) {
             try {
-                resultBuilder.append(future.get()); // Retrieve the result of the task
-                resultBuilder.append("\n");
+                result.add(future.get()); // Retrieve the result of the task
+                // 这里进行脱敏处理的时间统计
             } catch (InterruptedException | ExecutionException e) {
                 log.error("Error: " + e.getMessage());
             }
@@ -415,16 +408,22 @@ public class EncryptController {
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
-        String resultString = "脱敏" + points.length + "条数据用时" + totalTime + " ms\n" + resultBuilder.toString();
+        String timeString = "脱敏" + points.length + "条数据用时" + totalTime + " ms\n";
         String fileName = System.currentTimeMillis() + "test_result.txt";
-        try (FileWriter fileWriter = new FileWriter(desenFilePath.resolve(fileName).toFile())) {
-            fileWriter.write(resultString);
+        try (OutputStreamWriter fileWriter = new OutputStreamWriter(Files.newOutputStream(desenFilePath.resolve(fileName)))) {
+            fileWriter.write(timeString);
+            for(String s : result) {
+                fileWriter.write(s);
+                fileWriter.write("\n");
+            }
         } catch (IOException e) {
             return ResponseEntity.badRequest().body(null);
         }
-
+        result.clear();
+        result = null;
+        System.gc();
         // 准备返回文件
-        File tempFile = desenFilePath.resolve(fileName).toFile();
+        Path tempFile = desenFilePath.resolve(fileName);
         log.info("脱敏后文件写入完成");
         points = null;
         System.gc();
@@ -434,14 +433,10 @@ public class EncryptController {
 //                .headers(headers)
 //                .contentLength(tempFile.length())
 //                .body(Files.readAllBytes(tempFile.toPath()));
-        InputStream inputStream = Files.newInputStream(tempFile.toPath());
+        InputStream inputStream = Files.newInputStream(tempFile);
         InputStreamResource resource = new InputStreamResource(inputStream);
 
-        ResponseEntity<Resource> responseEntity = ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(tempFile.length())
-                .body(resource);
-//        try (InputStreamResource resource = new InputStreamResource(Files.newInputStream(tempFile.toPath()))) {
+        //        try (InputStreamResource resource = new InputStreamResource(Files.newInputStream(tempFile.toPath()))) {
 //            return ResponseEntity.ok()
 //                    .headers(headers)
 //                    .contentLength(tempFile.length())
@@ -450,7 +445,9 @@ public class EncryptController {
 //            log.error("Error reading file: " + e.getMessage());
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 //        }
-        return responseEntity;
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
     }
 
     private String simpilifiedOfAlgo(String message, Vertex UF_j) throws Exception {
