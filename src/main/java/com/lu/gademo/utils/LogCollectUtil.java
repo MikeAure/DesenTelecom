@@ -10,6 +10,7 @@ import com.lu.gademo.entity.ga.ruleCheck.SendRuleReq;
 import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -161,7 +162,9 @@ public class LogCollectUtil {
         sendEvaReq.setGlobalID(globalID);
         sendEvaReq.setDesenInfoPreIden(desenInfoPreIden.toString());
         sendEvaReq.setDesenInfoAfterIden(desenInfoAfterIden.toString());
-        sendEvaReq.setDesenInfoPreId(util.getSM3Hash(ArrayUtils.addAll(rawFileBytes, rawFileName.getBytes(StandardCharsets.UTF_8))));
+
+        sendEvaReq.setDesenInfoPreId(util.getSM3Hash(ArrayUtils.addAll(rawFileBytes,
+                rawFileName.getBytes(StandardCharsets.UTF_8))));
         sendEvaReq.setDesenInfoPre(rawFileName);
         sendEvaReq.setDesenInfoAfterId(desenInfoSm3Hash);
         sendEvaReq.setDesenInfoAfter(desenFileName);
@@ -185,6 +188,7 @@ public class LogCollectUtil {
 
     public List<ExcelParam> jsonStringToParams(String params) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+
         return objectMapper.readValue(params, new TypeReference<List<ExcelParam>>() {
         });
 

@@ -1139,99 +1139,102 @@
                     .catch((error) => console.error("Error:", error));
             };
 
-            // document.getElementById('fileDirUpload').addEventListener('change', function(event) {
-            //     const files = Array.from(event.target.files);
-            //     let tr;
-            //     let dataArray = [];
-            //     let table_body = document.getElementById("table2");
-            //     if (!table_body) {
-            //         alert("请先设置模板参数");
-            //         return;
-            //     }
-            //     for (let i = 0; i < table_body.rows.length; i++) {
-            //         let data = {};
-            //         tr = table_body.rows[i];
-            //         //console.log(tr);
-            //         data.id = tr.childNodes[0].innerHTML;
-            //         data.fieldName = tr.childNodes[1].innerHTML;
-            //         data.columnName = tr.childNodes[2].innerHTML;
-            //         data.dataType = tr.childNodes[3].firstChild.value;
-            //
-            //         data.k = tr.childNodes[4].firstChild.value;
-            //         data.tmParam = tr.childNodes[5].firstChild.value;
-            //         dataArray.push(JSON.stringify(data));
-            //         //console.log(dataArray);
-            //     }
-            //     let dataArrayJsonString = JSON.stringify(dataArray);
-            //
-            //     // 筛选出以 .xlsx 结尾的文件
-            //     const filteredFiles = files.filter(file => file.name.endsWith('.xlsx'));
-            //
-            //     const maxParallelUploads = 2; // 每次并行上传的文件数
-            //     let fileQueue = [...filteredFiles];
-            //
-            //     function uploadFile(file) {
-            //         console.log("Uploading file:", file.name);
-            //         return new Promise((resolve, reject) => {
-            //             const formData = new FormData();
-            //             formData.set("file", file);
-            //             formData.set("sheet", sceneName); // 这里替换为实际的 sceneName
-            //             formData.set("algName", "distortion");
-            //             formData.set("params", dataArrayJsonString); // 这里替换为实际的 params
-            //
-            //             fetch("/File/desenFile", {
-            //                 method: "POST",
-            //                 body: formData,
-            //             })
-            //                 .then(response => {
-            //                     if (response.status === 500) {
-            //                         return response.text().then(failedMsg => {
-            //                             alert(failedMsg);
-            //                             throw new Error(failedMsg); // Throw an error to stop further processing
-            //                         });
-            //                     }
-            //                     return response.blob();
-            //                 })
-            //                 .then(blob => {
-            //                     if (blob.size === 0) {
-            //                         const errorMsg = "Received empty response from the server for file: " + file.name;
-            //                         alert(errorMsg);
-            //                         throw new Error(errorMsg); // Throw an error to stop further processing
-            //                     }
-            //                     // Proceed with blob processing if not empty
-            //                     console.log("Blob received for file:", file.name);
-            //                     // 创建一个下载链接
-            //                     const downloadLink = document.createElement("a");
-            //                     downloadLink.href = URL.createObjectURL(blob);
-            //                     downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
-            //                     downloadLink.click();
-            //                     resolve(); // Mark this file as successfully uploaded
-            //                 })
-            //                 .catch(error => {
-            //                     console.error("Error uploading file:", file.name, error);
-            //                     reject(error); // Reject the promise on error
-            //                 });
-            //         });
-            //     }
-            //
-            //     function processQueue() {
-            //         if (fileQueue.length === 0) return;
-            //
-            //         const currentBatch = fileQueue.splice(0, maxParallelUploads);
-            //         const uploadPromises = currentBatch.map(file => uploadFile(file));
-            //
-            //         Promise.all(uploadPromises)
-            //             .then(() => {
-            //                 console.log('一批文件上传完成');
-            //                 processQueue(); // 继续处理队列中的下一批文件
-            //             })
-            //             .catch(error => {
-            //                 console.error('上传过程中出现错误', error);
-            //             });
-            //     }
-            //
-            //     processQueue(); // 开始处理队列
-            // });
+            document.getElementById('submitDirectory').onclick =  () => {
+                const files = Array.from(document.getElementById('fileDirUpload').files);
+                if (files.length === 0) {
+                    alert("请先选择文件夹");
+                    return;
+                }
+                let tr;
+                let dataArray = [];
+                let table_body = document.getElementById("table2");
+                if (!table_body) {
+                    alert("请先设置模板参数");
+                    return;
+                }
+                for (let i = 0; i < table_body.rows.length; i++) {
+                    let data = {};
+                    tr = table_body.rows[i];
+                    //console.log(tr);
+                    data.id = tr.childNodes[0].innerHTML;
+                    data.fieldName = tr.childNodes[1].innerHTML;
+                    data.columnName = tr.childNodes[2].innerHTML;
+                    data.dataType = tr.childNodes[3].firstChild.value;
+
+                    data.k = tr.childNodes[4].firstChild.value;
+                    data.tmParam = tr.childNodes[5].firstChild.value;
+                    dataArray.push(JSON.stringify(data));
+                    //console.log(dataArray);
+                }
+                let dataArrayJsonString = JSON.stringify(dataArray);
+                // 筛选出以 .xlsx 结尾的文件
+                const filteredFiles = files.filter(file => file.name.endsWith('.xlsx'));
+
+                const maxParallelUploads = 1; // 每次并行上传的文件数
+                let fileQueue = [...filteredFiles];
+
+                function uploadFile(file) {
+                    console.log("Uploading file:", file.name);
+                    return new Promise((resolve, reject) => {
+                        const formData = new FormData();
+                        formData.set("file", file);
+                        formData.set("sheet", sceneName); // 这里替换为实际的 sceneName
+                        formData.set("algName", "distortion");
+                        formData.set("params", dataArrayJsonString); // 这里替换为实际的 params
+
+                        fetch("/File/bigExcelDesen", {
+                            method: "POST",
+                            body: formData,
+                        })
+                            .then(response => {
+                                if (response.status === 500) {
+                                    return response.text().then(failedMsg => {
+                                        alert(failedMsg);
+                                        throw new Error(failedMsg); // Throw an error to stop further processing
+                                    });
+                                }
+                                return response.blob();
+                            })
+                            .then(blob => {
+                                if (blob.size === 0) {
+                                    const errorMsg = "Received empty response from the server for file: " + file.name;
+                                    alert(errorMsg);
+                                    throw new Error(errorMsg); // Throw an error to stop further processing
+                                }
+                                // Proceed with blob processing if not empty
+                                console.log("Blob received for file:", file.name);
+                                // 创建一个下载链接
+                                const downloadLink = document.createElement("a");
+                                downloadLink.href = URL.createObjectURL(blob);
+                                downloadLink.download = Date.now().toString() + ".xlsx"; // 下载的文件名
+                                downloadLink.click();
+                                resolve(); // Mark this file as successfully uploaded
+                            })
+                            .catch(error => {
+                                console.error("Error uploading file:", file.name, error);
+                                reject(error); // Reject the promise on error
+                            });
+                    });
+                }
+
+                function processQueue() {
+                    if (fileQueue.length === 0) return;
+
+                    const currentBatch = fileQueue.splice(0, maxParallelUploads);
+                    const uploadPromises = currentBatch.map(file => uploadFile(file));
+
+                    Promise.all(uploadPromises)
+                        .then(() => {
+                            console.log('一批文件上传完成');
+                            processQueue(); // 继续处理队列中的下一批文件
+                        })
+                        .catch(error => {
+                            console.error('上传过程中出现错误', error);
+                        });
+                }
+
+                processQueue(); // 开始处理队列
+            }
 
             function choose_file(event) {
                 //读取文件
@@ -1571,21 +1574,21 @@
                     })
             });
 
-            // document.getElementById('fileDirUpload').addEventListener('change', function(event) {
-            //     const files = event.target.files;
-            //     const allowedExtensions = ['.xlsx']; // 需要筛选的文件后缀
-            //
-            //     const filteredFiles = Array.from(files).filter(file => {
-            //         return allowedExtensions.some(extension => file.name.endsWith(extension));
-            //     });
-            //     console.log(filteredFiles.length)
-            //     // 输出筛选后的文件列表
-            //     filteredFiles.forEach(file => {
-            //         console.log(file.name);
-            //     });
-            //
-            //     // 如果需要进一步处理筛选后的文件，可以在这里编写逻辑
-            // });
+            document.getElementById('fileDirUpload').addEventListener('change', function(event) {
+                const files = event.target.files;
+                const allowedExtensions = ['.xlsx']; // 需要筛选的文件后缀
+
+                const filteredFiles = Array.from(files).filter(file => {
+                    return allowedExtensions.some(extension => file.name.endsWith(extension));
+                });
+                console.log(filteredFiles.length)
+                // 输出筛选后的文件列表
+                filteredFiles.forEach(file => {
+                    console.log(file.name);
+                });
+
+                // 如果需要进一步处理筛选后的文件，可以在这里编写逻辑
+            });
 
             function displayTable(data, page, pageSize = 10) {
                 const startIndex = (page - 1) * pageSize;
@@ -1950,15 +1953,17 @@
                                 <label for="fileUpload" class="upload-btn">
                                     选择文件
                                 </label>
-<#--                                <input type="file" id="fileDirUpload" webkitdirectory multiple style="display: none"/>-->
-<#--                                <label for="fileDirUpload" class="upload-btn m-l">选择文件夹</label>-->
+                                <input type="file" id="fileDirUpload" webkitdirectory multiple style="display: none"/>
+                                <label for="fileDirUpload" class="upload-btn m-l">选择文件夹</label>
                                 <button type="button" class="btn btn-sm btn-primary m-l" id="submitExcelParams">
                                     保存模板参数
                                 </button>
                             </div>
 
                             <div class="btn2">
-                                <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                                <button type="button" class="btn btn-sm btn-primary" id="submit">提交脱敏</button>
+                                <button type="button" class="btn btn-sm btn-primary" id="submitDirectory">脱敏文件夹</button>
+
                                 <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm">
                                     设置当前算法为默认算法
                                 </button>

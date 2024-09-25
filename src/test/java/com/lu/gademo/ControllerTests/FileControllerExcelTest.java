@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -97,17 +96,17 @@ public class FileControllerExcelTest {
         System.out.println(FIFTY_SCENE.size());
 //        for (String sceneName : FIFTY_SCENE) {
 
-            String url = "/" + "map" + "param/list";
-            // 模拟multipart/form-data请求
-            MvcResult result = mvc.perform(get(url))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andDo(MockMvcResultHandlers.print())
-                    .andReturn();
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<ExcelParam> excelParamList = objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8), new TypeReference<List<ExcelParam>>() {
-            }) ;
-            excelParamList.stream().collect(Collectors.toMap(ExcelParam::getColumnName, Function.identity())).forEach((k, v) -> System.out.println(k + ": " + v));
+        String url = "/" + "map" + "param/list";
+        // 模拟multipart/form-data请求
+        MvcResult result = mvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ExcelParam> excelParamList = objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8), new TypeReference<List<ExcelParam>>() {
+        });
+        excelParamList.stream().collect(Collectors.toMap(ExcelParam::getColumnName, Function.identity())).forEach((k, v) -> System.out.println(k + ": " + v));
 //            System.out.println(result.getResponse().getContentAsString(StandardCharsets.UTF_8));
 //        }
     }
@@ -454,7 +453,7 @@ public class FileControllerExcelTest {
     public void testExcelFilesNew52scenes() throws Exception {
         Map<String, List<String>> failedResult = new HashMap<>();
 
-        Path currentDirectory = Paths.get("D:\\52scenes1w\\43");
+        Path currentDirectory = Paths.get("D:\\52scenes1w\\40");
         System.out.println("CurrentDirectory: " + currentDirectory.toString());
         List<String> failedFileNameList = new ArrayList<>();
         for (String sceneName : FIFTYTWO_SCENE) {
@@ -509,8 +508,101 @@ public class FileControllerExcelTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
+    @Test
+    void bigFileTest() throws Exception {
+        final String sceneName = "meeting";
+        System.out.println("正在获取：" + sceneName + "参数");
+        String url = "/" + sceneName + "param/list";
+        // 模拟multipart/form-data请求
+        MvcResult excelParam = mvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+
+        String params = excelParam.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        System.out.println("Params: " + params);
+        System.out.println("获取" + sceneName + "成功");
+//        String fileName = EXCEL_FILE_NAMES_52.stream()
+//                .filter(name -> name.substring(0, name.lastIndexOf("."))
+//                        .equalsIgnoreCase(sceneName))
+//                .findFirst().get();
+//        System.out.println(fileName);
+        Path testFilePath = Paths.get("D:\\meeting5000wv2\\meeting3.xlsx");
+        System.out.println(testFilePath.toAbsolutePath());
+        System.out.println("正在测试文件：" + testFilePath.toAbsolutePath());
+        byte[] excelBytes = Files.readAllBytes(testFilePath);
+        MockMultipartFile excelFile = new MockMultipartFile("file", "meeting100w.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelBytes);
+
+        try {
+            mvc.perform(multipart("/File/bigExcelDesen")
+                            .file(excelFile)
+                            .param("sheet", sceneName)
+                            .param("params", params)
+                            .param("algName", "distortion"))
+                    .andExpect(status().isOk())
+                    .andDo(MockMvcResultHandlers.print())
+                    .andReturn();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void bigFileTestAll() throws Exception {
+        Map<String, String> failedRecord = new HashMap<>();
+        final String sceneName = "meeting";
+        System.out.println("正在获取：" + sceneName + "参数");
+        String url = "/" + sceneName + "param/list";
+        // 模拟multipart/form-data请求
+        MvcResult excelParam = mvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+
+        String params = excelParam.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        System.out.println("Params: " + params);
+        System.out.println("获取" + sceneName + "成功");
+//        String fileName = EXCEL_FILE_NAMES_52.stream()
+//                .filter(name -> name.substring(0, name.lastIndexOf("."))
+//                        .equalsIgnoreCase(sceneName))
+//                .findFirst().get();
+//        System.out.println(fileName);
+        Path directoryPath = Paths.get("D:\\meeting100w50\\");
+        for (int i = 40; i < 50; i++) {
+            Path testFilePath = directoryPath.resolve("meeting100w" + Integer.valueOf(i) + ".xlsx");
+            System.out.println(testFilePath.toAbsolutePath());
+            System.out.println("正在测试文件：" + testFilePath.toAbsolutePath());
+            byte[] excelBytes = Files.readAllBytes(testFilePath);
+            MockMultipartFile excelFile = new MockMultipartFile("file", "meeting100w" + Integer.valueOf(i) + ".xlsx",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelBytes);
+
+            try {
+                mvc.perform(multipart("/File/bigExcelDesen")
+                                .file(excelFile)
+                                .param("sheet", sceneName)
+                                .param("params", params)
+                                .param("algName", "distortion"))
+                        .andExpect(status().isOk())
+                        .andDo(MockMvcResultHandlers.print())
+                        .andReturn();
+            } catch (Exception e) {
+                failedRecord.put(util.getTime(), testFilePath.toAbsolutePath().toString());
+                e.printStackTrace();
+            }
+
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("failed_bigfiles.txt", true))) {
+            for (Map.Entry<String, String> record : failedRecord.entrySet()) {
+                writer.write(record.getKey() + ": " + record.getValue());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.lu.gademo.utils.impl;
 
 import com.lu.gademo.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -13,16 +14,20 @@ import java.util.List;
 @Slf4j
 @Component
 public class AnonymityImpl implements Anonymity {
+    private final KAnonymityUtil kAnonymityUtil;
+
+    public AnonymityImpl() {
+//        File directory = new File("");
+        this.kAnonymityUtil = new KAnonymityUtil();
+//        String currentPath = directory.getAbsolutePath();
+//        String locationPrivacy = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
+//        String path = Paths.get(currentPath, locationPrivacy).toString();
+    }
+
     public DSObject service(DSObject object, Integer alg, Number... params) {
-
-        File directory = new File("");
-        Util util = new UtilImpl();
-        KAnonymityUtil kAnonymityUtil = new KAnonymityUtil();
-        String currentPath = directory.getAbsolutePath();
-        String locationPrivacy = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
-        String path = Paths.get(currentPath, locationPrivacy).toString();
+        log.info("调用匿名算法统一接口");
 //        System.out.println(path);
-
+        if (object == null) return null;
         switch (alg) {
 
             /*

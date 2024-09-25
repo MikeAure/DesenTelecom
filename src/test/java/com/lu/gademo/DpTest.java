@@ -367,7 +367,7 @@ public class DpTest {
 
     private static List<String> generateRandomDates(int count) {
         List<String> dates = new ArrayList<>(count);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        ThreadLocal<SimpleDateFormat> dateFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyyMMdd"));
 
         // 设置日期范围，比如从1970年到2023年
         long startMillis = parseDate("1970-01-01").getTime();
@@ -377,7 +377,7 @@ public class DpTest {
         for (int i = 0; i < count; i++) {
             long randomMillis = ThreadLocalRandom.current().nextLong(startMillis, endMillis);
             Date randomDate = new Date(randomMillis);
-            String formattedDate = dateFormat.format(randomDate);
+            String formattedDate = dateFormat.get().format(randomDate);
             dates.add(formattedDate);
         }
 

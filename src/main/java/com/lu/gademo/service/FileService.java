@@ -6,10 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.concurrent.ExecutionException;
 
 public interface FileService {
     /**
@@ -19,7 +17,7 @@ public interface FileService {
      * params 脱敏参数
      */
     void redesenExcel(ReDesensitizeEvent event) throws Exception;
-    void redesenSingleExcel(ReDesensitizeEvent event) throws Exception;
+    void redesenSingleText(ReDesensitizeEvent event) throws Exception;
     void redesenGraph(ReDesensitizeEvent event) throws Exception;
     void redesenImage(ReDesensitizeEvent event) throws Exception;
     void redesenVideo(ReDesensitizeEvent event) throws Exception;

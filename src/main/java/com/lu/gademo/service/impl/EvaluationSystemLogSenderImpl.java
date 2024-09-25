@@ -25,6 +25,9 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * 用于将日志发送给脱敏评测系统
+ */
 @Slf4j
 @Data
 @Service

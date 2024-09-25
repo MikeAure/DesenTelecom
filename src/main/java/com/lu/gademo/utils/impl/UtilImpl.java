@@ -382,7 +382,7 @@ public class UtilImpl implements Util {
 
     // 方法：写入脱敏数据
     private <T> void writeDesensitizedValueToCell(Cell newCell, T element) {
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        ThreadLocal<SimpleDateFormat> fmt = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         if (element instanceof Double) {
             newCell.setCellValue((Double) element);
         } else if (element instanceof Integer) {
@@ -390,7 +390,7 @@ public class UtilImpl implements Util {
         } else if (element instanceof String) {
             newCell.setCellValue((String) element);
         } else if (element instanceof java.util.Date) {
-            newCell.setCellValue(fmt.format(element));
+            newCell.setCellValue(fmt.get().format(element));
         }
     }
 

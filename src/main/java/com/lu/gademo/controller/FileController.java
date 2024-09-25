@@ -1,10 +1,13 @@
 package com.lu.gademo.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
+import com.lu.gademo.entity.Meeting;
 import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
+import com.lu.gademo.service.impl.FileServiceImpl;
 import com.lu.gademo.service.impl.FileStorageService;
 import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.*;
@@ -39,6 +42,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 文件脱敏controller
@@ -50,28 +55,28 @@ import java.util.concurrent.TimeoutException;
 public class FileController extends BaseController {
     private AlgorithmsFactory algorithmsFactory;
     // 系统id
-    private RecvFileDesen officeFileDesen;
-    private Boolean readyState;
+    private final RecvFileDesen officeFileDesen;
+    private final Boolean readyState;
     // SendBackFileName
     private String sendBackFileName;
     // 脱敏完成情况
     private boolean sendBackFlag;
     // 图像格式
-    private List<String> imageType;
+    private final List<String> imageType;
     // 视频格式
-    private List<String> videoType;
+    private final List<String> videoType;
     // 音频格式
-    private List<String> audioType;
+    private final List<String> audioType;
 
-    private FileService fileService;
-    // param  service
+    private final FileService fileService;
 
-    private ExcelParamService excelParamService;
+    private final ExcelParamService excelParamService;
 
-    private FileStorageService fileStorageService;
-    private LogCollectUtil logCollectUtil;
+    private final FileStorageService fileStorageService;
 
-    private MeetingAnalysisEventListener meetingAnalysisEventListener;
+    private final LogCollectUtil logCollectUtil;
+
+//    private MeetingAnalysisEventListener meetingAnalysisEventListener;
 
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
@@ -252,7 +257,52 @@ public class FileController extends BaseController {
         }
     }
 
+    /**
+     * 用于处理100w行规模的文件
+     * @param file
+     * @param params
+     * @param algName
+     * @param sheet
+     * @return
+     */
+    @ResponseBody
+    @PostMapping(value = "bigExcelDesen")
+    public ResponseEntity<Resource> bigExcelDesen(@RequestPart("file") MultipartFile file,
+                                            @RequestParam("params") String params,
+                                            @RequestParam("algName") String algName,
+                                            @RequestParam("sheet") String sheet
+    ) throws IOException {
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+        log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
+        log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
+        // 调用脱敏函数
+        String fileName = file.getOriginalFilename();
+        String fileType = getFileSuffix(fileName);
+        log.info("File Type: " + fileType);
+        log.info("AlgName: " + algName);
+        log.info("Params: {}", params);
+        log.info("Sheet: {}", sheet);
+        List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
+        Map<String, ExcelParam> config = excelParamList.parallelStream()
+                .collect(Collectors.toMap(param -> param.getFieldName().trim(), Function.identity()));
+        log.info("Raw File Path String: {}", fileStorageDetails.getRawFilePathString());
+        EasyExcel.read(fileStorageDetails.getRawFilePathString(), Meeting.class,
+                new MeetingAnalysisEventListener(algorithmsFactory, config, fileStorageDetails.getDesenFilePathString()))
+                .sheet().doRead();
+        excelParamList.clear();
+        config.clear();
+
+        Resource resource = new InputStreamResource(Files.newInputStream(fileStorageDetails.getDesenFilePath()));
+//        fileStorageDetails.setRawFileBytes(new byte[0]);
+        HttpHeaders httpheaders = new HttpHeaders();
+        httpheaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        httpheaders.setContentDispositionFormData("attachment", fileStorageDetails.getDesenFileName());
+        return ResponseEntity.ok().headers(httpheaders).body(resource);
+
+    }
+
     // 接收信工所Office文档
+    @ResponseBody
     @PostMapping(value = "recvFileDesen", produces = "application/json;charset=UTF-8")
     Result<Object> recvFileDesen(@NotNull @RequestPart("file") MultipartFile file) {
 
@@ -276,6 +326,8 @@ public class FileController extends BaseController {
         }
 
     }
+
+
 
     //    @GetMapping(value = "recvOnLineTaxiFile")
 //    @ResponseBody

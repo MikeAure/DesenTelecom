@@ -281,9 +281,9 @@
                         <li>
                             <a class="J_menuItem" href="${ctx!}/fifty_scene/homerepair" style="font-size: 15px;">家庭维修类场景</a>
                         </li>
-                        <li>
-                            <a class="J_menuItem" href="${ctx!}/fifty_scene/telecomclient" style="font-size: 15px;">电信客户信息数据</a>
-                        </li>
+<#--                        <li>-->
+<#--                            <a class="J_menuItem" href="${ctx!}/fifty_scene/telecomclient" style="font-size: 15px;">电信客户信息数据</a>-->
+<#--                        </li>-->
 
 <#--                        <li>-->
 <#--                            <a class="J_menuItem" href="${ctx!}/fifty_scene/onlinetaxi2" style="font-size: 15px;">网上打车场景（接收数据）</a>-->
@@ -343,7 +343,7 @@
                                 差分隐私
                                 <span class="fa arrow"></span>
                             </a>
-                            <ul class="nav nav-third-level collapse in" aria-expanded="true" style="font-size: 13px;">
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/differential_privacy_laplace">
                                         拉普拉斯 </a>
@@ -370,7 +370,7 @@
                                 数据泛化
                                 <span class="fa arrow"></span>
                             </a>
-                            <ul class="nav nav-third-level collapse in" aria-expanded="true" style="font-size: 13px;">
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/generalization_num_string">
                                         数值与字符泛化 </a>
@@ -395,7 +395,7 @@
                                 匿名
                                 <span class="fa arrow"></span>
                             </a>
-                            <ul class="nav nav-third-level collapse in" aria-expanded="true" style="font-size: 13px;">
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/k_anonymity_alg"> K 匿名 </a>
                                 </li>
@@ -412,7 +412,7 @@
                                 数据置换
                                 <span class="fa arrow"></span>
                             </a>
-                            <ul class="nav nav-third-level collapse in" , aria-expanded="true" style="font-size: 13px;">
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
                                 <li>
                                     <a class="J_menuItem" href="${ctx!}/desentools/replacement_num_string">
                                         数值与字符置换 </a>

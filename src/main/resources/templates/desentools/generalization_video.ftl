@@ -651,13 +651,13 @@
         margin: 30px;
     }
 
-    #meanValueVideo_pre, #meanValueVideo_after, #replace_region_video_pre, #replace_region_video_after {
-        text-align: center;
-    }
+    /*#meanValueVideo_pre, #meanValueVideo_after, #replace_region_video_pre, #replace_region_video_after {*/
+    /*    text-align: center;*/
+    /*}*/
 
-    #pixelate_video_after, #pixelate_video_pre, #gaussian_blur_video_after, #gaussian_blur_video_pre, #box_blur_video_after, #box_blur_video_pre {
-        text-align: center;
-    }
+    /*#pixelate_video_after, #pixelate_video_pre, #gaussian_blur_video_after, #gaussian_blur_video_pre, #box_blur_video_after, #box_blur_video_pre {*/
+    /*    text-align: center;*/
+    /*}*/
 
     #meanValueVideo_pre, #meanValueVideo_after, #replace_region_video_pre, #replace_region_video_after,
     #pixelate_video_after, #pixelate_video_pre, #gaussian_blur_video_after, #gaussian_blur_video_pre, #box_blur_video_after, #box_blur_video_pre video {

@@ -82,11 +82,11 @@ def audio_augmentation(input_signal, sample_rate, param_chosen=2):
     elif param_chosen == 1:
         print("param_chosen == 1")
         augmentations = [
-            # 低通滤波 (上限频率设置为 4000 Hz)
-            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=4000, p=1),
+            # 低通滤波 (上限频率设置为 3000 Hz)
+            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=3000, p=1),
 
-            # 高通滤波 (下限频率设置为 200 Hz)
-            HighPassFilter(min_cutoff_freq=200, max_cutoff_freq=8000, p=1),
+            # 高通滤波 (下限频率设置为 300 Hz)
+            HighPassFilter(min_cutoff_freq=300, max_cutoff_freq=8000, p=1),
 
             # 极性反转
             PolarityInversion(p=1),
@@ -97,11 +97,11 @@ def audio_augmentation(input_signal, sample_rate, param_chosen=2):
     elif param_chosen == 2:
         print("param_chosen == 2")
         augmentations = [
-            # 低通滤波 (上限频率设置为 5000 Hz)
-            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=5000, p=1),
+            # 低通滤波 (上限频率设置为 3000 Hz)
+            LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=3000, p=1),
 
-            # 高通滤波 (下限频率设置为 100 Hz)
-            HighPassFilter(min_cutoff_freq=100, max_cutoff_freq=8000, p=1),
+            # 高通滤波 (下限频率设置为 300 Hz)
+            HighPassFilter(min_cutoff_freq=300, max_cutoff_freq=8000, p=1),
 
             # 极性反转
             PolarityInversion(p=1),

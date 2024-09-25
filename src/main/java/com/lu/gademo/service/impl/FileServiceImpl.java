@@ -30,14 +30,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -106,7 +104,7 @@ public class FileServiceImpl implements FileService {
                 redesenVideo(event);
                 break;
             case "text":
-                redesenSingleExcel(event);
+                redesenSingleText(event);
                 break;
             case "graph":
                 redesenGraph(event);
@@ -210,7 +208,6 @@ public class FileServiceImpl implements FileService {
 
         log.info("正在写入Excel文件");
         for (Map.Entry<Integer, List<?>> entry : desenResult.entrySet()) {
-//            util.write2Excel(targetSheet, totalRowNum, entry.getKey(), entry.getValue());
             util.write2Excel(originalSheet, targetSheet, totalRowNum, entry.getKey(), entry.getValue());
         }
         log.info("Excel文件写入完成");
@@ -1411,7 +1408,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void redesenSingleExcel(ReDesensitizeEvent event) throws Exception {
+    public void redesenSingleText(ReDesensitizeEvent event) throws Exception {
         RecEvaResultInv recEvaResultInv = event.getRecEvaResultInv();
         LogManagerEvent logManagerEvent = event.getLogManagerEvent();
         String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
@@ -1432,7 +1429,7 @@ public class FileServiceImpl implements FileService {
         Long rawFileSize = Files.size(rawFilePath);
         String timeStamp = String.valueOf(System.currentTimeMillis());
         // 构造新的脱敏后文件名
-        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
+        desenFileNameList[desenFileNameList.length - 1] = timeStamp + "." + rawFileSuffix;
         String recFileName = String.join("_", desenFileNameList);
         log.info("recFileName {}", recFileName);
         Path desenFilePath = fileStorageService.getDesenFileDirectory().resolve(recFileName);
@@ -1487,9 +1484,8 @@ public class FileServiceImpl implements FileService {
         byte[] rawFileBytes = Files.readAllBytes(rawFilePath);
         Long rawFileSize = Files.size(rawFilePath);
         String timeStamp = String.valueOf(System.currentTimeMillis());
-//        System.out.println(rawFileName.split("_")[1]);
         // 构造新的脱敏后文件名
-        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
+        desenFileNameList[desenFileNameList.length - 1] = timeStamp + "." + rawFileSuffix;
         String recFileName = String.join("_", desenFileNameList);
         log.info("recFileName {}", recFileName);
         Path desenFilePath = fileStorageService.getDesenFileDirectory().resolve(recFileName);
@@ -1551,9 +1547,9 @@ public class FileServiceImpl implements FileService {
         byte[] rawFileBytes = Files.readAllBytes(rawFilePath);
         Long rawFileSize = Files.size(rawFilePath);
         String timeStamp = String.valueOf(System.currentTimeMillis());
-//        System.out.println(rawFileName.split("_")[1]);
         // 构造新的脱敏后文件名
-        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
+        desenFileNameList[desenFileNameList.length - 1] = timeStamp + "." + rawFileSuffix;
+
         String recFileName = String.join("_", desenFileNameList);
         log.info("recFileName {}", recFileName);
         Path desenFilePath = fileStorageService.getDesenFileDirectory().resolve(recFileName);
@@ -1617,7 +1613,8 @@ public class FileServiceImpl implements FileService {
         String timeStamp = String.valueOf(System.currentTimeMillis());
 //        System.out.println(rawFileName.split("_")[1]);
         // 构造新的脱敏后文件名
-        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
+        desenFileNameList[desenFileNameList.length - 1] = timeStamp + "." + rawFileSuffix;
+
         String recFileName = String.join("_", desenFileNameList);
         log.info("recFileName {}", recFileName);
         Path desenFilePath = fileStorageService.getDesenFileDirectory().resolve(recFileName);
@@ -1680,7 +1677,8 @@ public class FileServiceImpl implements FileService {
         String timeStamp = String.valueOf(System.currentTimeMillis());
         // System.out.println(rawFileName.split("_")[1]);
         // 构造新的脱敏后文件名
-        desenFileNameList[2] = timeStamp + "." + rawFileSuffix;
+        desenFileNameList[desenFileNameList.length - 1] = timeStamp + "." + rawFileSuffix;
+
         String recFileName = String.join("_", desenFileNameList);
         log.info("recFileName {}", recFileName);
         Path desenFilePath = fileStorageService.getDesenFileDirectory().resolve(recFileName);
@@ -2025,7 +2023,6 @@ public class FileServiceImpl implements FileService {
 //                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
-
                         // 基于随机均匀噪声的数值加噪算法
                         case 5: {
                             // 脱敏要求
@@ -2038,7 +2035,6 @@ public class FileServiceImpl implements FileService {
 //                            util.write2Excel(sheet, totalRowNum, columnIndex, tempResult);
                             break;
                         }
-
                         // 基于随机拉普拉斯噪声的数值加噪算法
                         case 6: {
                             // 脱敏要求
@@ -2101,7 +2097,6 @@ public class FileServiceImpl implements FileService {
                             desenResult.put(columnIndex, tempResult);
                             break;
                         }
-
                     }
                     break;
                 }
@@ -2157,9 +2152,7 @@ public class FileServiceImpl implements FileService {
                             // 脱敏要求
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("置换,");
                             // 脱敏
-                            DSObject rawData = new DSObject(objs);
-                            tempResult = getDsList(algorithmInfo, rawData, excelParam);
-                            desenResult.put(columnIndex, tempResult);
+                            desenResult.put(columnIndex, getDsList(algorithmInfo, new DSObject(objs), excelParam));
                             break;
                         }
                     }
@@ -2175,18 +2168,14 @@ public class FileServiceImpl implements FileService {
                             // 脱敏要求: 列名+当前算法作用
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("日期添加Laplace噪声,");
                             // 脱敏
-                            DSObject rawData = new DSObject(objs);
-                            dates = getDsList(algorithmInfo, rawData, excelParam);
-                            desenResult.put(columnIndex, dates);
+                            desenResult.put(columnIndex, getDsList(algorithmInfo, new DSObject(objs), excelParam));
                             break;
                         }
                         case 18: {
                             // 脱敏要求
                             infoBuilders.desenRequirements.append(excelParam.getColumnName()).append("日期进行分组置换,");
                             // 脱敏
-                            DSObject rawData = new DSObject(objs);
-                            dates = getDsList(algorithmInfo, rawData, excelParam);
-                            desenResult.put(columnIndex, dates);// 写列数据
+                            desenResult.put(columnIndex, getDsList(algorithmInfo, new DSObject(objs), excelParam));
                             break;
                         }
                     }
@@ -4306,6 +4295,13 @@ public class FileServiceImpl implements FileService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 为特定脱敏字段增加脱敏等级
+     * @param originalExcelParam 原始参数
+     * @param desenLevel 新脱敏等级
+     * @param ifUpdateDesenLevel
+     * @return
+     */
     private ExcelParam addDesenLevel(ExcelParam originalExcelParam, String desenLevel, Boolean ifUpdateDesenLevel) {
         int desenLevelNum = Integer.parseInt(desenLevel);
         if (ifUpdateDesenLevel) {

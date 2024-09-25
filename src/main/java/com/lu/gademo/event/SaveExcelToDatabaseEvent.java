@@ -1,7 +1,6 @@
 package com.lu.gademo.event;
 
 import com.lu.gademo.entity.FileStorageDetails;
-import javafx.application.Application;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.http.ResponseEntity;

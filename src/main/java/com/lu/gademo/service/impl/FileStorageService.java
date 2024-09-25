@@ -35,7 +35,6 @@ public class FileStorageService {
     }
 
     /**
-     *
      * @param file 保存MultipartFile并生成原始文件和脱敏文件相关的信息
      * @return 包含原始文件路径信息和文件内容、脱敏文件路径信息的FileStorageDetails
      * @throws IOException
@@ -57,7 +56,7 @@ public class FileStorageService {
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
         Long rawFileSize = file.getSize();
-
+        log.info("rawFileSize: {}", rawFileSize);
         // Path for the desensitized file
         String desenFileTimeStamp = String.valueOf(System.currentTimeMillis());
         String desenFileName = rawFileNameTemp + "_" + desenFileTimeStamp + "." + rawFileSuffix;
@@ -66,6 +65,7 @@ public class FileStorageService {
 
         // Save the original file
         file.transferTo(rawFilePath);
+//        Files.write(rawFilePath, rawFileBytes);
 
         return FileStorageDetails.builder()
                 .rawFileName(rawFileName)
@@ -82,7 +82,53 @@ public class FileStorageService {
     }
 
     /**
+     * @param file 保存MultipartFile并生成原始文件和脱敏文件相关的信息
+     * @return 包含原始文件路径信息和文件内容、脱敏文件路径信息的FileStorageDetails
+     * @throws IOException
+     */
+    public FileStorageDetails saveRawFileWithDesenInfoForBigFile(MultipartFile file) throws IOException {
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        if (file.getOriginalFilename() == null) {
+            throw new IOException("Input file name is null");
+        }
+
+        String originalFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        String fileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+        String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        String rawFileNameTemp = fileTimeStamp + "_" + fileName;
+        String rawFileName = fileTimeStamp + "_" + originalFileName;
+        log.info("RawFileName: {}", rawFileName);
+        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        Long rawFileSize = file.getSize();
+        log.info("rawFileSize: {}", rawFileSize);
+        // Path for the desensitized file
+        String desenFileTimeStamp = String.valueOf(System.currentTimeMillis());
+        String desenFileName = rawFileNameTemp + "_" + desenFileTimeStamp + "." + rawFileSuffix;
+        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+
+        // Save the original file
+        file.transferTo(rawFilePath);
+//        Files.write(rawFilePath, rawFileBytes);
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .rawFileSize(rawFileSize)
+                .desenFileName(desenFileName)
+                .desenFileSuffix(rawFileSuffix)
+                .desenFilePath(desenFilePath)
+                .desenFilePathString(desenFilePathString)
+                .build();
+    }
+
+    /**
      * 将原始文件复制到raw_files，并设置脱敏文件路径信息
+     *
      * @param file
      * @return 包含原始文件路径信息和文件内容、脱敏后文件路径信息的FileStorageDetails
      * @throws IOException
@@ -165,7 +211,8 @@ public class FileStorageService {
 
     /**
      * 将字节数组的内容保存到原始文件中并返回原始文件信息
-     * @param fileName 文件名
+     *
+     * @param fileName     文件名
      * @param rawFileBytes 文件的字节数组
      * @return 仅包含原始文件信息的FileStorageDetails
      * @throws IOException
@@ -192,6 +239,7 @@ public class FileStorageService {
 
     /**
      * 返回仅包含原始文件存储路径信息的FileStorageDetails，文件内容为空
+     *
      * @param fileName 文件名
      * @return 仅包含原始文件存储路径信息的FileStorageDetails
      * @throws IOException

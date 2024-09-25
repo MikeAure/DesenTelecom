@@ -203,10 +203,12 @@ public class DpUtilImpl implements DpUtil {
             } else if (privacyLevel == 3) {
                 epsilon = 0.7;
             }
+            log.info("dpCode chosen epsilon: {}", epsilon);
             //扰动概率p
             double temp = Math.exp(epsilon);
             p = new BigDecimal(temp).divide(new BigDecimal(temp + code1.size() - 1), 6,
                     RoundingMode.HALF_UP).doubleValue();
+            log.info("perturbation probability p: {}", p);
             //循环处理数据
             for (int i = 0; i < re_data.size(); i++) {
                 //		获取一个小数 区间为 (0,1)若大于p，执行扰动
@@ -959,14 +961,14 @@ private String dealAddress(String addr, int privacyLevel) {
     public List<Date> dpDate(List<Object> datas, Integer privacyLevel) throws ParseException {
         List<Date> reData = new ArrayList<>();
         java.util.Date tempDate;
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        ThreadLocal<SimpleDateFormat> fmt = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         for (Object data : datas) {
             if (data == null) {
                 reData.add(null);
             } else {
-                tempDate = fmt.parse(data.toString());
+                tempDate = fmt.get().parse(data.toString());
                 if (tempDate == null) {
-                    // TODO: 应有更好的处理方法
+
 //                    throw new ParseException("Parse date error : " + data, 0);
                     reData.add(null);
                 } else {
@@ -1021,13 +1023,13 @@ private String dealAddress(String addr, int privacyLevel) {
                 Date dateTemp = new Date(0);
                 //根据noise干扰
                 if (noise >= 0) {
-                    d = fmt.format(new Date(reData.get(i).getTime() + Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond)));
-                    dateTemp = new Date(fmt.parse(d).getTime());
+                    d = fmt.get().format(new Date(reData.get(i).getTime() + Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond)));
+                    dateTemp = new Date(fmt.get().parse(d).getTime());
 //                    d = fmt.format(new Date(reData.get(i).getTime() + scaledNoise));
 //                    dateTemp = new Date(fmt.parse(d).getTime());
                 } else {
-                    d = fmt.format(new Date(reData.get(i).getTime() - (Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond))));
-                    dateTemp = new Date(fmt.parse(d).getTime());
+                    d = fmt.get().format(new Date(reData.get(i).getTime() - (Integer.valueOf(day) * 24 * 60 * 60 * 1000 + Integer.valueOf(hour) * 60 * 60 * 1000 + Integer.valueOf(minute) * 60 * 1000 + Integer.valueOf(second) * 1000 + Integer.valueOf(msecond))));
+                    dateTemp = new Date(fmt.get().parse(d).getTime());
 //                    d = fmt.format(new Date(reData.get(i).getTime() - scaledNoise));
 //                    dateTemp = new Date(fmt.parse(d).getTime());
                 }
@@ -1040,7 +1042,7 @@ private String dealAddress(String addr, int privacyLevel) {
     //日期分组置换
     public List<Date> date_group_replace(List<Object> datas, Integer privacyLevel) throws ParseException {
         //日期格式
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        ThreadLocal<SimpleDateFormat> dateFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
         //毫秒list
         List<Double> milliseconds = new ArrayList<>();
         for (Object data : datas) {
@@ -1048,10 +1050,7 @@ private String dealAddress(String addr, int privacyLevel) {
                 milliseconds.add(0.0);
             else {
                 //java.util.Date utilDate = dateFormat.parse(data + "");
-                java.util.Date date = dateFormat.parse(data.toString());
-
-                //Date sqlDate = new Date(utilDate.getTime());
-                // 日期解析可能失败,如果失败则添加0
+                java.util.Date date = dateFormat.get().parse(data.toString());
                 if (date == null) {
                     milliseconds.add(0.0);
                 } else {
@@ -1067,14 +1066,13 @@ private String dealAddress(String addr, int privacyLevel) {
                 if (data == null) {
                     reData.add(null);
                 } else {
-                    java.util.Date date = dateFormat.parse(data.toString());
+                    java.util.Date date = dateFormat.get().parse(data.toString());
                     // 如果解析失败则添加null
                     if (date == null) {
                         reData.add(null);
                     } else {
                         reData.add(new Date(date.getTime()));
                     }
-//                    reData.add(new Date(dateFormat.parse(data + "").getTime()));
                 }
             }
             return reData;
@@ -1867,7 +1865,6 @@ private String dealAddress(String addr, int privacyLevel) {
     // 辅助方法：根据隐私级别和随机索引对IP地址应用掩码
     private String applyMaskToIp(String ip, String pattern, String[] parts, Integer privacyLevel, int random, boolean isIpv4, boolean isIpv6) {
         ArrayList<String> patTemp = new ArrayList<>(Arrays.asList(parts));
-
         switch (privacyLevel) {
             case 1: {
                 if (isIpv4) {

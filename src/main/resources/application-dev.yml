@@ -51,8 +51,8 @@ spring:
 
     servlet:
         multipart:
-            maxFileSize: 100MB
-            maxRequestSize: 100MB
+            maxFileSize: 200MB
+            maxRequestSize: 200MB
 
     thymeleaf:
         cache: false
@@ -66,7 +66,7 @@ server:
 
 logging:
     file:
-        path: .
+        path: ./log
     level:
         org:
             hibernate: INFO
@@ -77,15 +77,19 @@ effectEva:
     address: 127.0.0.1
     port: 10005
 evidence:
-    localAddress: 172.28.72.214
+#    localAddress: 172.28.72.214
+    localAddress: 127.0.0.1
     localPort: 50004
-    remoteAddress: 172.28.72.214
+#    remoteAddress: 172.28.72.214
+    remoteAddress: 127.0.0.1
     remotePort: 50005
 ruleCheck:
-    address: 172.28.72.224
+#    address: 172.28.72.224
+    address: 127.0.0.1
     port: 30002
 splitReconstruct:
-    address: 172.28.72.225
+#    address: 172.28.72.225
+    address: 127.0.0.1
     port: 40011
 
 evidenceSystem:
@@ -119,12 +123,16 @@ logSenderManager:
     ifSendToEvaFirst: false
     ifSaveToDatabase: false
     ifSendFile: false
-    ifPerformenceTest: false
-
+    ifPerformenceTest: true
 
 fetch:
     database:
         task:
-            enabled: false
+            enabled: true
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
+course2:
+    host: 172.28.72.218
+    username: root
+    password: GDS&123softswitch
+    remotePath: /root/env_fenjifenlei/dataplatform_config.json

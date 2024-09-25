@@ -66,7 +66,7 @@ def cli_main():
     stime = time.time()
     # print('当前时间：', str(stime) + '秒')
 
-    tmp_data = args.name  # 接收id
+    tmp_data = args.name.strip('"') # 接收id
     # print(tmp_data)
 
     tmp_list = tmp_data.split("@@")

@@ -61,7 +61,8 @@ public class LocationUtil {
      * @param y4 区域右下角的y坐标
      * @return 混合区域3的计算结果
      */
-    public static  LinkedList<String> mixzone3(double x, double y, int id, double time, double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+    public static  LinkedList<String> mixzone3(double x, double y, int id, double time, double x1, double y1, double x2,
+                                               double y2, double x3, double y3, double x4, double y4) {
         setZone(x1, y1, x2, y2, x3, y3, x4, y4);
         User user = new User();
         user.id = String.valueOf(id);

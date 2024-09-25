@@ -17,18 +17,22 @@ import java.util.List;
 @Component
 public class ReplaceImpl implements Replace {
     private final DpUtil dpUtil;
+    private final String currentPath;
+    private final String dealImagePath;
+    private final String path_audio;
 
     @Autowired
     public ReplaceImpl(DpUtil dpUtil) {
         this.dpUtil = dpUtil;
+        this.currentPath = Paths.get("").normalize().toAbsolutePath().toString();
+        this.dealImagePath = Paths.get(currentPath, "image", "dealImage.py").toString();
+        this.path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();
     }
-    public DSObject service(DSObject object, Integer alg, Number... params) {
-        String currentPath = Paths.get("./").normalize().toAbsolutePath().toString();
-        String dealImagePath = Paths.get(currentPath, "image", "dealImage.py").toString();
-        String path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();
-        log.info("调用数据置换算法统一接口");
-        switch (alg) {
 
+    public DSObject service(DSObject object, Integer alg, Number... params) {
+        log.info("调用数据置换算法统一接口");
+        if (object == null) return null;
+        switch (alg) {
             /*
                 Hiding
                 将数据替换成一个常量，常用作不需要该敏感字段时

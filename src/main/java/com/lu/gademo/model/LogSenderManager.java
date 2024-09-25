@@ -172,6 +172,7 @@ public class LogSenderManager {
         SendSplitDesenData sendSplitDesenData = logManagerEvent.getSendSplitDesenData();
         byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
         byte[] desenFileBytes = fileStorageDetails.getDesenFileBytes();
+
         CompletableFuture<ResponseEntity<byte[]>> responseEntityCompletableFuture = logManagerEvent.getResponseEntityCompletableFuture();
 
         String fileDataType = sendRuleReq.getFileDataType();
@@ -213,7 +214,8 @@ public class LogSenderManager {
                 String entityName = sendEvaReq.getFileType();
                 // 将脱敏后的表格文件内容保存到数据库表中
                 if (ifSaveToDatabase && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
-                    eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails, responseEntityCompletableFuture, responseEntityResult));
+                    eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails,
+                            responseEntityCompletableFuture, responseEntityResult));
                 } else {
                     responseEntityCompletableFuture.complete(responseEntityResult);
                 }
@@ -302,7 +304,6 @@ public class LogSenderManager {
      */
     public void submitToFourSystems(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal, SendEvaReq sendEvaReq,
                                     SendRuleReq sendRuleReq, SendSplitDesenData sendSplitDesenData, byte[] rawFileBytes, byte[] desenFileBytes) {
-
 
         ExecutorService executorService = Executors.newFixedThreadPool(4);
         executorService.submit(() -> {

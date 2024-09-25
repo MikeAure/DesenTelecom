@@ -32,7 +32,7 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
     private final WriteSheet writeSheet;
     private final AlgorithmsFactory algorithmsFactory;
     private final Map<String, ExcelParam> config;
-    private final SimpleDateFormat sdf;
+    private final ThreadLocal<SimpleDateFormat> sdf;
 
     public MeetingAnalysisEventListener(AlgorithmsFactory algorithmsFactory, Map<String, ExcelParam> config, String desenFilePath) {
         this.patch = new ArrayList<>(BATCH_SIZE);
@@ -40,7 +40,7 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
         this.writeSheet = EasyExcel.writerSheet("Sheet1").build();
         this.algorithmsFactory = algorithmsFactory;
         this.config = config;
-        this.sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        this.sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
     @Override
@@ -95,7 +95,7 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
                 field.setAccessible(true);
                 if (field.getType() == Date.class) {
                     Date value = (Date) field.get(obj);
-                    map.get(field.getName()).add(sdf.format(value));
+                    map.get(field.getName()).add(sdf.get().format(value));
                 } else {
                     Object value = field.get(obj);
                     map.get(field.getName()).add(value);
@@ -107,6 +107,13 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
         List<Meeting> desenResult = getDesenResult(maskedData, fields);
         System.out.println(desenResult.get(0).getHysj());
         this.excelWriter.write(desenResult, this.writeSheet);
+        maskedData.clear();
+        desenResult.clear();
+        map.clear();
+        maskedData = null;
+        desenResult = null;
+        map = null;
+        System.gc();
         System.out.println(patch.size());
     }
 

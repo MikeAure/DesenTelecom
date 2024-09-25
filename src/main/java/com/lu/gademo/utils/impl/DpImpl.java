@@ -23,21 +23,23 @@ import java.util.stream.Collectors;
 public class DpImpl implements Dp {
 
     private final DpUtil dpUtil;
+    File directory;
+    String currentPath;
+    String path1;
+    String path2;
 
     @Autowired
     public DpImpl(DpUtil dpUtil) {
         this.dpUtil = dpUtil;
+        this.directory = new File("");
+        this.currentPath = directory.getAbsolutePath();
+        this.path1 = Paths.get(currentPath, "perturbation", "differential_privacy", "dp.py").toString();
+        this.path2 = Paths.get(currentPath, "perturbation", "other", "randomNoise.py").toString();
     }
 
     public DSObject service(DSObject object, Integer alg, Number... params) {
         log.info("调用差分隐私算法统一接口");
-
         if (object == null) return null;
-
-        File directory = new File("");
-        String currentPath = directory.getAbsolutePath();
-        String path1 = Paths.get(currentPath, "perturbation", "differential_privacy", "dp.py").toString();
-        String path2 = Paths.get(currentPath, "perturbation", "other", "randomNoise.py").toString();
 
         switch (alg) {
             /*

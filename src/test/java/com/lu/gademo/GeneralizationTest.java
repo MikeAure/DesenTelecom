@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @SpringBootTest
 public class GeneralizationTest {
     Generalization generalization;
+
     @Autowired
     public GeneralizationTest(Generalization generalization) {
         this.generalization = generalization;
@@ -362,7 +363,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "audio", "0001_aug.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 21);
+        DSObject result = generalization.service(dsObject, 21, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -377,7 +378,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "audio", "0001_median.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 22, 16);
+        DSObject result = generalization.service(dsObject, 22, 1);
         for (Object s : result.getList()) {
             System.out.println(s);
         }
