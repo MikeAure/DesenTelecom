@@ -350,15 +350,6 @@
                                               style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
-
-                            <div class="text-center">
-                                <label for="value_hide_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="value_hide_output" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -415,15 +406,6 @@
                                               style="margin-top: 10px;"></textarea>
                                 </div>
                             </div>
-
-                            <div class="text-center">
-                                <label for="valueShift_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="valueShift_output" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -475,14 +457,6 @@
                             <div class="text-center">
                                 <label for="SHA512_output"
                                        style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <textarea id="SHA512_output" rows="2" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <label for="SHA512_output"
-                                       style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏日志:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="SHA512_output" rows="2" cols="50" readonly
                                               style="margin-top: 10px;"></textarea>
@@ -895,13 +869,6 @@
 
 </body>
 <style>
-    .ibox-title {
-        height: 200px;
-        border-color: #edf1f2;
-        background-color: #dbeafe;
-        color: black;
-        display: flex;
-    }
 
     textarea {
         font-size: 1.5em;

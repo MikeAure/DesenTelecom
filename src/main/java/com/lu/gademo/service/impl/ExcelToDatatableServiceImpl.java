@@ -20,6 +20,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import javax.persistence.Column;
 import java.io.FileInputStream;
@@ -35,7 +36,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
-
 public class ExcelToDatatableServiceImpl {
     @Autowired
     private ApplicationContext applicationContext;
@@ -47,22 +47,13 @@ public class ExcelToDatatableServiceImpl {
     private DataPlatformDesenServiceImpl dataPlatformDesenService;
 
     @EventListener
-    public <T> void saveToDatabaseAfterEvaluation(SaveExcelToDatabaseEvent saveExcelToDatabaseEvent) {
+    public void saveToDatabaseAfterEvaluation(SaveExcelToDatabaseEvent saveExcelToDatabaseEvent) {
         CompletableFuture<ResponseEntity<byte[]>> futureResult = saveExcelToDatabaseEvent.getFutureResult();
         ResponseEntity<byte[]> responseEntity = saveExcelToDatabaseEvent.getResponseEntity();
         log.info("Saving to database");
         FileStorageDetails fileStorageDetails = saveExcelToDatabaseEvent.getFileStorageDetails();
         String entityClassName = saveExcelToDatabaseEvent.getEntityClassName();
-//        String[] entityNameList = entityClassName.split("_");
-//        StringBuilder builder = new StringBuilder();
-//        for (int i = 0; i < entityNameList.length; i++) {
-//            if (i == 0) {
-//                builder.append(entityNameList[i]);
-//            } else {
-//                builder.append(StringUtils.capitalize(entityNameList[i]));
-//            }
-//        }
-//        String entityName = builder.toString();
+
         log.info("EntityName: {}", entityClassName);
         log.info("DesenFilePathString: {}", fileStorageDetails.getDesenFilePathString());
 
@@ -79,7 +70,6 @@ public class ExcelToDatatableServiceImpl {
             }
             // 保存数据库成功后再发送对前端的响应
             futureResult.complete(responseEntity);
-            return;
         } else if (entityClassName.contains("customer_desen_msg")) {
             try {
                 exportCustomerDesenMsgExcelToDatabase(fileStorageDetails.getDesenFilePathString(), entityClassName);
@@ -93,7 +83,6 @@ public class ExcelToDatatableServiceImpl {
             }
             // 保存数据库成功后再发送对前端的响应
             futureResult.complete(responseEntity);
-            return;
         }
 //        try {
 ////            exportExcelToDatabase(CustomerDesenMsg.class, fileStorageDetails.getDesenFilePathString());

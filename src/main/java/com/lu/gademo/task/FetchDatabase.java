@@ -7,11 +7,11 @@ import com.lu.gademo.entity.ClassificationResult;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
+import com.lu.gademo.mapper.ga.TypeAlgoMappingDao;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.DataPlatformDesenServiceImpl;
 import com.lu.gademo.service.impl.FileStorageService;
-import com.lu.gademo.utils.LogCollectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
@@ -35,34 +35,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
+
 @ConditionalOnProperty(name = "fetch.database.task.enabled", havingValue = "true", matchIfMissing = false)
 public class FetchDatabase {
-    @Autowired
-    private DataPlatformDesenServiceImpl dataPlatformDesenService;
-    @Autowired
-    private FileService fileService;
-    @Autowired
-    private FileStorageService fileStorageService;
-    @Autowired
-    private ExcelParamService excelParamService;
-    @Autowired
-    private LogCollectUtil logCollectUtil;
+
+    private final DataPlatformDesenServiceImpl dataPlatformDesenService;
+    private final FileService fileService;
+    private final FileStorageService fileStorageService;
+    private final ExcelParamService excelParamService;
 
     // 远程服务器信息
-    @Value("${course2.host}")
-    String remoteHost; // 远程服务器地址
-    @Value("${course2.username}")
-    String username;
-    @Value("${course2.password}")// SSH 用户名
-    String password;
-    @Value("${course2.remotePath}")// SSH 密码
-    String remoteFilePath;  // 远程文件路径
-    Path localFilePath = Paths.get("dataplatform_config.json");           // 本地存储路径
+    private final String remoteHost; // 远程服务器地址
+    private final String userName;
+    private final String password;
+    private final String remoteFilePath;  // 远程文件路径
+    private final Path localFilePath;           // 本地存储路径
+    private ObjectMapper objectMapper;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private TypeAlgoMappingDao typeAlgoMappingDao;
+
+    @Autowired
+    public FetchDatabase(DataPlatformDesenServiceImpl dataPlatformDesenService,
+                         FileService fileService, FileStorageService fileStorageService,
+                         ExcelParamService excelParamService,
+                         @Value("${course2.host}") String remoteHost,
+                         @Value("${course2.username}") String userName,
+                         @Value("${course2.password}") String password,
+                         @Value("${course2.remotePath}") String remoteFilePath,
+                         TypeAlgoMappingDao typeAlgoMappingDao
+
+    ) {
+        this.dataPlatformDesenService = dataPlatformDesenService;
+        this.fileService = fileService;
+        this.fileStorageService = fileStorageService;
+        this.excelParamService = excelParamService;
+        this.remoteHost = remoteHost;
+        this.userName = userName;
+        this.password = password;
+        this.remoteFilePath = remoteFilePath;
+        this.localFilePath = Paths.get("dataplatform_config.json");           // 本地存储路径
+        this.objectMapper = new ObjectMapper();
+        this.typeAlgoMappingDao = typeAlgoMappingDao;
+
+    }
 
     @Scheduled(initialDelayString = "${fetch.database.task.initialDelay}", fixedRateString = "${fetch.database.task.fixedRate}")
     public boolean fetchDatabaseAndDesen() throws IOException, IllegalAccessException {
@@ -87,14 +106,15 @@ public class FetchDatabase {
         // 2. 对数据进行脱敏处理并写入文件
         Path tempFilePath = Paths.get(sheetName + "_temp.xlsx");
         dataPlatformDesenService.writeToExcel(allRecordsByTableName, dataPlatformDesenService.getColumnMapping(), tempFilePath);
+
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
+
         FileStorageDetails fileStorageDetails1 = null;
         FileStorageDetails fileStorageDetails2 = null;
         FileStorageDetails fileStorageDetails3 = null;
 //        int strategyInt = Integer.parseInt(algName);
 //        String sheetNameWithStrategy = "";
-
 //        String lowStrategy = sheetName + "_low";
         String mediumStrategy = sheetName + "_medium";
 //        String highStrategy = sheetName + "_high";
@@ -172,6 +192,10 @@ public class FetchDatabase {
         JsonNode columnList = objectMapper.readTree(path.toFile()).get("columnList");
         List<ClassificationResult> courseTwoList = objectMapper.readValue(columnList.toString(), new TypeReference<List<ClassificationResult>>() {
         });
+        for (ClassificationResult item : courseTwoList) {
+            log.info("{} 对应的分类：{}, 可选算法：{}", item.getColumnName(), item.getColumnType(),
+                    typeAlgoMappingDao.getAlgNamesByTypeName(item.getColumnType()));
+        }
         Map<String, Integer> courseTwoMap = new HashMap<>();
 
         for (ClassificationResult item : courseTwoList) {
@@ -240,7 +264,7 @@ public class FetchDatabase {
         client.setServerKeyVerifier(AcceptAllServerKeyVerifier.INSTANCE);
         client.start();
 
-        try (ClientSession session = client.connect(username, remoteHost, 22)
+        try (ClientSession session = client.connect(userName, remoteHost, 22)
                 .verify(7, TimeUnit.SECONDS).getSession()) {
 
             // 添加密码认证

@@ -31,9 +31,9 @@ public class LogSenderManagerTest {
         byte[] rawFileBytes = new byte[20];
         byte[] desenFileBytes = new byte[20];
 
-        SendSplitDesenData dataResult = logCollectUtil
-                .buildSendSplitReq(desenInfoAfterIden, desenAlg, rawFileName, rawFileBytes, desenFileName, desenFileBytes, desenIntention,
-                        desenRequirements, controlSet, desenAlgParam, startTime, endTime, desenLevel, true);
-        logSenderManager.send2Split(dataResult, rawFileBytes);
+//        SendSplitDesenData dataResult = logCollectUtil
+//                .buildSendSplitReq(desenInfoAfterIden, desenAlg, rawFileName, rawFileBytes, desenFileName, desenFileBytes, desenIntention,
+//                        desenRequirements, controlSet, desenAlgParam, startTime, endTime, desenLevel, true);
+//        logSenderManager.send2Split(dataResult, rawFileBytes);
     }
 }

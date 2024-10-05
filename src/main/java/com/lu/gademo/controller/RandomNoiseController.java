@@ -32,8 +32,6 @@ public class RandomNoiseController {
                              @RequestParam String samples,
                              @RequestParam String algName,
                              @RequestParam String params) {
-        String[] types = algName.split(",");
-        algName = types[types.length - 1];
         log.info(algName);
         int algNum = 0;
         switch (algName) {
@@ -46,7 +44,6 @@ public class RandomNoiseController {
                 algNum = 3;
                 break;
             }
-            //
             case "noisy_hist2": {
                 algNum = 25;
                 break;
@@ -56,19 +53,10 @@ public class RandomNoiseController {
 
         }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
-        DSObject resultDS = null;
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-
-//        if (algName.equals("report_noisy_max3")) {
-            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples), Integer.parseInt(params));
-//        } else {
-//            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples));
-//        }
-
+        DSObject resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples), Integer.parseInt(params));
         StringBuilder resultString = new StringBuilder();
-        for (Object s : resultDS.getList()) {
-            resultString.append(s).append("\n");
-        }
+        resultDS.getList().forEach(s -> resultString.append(s).append("\n"));
         return resultString.toString();
     }
 
@@ -81,12 +69,9 @@ public class RandomNoiseController {
                               @RequestParam String t,
                               @RequestParam String params) {
 
-        String[] types = algName.split(",");
-        algName = types[types.length - 1];
         log.info(algName);
         int algNum;
         switch (algName) {
-            //
             case "sparse_vector_technique3": {
                 algNum = 13;
                 break;
@@ -95,7 +80,6 @@ public class RandomNoiseController {
                 algNum = 14;
                 break;
             }
-            //
             case "sparse_vector_technique5": {
                 algNum = 15;
                 break;
@@ -111,13 +95,10 @@ public class RandomNoiseController {
         }
 
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
-
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
         DSObject resultDS = dp.service(rawObject, algNum, Integer.parseInt(c), Integer.parseInt(t), Integer.parseInt(params));
         StringBuilder resultString = new StringBuilder();
-        for (Object s : resultDS.getList()) {
-            resultString.append(s).append("\n");
-        }
+        resultDS.getList().forEach(s -> resultString.append(s).append("\n"));
         return resultString.toString();
     }
 }

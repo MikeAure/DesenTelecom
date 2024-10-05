@@ -1962,7 +1962,7 @@
 
                             <div class="btn2">
                                 <button type="button" class="btn btn-sm btn-primary" id="submit">提交脱敏</button>
-                                <button type="button" class="btn btn-sm btn-primary" id="submitDirectory">脱敏文件夹</button>
+                                <button type="button" class="btn btn-sm btn-primary m-l" id="submitDirectory">脱敏文件夹</button>
 
                                 <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm">
                                     设置当前算法为默认算法

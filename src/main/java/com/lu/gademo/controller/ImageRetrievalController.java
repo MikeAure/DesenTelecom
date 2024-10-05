@@ -67,8 +67,6 @@ public class ImageRetrievalController {
         if (!Files.exists(desenFileDirectory)) {
             Files.createDirectory(desenFileDirectory);
         }
-        log.info("rawFileDirectory: " + rawFileDirectory.toAbsolutePath());
-        log.info("desenFileDirectory: " + desenFileDirectory.toAbsolutePath());
     }
 
     @PostMapping("/getImage")
@@ -204,16 +202,10 @@ public class ImageRetrievalController {
         String eigenVectorFilePathString = eigenVectorFilePath.toString();
 
         // 脱敏参数处理
-        Integer desenParam = Integer.valueOf(params);
-
-        // 调用脱敏程序处理
-        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
-
         log.info("Start image desen");
         // 脱敏开始时间
         String startTime = util.getTime();
         long startTimePoint = System.currentTimeMillis();
-
         Path desenAppPath = currentDirectory.resolve("image").resolve("ImageRetrieval");
         Path desenApp = desenAppPath.resolve("FUNC.py");
         CommandExecutor.executePython(rawFilePathString + " " + desenFilePathString + " " + eigenVectorFilePathString, "",
@@ -256,15 +248,6 @@ public class ImageRetrievalController {
         logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
                 rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix,
                 startTime, endTime);
-
-        // 读取文件返回
-        HttpHeaders headers = new HttpHeaders();
-        if ((rawFileSuffix.equals("png"))) {
-            headers.setContentType(MediaType.IMAGE_PNG);
-        } else {
-            headers.setContentType(MediaType.IMAGE_JPEG);
-        }
-        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
 
         resultMap.put("imageFileName", desenFileName);
         resultMap.put("eigenVectorFileName", eigenVectorFileName);

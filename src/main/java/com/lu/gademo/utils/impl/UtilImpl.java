@@ -311,7 +311,7 @@ public class UtilImpl implements Util {
         return Base64.getDecoder().decode(byteString);
     }
 
-    public <T> void write2Excel(Sheet originalSheet, Sheet newSheet, int lastRowNum, int columnIndex, List<T> datas) {
+    public <T> void write2Excel(Sheet originalSheet, Sheet newSheet, int lastRowNum, int columnIndex, List<T> data) {
         // 遍历原始Sheet的每一行
         for (int j = 0; j <= lastRowNum; j++) {
             Row originalRow = originalSheet.getRow(j);
@@ -327,7 +327,7 @@ public class UtilImpl implements Util {
                 Cell newCell = newRow.createCell(columnIndex);
 
                 if (j > 0) { // 检查是否为指定列并忽略标题行
-                    T element = datas.get(j - 1);  // 获取脱敏后的数据
+                    T element = data.get(j - 1);  // 获取脱敏后的数据
                     if (element == null) {
                         // 脱敏数据为null时，写入原始值
                         writeOriginalValueToCell(originalCell, newCell);
@@ -335,10 +335,6 @@ public class UtilImpl implements Util {
                         // 否则写入脱敏数据
                         writeDesensitizedValueToCell(newCell, element);
                     }
-//                    } else if (originalCell != null) {
-//                        // 复制非脱敏列的原始值
-//                        writeOriginalValueToCell(originalCell, newCell);
-//                    }
                 } else if (j == 0) {
 //                        // 复制非脱敏列的原始值
                     writeOriginalValueToCell(originalCell, newCell);

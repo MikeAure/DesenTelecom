@@ -102,7 +102,7 @@ public class GeneralizationImpl implements Generalization {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 try {
-                    return new DSObject(dpUtil.date_group_replace(value, params[0].intValue()));
+                    return new DSObject(dpUtil.dateGroupReplace(value, params[0].intValue()));
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }

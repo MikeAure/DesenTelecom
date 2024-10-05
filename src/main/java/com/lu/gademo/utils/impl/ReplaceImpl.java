@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.value_hide(value, params[0].intValue()));
+                return new DSObject(dpUtil.valueHide(value, params[0].intValue()));
             }
 
             /*

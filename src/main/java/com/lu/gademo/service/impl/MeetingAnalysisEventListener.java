@@ -1,9 +1,7 @@
 package com.lu.gademo.service.impl;
 
-import cn.hutool.core.annotation.AliasFor;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.write.metadata.WriteSheet;
@@ -12,21 +10,15 @@ import com.lu.gademo.entity.Meeting;
 import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.utils.AlgorithmsFactory;
 import com.lu.gademo.utils.DSObject;
-import freemarker.template.SimpleDate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.persistence.Column;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import static com.lu.gademo.service.impl.FileServiceImpl.getDsList;
 
 
 public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>  {
 
-    private static final int BATCH_SIZE = 10000;
+    private static final int BATCH_SIZE = 50000;
     private final List<Meeting> patch;
     private final ExcelWriter excelWriter;
     private final WriteSheet writeSheet;

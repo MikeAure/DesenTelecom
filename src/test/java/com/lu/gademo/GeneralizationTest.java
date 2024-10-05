@@ -1,6 +1,7 @@
 package com.lu.gademo;
 
 import com.lu.gademo.utils.DSObject;
+import com.lu.gademo.utils.DpUtil;
 import com.lu.gademo.utils.Generalization;
 import com.lu.gademo.utils.impl.DpUtilImpl;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,11 @@ import java.util.stream.Collectors;
 @SpringBootTest
 public class GeneralizationTest {
     Generalization generalization;
+    DpUtil dpUtil;
 
     @Autowired
-    public GeneralizationTest(Generalization generalization) {
+    public GeneralizationTest(Generalization generalization, DpUtil dpUtil) {
+        this.dpUtil = dpUtil;
         this.generalization = generalization;
     }
 
@@ -384,21 +387,21 @@ public class GeneralizationTest {
         }
     }
 
-//    @Test
+    @Test
     // 测试两种算法的实现是否相同
     public void testKNum() {
         Random random = new Random();
         boolean allTestsPassed = true;
         for (int i = 0; i < 100; i++) {
             List<Double> numList = new ArrayList<>();
-            int numElements = random.nextInt(100000) + 1; // 生成1到20个元素
+            int numElements = random.nextInt(100) + 1; // 生成1到20个元素
             for (int j = 0; j < numElements; j++) {
-                numList.add(random.nextDouble() * 1000000); // 生成0到100之间的随机浮点数
+                numList.add(random.nextDouble() * 100); // 生成0到100之间的随机浮点数
             }
             int k = random.nextInt(numElements) + 1; // 确保k不为0
 
-            List<Double> doubleList = DpUtilImpl.k_num(numList, k);
-            List<Double> doubleList2 = DpUtilImpl.kNumNew(numList, k);
+            List<Double> doubleList = dpUtil.kNum(numList, k);
+            List<Double> doubleList2 = dpUtil.kNumNew(numList, k);
 
             if (!doubleList.equals(doubleList2)) {
                 allTestsPassed = false;

@@ -120,7 +120,6 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
 
         // 相关请求信息存储到数据库
         reqEvidenceSaveDao.save(reqEvidenceSave);
-
         // 存证响应
         EvidenceResponse evidenceResponse = new EvidenceResponse();
 
@@ -152,10 +151,9 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
             // 认证与校验
             //byte[] auth = new byte[16];
             //remoteInputStream.read(auth);
-            String response = new String(responseDataBytes, StandardCharsets.UTF_8);
             //String转json 存储响应信息
             log.info("读取校验");
-            JsonNode responseJson = objectMapper.readTree(response);
+            JsonNode responseJson = objectMapper.readTree(new String(responseDataBytes, StandardCharsets.UTF_8));
             log.info("存证系统响应：{}", responseJson.toPrettyString());
             // systemID: 系统ID
             evidenceResponse.setSystemID(responseJson.get("systemID").asInt());

@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -107,7 +108,7 @@ public class FileController extends BaseController {
                                             @RequestParam("params") String params,
                                             @RequestParam("algName") String algName,
                                             @RequestParam("sheet") String sheet
-    ) throws IOException{
+    ) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
         log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
         log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
@@ -120,7 +121,7 @@ public class FileController extends BaseController {
         String fileType = getFileSuffix(fileName);
         log.info("File Type: " + fileType);
         log.info("AlgName: " + algName);
-        log.info("Params: {}", params);
+//        log.info("Params: {}", params);
         log.info("Sheet: {}", sheet);
 
         // 判断数据模态
@@ -280,7 +281,7 @@ public class FileController extends BaseController {
         String fileType = getFileSuffix(fileName);
         log.info("File Type: " + fileType);
         log.info("AlgName: " + algName);
-        log.info("Params: {}", params);
+//        log.info("Params: {}", params);
         log.info("Sheet: {}", sheet);
         List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
         Map<String, ExcelParam> config = excelParamList.parallelStream()
@@ -292,11 +293,15 @@ public class FileController extends BaseController {
         excelParamList.clear();
         config.clear();
 
-        Resource resource = new InputStreamResource(Files.newInputStream(fileStorageDetails.getDesenFilePath()));
+        Resource resource = new FileSystemResource(fileStorageDetails.getDesenFilePath());
 //        fileStorageDetails.setRawFileBytes(new byte[0]);
         HttpHeaders httpheaders = new HttpHeaders();
         httpheaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         httpheaders.setContentDispositionFormData("attachment", fileStorageDetails.getDesenFileName());
+        excelParamList = null;
+        config = null;
+        fileStorageDetails = null;
+        System.gc();
         return ResponseEntity.ok().headers(httpheaders).body(resource);
 
     }
@@ -489,7 +494,7 @@ public class FileController extends BaseController {
 
     }
 
-    //    @GetMapping(value = "fileDesenRequest")
+//    @GetMapping(value = "fileDesenRequest")
 //    @ResponseBody
     ResponseEntity<Map<String, Object>> fileDesenRequest() {
         Map<String, Object> response = new HashMap<>();
@@ -509,14 +514,15 @@ public class FileController extends BaseController {
     public ResponseEntity<String> handleFileProcessingExceptions(Exception ex) {
         String errorMsg = "处理文件时出错: ";
         if (ex instanceof TimeoutException) {
-            errorMsg += "等待处理结果超时";
+            errorMsg += "等待处理结果超时\n";
         } else if (ex instanceof InterruptedException) {
-            errorMsg += "处理中断";
+            errorMsg += "处理中断\n";
         } else if (ex instanceof ExecutionException) {
-            errorMsg += "执行异常";
+            errorMsg += "执行异常\n";
         } else if (ex instanceof  IOException) {
-            errorMsg += "文件读写异常";
+            errorMsg += "文件读写异常\n";
         }
+        errorMsg += ex.getMessage();
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).body(errorMsg);

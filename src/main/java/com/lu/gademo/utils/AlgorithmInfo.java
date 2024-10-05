@@ -21,7 +21,10 @@ public class AlgorithmInfo {
     // 四种类型的算法接口的基接口
     private BaseDesenAlgorithm executor;
 
-    public AlgorithmInfo(String name, int id, AlgorithmType type, int originalId, List<Object> params, BaseDesenAlgorithm executor) {
+    private String requirement;
+
+    public AlgorithmInfo(String name, int id, AlgorithmType type, int originalId,
+                         List<Object> params, BaseDesenAlgorithm executor, String requirement) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -47,6 +50,7 @@ public class AlgorithmInfo {
             default:
         }
         this.executor = executor;
+        this.requirement = requirement;
     }
 
     public DSObject execute(DSObject rawData, Number... params) {
@@ -63,9 +67,10 @@ public class AlgorithmInfo {
         if (obj instanceof AlgorithmInfo) {
             AlgorithmInfo algInfo = (AlgorithmInfo) obj;
             // params可能为空
-            boolean four = name.equals(algInfo.name) && id == algInfo.id && type == algInfo.type && originalId == algInfo.originalId && params == algInfo.params;
+            boolean six = name.equals(algInfo.name) && id == algInfo.id && type == algInfo.type
+                    && originalId == algInfo.originalId && params == algInfo.params && requirement.equals(algInfo.requirement);
             boolean executorEquals = algInfo.executor.getClass().equals(this.executor.getClass());
-            return four && executorEquals;
+            return six && executorEquals;
         } else {
             return false;
         }

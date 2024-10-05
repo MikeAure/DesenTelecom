@@ -5,62 +5,62 @@
     "columnList": [
         {
             "columnName": "srcip",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "2"
         },
         {
             "columnName": "ad",
-            "columnType": "{个人终端设备信息}",
+            "columnType": "个人终端设备信息",
             "columnLevel": "4"
         },
         {
             "columnName": "ts",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "2"
         },
         {
             "columnName": "url",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "3"
         },
         {
             "columnName": "ref",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "3"
         },
         {
             "columnName": "ua",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "3"
         },
         {
             "columnName": "dstip",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "2"
         },
         {
             "columnName": "cookie",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "3"
         },
         {
             "columnName": "src_port",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "2"
         },
         {
             "columnName": "json",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "2"
         },
         {
             "columnName": "update_time",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "2"
         },
         {
             "columnName": "dataid",
-            "columnType": "{个人上网信息}",
+            "columnType": "个人上网信息",
             "columnLevel": "2"
         }
     ]

@@ -83,7 +83,7 @@ public class FileControllerExcelTest {
     Util util;
 
     @Autowired
-    public FileControllerExcelTest(MockMvc mvc, Util util) throws IOException {
+    public FileControllerExcelTest(MockMvc mvc, Util util) {
         this.mvc = mvc;
         this.excelPath = Paths.get(EXCEL_FILE_PATH);
         this.excelPath1000w = Paths.get(EXCEL_FILE_PATH_1000w);
@@ -453,7 +453,7 @@ public class FileControllerExcelTest {
     public void testExcelFilesNew52scenes() throws Exception {
         Map<String, List<String>> failedResult = new HashMap<>();
 
-        Path currentDirectory = Paths.get("D:\\52scenes1w\\40");
+        Path currentDirectory = Paths.get("D:\\52scenes1w\\51");
         System.out.println("CurrentDirectory: " + currentDirectory.toString());
         List<String> failedFileNameList = new ArrayList<>();
         for (String sceneName : FIFTYTWO_SCENE) {
@@ -511,7 +511,7 @@ public class FileControllerExcelTest {
     }
 
     @Test
-    void bigFileTest() throws Exception {
+    public void bigFileTest() throws Exception {
         final String sceneName = "meeting";
         System.out.println("正在获取：" + sceneName + "参数");
         String url = "/" + sceneName + "param/list";
@@ -552,7 +552,7 @@ public class FileControllerExcelTest {
     }
 
     @Test
-    void bigFileTestAll() throws Exception {
+    public void bigFileTestAll() throws Exception {
         Map<String, String> failedRecord = new HashMap<>();
         final String sceneName = "meeting";
         System.out.println("正在获取：" + sceneName + "参数");
@@ -561,7 +561,6 @@ public class FileControllerExcelTest {
         MvcResult excelParam = mvc.perform(get(url))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
                 .andReturn();
 
         String params = excelParam.getResponse().getContentAsString(StandardCharsets.UTF_8);
@@ -572,29 +571,31 @@ public class FileControllerExcelTest {
 //                        .equalsIgnoreCase(sceneName))
 //                .findFirst().get();
 //        System.out.println(fileName);
-        Path directoryPath = Paths.get("D:\\meeting100w50\\");
-        for (int i = 40; i < 50; i++) {
-            Path testFilePath = directoryPath.resolve("meeting100w" + Integer.valueOf(i) + ".xlsx");
+        Path directoryPath = Paths.get("D:\\meeting5000wv3Excel\\");
+        for (int i = 0; i < 500; i++) {
+            Path testFilePath = directoryPath.resolve("meeting" + i + ".xlsx");
             System.out.println(testFilePath.toAbsolutePath());
             System.out.println("正在测试文件：" + testFilePath.toAbsolutePath());
-            byte[] excelBytes = Files.readAllBytes(testFilePath);
-            MockMultipartFile excelFile = new MockMultipartFile("file", "meeting100w" + Integer.valueOf(i) + ".xlsx",
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelBytes);
+
+            MockMultipartFile excelFile = new MockMultipartFile("file", "meeting100w" + i + ".xlsx",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Files.newInputStream(testFilePath.toFile().toPath()));
 
             try {
+
                 mvc.perform(multipart("/File/bigExcelDesen")
                                 .file(excelFile)
                                 .param("sheet", sceneName)
                                 .param("params", params)
                                 .param("algName", "distortion"))
-                        .andExpect(status().isOk())
-                        .andDo(MockMvcResultHandlers.print())
-                        .andReturn();
+                        .andExpect(status().isOk());
+
             } catch (Exception e) {
                 failedRecord.put(util.getTime(), testFilePath.toAbsolutePath().toString());
                 e.printStackTrace();
             }
-
+            excelFile = null;
+            Thread.sleep(1000); // 暂停1秒
+            System.gc();
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("failed_bigfiles.txt", true))) {
             for (Map.Entry<String, String> record : failedRecord.entrySet()) {

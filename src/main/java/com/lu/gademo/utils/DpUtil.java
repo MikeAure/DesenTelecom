@@ -7,6 +7,8 @@ import java.util.List;
 
 //差分处理的算法
 public interface DpUtil {
+    List<Double> kNum(List<Double> array, int k);
+    List<Double> kNumNew(List<Double> array, int k);
     //单编码数据的处理
     List<String> dpCode(List<Object> data, Integer privacyLevel);
 
@@ -17,7 +19,7 @@ public interface DpUtil {
     List<Double> laplaceToValue(List<Object> data, Integer privacyLevel);
 
     //数值k-分组抑制
-    List<Double> k_NumberCode(List<Object> data, Integer privacyLevel);
+    List<Double> kNumberCode(List<Object> data, Integer privacyLevel);
 
     // 取整
     List<Double> getInt(List<Object> data, Integer privacyLevel);
@@ -41,7 +43,7 @@ public interface DpUtil {
     List<Date> dpDate(List<Object> data, Integer privacyLevel) throws ParseException;
 
     // 日期分组置换
-    List<Date> date_group_replace(List<Object> data, Integer privacyLevel) throws ParseException;
+    List<Date> dateGroupReplace(List<Object> data, Integer privacyLevel) throws ParseException;
 
     //名称脱敏算法，名字处理方式,(卢**)
     List<String> nameHide(List<Object> names, Integer privacyLevel);
@@ -51,7 +53,7 @@ public interface DpUtil {
 
     // 身份号码的处理
     String IDCode(String ID, String zs, Date birthday, String sex);
-
+//
     String IDCode(String ID, Date birthday, String sex);
 
     // 信息主键编号处理
@@ -79,7 +81,7 @@ public interface DpUtil {
     List<String> floorTime(List<Object> dataList, Integer privacyLevel);
 
     // 将字符串中数字替换为0
-    List<String> value_hide(List<Object> dataList, Integer privacyLevel);
+    List<String> valueHide(List<Object> dataList, Integer privacyLevel);
 
     //数值映射为新值  *50
     List<Double> valueMapping(List<Object> dataList, Integer privacyLevel);

@@ -26,6 +26,7 @@ import com.lu.gademo.utils.LogInfo;
 import com.lu.gademo.utils.Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -37,6 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -269,22 +271,31 @@ public class LogSenderManager {
                                                    String desenFileName, byte[] desenFileBytes, long desenFileSize,
                                                    String fileType, String rawFileSuffix,
                                                    String startTime, String endTime) {
+        String desenFileHash = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, desenFileName.getBytes(StandardCharsets.UTF_8)));
+        String rawFileHash = util.getSM3Hash(ArrayUtils.addAll(rawFileBytes, rawFileName.getBytes(StandardCharsets.UTF_8)));
+        String rawFileSig = "";
+        try {
+            rawFileSig = util.getSM2Sign(rawFileBytes);
+        } catch (Exception e) {
+            rawFileSig = rawFileHash;
+            log.error(e.getMessage());
+        }
         ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
         SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
-                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, globalID, infoBuilders.desenInfoPreIden.toString(),
+                rawFileHash, rawFileSize, desenFileHash, globalID, infoBuilders.desenInfoPreIden.toString(),
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
-                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
-        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileBytes, rawFileSize,
-                desenFileName, desenFileBytes, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType, rawFileSig);
+        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileHash, rawFileSize,
+                desenFileName, desenFileHash, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
                 fileType, rawFileSuffix, desenCom);
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileName, rawFileBytes, desenFileName, desenFileBytes,
+        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileHash, desenFileHash,
                 infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
         SendSplitDesenData sendSplitDesenData = logCollectUtil.buildSendSplitReq(infoBuilders.desenInfoAfterIden, infoBuilders.desenAlg,
-                rawFileName, rawFileBytes, desenFileName, desenFileBytes, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                rawFileHash, desenFileHash, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
 
         return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, sendEvaReq, sendRuleReq, sendSplitDesenData);

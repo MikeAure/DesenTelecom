@@ -79,32 +79,22 @@ public class LogCollectUtil {
     }
 
     public SubmitEvidenceLocal buildSubmitEvidenceLocal(String evidenceID, StringBuilder desenAlg,
-                                                        String rawFileName, byte[] rawFileBytes, Long rawFileSize,
-                                                        String desenFileName, byte[] desenFileBytes, String globalID,
+                                                        String rawFileName, String rawFileHash, Long rawFileSize,
+                                                        String desenFileHash, String globalID,
                                                         String desenInfoPreIden, StringBuilder desenIntention,
                                                         StringBuilder desenRequirements, String desenControlSet,
                                                         StringBuilder desenAlgParam, String startTime,
                                                         String endTime, StringBuilder desenLevel,
-                                                        Boolean desenCom, StringBuilder fileDataType) {
+                                                        Boolean desenCom, StringBuilder fileDataType, String rawFileSig) {
         SubmitEvidenceLocal submitEvidenceLocal = new SubmitEvidenceLocal();
-        String desenFileHash = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, desenFileName.getBytes(StandardCharsets.UTF_8)));
+
         submitEvidenceLocal.setSystemID(systemID);
         submitEvidenceLocal.setSystemIP(util.getIP());
         submitEvidenceLocal.setMainCMD(evidenceSubmitMainCommand);
         submitEvidenceLocal.setSubCMD(evidenceSubmitSubCommand);
-        submitEvidenceLocal.setEvidenceID(desenFileHash);
+        submitEvidenceLocal.setEvidenceID(evidenceID);
         submitEvidenceLocal.setMsgVersion(evidenceSubmitMsgVersion);
 
-
-        String rawFileHash = util.getSM3Hash(ArrayUtils.addAll(rawFileBytes, rawFileName.getBytes(StandardCharsets.UTF_8)));
-        String rawFileSig = "";
-
-        try {
-            rawFileSig = util.getSM2Sign(rawFileBytes);
-        } catch (Exception e) {
-            rawFileSig = rawFileHash;
-            log.error(e.getMessage());
-        }
         String fileTitle = "脱敏工具集脱敏" + rawFileName + "文件存证记录";
         String fileAbstract = "脱敏工具集采用算法" + desenAlg + "脱敏" + rawFileName + "文件存证记录";
         String fileKeyword = rawFileName + "," + desenInfoPreIden;
@@ -138,8 +128,8 @@ public class LogCollectUtil {
     }
 
     public SendEvaReq buildSendEvaReq(String globalID, String evidenceID,
-                                      String rawFileName, byte[] rawFileBytes, Long rawFileSize,
-                                      String desenFileName, byte[] desenFileBytes, Long desenFileSize,
+                                      String rawFileName, String rawFileHash, Long rawFileSize,
+                                      String desenFileName, String desenFileHash, Long desenFileSize,
                                       StringBuilder desenInfoPreIden, StringBuilder desenInfoAfterIden,
                                       StringBuilder desenIntention, StringBuilder desenRequirements,
                                       String desenControlSet, StringBuilder desenAlg,
@@ -155,18 +145,16 @@ public class LogCollectUtil {
 //        System.arraycopy(rawFileBytes, 0, combined, rawFileNameBytes.length, rawFileBytes.length);
 //        System.arraycopy(desenFileNameBytes, 0, desenCombined, 0, desenFileNameBytes.length);
 //        System.arraycopy(desenFileBytes, 0, desenCombined, desenFileNameBytes.length, desenFileBytes.length);
-        String desenInfoSm3Hash = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, desenFileName.getBytes(StandardCharsets.UTF_8)));
-        sendEvaReq.setEvaRequestId(desenInfoSm3Hash);
+
+        sendEvaReq.setEvaRequestId(desenFileHash);
         sendEvaReq.setSystemID(systemID);
-        sendEvaReq.setEvidenceID(desenInfoSm3Hash);
+        sendEvaReq.setEvidenceID(evidenceID);
         sendEvaReq.setGlobalID(globalID);
         sendEvaReq.setDesenInfoPreIden(desenInfoPreIden.toString());
         sendEvaReq.setDesenInfoAfterIden(desenInfoAfterIden.toString());
-
-        sendEvaReq.setDesenInfoPreId(util.getSM3Hash(ArrayUtils.addAll(rawFileBytes,
-                rawFileName.getBytes(StandardCharsets.UTF_8))));
+        sendEvaReq.setDesenInfoPreId(rawFileHash);
         sendEvaReq.setDesenInfoPre(rawFileName);
-        sendEvaReq.setDesenInfoAfterId(desenInfoSm3Hash);
+        sendEvaReq.setDesenInfoAfterId(desenFileHash);
         sendEvaReq.setDesenInfoAfter(desenFileName);
         sendEvaReq.setDesenIntention(desenIntention.toString());
         sendEvaReq.setDesenRequirements(desenRequirements.toString());
@@ -207,8 +195,7 @@ public class LogCollectUtil {
         return result;
     }
 
-    public SendRuleReq buildSendRuleReq(String evidenceID, String rawFileName, byte[] rawFileBytes,
-                                        String desenFileName, byte[] desenFileBytes,
+    public SendRuleReq buildSendRuleReq(String evidenceID, String rawFileHash, String desenFileHash,
                                         StringBuilder desenInfoAfterIden, StringBuilder desenIntention,
                                         StringBuilder desenRequirements, String desenControlSet,
                                         StringBuilder desenAlg, StringBuilder desenAlgParam,
@@ -216,12 +203,11 @@ public class LogCollectUtil {
                                         Boolean desenCom, StringBuilder dataType
     ) {
         SendRuleReq sendRuleReq = new SendRuleReq();
-        String desenInfoSm3Hash = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, desenFileName.getBytes(StandardCharsets.UTF_8)));
-        sendRuleReq.setEvidenceId(desenInfoSm3Hash);
+        sendRuleReq.setEvidenceId(evidenceID);
         sendRuleReq.setDesenInfoAfterIden(desenInfoAfterIden.toString());
         sendRuleReq.setFileDataType(dataType.toString());
-        sendRuleReq.setDesenInfoPre(util.getSM3Hash(ArrayUtils.addAll(rawFileBytes, rawFileName.getBytes(StandardCharsets.UTF_8))));
-        sendRuleReq.setDesenInfoAfter(desenInfoSm3Hash);
+        sendRuleReq.setDesenInfoPre(rawFileHash);
+        sendRuleReq.setDesenInfoAfter(desenFileHash);
         sendRuleReq.setDesenIntention(desenIntention.toString());
         sendRuleReq.setDesenRequirements(desenRequirements.toString());
         sendRuleReq.setDesenControlSet(desenControlSet);
@@ -237,16 +223,12 @@ public class LogCollectUtil {
     }
 
     public SendSplitDesenData buildSendSplitReq(StringBuilder desenInfoAfterIden, StringBuilder desenAlg,
-                                                String rawFileName, byte[] rawFileBytes,
-                                                String desenFileName, byte[] desenFileBytes, StringBuilder desenIntention,
+                                                String rawFileHash, String desenFileHash, StringBuilder desenIntention,
                                                 StringBuilder desenRequirements, String desenControlSet,
                                                 StringBuilder desenAlgParam, String startTime,
                                                 String endTime, StringBuilder desenLevel,
                                                 Boolean desenCom) {
         SendSplitDesenData sendSplitDesenData = new SendSplitDesenData();
-
-        String rawFileHash = util.getSM3Hash(ArrayUtils.addAll(rawFileBytes, rawFileName.getBytes(StandardCharsets.UTF_8)));
-        String desenFileHash = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, desenFileName.getBytes(StandardCharsets.UTF_8)));
 
         sendSplitDesenData.setDesenInfoAfterIden(desenInfoAfterIden.toString());
         sendSplitDesenData.setDesenInfoPreID(rawFileHash);
@@ -266,7 +248,7 @@ public class LogCollectUtil {
     }
 
     public void logExecutionTime(String executionTime, String objectMode) {
-        log.info("Desensitization finished in " + executionTime + "ms");
-        log.info(objectMode + " desensitization finished");
+        log.info("Desensitization finished in {}ms", executionTime);
+        log.info("{} desensitization finished", objectMode);
     }
 }

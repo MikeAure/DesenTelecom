@@ -3,6 +3,7 @@ package com.lu.gademo.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
+import com.lu.gademo.mapper.ga.TypeAlgoMappingDao;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.impl.FileStorageService;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 用于接收电信Agent的请求
@@ -31,8 +34,9 @@ public class TelecomDesenController {
     private FileStorageService fileStorageService;
     private ExcelParamService excelParamService;
     private LogCollectUtil logCollectUtil;
+    private TypeAlgoMappingDao typeAlgoMappingDao;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
     /**
      * 根据课题二的配置设置脱敏策略
@@ -40,10 +44,17 @@ public class TelecomDesenController {
      * @param reqConfigs
      */
     private void setStrategyConfig(List<ExcelParam> strategyConfig, List<ExcelParam> reqConfigs) {
+
+
         for (int i = 0; i < strategyConfig.size(); i++) {
             ExcelParam rawConfig = strategyConfig.get(i);
+            String typeName = reqConfigs.get(i).getFieldName();
             String colName = rawConfig.getColumnName();
             String fieldName = rawConfig.getFieldName();
+
+            log.info("TypeName：{}", typeName);
+            log.info("{} 对应的算法：{}", colName, typeAlgoMappingDao.getAlgNamesByTypeName(typeName));
+
             int tmParam = rawConfig.getTmParam();
             ExcelParam reqConfig = null;
             // 如果为主键列，则不脱敏
@@ -70,7 +81,7 @@ public class TelecomDesenController {
                                 @RequestParam("params") String params,
                                 @RequestParam("algName") String algName,
                                 @RequestParam("sheet") String sheetName) throws IOException {
-//        FileStorageDetails fileStorageDetails1 = null;
+        FileStorageDetails fileStorageDetails1 = null;
         FileStorageDetails fileStorageDetails2 = null;
 //        FileStorageDetails fileStorageDetails3 = null;
 //        int strategyInt = Integer.parseInt(algName);

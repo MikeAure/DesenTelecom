@@ -14,7 +14,6 @@ import java.io.IOException;
 public class BaseController {
     @Autowired
     protected HttpServletRequest request;
-
     @Autowired
     protected HttpServletResponse response;
 

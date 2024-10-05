@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 public interface FileService {
     /**
@@ -29,19 +31,19 @@ public interface FileService {
 
     ResponseEntity<byte[]> dealImage(MultipartFile file, String params, String algName) throws IOException;
 
-    ResponseEntity<byte[]> dealExcel(FileStorageDetails file, String params, String sheet, Boolean ifSaveExcel) throws IOException;
+    ResponseEntity<byte[]> dealExcel(FileStorageDetails file, String params, String sheet, Boolean ifSaveExcel) throws IOException, ExecutionException, InterruptedException, TimeoutException;
 
     ResponseEntity<byte[]> dealExcel(MultipartFile file, String params, String sheet, Boolean ifSaveExcel) throws IOException;
 
-    ResponseEntity<byte[]> dealVideo(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
+    ResponseEntity<byte[]> dealVideo(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ExecutionException, InterruptedException, TimeoutException;
 
     ResponseEntity<byte[]> dealVideo(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
 
-    ResponseEntity<byte[]> dealAudio(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
+    ResponseEntity<byte[]> dealAudio(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ExecutionException, InterruptedException, TimeoutException;
 
     ResponseEntity<byte[]> dealAudio(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException;
 
-    ResponseEntity<byte[]> dealGraph(FileStorageDetails fileStorageDetails, String params) throws IOException;
+    ResponseEntity<byte[]> dealGraph(FileStorageDetails fileStorageDetails, String params) throws IOException, ExecutionException, InterruptedException, TimeoutException;
 
     ResponseEntity<byte[]> dealGraph(MultipartFile file, String params) throws IOException, SQLException, InterruptedException;
 

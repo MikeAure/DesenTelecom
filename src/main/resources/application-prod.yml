@@ -69,8 +69,8 @@ logging:
         path: ./log
     level:
         org:
-            hibernate: INFO
-            hibernate.SQL: INFO
+            hibernate: WARN
+            hibernate.SQL: WARN
 
 effectEva:
     address: 172.28.72.223
