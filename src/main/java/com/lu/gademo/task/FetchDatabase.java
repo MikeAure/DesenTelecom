@@ -35,12 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Component
 
-@ConditionalOnProperty(name = "fetch.database.task.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "fetch.database.dataPlatformTask.enabled", havingValue = "true", matchIfMissing = false)
 public class FetchDatabase {
 
     private final DataPlatformDesenServiceImpl dataPlatformDesenService;
@@ -57,6 +56,8 @@ public class FetchDatabase {
     private ObjectMapper objectMapper;
 
     private TypeAlgoMappingDao typeAlgoMappingDao;
+    private int localDatabasePageSize;
+    private int jdDatabasePageSize;
 
     @Autowired
     public FetchDatabase(DataPlatformDesenServiceImpl dataPlatformDesenService,
@@ -66,6 +67,8 @@ public class FetchDatabase {
                          @Value("${course2.username}") String userName,
                          @Value("${course2.password}") String password,
                          @Value("${course2.remotePath}") String remoteFilePath,
+                         @Value("${fetch.database.localDatabasePageSize}") int localDatabasePageSize,
+                         @Value("${fetch.database.pageSize.jdDatabase}") int jdDatabasePageSize,
                          TypeAlgoMappingDao typeAlgoMappingDao
 
     ) {
@@ -81,6 +84,8 @@ public class FetchDatabase {
         this.objectMapper = new ObjectMapper();
         this.typeAlgoMappingDao = typeAlgoMappingDao;
 
+        this.localDatabasePageSize = localDatabasePageSize;
+        this.jdDatabasePageSize = jdDatabasePageSize;
     }
 
     @Scheduled(initialDelayString = "${fetch.database.task.initialDelay}", fixedRateString = "${fetch.database.task.fixedRate}")
@@ -133,21 +138,17 @@ public class FetchDatabase {
         scanner.nextLine();
 //        log.info("正在更新高脱敏策略");
 //        updateExcelParam(courseTwoMap, highStrategyConfig);
-
 //        String lowStrategyConfigString = objectMapper.writeValueAsString(lowStrategyConfig);
         String mediumStrategyConfigString = objectMapper.writeValueAsString(mediumStrategyConfig);
 //        String highStrategyConfigString = objectMapper.writeValueAsString(highStrategyConfig);
 
         try {
-//            fileStorageDetails1 = fileStorageService.saveRawFileWithDesenInfo(tempFilePath);
             fileStorageDetails2 = fileStorageService.saveRawFileWithDesenInfo(tempFilePath);
-//            fileStorageDetails3 = fileStorageService.saveRawFileWithDesenInfo(tempFilePath);
         } catch (IOException e) {
             if (Files.exists(tempFilePath)) {
                 Files.delete(tempFilePath);
             }
             log.error("Failed to save raw file: {}", e.getMessage());
-//            return new Result<>(500, "Failed to save file", "");
             return false;
         }
         try {
@@ -182,9 +183,7 @@ public class FetchDatabase {
         if (Files.exists(tempFilePath)) {
             Files.delete(tempFilePath);
         }
-//        return new Result<>(200, "Success", "");
         return true;
-
     }
 
     private Map<String, Integer> readFromCourseTwo() throws IOException {
@@ -193,7 +192,7 @@ public class FetchDatabase {
         List<ClassificationResult> courseTwoList = objectMapper.readValue(columnList.toString(), new TypeReference<List<ClassificationResult>>() {
         });
         for (ClassificationResult item : courseTwoList) {
-            log.info("{} 对应的分类：{}, 可选算法：{}", item.getColumnName(), item.getColumnType(),
+            log.info("{} 对应的分类：{}, 可选算法：{}", "f_"+item.getColumnName(), item.getColumnType(),
                     typeAlgoMappingDao.getAlgNamesByTypeName(item.getColumnType()));
         }
         Map<String, Integer> courseTwoMap = new HashMap<>();
@@ -202,8 +201,6 @@ public class FetchDatabase {
             courseTwoMap.put("f_" + item.getColumnName(), item.getColumnLevel());
         }
         return courseTwoMap;
-
-
     }
 
     private void updateExcelParam(Map<String, Integer> courseTwoMap, List<ExcelParam> strategyConfig) {
@@ -212,7 +209,7 @@ public class FetchDatabase {
                 continue;
             }
             Integer courseTwoMapTmParam = courseTwoMap.get(item.getColumnName());
-            System.out.println(courseTwoMapTmParam);
+            log.info("分类分级结果 {} 对应脱敏等级：{}", item.getColumnName(), courseTwoMapTmParam);
             if (courseTwoMapTmParam == 4) {
                 courseTwoMapTmParam = 3;
             }

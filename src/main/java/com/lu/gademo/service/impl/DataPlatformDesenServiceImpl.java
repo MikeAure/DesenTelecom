@@ -19,8 +19,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +31,17 @@ import java.util.Map;
 @Service
 @Getter
 public class DataPlatformDesenServiceImpl {
-    private SadaGdpiClickDtlParamUserLogDao sadaGdpiClickDtlParamUserLogDao;
-    private SadaGdpiClickDtlParamDao sadaDtlDao;
+    private final SadaGdpiClickDtlParamUserLogDao sadaGdpiClickDtlParamUserLogDao;
+    private final SadaGdpiClickDtlParamDao sadaDtlDao;
 
-    private Map<String, String> columnMapping = new LinkedHashMap<>();
+    private final Map<String, String> columnMapping;
 
     @Autowired
     public DataPlatformDesenServiceImpl(SadaGdpiClickDtlParamDao sadaGdpiClickDtlParamDao,
                                         SadaGdpiClickDtlParamUserLogDao sadaGdpiClickDtlParamUserLogDao) {
         this.sadaDtlDao = sadaGdpiClickDtlParamDao;
         this.sadaGdpiClickDtlParamUserLogDao = sadaGdpiClickDtlParamUserLogDao;
+        columnMapping = new LinkedHashMap<>();
         columnMapping.put("sid", "sid");
         columnMapping.put("f_srcip", "fSrcip");
         columnMapping.put("f_ad", "fAd");
@@ -63,7 +66,7 @@ public class DataPlatformDesenServiceImpl {
     }
 
     // 批量插入
-    public void insertListBatch(String tableName, List<SadaGdpiClickDtl> list, int batchSize) {
+    public void insertListInBatch(String tableName, List<SadaGdpiClickDtl> list, int batchSize) {
         for (int i = 0; i < list.size(); i += batchSize) {
             List<SadaGdpiClickDtl> batchList = list.subList(i, Math.min(i + batchSize, list.size()));
             insertList(tableName, batchList);
@@ -83,7 +86,8 @@ public class DataPlatformDesenServiceImpl {
         if (sadaGdpiClickDtlParamUserLogDao.getItemTotalNumberByTabelName(tableName) > 0) {
             sadaGdpiClickDtlParamUserLogDao.deleteAll(tableName);
         }
-        insertListBatch(tableName, list, 1000);
+        // 分批次插入，一次性插入大量数据数据库会报错
+        insertListInBatch(tableName, list, 1000);
     }
 
     // 使用指向另一个数据的Dao进行插入
@@ -97,6 +101,8 @@ public class DataPlatformDesenServiceImpl {
     }
 
     public void writeToExcel(List<SadaGdpiClickDtl> dataList, Map<String, String> columnMapping, Path filePath) throws IOException, IllegalAccessException, FileNotFoundException {
+        DateTimeFormatter ldtFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        ThreadLocal<SimpleDateFormat> sdfWithTime = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         // 创建一个新的工作簿
         Workbook workbook = new XSSFWorkbook();
         // 创建一个新的工作表
@@ -115,7 +121,6 @@ public class DataPlatformDesenServiceImpl {
         int rowIndex = 1;
         for (SadaGdpiClickDtl entity : dataList) {
             Row row = sheet.createRow(rowIndex++);
-
             colIndex = 0;
             for (String fieldName : columnMapping.values()) {
                 Cell cell = row.createCell(colIndex++);
@@ -123,13 +128,13 @@ public class DataPlatformDesenServiceImpl {
                 if (field != null) {
                     field.setAccessible(true);
                     Object value = field.get(entity);
-
                     if (value != null) {
                         // 格式化LocalDateTime
                         if (value instanceof LocalDateTime) {
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                            cell.setCellValue(((LocalDateTime) value).format(formatter));
-                        } else {
+                            cell.setCellValue(((LocalDateTime) value).format(ldtFormatter));
+                        } else if (value instanceof Date) {
+                            cell.setCellValue(sdfWithTime.get().format((Date) value));
+                        }else {
                             cell.setCellValue(value.toString());
                         }
                     }
@@ -139,7 +144,7 @@ public class DataPlatformDesenServiceImpl {
 
         // 写入 Excel 文件
         try (FileOutputStream fileOut = new FileOutputStream(filePath.toAbsolutePath().toString())) {
-            log.info(filePath.toAbsolutePath().toString());
+            log.info("Transforming file");
             workbook.write(fileOut);
         } catch (IOException e) {
             e.printStackTrace();

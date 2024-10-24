@@ -104,8 +104,6 @@ public class TWED {
     }
 
     public static void main(String[] args) throws Exception {
-
-
         String filename = "src/ElectricDevices_TEST.tsv";
         String split = "\\s+";
 
@@ -143,7 +141,6 @@ public class TWED {
                 }
                 encryptedDataList.put(i, encryptedRecord);
             }
-
 
             for (int w = 0; w < cycle; w++) {
                 int loc1 = (int) (Math.random() * n);

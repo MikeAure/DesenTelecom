@@ -1,41 +1,69 @@
 package com.lu.gademo.controller;
 
-import com.lu.gademo.dao.ga.ToolsetDefaultToolDao;
+import com.lu.gademo.entity.ga.SceneInfo;
+import com.lu.gademo.service.impl.SceneInfoDaoServiceImpl;
 import com.lu.gademo.service.impl.ToolsetService;
 import com.lu.gademo.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @Controller
 public class GaController extends BaseController {
+
+    private final ToolsetService toolsetService;
+    private final SceneInfoDaoServiceImpl sceneInfoDaoService;
+    private final List<SceneInfo> allSceneInfos;
+
+
     @Autowired
-    private ToolsetService toolsetService;
+    public GaController(ToolsetService toolsetService, SceneInfoDaoServiceImpl sceneInfoDaoService) {
+        this.toolsetService = toolsetService;
+        this.sceneInfoDaoService = sceneInfoDaoService;
+        this.allSceneInfos = sceneInfoDaoService.getAllSceneInfos();
+    }
 
     @RequestMapping(value = {"/", "/index"})
-    public String index() {
-        return "index";
+    public String index(Model model) {
+        model.addAttribute("scenes", allSceneInfos);
+        return "index.html";
     }
 
     @RequestMapping(value = {"/home"})
     public String home() {
-        return "home";
+        return "home.html";
     }
 
-    @RequestMapping(value = {"/welcome"})
-    public String welcome() {
-        return "welcome";
-    }
 
     // 五十场景模板
     @GetMapping(value = {"/fifty_scene/{name}"})
-    public String getFiftyScenesView(@PathVariable String name) {
-        return "fifty_scene/" + name;
+    public String getFiftyScenesView(@PathVariable String name, Model model) {
+        model.addAttribute("sheet", name);
+//        return "fifty_scene/" + name;
+        return "fifty_scene/fifty_scene";
+
     }
 
     // 脱敏算法验证  按照模态分类
     @GetMapping(value = {"/verify/{name}"})
-    public String getVerifyViews(@PathVariable String name) {
+    public String getVerifyViews(@PathVariable String name, Model model) {
+//        List<AlgorithmInfoDto> audioAlgorithmInfoDtoList = new ArrayList<AlgorithmInfoDto>(Arrays.asList(
+//                new AlgorithmInfoDto(70, "dpAudio", "差分-基于差分隐私的声纹特征脱敏算法"),
+//                new AlgorithmInfoDto(71, "voice_replace", "置换-声纹替换算法"),
+//                new AlgorithmInfoDto(72, "apply_audio_effects", "置换-音频变形"),
+//                new AlgorithmInfoDto(73, "audio_reshuffle", "置换-音频重排"),
+//                new AlgorithmInfoDto(74, "audio_floor", "泛化-音频取整"),
+//                new AlgorithmInfoDto(75, "audio_spec", "泛化-频域遮掩"),
+//                new AlgorithmInfoDto(76, "audio_augmentation", "泛化-音频失真"),
+//                new AlgorithmInfoDto(77, "audio_median", "泛化-基于均值的采样点替换")
+//                ));
+//        if (name.equals("audio")) {
+//            model.addAttribute("distortionAudioAlgoList", audioAlgorithmInfoDtoList);
+//            model.addAttribute("defaultOption", "audio_spec");
+//        }
+
         return "verify/" + name;
     }
 
@@ -45,14 +73,15 @@ public class GaController extends BaseController {
         return "desentools/" + toolName;
     }
 
-    @RequestMapping(value = {"/templateManagement"})
-    public String getTemplateManagementView() {
-        return "templateManagement/scenario";
+    @GetMapping(value = {"/templateManagement"})
+    public String getTemplateManagementView(Model model) {
+        model.addAttribute("scenes", allSceneInfos);
+        return "templateManagement/scenario.html";
     }
 
-    @RequestMapping(value = {"/performenceTest"})
+    @GetMapping(value = {"/performenceTest"})
     public String getPerformanceTestView() {
-        return "performancetest";
+        return "performancetest.html";
     }
 
     @ResponseBody

@@ -4,7 +4,7 @@ import com.alibaba.excel.EasyExcel;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.ExcelParam;
-import com.lu.gademo.entity.Meeting;
+import com.lu.gademo.entity.ga.Meeting;
 import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.AlgorithmsFactory;
 import org.junit.jupiter.api.Test;

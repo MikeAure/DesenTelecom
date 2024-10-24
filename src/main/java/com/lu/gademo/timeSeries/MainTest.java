@@ -593,7 +593,7 @@ public class MainTest {
         BigInteger L = verifyParam.L;
         BigInteger LMinusOne = L.subtract(BigInteger.ONE);
 
-        BigInteger VerifycipherMinusOne = SymHomSch.EncBiginteger(LMinusOne, verifyParam);
+        BigInteger VerifyCipherMinusOne = SymHomSch.EncBiginteger(LMinusOne, verifyParam);
 
         BigInteger FilterCipherOne = SymHomSch.EncBiginteger(BigInteger.ONE, filterParam);
         BigInteger FilterCipherZero = SymHomSch.EncBiginteger(BigInteger.ZERO, filterParam);
@@ -604,7 +604,7 @@ public class MainTest {
 //		OutsourcingD(filename, split, filterParam, verifyParam);
 
         return String.valueOf(QueryProcessingN(q, filename, split, filterParam, verifyParam, FilterCipherOne,
-                FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifycipherMinusOne));
+                FilterCipherZero, VerifyCipherOne, VerifyCipherZero, VerifyCipherMinusOne));
 
     }
 

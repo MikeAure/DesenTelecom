@@ -18,24 +18,24 @@ public interface TypeAlgoMappingDao {
     })
     List<TypeAlgoMapping> getTypeAlgoMappingInfoByTypeId(int typeId);
 
-    @Select({
-            "SELECT t.typeName, a.algoName",
-            "FROM type_info t",
-            "JOIN type_algo_mapping tam ON t.typeId = tam.typeId",
-            "JOIN algo_info a ON tam.algoId = a.algoId",
-            "WHERE t.typeName = #{typeName}"
-    })
-    @Results({
-            @Result(column = "typeName", property = "typeName"),
-            @Result(column = "algName", property = "algNames", many = @Many(select = "getAlgNamesByTypeName"))
-    })
-    List<TypeWithAlgoNames> getAlgorithmsByTypeName(@Param("typeName") String typeName);
+//    @Select({
+//            "SELECT t.typeName, a.algoName",
+//            "FROM type_info t",
+//            "JOIN type_algo_mapping tam ON t.typeId = tam.typeId",
+//            "JOIN algo_info a ON tam.algoId = a.algoId",
+//            "WHERE t.typeName = #{typeName}"
+//    })
+//    @Results({
+//            @Result(column = "typeName", property = "typeName"),
+//            @Result(column = "algName", property = "algNames", many = @Many(select = "getAlgNamesByTypeName"))
+//    })
+//    List<TypeWithAlgoNames> getAlgorithmsByTypeName(@Param("typeName") String typeName);
 
     @Select({
-            "SELECT a.algoName",
+            "SELECT a.chineseName",
             "FROM type_info t",
             "JOIN type_algo_mapping tam ON t.typeId = tam.typeId",
-            "JOIN algo_info a ON tam.algoId = a.algoId",
+            "JOIN algo_info a ON tam.algoId = a.originalId",
             "WHERE t.typeName = #{typeName}"
     })
     List<String> getAlgNamesByTypeName(@Param("typeName") String typeName);

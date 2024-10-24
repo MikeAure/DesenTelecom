@@ -14,7 +14,6 @@ public class SHSParamters {
     public BigInteger L;
 
     public SHSParamters(int k0, int k1, int k2, BigInteger p, BigInteger q, BigInteger N, BigInteger L) {
-
         this.k0 = k0;
         this.k1 = k1;
         this.k2 = k2;

@@ -120,10 +120,21 @@ logSenderManager:
 
 fetch:
     database:
-        task:
+        dataPlatformTask:
             enabled: true
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
+        jdPlatformTask:
+            enabled: true
+            initialDelay: 5000   # 初始延迟时间（毫秒）
+            fixedRate: 180000    # 间隔时间（毫秒）
+            localTableName: meeting_datatable
+            localTargetTableName: meeting_datatable_desen
+            jdTableName: t_userinfo
+            jdTargetTableName: t_userinfo_desen
+        pageSize:
+            localDatabase: 50000
+            jdDatabase: 50000
 course2:
     host: 172.28.72.218
     username: root

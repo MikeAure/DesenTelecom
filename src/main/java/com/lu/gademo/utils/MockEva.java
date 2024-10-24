@@ -317,6 +317,9 @@ public class MockEva {
         if (selectedList.contains("sid")) {
             selectedList.remove("sid");
         }
+//        if (selectedList.contains("手机号码")) {
+//            selectedList.remove("手机号码");
+//        }
         result.put("desenFailedColName", String.join(",", selectedList));
         result.put("desenIntention", jsonNodes.get("data").get("content").get("desenIntention").asText());
         result.put("desenRequirements", jsonNodes.get("data").get("content").get("desenRequirements").asText());

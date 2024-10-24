@@ -55,7 +55,7 @@ public class ExcelToDatatableServiceImpl {
         String entityClassName = saveExcelToDatabaseEvent.getEntityClassName();
 
         log.info("EntityName: {}", entityClassName);
-        log.info("DesenFilePathString: {}", fileStorageDetails.getDesenFilePathString());
+//        log.info("DesenFilePathString: {}", fileStorageDetails.getDesenFilePathString());
 
         if (entityClassName.contains("sada_gdpi_click_dtl")) {
             try {

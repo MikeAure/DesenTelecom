@@ -49,8 +49,6 @@ public class EncryptController {
     @Autowired
     private ServerMain server = new ServerMain();
     @Autowired
-    private FileStorageService fileStorageService;
-    @Autowired
     private Util util;
     @Autowired
     private LogSenderManager logSenderManager;
@@ -377,6 +375,7 @@ public class EncryptController {
             return ResponseEntity.badRequest().body(null);
         }
         long startTimePoint = System.nanoTime();
+        System.out.println("points.length = " + points.length);
         for (int i = 0; i < points.length; i++) {
             String coorResult = coor.latLon2UTM(points[i][0], points[i][1]);
             String[] coorResults = coorResult.split(" ");
@@ -428,7 +427,7 @@ public class EncryptController {
         points = null;
         System.gc();
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=result.txt");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
 //        return ResponseEntity.ok()
 //                .headers(headers)
 //                .contentLength(tempFile.length())
@@ -459,13 +458,14 @@ public class EncryptController {
         // EN
         String C_QUStr = messages[2];
         // EN_i1 - EN_i4
+
         String[] C_iStr = C_QUStr.trim().split(symbol3);
         String[] C_inStr = null;
         BigInteger[] D_in = new BigInteger[2];
         StringBuilder DSb = new StringBuilder();
         String D = null;
         String D_i = null;
-
+        System.out.println("C_iStr.length = " + C_iStr.length);
         for (int i = 0; i < C_iStr.length; i++) {
             // EN_ij1-EN_ij6
             C_inStr = C_iStr[i].trim().split(symbol1);

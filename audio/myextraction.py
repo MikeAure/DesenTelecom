@@ -1,8 +1,6 @@
 from model import *
 import torch
-from voiceprintplt import draw_voiceprint1, draw_voiceprint2
 import librosa
-from scipy.fftpack import fft, ifft, dct, idct
 import numpy as np
 import wave
 import os
@@ -24,7 +22,6 @@ def extract_voiceprint(audiofilename, sr):
             map_location='cpu'))  # .to(device)) #, map_location='cpu')
     speakermodel = speakermodel.to(device)
     speakermodel.eval()
-
 
     embedding_size = 512
     # ==========提取声纹代码(封装成函数，输入audiofilename，输出voiceprint)=========

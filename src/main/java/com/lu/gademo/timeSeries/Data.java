@@ -55,7 +55,6 @@ public class Data {
 
             dataList.put(count, tempDouble);
             count++;
-
         }
 
         return dataList;

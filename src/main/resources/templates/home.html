@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<html lang=ch xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>个人敏感信息脱敏工具集</title>
+    <link rel="shortcut icon" th:href="@{/favicon.ico}">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/font-awesome.css}" rel="stylesheet">
+    <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet">
+    <link th:href="@{/css/animate.css}" rel="stylesheet">
+    <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+</head>
+<body>
+<!-- 全局js -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/xlsx.full.min.js}"></script>
+
+<!-- Bootstrap table -->
+<script th:src="@{/js/plugins/bootstrap-table/bootstrap-table.min.js}"></script>
+<script th:src="@{/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js}"></script>
+<script th:src="@{/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+
+<!-- Peity -->
+<script th:src="@{/js/plugins/peity/jquery.peity.min.js}"></script>
+
+<script th:src="@{/js/plugins/layer/layer.min.js}"></script>
+<script th:src="@{/js/multiple-select.min.js}"></script>
+
+<!-- 自定义js -->
+<script th:src="@{/js/content.js}"></script>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <span>个人敏感信息按需脱敏工具集</span>
+            </div>
+            <div class="ibox-content">
+                <img src="img/img.png" width="100%" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<style>
+    .ibox-title {
+        height: 200px;
+        border-color: #edf1f2;
+        /*background-color: #f6f8f8;*/
+        background-color: #dbeafe;
+        color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ibox-title span {
+        font-size: 50px;
+    }
+
+    .ibox-content {
+        margin: 0;
+        padding: 0;
+        display: block;
+        position: relative;
+        /*display: inline-block;*/
+    }
+
+    .ibox-content img {
+        display: block;
+    }
+
+
+</style>
+</html>

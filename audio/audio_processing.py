@@ -1,9 +1,8 @@
+import librosa
 import numpy as np
 from python_speech_features import fbank, delta
 
 import constants as c
-
-import librosa
 
 
 def mk_MFB(filename, sample_rate=c.SAMPLE_RATE, use_delta=c.USE_DELTA, use_scale=c.USE_SCALE,

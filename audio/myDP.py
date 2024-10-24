@@ -98,7 +98,8 @@ def dpVector2(vectorPath, dp_vector_txt_path, budget):
     vector_txt.close()
     dp_vector_txt.write(a)
     dp_vector_txt.close()
-    
+
+
 def preprocess(vectorPath, dp_vector_txt_path):
     dp_vector_txt = open(dp_vector_txt_path, mode='w+')
     vector_txt = open(vectorPath, mode='r')

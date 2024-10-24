@@ -1,8 +1,8 @@
 package com.lu.gademo.controller;
 
-import com.lu.gademo.mapper.ga.ExcelParamDao;
 import com.lu.gademo.entity.ExcelParam;
 
+import com.lu.gademo.service.ExcelParamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +18,12 @@ import java.util.List;
 @RequestMapping("/Param")
 @Slf4j
 public class ParamController {
-
+    private final ExcelParamService excelParamService;
 
     @Autowired
-    private ExcelParamDao excelParamDao;
+    public ParamController(ExcelParamService excelParamService) {
+        this.excelParamService = excelParamService;
+    }
 
     //参数列表，
     /*使用到页面
@@ -39,8 +41,8 @@ public class ParamController {
         // 将 tableName 转换为小写
         String lowerCaseTableName = tableName.toLowerCase();
         // 查询参数
-        List<ExcelParam> params = excelParamDao.findTable(lowerCaseTableName); // 这里传入表名
-        return params;
+        // 这里传入表名
+        return excelParamService.findTable(lowerCaseTableName);
     }
 
 
@@ -49,9 +51,9 @@ public class ParamController {
     public ResponseEntity<String> saveData(@RequestParam String tableName,@RequestBody List<ExcelParam> tableParams) {
         try {
 
-            excelParamDao.deleteAll(tableName);
+            excelParamService.deleteAll(tableName);
             // 在服务层中处理保存逻辑
-            excelParamDao.saveTableParams(tableName,tableParams);
+            excelParamService.insertAll(tableName,tableParams);
 
             return ResponseEntity.ok("数据保存成功！");
         } catch (Exception e) {
@@ -64,7 +66,7 @@ public class ParamController {
     @DeleteMapping("/deleteData/{id}")
     public ResponseEntity<String> deleteData(@RequestParam String tableName,@PathVariable int id) {
         try {
-            excelParamDao.deleteById(tableName,id);
+            excelParamService.deleteByTabelNameAndId(tableName,id);
             return ResponseEntity.ok("数据删除成功");
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -81,8 +83,7 @@ public class ParamController {
             @RequestParam(value="dataType") Integer DataType
     ){
         //统计参数，DataType 表示统计参数类型
-        List<ExcelParam> params= excelParamDao.getByDataType(tableName,DataType);
-        return params;
+        return excelParamService.getByTableNameAndDataType(tableName,DataType);
     }
 
 }

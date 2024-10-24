@@ -16,4 +16,13 @@ public enum AlgorithmType {
     public int getValue() {
         return value;
     }
+
+    public static AlgorithmType fromValue(int value) {
+        for (AlgorithmType type : AlgorithmType.values()) {
+            if (type.getValue() == value) {
+                return type;
+            }
+        }
+        return UNKNOWN;
+    }
 }

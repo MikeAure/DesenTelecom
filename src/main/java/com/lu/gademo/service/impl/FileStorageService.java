@@ -51,7 +51,7 @@ public class FileStorageService {
         String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
         String rawFileNameTemp = fileTimeStamp + "_" + fileName;
         String rawFileName = fileTimeStamp + "_" + originalFileName;
-        log.info("RawFileName: {}", rawFileName);
+//        log.info("RawFileName: {}", rawFileName);
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
@@ -98,7 +98,7 @@ public class FileStorageService {
         String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
         String rawFileNameTemp = fileTimeStamp + "_" + fileName;
         String rawFileName = fileTimeStamp + "_" + originalFileName;
-        log.info("RawFileName: {}", rawFileName);
+//        log.info("RawFileName: {}", rawFileName);
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         Long rawFileSize = file.getSize();
@@ -145,7 +145,7 @@ public class FileStorageService {
         String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
         String rawFileNameTemp = fileTimeStamp + "_" + fileName;
         String rawFileName = fileTimeStamp + "_" + originalFileName;
-        log.info("RawFileName: {}", rawFileName);
+//        log.info("RawFileName: {}", rawFileName);
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         byte[] rawFileBytes = Files.readAllBytes(file);

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ch" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta name="referrer" content="no-referrer">
+    <title>脱敏</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+    <!-- Bootstrap CSS -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet">
+    <link th:href="@{/css/animate.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link rel="shortcut icon" th:href="@{/favicon.ico}">
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+<div id="wrapper">
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="nav-close"><i class="fa fa-times-circle"></i>
+        </div>
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+                <!--脱敏算法验证-->
+                <li>
+                    <a href="#" style="font-size: 20px;">
+                        <i class="fa fa fa-home"></i>
+                        <span class="nav-label" style="font-size: 20px;">脱敏算法验证</span>
+                        <span class="fa arrow"></span>
+                    </a>
+
+                    <ul class="nav nav-second-level">
+
+                        <li>
+                            <a class="J_menuItem" th:href="@{/verify/text}" style="font-size: 15px;">文本</a>
+                        </li>
+
+                        <li>
+                            <a class="J_menuItem" th:href="@{/verify/excel}" style="font-size: 15px;">表格</a>
+                        </li>
+
+                        <li>
+                            <a class="J_menuItem" th:href="@{/verify/image}" style="font-size: 15px;">图像</a>
+                        </li>
+
+                        <li>
+                            <a class="J_menuItem" th:href="@{/verify/video}" style="font-size: 15px;">视频</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" th:href="@{/verify/audio}" style="font-size: 15px;">音频</a>
+                        </li>
+                        <li>
+                            <a class="J_menuItem" th:href="@{/verify/graph}" style="font-size: 15px;">图形</a>
+                        </li>
+                    </ul>
+                </li>
+                <!--52个应用场景-->
+                <li>
+                    <a href="#" style="font-size: 20px;">
+                        <i class="fa fa fa-cog"></i>
+                        <span class="nav-label" style="font-size: 20px;">典型场景验证</span>
+                        <span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level">
+<!--                        <option th:value="${algoInfo.value}" th:selected="${algoInfo.value eq defaultOption}"-->
+                            <!--                                                th:each="algoInfo : ${distortionAudioAlgoList}"-->
+                            <!--                                                th:text="${algoInfo.name}"></option>-->
+                        <li th:each="scene : ${scenes}">
+                            <a class="J_menuItem" th:href="@{'/fifty_scene/' + ${scene.sceneName}}" style="font-size: 15px;"
+                               th:text="${scene.sceneChineseName}">场景名称</a>
+                        </li>
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/map}" style="font-size: 15px;">地图导航类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/map}" style="font-size: 15px;">地图导航类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/onlinetaxi}"-->
+<!--                               style="font-size: 15px;">网络约车类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/communication}" style="font-size: 15px;">即时通信类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/community}"-->
+<!--                               style="font-size: 15px;">网络社区类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/onlinepayment}" style="font-size: 15px;">网络支付类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/onlineshopping}" style="font-size: 15px;">网上购物类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/takeaway}"-->
+<!--                               style="font-size: 15px;">餐饮外卖类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/express}"-->
+<!--                               style="font-size: 15px;">邮件快件寄递类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/transportationticket}"-->
+<!--                               style="font-size: 15px;">交通票务类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/marry}"-->
+<!--                               style="font-size: 15px;">婚恋相亲类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/employment}"-->
+<!--                               style="font-size: 15px;">求职招聘类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/onlinelending}" style="font-size: 15px;">网络借贷类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/house}"-->
+<!--                               style="font-size: 15px;">房屋租售类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/usedcar}"-->
+<!--                               style="font-size: 15px;">二手车交易类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/consultation}" style="font-size: 15px;">问诊挂号类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/travel}"-->
+<!--                               style="font-size: 15px;">旅游服务类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/hotel}"-->
+<!--                               style="font-size: 15px;">酒店服务类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/game}"-->
+<!--                               style="font-size: 15px;">网络游戏类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/education}"-->
+<!--                               style="font-size: 15px;">学习教育类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/locallife}"-->
+<!--                               style="font-size: 15px;">本地生活类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/woman}"-->
+<!--                               style="font-size: 15px;">女性健康类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/usecar}"-->
+<!--                               style="font-size: 15px;">用车服务类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/investment}"-->
+<!--                               style="font-size: 15px;">投资理财类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/bank}"-->
+<!--                               style="font-size: 15px;">手机银行类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/mailbox}"-->
+<!--                               style="font-size: 15px;">邮箱云盘类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/meeting}"-->
+<!--                               style="font-size: 15px;">远程会议类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/webcast}"-->
+<!--                               style="font-size: 15px;">网络直播类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/onlinemovie}" style="font-size: 15px;">在线影音类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/shortvideo}"-->
+<!--                               style="font-size: 15px;">短视频类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/news}"-->
+<!--                               style="font-size: 15px;">新闻资讯类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/sports}"-->
+<!--                               style="font-size: 15px;">运动健身类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/browser}"-->
+<!--                               style="font-size: 15px;">浏览器类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/input}"-->
+<!--                               style="font-size: 15px;">输入法类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/security}"-->
+<!--                               style="font-size: 15px;">安全管理类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/ebook}"-->
+<!--                               style="font-size: 15px;">电子图书类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/capture}"-->
+<!--                               style="font-size: 15px;">拍摄美化类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/appstore}"-->
+<!--                               style="font-size: 15px;">应用商店类场景</a>-->
+<!--                        </li>-->
+
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/tools}"-->
+<!--                               style="font-size: 15px;">实用工具类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/performanceticket}" style="font-size: 15px;">演出票务场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/networkaccess}" style="font-size: 15px;">电话/有线电视入网类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/telecommunication}" style="font-size: 15px;">电信业务使用类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/monitor}"-->
+<!--                               style="font-size: 15px;">安防监控类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/pay}"-->
+<!--                               style="font-size: 15px;">生活缴费类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/customerservice}" style="font-size: 15px;">客服类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/schoolservice}" style="font-size: 15px;">校园服务类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/smarthome}"-->
+<!--                               style="font-size: 15px;">智慧家居类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/autonomousdriving}" style="font-size: 15px;">自动驾驶类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/telemedicine}" style="font-size: 15px;">远程诊疗类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/vr}"-->
+<!--                               style="font-size: 15px;">虚拟现实类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/onlinevoting}" style="font-size: 15px;">网上投票类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/petcare}" style="font-size: 15px;">宠物照顾类场景</a>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <a class="J_menuItem" th:href="@{/fifty_scene/homerepair}" style="font-size: 15px;">家庭维修类场景</a>-->
+<!--                        </li>-->
+                    </ul>
+                </li>
+<!--                脱敏工具设置-->
+                <li>
+                    <a href="#" style="font-size: 20px;">
+                        <i class="fa fa fa-cog"></i>
+                        <span class="nav-label" style="font-size: 20px;">脱敏工具设置</span>
+                        <span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level">
+                        <li class="active">
+                            <a href="#" style="font-size: 15px;">
+                                差分隐私
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/differential_privacy_laplace}">
+                                        拉普拉斯 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/differential_privacy_exp}"> 指数 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/differential_privacy_svt}"> SVT
+                                        稀疏向量 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/differential_privacy_ldp}">
+                                        随机响应 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/differential_privacy_random_noise}">
+                                        随机加噪 </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" style="font-size: 15px;">
+                                数据泛化
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/generalization_num_string}">
+                                        数值与字符泛化 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/generalization_location}">
+                                        位置数据泛化 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/generalization_image}"> 图像泛化 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/generalization_video}"> 视频泛化 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/generalization_audio}"> 音频泛化 </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" style="font-size: 15px;">
+                                匿名
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/k_anonymity_alg}"> K 匿名 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/l_diversity_alg}"> L 多样性 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/t_closeness_alg}"> T 接近 </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" style="font-size: 15px;">
+                                数据置换
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-third-level collapse" aria-expanded="true" style="font-size: 13px;">
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/replacement_num_string}">
+                                        数值与字符置换 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/replacement_image}"> 图像置换 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/replacement_video}"> 视频置换 </a>
+                                </li>
+                                <li>
+                                    <a class="J_menuItem" th:href="@{/desentools/replacement_audio}"> 音频置换 </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="J_menuItem" th:href="@{/templateManagement/}" style="font-size: 20px;">
+                        <i class="fa fa fa-cog"></i>
+                        <span class="nav-label">应用场景模板管理</span>
+
+                    </a>
+                </li>
+                <li>
+                    <a class="J_menuItem" th:href="@{/performenceTest}" style="font-size: 20px;">
+                        <i class="fa fa fa-cog"></i>
+                        <span class="nav-label">性能测试</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!--左侧导航结束-->
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div class="row J_mainContent" id="content-main">
+            <iframe id="J_iframe" width="100%" height="100%" th:src="@{/home}" data-id="index_v1.html"
+                    seamless>
+
+            </iframe>
+        </div>
+
+    </div>
+    <!--右侧部分结束-->
+</div>
+</body>
+
+<!-- 引入JS脚本文件 -->
+<script th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
+<script th:src="@{/js/bootstrap.min.js?v=3.3.6}"></script>
+<script th:src="@{/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+<script th:src="@{/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+<script th:src="@{/js/plugins/layer/layer.min.js}"></script>
+
+<!-- 自定义js -->
+<script th:src="@{/js/hAdmin.js?v=4.1.0}"></script>
+<script th:src="@{/js/index.js}" type="text/javascript"></script>
+
+<!-- 内联样式 -->
+<style>
+    .navbar-static-side {
+        background-color: #1f2937;
+    }
+</style>
+
+</html>

@@ -7,6 +7,9 @@ import org.apache.ibatis.type.JdbcType;
 
 import java.util.List;
 
+/**
+ * 用于读取userlogdtl中的数据
+ */
 @Mapper
 public interface SadaGdpiClickDtlParamDao {
     /**

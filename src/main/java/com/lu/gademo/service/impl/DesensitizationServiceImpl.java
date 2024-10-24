@@ -25,29 +25,33 @@ import java.util.List;
 
 @Service
 public class DesensitizationServiceImpl implements DesensitizationService {
-    ObjectMapper objectMapper = new ObjectMapper();
-    @Autowired
+    ObjectMapper objectMapper;
     Util util;
     // 效果评测Dao
-    @Autowired
     private SendEvaReqDao sendEvaReqDao;
-    @Autowired
     private ExcelParamService excelParamService;
-    @Autowired
     private FileService fileService;
+    private Path rawFileDirectory;
 
-    private Path rawFileDirectory = Paths.get("raw_files");
-
+    @Autowired
+    public DesensitizationServiceImpl(Util util, SendEvaReqDao sendEvaReqDao, ExcelParamService excelParamService, FileService fileService) {
+        this.util = util;
+        this.sendEvaReqDao = sendEvaReqDao;
+        this.excelParamService = excelParamService;
+        this.fileService = fileService;
+        rawFileDirectory = Paths.get("raw_files");
+        objectMapper = new ObjectMapper();
+    }
 
     @Override
     public void redesen(RecEvaResultInv recEvaResultInv) throws Exception {
         String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
         SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterIden(desenInfoAfterID);
         // 字段名列表
-        String[] attributeNameList = evaReq.getDesenInfoPreIden().split(",");
+//        String[] attributeNameList = evaReq.getDesenInfoPreIden().split(",");
         String rawFileName = evaReq.getDesenInfoPre();
-        String desenFileName = evaReq.getDesenInfoAfter();
-        String[] desenAlgList = evaReq.getDesenAlg().split(",");
+//        String desenFileName = evaReq.getDesenInfoAfter();
+//        String[] desenAlgList = evaReq.getDesenAlg().split(",");
         String[] desenLevelList = evaReq.getDesenAlg().split(",");
         String templateName = evaReq.getFileType();
 

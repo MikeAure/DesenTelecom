@@ -1,9 +1,7 @@
 package com.lu.gademo;
 
+import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.utils.*;
-import com.lu.gademo.utils.impl.DpImpl;
-import com.lu.gademo.utils.impl.GeneralizationImpl;
-import com.lu.gademo.utils.impl.ReplaceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

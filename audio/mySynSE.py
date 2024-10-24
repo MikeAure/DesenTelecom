@@ -23,7 +23,7 @@ def save_syn(lines):
     # if not os.path.exists(filesynHx):
     #     os.makedirs(filesynHx)e
     # for line in lines:
-    data = lines[0].strip().replace('[ ', '').replace(' ]', '').split()
+    data = lines[0].strip().replace('[ ', '').replace(' f]', '').split()
 
     # filename = data[0]
     # panduan=os.path.join(filesynHx,filename+'.wav')

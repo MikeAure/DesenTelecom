@@ -73,17 +73,14 @@ public class DPController {
                 break;
             }
             default:
-                throw new RuntimeException("Unkown algorithm: " + algName);
+                throw new RuntimeException("Unknown algorithm: " + algName);
 
         }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject resultDS = null;
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-//        if (algName.equals("report_noisy_max1")) {
             resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples), Integer.parseInt(params));
-//        } else {
-//            resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples));
-//        }
+
         StringBuilder resultString = new StringBuilder();
         if (resultDS.getList() != null && !resultDS.getList().isEmpty()) {
             for (Object s : resultDS.getList()) {

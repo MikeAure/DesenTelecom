@@ -1346,21 +1346,21 @@ public class DpUtilImpl implements DpUtil {
             }
         }
 
-        BigDecimal max_data = Collections.max(reData, Comparator.nullsFirst(Comparator.naturalOrder()));
+        BigDecimal maxData = Collections.max(reData, Comparator.nullsFirst(Comparator.naturalOrder()));
         for (BigDecimal item : reData) {
             if (item == null) {
                 result.add(null);
             } else {
                 BigDecimal flooredValue = BigDecimal.ZERO;
-                if (max_data.compareTo(BigDecimal.valueOf(10)) <= 0) {
+                if (maxData.compareTo(BigDecimal.valueOf(10)) <= 0) {
                     flooredValue = BigDecimal.TEN;
                 } else {
                     BigDecimal flooredValue1 = item.divide(BigDecimal.TEN, 0, RoundingMode.FLOOR).multiply(BigDecimal.TEN);
-                    if (max_data.compareTo(BigDecimal.valueOf(100)) <= 0) {
+                    if (maxData.compareTo(BigDecimal.valueOf(100)) <= 0) {
                         flooredValue = flooredValue1;
                     } else {
                         BigDecimal flooredValue2 = item.divide(BigDecimal.valueOf(100), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(100));
-                        if (max_data.compareTo(BigDecimal.valueOf(1000)) <= 0) {
+                        if (maxData.compareTo(BigDecimal.valueOf(1000)) <= 0) {
                             if (privacyLevel == 1) {
                                 flooredValue = flooredValue1;
                             } else {
@@ -1368,7 +1368,7 @@ public class DpUtilImpl implements DpUtil {
                             }
                         } else {
                             BigDecimal flooredValue3 = item.divide(BigDecimal.valueOf(1000), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(1000));
-                            if (max_data.compareTo(BigDecimal.valueOf(10000)) <= 0) {
+                            if (maxData.compareTo(BigDecimal.valueOf(10000)) <= 0) {
                                 if (privacyLevel == 1) {
                                     flooredValue = flooredValue1;
                                 } else if (privacyLevel == 2) {
@@ -1391,7 +1391,6 @@ public class DpUtilImpl implements DpUtil {
                 result.add(flooredValue.toString());
             }
         }
-
         return result;
     }
 

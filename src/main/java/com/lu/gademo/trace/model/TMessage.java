@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-@Data
 @SuppressWarnings("serial")
 public class TMessage implements Serializable {
     private int msgType;

@@ -6,6 +6,9 @@ import org.apache.ibatis.type.JdbcType;
 
 import java.util.List;
 
+/**
+ * 用于向userlog1数据库数据库表中写入脱敏后的数据
+ */
 @Mapper
 public interface SadaGdpiClickDtlParamUserLogDao {
     /**

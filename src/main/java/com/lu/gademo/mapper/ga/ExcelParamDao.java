@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 使用MyBatis访问模板数据表
@@ -17,7 +18,9 @@ public interface  ExcelParamDao {
      * @return List<ExcelParam> 表中所有ExcelParam实体
      */
     @Select({"SELECT * FROM ${name} "})
-    @Results({
+    @Results(
+            id = "ExcelParamMap",
+            value = {
             @Result(column = "id", property = "id", jdbcType = JdbcType.VARCHAR),
             @Result(column = "field_name", property = "fieldName", jdbcType = JdbcType.VARCHAR),
             @Result(column = "column_name", property = "columnName", jdbcType = JdbcType.VARCHAR),
@@ -48,23 +51,17 @@ public interface  ExcelParamDao {
             "</foreach>",
             "</script>"
     })
-    void saveTableParams(@Param("tableName") String tableName, @Param("list") List<ExcelParam> dataList);
+    void insertAll(@Param("tableName") String tableName, @Param("list") List<ExcelParam> dataList);
 
     /**
      * 通过数据类型和表名获取ExcelParam实体列表
      * @param name 表名
-     * @param DataType 数据类型
+     * @param dataType 数据类型
      * @return
      */
+    @ResultMap("ExcelParamMap")
     @Select({"SELECT * FROM ${name} WHERE data_type = #{dataType}"})
-    @Results({
-            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER),
-            @Result(column = "field_name", property = "fieldName", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "column_name", property = "columnName", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "data_type", property = "dataType", jdbcType = JdbcType.INTEGER),
-            @Result(column = "tm_param", property = "tmParam", jdbcType = JdbcType.INTEGER)
-    })
-    List<ExcelParam> getByDataType(String name, @Param("dataType") Integer DataType);
+    List<ExcelParam> getByTableNameAndDataType(String name, @Param("dataType") Integer dataType);
 
     /**
      * 通过列名获取ExcelParam实体列表
@@ -72,30 +69,26 @@ public interface  ExcelParamDao {
      * @param colName
      * @return
      */
+    @ResultMap("ExcelParamMap")
     @Select({"SELECT * FROM ${name} WHERE column_name = #{colName}"})
-    @Results({
-            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER),
-            @Result(column = "field_name", property = "fieldName", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "column_name", property = "columnName", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "data_type", property = "dataType", jdbcType = JdbcType.INTEGER),
-            @Result(column = "tm_param", property = "tmParam", jdbcType = JdbcType.INTEGER)
-    })
+
     List<ExcelParam> getByColName(String name, @Param("colName") String colName);
 
-
+    @ResultMap("ExcelParamMap")
     @Select({"SELECT * FROM ${name}"})
-    @Results({
-            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER),
-            @Result(column = "field_name", property = "fieldName", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "column_name", property = "columnName", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "data_type", property = "dataType", jdbcType = JdbcType.INTEGER),
-            @Result(column = "tm_param", property = "tmParam", jdbcType = JdbcType.INTEGER),
-            @Result(column = "k", property = "k", jdbcType = JdbcType.INTEGER)
-    })
     List<ExcelParam> findTable(String name);
 
 
     @Delete({"DELETE FROM ${name} WHERE id = #{id}"})
-    void deleteById(@Param("name") String name, @Param("id") int id);
+    void deleteByTableNameAndId(@Param("name") String name, @Param("id") int id);
 
+    @Results(
+            id = "FieldNameAndColumnNameMapping",
+            value = {
+                    @Result(column = "field_name", property = "fieldName", jdbcType = JdbcType.VARCHAR),
+                    @Result(column = "column_name", property = "columnName", jdbcType = JdbcType.VARCHAR),
+            })
+    @MapKey("column_name")
+    @Select({"SELECT field_name, column_name FROM ${name}"})
+    Map<String, String> getFieldNameAndColumnNameMapping(String name);
 }

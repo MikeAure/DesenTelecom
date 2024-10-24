@@ -114,7 +114,7 @@ public class LocationUtil {
     private static int spaceTwistClient(List<PointST> input, int k, PointST q, List<PointST> w) {
         PointST qfake = new PointST(Math.random() * HUNDRED, Math.random() * HUNDRED);
         List<PointST> vec = new ArrayList<>(input);
-        Collections.sort(vec, Comparator.comparingDouble(p -> distance1(p, qfake)));
+        vec.sort(Comparator.comparingDouble(p -> distance1(p, qfake)));
 
         int cnt;
         for (cnt = 0; cnt <= k - 1; cnt++) {

@@ -1,10 +1,11 @@
 package com.lu.gademo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.dao.ga.effectEva.SendEvaReqDao;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.LogCollectResult;
+import com.lu.gademo.service.SendEvaReqService;
+import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
 import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import com.lu.gademo.event.LogManagerEvent;
@@ -22,14 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -39,7 +38,6 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +50,7 @@ import java.util.stream.Stream;
 @Service
 @Data
 public class FileServiceImpl implements FileService {
-    private final SendEvaReqDao sendEvaReqDao;
+    private final SendEvaReqService sendEvaReqService;
 
     private AlgorithmsFactory algorithmsFactory;
 
@@ -116,7 +114,7 @@ public class FileServiceImpl implements FileService {
                            Replace replacement, Generalization generalization, Anonymity anonymity,
                            LogSenderManager logSenderManager, Util util, ExcelParamService excelParamService,
                            DpUtil dpUtil, LogCollectUtil logCollectUtil, ApplicationEventPublisher eventPublisher,
-                           SendEvaReqDao sendEvaReqDao,
+                           SendEvaReqService sendEvaReqDao,
                            @Value("${logSenderManager.ifSendToEvaFirst}")
                            Boolean ifSendEvaFirst, FileStorageService fileStorageService,
                            @Value("${logSenderManager.ifPerformenceTest}")
@@ -144,7 +142,7 @@ public class FileServiceImpl implements FileService {
         }
         log.info("rawFileDirectory: " + rawFileDirectory.toAbsolutePath());
         log.info("desenFileDirectory: " + desenFileDirectory.toAbsolutePath());
-        this.sendEvaReqDao = sendEvaReqDao;
+        this.sendEvaReqService = sendEvaReqDao;
         this.objectMapper = new ObjectMapper();
         this.ifSendToEvaFirst = ifSendEvaFirst;
         this.fileStorageService = fileStorageService;
@@ -154,10 +152,10 @@ public class FileServiceImpl implements FileService {
 
     private LogInfo processExcel(FileStorageDetails fileStorageDetails, String params, String sheetName,
                                  Boolean ifSaveExcelParams) throws IOException {
+        String objectMode = "text";
         // 包含不同的流转场景信息
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
-        String objectMode = "text";
 
         // 设置原文件保存路径
         String rawFileName = fileStorageDetails.getRawFileName();
@@ -169,7 +167,6 @@ public class FileServiceImpl implements FileService {
         // 设置脱敏后文件路径信息
         String desenFileName = fileStorageDetails.getDesenFileName();
         Path desenFilePath = fileStorageDetails.getDesenFilePath();
-        log.info(desenFilePath.toAbsolutePath().toString());
         String desenFilePathString = fileStorageDetails.getDesenFilePathString();
 
         // 读取excel文件
@@ -189,24 +186,24 @@ public class FileServiceImpl implements FileService {
                 .map(Cell::toString)
                 .collect(Collectors.toList());
 
-        log.info("表格总列数：{}", columnCount);
+        log.info("总列数：{}", columnCount);
         // 调用脱敏程序处理
-        log.info("开始对表格文件{}进行脱敏", rawFileName);
+        log.info("开始进行脱敏");
         String startTime = util.getTime();
         Map<Integer, List<?>> desenResult = realDealExcel(
                 preprocessSheet(originalSheet, excelParamList, totalRowNum, fieldNameRow, columnCount)
                 ,infoBuilders, excelParamList, totalRowNum, fieldNameRow, columnCount);
         String endTime = util.getTime();
-        log.info("表格文件脱敏结束");
-        log.info("创建新Excel Workbook");
+        log.info("脱敏结束");
+//        log.info("创建新Excel Workbook");
         Workbook targetWorkbook = new XSSFWorkbook();
         Sheet targetSheet = targetWorkbook.createSheet("MaskedSheet");
 
-        log.info("正在写入Excel文件");
+        log.info("正在准备文件");
         for (Map.Entry<Integer, List<?>> entry : desenResult.entrySet()) {
             util.write2Excel(originalSheet, targetSheet, totalRowNum, entry.getKey(), entry.getValue());
         }
-        log.info("Excel文件写入完成");
+        log.info("文件准备完成");
         // 保存处理后的Excel数据到ByteArrayOutputStream中
         // 保存脱敏后文件
         // 脱敏文件路径
@@ -222,7 +219,6 @@ public class FileServiceImpl implements FileService {
         String paramsFilePath = paramDirectory.resolve(paramsFileName).toAbsolutePath().toString();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(paramsFilePath))) {
             for (ExcelParam p : excelParamList) {
-                // 将每个ExcelParam对象转换为字符串并写入文件
                 String line = p.toString();
                 writer.write(line);
                 writer.newLine(); // 换行
@@ -292,7 +288,7 @@ public class FileServiceImpl implements FileService {
         Map<Integer, List<?>> desenResult = new HashMap<>();
         log.info("Total column number is " + columnCount);
         // 调用脱敏程序处理
-        log.info("Start Excel file desen");
+        log.info("Start desen");
         // 脱敏开始时间
         String startTime = util.getTime();
         long startTimePoint = System.nanoTime();
@@ -1271,7 +1267,7 @@ public class FileServiceImpl implements FileService {
         String[] updateFieldList = recEvaResultInv.getDesenFailedColName().split(",");
         log.info("DesenFailedColName {}", recEvaResultInv.getDesenFailedColName());
         log.info("updateFieldList: {}", Arrays.toString(updateFieldList));
-        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
+        SendEvaReq evaReq = sendEvaReqService.findByDesenInfoAfterId(desenInfoAfterID);
         // 字段名列表
         String[] attributeNameList = evaReq.getDesenInfoPreIden().split(",");
         String rawFileName = evaReq.getDesenInfoPre();
@@ -1279,6 +1275,11 @@ public class FileServiceImpl implements FileService {
         String[] desenFileNameList = evaReq.getDesenInfoAfter().split("_");
         String[] desenAlgList = evaReq.getDesenAlg().split(",");
         String[] desenLevelList = evaReq.getDesenLevel().split(",");
+
+        Map<String, Integer> attributeDesenMap = new HashMap<>();
+        for (int i = 0; i < attributeNameList.length; i++) {
+            attributeDesenMap.put(attributeNameList[i], Integer.parseInt(desenLevelList[i]));
+        }
         // 取模板名，根据模板名在数据库中找到相应的算法
         String templateName = evaReq.getFileType() + "_param";
 
@@ -1286,11 +1287,12 @@ public class FileServiceImpl implements FileService {
         List<ExcelParam> resultExcelParam = new ArrayList<>();
         for (int i = 0; i < originExcelParam.size(); i++) {
             ExcelParam excelParamTemp = originExcelParam.get(i);
+            String colName = excelParamTemp.getColumnName();
             // 根据评测结果针对特定字段提升脱敏等级
-            if (Arrays.asList(updateFieldList).contains(excelParamTemp.getColumnName())) {
-                resultExcelParam.add(addDesenLevel(originExcelParam.get(i), desenLevelList[i], true));
+            if (Arrays.asList(updateFieldList).contains(colName)) {
+                resultExcelParam.add(addDesenLevel(excelParamTemp, attributeDesenMap.get(colName), true));
             } else {
-                resultExcelParam.add(addDesenLevel(originExcelParam.get(i), desenLevelList[i], false));
+                resultExcelParam.add(addDesenLevel(excelParamTemp, attributeDesenMap.get(colName), false));
             }
         }
         // 将脱敏参数转为字符串，方便接口复用
@@ -1333,7 +1335,7 @@ public class FileServiceImpl implements FileService {
         RecEvaResultInv recEvaResultInv = event.getRecEvaResultInv();
         LogManagerEvent logManagerEvent = event.getLogManagerEvent();
         String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
-        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
+        SendEvaReq evaReq = sendEvaReqService.findByDesenInfoAfterId(desenInfoAfterID);
         // 字段名列表
         String rawFileName = evaReq.getDesenInfoPre();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
@@ -1388,7 +1390,7 @@ public class FileServiceImpl implements FileService {
         RecEvaResultInv recEvaResultInv = event.getRecEvaResultInv();
         LogManagerEvent logManagerEvent = event.getLogManagerEvent();
         String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
-        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
+        SendEvaReq evaReq = sendEvaReqService.findByDesenInfoAfterId(desenInfoAfterID);
         // 字段名列表
         String rawFileName = evaReq.getDesenInfoPre();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
@@ -1451,7 +1453,7 @@ public class FileServiceImpl implements FileService {
         RecEvaResultInv recEvaResultInv = event.getRecEvaResultInv();
         LogManagerEvent logManagerEvent = event.getLogManagerEvent();
         String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
-        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
+        SendEvaReq evaReq = sendEvaReqService.findByDesenInfoAfterId(desenInfoAfterID);
         // 字段名列表
         String rawFileName = evaReq.getDesenInfoPre();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
@@ -1515,7 +1517,7 @@ public class FileServiceImpl implements FileService {
         RecEvaResultInv recEvaResultInv = event.getRecEvaResultInv();
         LogManagerEvent logManagerEvent = event.getLogManagerEvent();
         String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
-        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
+        SendEvaReq evaReq = sendEvaReqService.findByDesenInfoAfterId(desenInfoAfterID);
         // 字段名列表
         String rawFileName = evaReq.getDesenInfoPre();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
@@ -1579,7 +1581,7 @@ public class FileServiceImpl implements FileService {
         RecEvaResultInv recEvaResultInv = event.getRecEvaResultInv();
         LogManagerEvent logManagerEvent = event.getLogManagerEvent();
         String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
-        SendEvaReq evaReq = sendEvaReqDao.findByDesenInfoAfterId(desenInfoAfterID);
+        SendEvaReq evaReq = sendEvaReqService.findByDesenInfoAfterId(desenInfoAfterID);
         // 字段名列表
         String rawFileName = evaReq.getDesenInfoPre();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
@@ -1809,12 +1811,10 @@ public class FileServiceImpl implements FileService {
                     }
                     // 日期类型
                     if (excelParam.getDataType() == 4) {
-//                        objs.add(dataFormatter.formatCellValue(cell));
                         switch (cell.getCellType()) {
                             case STRING:
                                 // 如果单元格是字符串类型，尝试解析为日期
                                 String dateString = cell.getStringCellValue();
-//                                log.info("Date String: " + dateString);
                                 java.util.Date date = dateParseUtil.parseDate(dateString);
                                 if (date != null) {
                                     String formattedDate = sdf.format(date);
@@ -1908,7 +1908,7 @@ public class FileServiceImpl implements FileService {
 
             int algoNum = excelParam.getK();
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(algoNum);
-            log.info("Excel Param: {}", excelParam);
+//            log.info("Excel Param: {}", excelParam);
             addDataTypeAndInfoIden(infoBuilders, excelParam, columnName, algoNum);
             // 取列数据
             List<Object> objs = preprocessedData.get(columnIndex);
@@ -1927,8 +1927,8 @@ public class FileServiceImpl implements FileService {
         double singleCellTime = everyColumnTime / totalRowNum;
         double cellsInOneSecond = 1000 / singleCellTime;
 
-        log.info("脱敏表格精确总用时：{} ms", endTimePoint - startTimePoint);
-        log.info("脱敏表格每列用时：{} ms", everyColumnTime);
+        log.info("脱敏精确总用时：{} ms", endTimePoint - startTimePoint);
+        log.info("脱敏每列用时：{} ms", everyColumnTime);
         log.info("每秒钟可脱敏单元格数量：{}", cellsInOneSecond);
         return desenResult;
 
@@ -2378,7 +2378,7 @@ public class FileServiceImpl implements FileService {
 
         // 一秒数据量
         log.info("Number of dealt data per second:" + 10e9 / oneTime);
-        log.info("Excel desen finished");
+        log.info("Desen finished");
 
         // 保存处理后的Excel数据到ByteArrayOutputStream中
         // 保存脱敏后文件
@@ -3072,7 +3072,7 @@ public class FileServiceImpl implements FileService {
         int columnCount = fieldRow.getPhysicalNumberOfCells(); // 获取列数
         log.info("Total column number is " + columnCount);
         // 调用脱敏程序处理
-        log.info("Start Excel file desen");
+        log.info("Start file desen");
         // 脱敏开始时间
         String startTime = util.getTime();
         long startTimePoint = System.nanoTime();
@@ -3302,7 +3302,7 @@ public class FileServiceImpl implements FileService {
         log.info("Single data running time：" + oneTime + " ns");
         // 一秒数据量
         log.info("Number of dealt data per second:" + 1e9 / oneTime);
-        log.info("Excel desen finished");
+        log.info("Desen finished");
 
         // 保存处理后的Excel数据到outputStream中
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -3363,7 +3363,9 @@ public class FileServiceImpl implements FileService {
             logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_PLAIN);
-            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+//            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
+//            headers.setContentDisposition(ContentDisposition.attachment().filename(desenFileName).build());
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + desenFileName);
             responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
         }
         // 在此处等待响应返回
@@ -3978,8 +3980,8 @@ public class FileServiceImpl implements FileService {
      * @param ifUpdateDesenLevel
      * @return
      */
-    private ExcelParam addDesenLevel(ExcelParam originalExcelParam, String desenLevel, Boolean ifUpdateDesenLevel) {
-        int desenLevelNum = Integer.parseInt(desenLevel);
+    private ExcelParam addDesenLevel(ExcelParam originalExcelParam, int desenLevel, Boolean ifUpdateDesenLevel) {
+        int desenLevelNum = desenLevel;
         if (ifUpdateDesenLevel) {
             if (desenLevelNum != 3) {
                 desenLevelNum += 1;

@@ -57,10 +57,18 @@ spring:
     thymeleaf:
         cache: false
         encoding: UTF-8
-        mode: ftl
+        servlet:
+            content-type: text/html
+
 mybatis:
     configuration:
         log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+pagehelper:
+    reasonable: true
+    page-size-zero: true
+    support-methods-arguments: true
+
 server:
     port: 8352
 
@@ -110,9 +118,6 @@ evidenceSystem:
         msgVersion: '0x3110'
         subCommand: '0x0031'
 
-socketrecv:
-    port: 10008
-
 systemId:
     desenToolsetSystemId: '0x31000000'
     evaluationSystemId: '0x32000000'
@@ -127,10 +132,21 @@ logSenderManager:
 
 fetch:
     database:
-        task:
-            enabled: true
+        dataPlatformTask:
+            enabled: false
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
+        jdPlatformTask:
+            enabled: false
+            initialDelay: 5000   # 初始延迟时间（毫秒）
+            fixedRate: 180000    # 间隔时间（毫秒）
+            localTableName: meeting_datatable_copy1
+            localTargetTableName: meeting_datatable_desen_copy1
+            jdTableName: t_userinfo
+            jdTargetTableName: t_userinfo_desen
+        pageSize:
+            localDatabase: 50000
+            jdDatabase: 50000
 course2:
     host: 172.28.72.218
     username: root

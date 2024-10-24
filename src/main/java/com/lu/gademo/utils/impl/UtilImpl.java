@@ -2,6 +2,7 @@ package com.lu.gademo.utils.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
 import com.lu.gademo.utils.Util;
 import freemarker.template.SimpleDate;
 import lombok.extern.slf4j.Slf4j;
@@ -13,21 +14,21 @@ import org.bouncycastle.util.encoders.Hex;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.*;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component

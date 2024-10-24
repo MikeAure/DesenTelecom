@@ -6,7 +6,7 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.lu.gademo.entity.ExcelParam;
-import com.lu.gademo.entity.Meeting;
+import com.lu.gademo.entity.ga.Meeting;
 import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.utils.AlgorithmsFactory;
 import com.lu.gademo.utils.DSObject;

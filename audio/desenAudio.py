@@ -1,14 +1,14 @@
-
+import librosa
+import numpy
 import os
+import random
+import soundfile as sf
 import sys
 import time
+from audiomentations import Compose, Gain
 from pydub import AudioSegment
 from pydub.generators import Sine
-import librosa
-from audiomentations import Compose, Gain
-import soundfile as sf
-import numpy
-import random
+
 
 def dpAudio(file_path, newFilePath, budget):
     # 文件名(含后缀）
@@ -77,10 +77,10 @@ def replace_voice_print(file_path, template_file, newFilePath):
     tp_lists = [extract_voiceprint(template_file, sr=16000).squeeze(dim=0).tolist()]
     with open(vector, 'w+') as file:
         file.write(str(vp_lists))
-    
+
     with open(template_vector, 'w+') as file:
         file.write(str(tp_lists))
-    
+
     # 预处理
     preprocess(template_vector, processed_template_vector)
 
@@ -100,7 +100,7 @@ def replace_voice_print(file_path, template_file, newFilePath):
     end_time = time.perf_counter()
     execution_time_ms = (end_time - start_time) * 1000
     print("Process execution time (ms): ", execution_time_ms)
-    
+
 
 def replace_voice_print_fixed(file_path, newFilePath):
     # 文件名(含后缀）
@@ -127,10 +127,10 @@ def replace_voice_print_fixed(file_path, newFilePath):
     # tp_lists = [extract_voiceprint(template_file, sr=16000).squeeze(dim=0).tolist()]
     with open(vector, 'w+') as file:
         file.write(str(vp_lists))
-    
+
     # with open(template_vector, 'w+') as file:
     #     file.write(str(tp_lists))
-    
+
     # 预处理
     # preprocess(template_vector, processed_template_vector)
 
@@ -150,8 +150,8 @@ def replace_voice_print_fixed(file_path, newFilePath):
     end_time = time.perf_counter()
     execution_time_ms = (end_time - start_time) * 1000
     print("Process execution time (ms): ", execution_time_ms)
-    
-    
+
+
 def add_beep(input_file, input_format, output_file, output_format, start_time_sec, duration_sec, beep_frequency=1000):
     # Load the input audio file
     audio = AudioSegment.from_file(input_file, format=input_format)
@@ -193,6 +193,7 @@ def apply_audio_effects(input_file, output_file, n_steps, rate, min_gain_db, max
     augmented_signal = transform(samples=augmented_signal, sample_rate=int(sample_rate))
     sf.write(output_file, augmented_signal, sample_rate)
 
+
 def audio_reshuffle(audio, output_path, block_num):
     wave_form, sample_rate = librosa.load(audio)
     waveform_splits = numpy.array_split(wave_form, block_num)
@@ -221,6 +222,7 @@ if __name__ == '__main__':
         from myDP import *
         from myStart2 import *
         from mystt1 import *
+
         dpAudio(file_path, newFilePath, budget)
     elif algName == "add_beep":
         dealTime = int(sys.argv[5])
@@ -233,7 +235,8 @@ if __name__ == '__main__':
         from myDP import *
         from myStart2 import *
         from mystt1 import *
-        replace_voice_print_fixed(file_path, newFilePath)       
+
+        replace_voice_print_fixed(file_path, newFilePath)
     elif algName == "apply_audio_effects":
         effects_param = [(-3, 0.7, -5, 5), (2, 0.8, -10, 10), (5, 0.9, -20, 20)][param]
         apply_audio_effects(file_path, newFilePath, *effects_param)
@@ -242,20 +245,15 @@ if __name__ == '__main__':
         block = [5, 10, 15][int(sys.argv[5])]
         # block = int(sys.argv[5])
         audio_reshuffle(file_path, newFilePath, block)
-    
+
     # from myextraction import *
     # from myDP import *
     # from myStart2 import *
     # from mystt1 import *
-    
+
     # # dpAudio("D:\\Programming\\Desen\\raw_files\\1710382610951audiotest.wav", 
     # #         "D:\\Programming\\Desen\\desen_files\\desen_1710382610951audiotest.wav", 
     # #         0.5)
 
     # replace_voice_print_fixed("D:\\Programming\\Desen\\raw_files\\17127445577770001.wav", 
     #                   "D:\\Programming\\Desen\\desen_files\\desen_17127445577770001.wav")
-
-
-
-
-
