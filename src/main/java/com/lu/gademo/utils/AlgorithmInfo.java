@@ -1,12 +1,15 @@
 package com.lu.gademo.utils;
 
-import lombok.Data;
+import lombok.*;
+
 import java.util.List;
 
 /**
  * 算法信息类，用于存储算法的相关信息，方便调用统一接口
  */
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class AlgorithmInfo {
     // 算法名称
     private String name;

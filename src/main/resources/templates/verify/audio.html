@@ -178,35 +178,43 @@
 
     <!-- 自定义js -->
     <script th:src="@{/js/content.js?v=1.0.0}"></script>
-    <script type="text/javascript">
-        let defaultOption = 'dpAudio'; // 预设的默认选项
+    <script type="text/javascript" th:inline="javascript">
+        let defaultOption = [[${defaultAlgName}]];
+
+        // let defaultOption = 'dpAudio'; // 预设的默认选项
         document.addEventListener('DOMContentLoaded', function () {
             let selectElement = document.getElementById('distortionAudioAlgName');
-            fetch('/toolset/getDefaultSelection?toolsetName=' + 'audio')
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to fetch');
-                    }
-                })
-                .then(data => {
-                    if (data.code === 200 && data.data) {
-                        setDefaultOption(data.data);
-                        defaultOption = data.data;
-                        if (defaultOption === "voice_replace") {
-                            document.getElementById("privacyLevel").style.display = "none";
-                        } else {
-                            document.getElementById("privacyLevel").style.display = "block";
-                        }
-                    } else {
-                        setDefaultOption(defaultOption);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    setDefaultOption(defaultOption);
-                });
+            setDefaultOption(defaultOption);
+            if (defaultOption === "voice_replace") {
+                document.getElementById("privacyLevel").style.display = "none";
+            } else {
+                document.getElementById("privacyLevel").style.display = "block";
+            }
+            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'audio')
+            //     .then(response => {
+            //         if (response.ok) {
+            //             return response.json();
+            //         } else {
+            //             throw new Error('Failed to fetch');
+            //         }
+            //     })
+            //     .then(data => {
+            //         if (data.code === 200 && data.data) {
+            //             setDefaultOption(data.data);
+            //             defaultOption = data.data;
+            //             if (defaultOption === "voice_replace") {
+            //                 document.getElementById("privacyLevel").style.display = "none";
+            //             } else {
+            //                 document.getElementById("privacyLevel").style.display = "block";
+            //             }
+            //         } else {
+            //             setDefaultOption(defaultOption);
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         setDefaultOption(defaultOption);
+            //     });
 
             function setDefaultOption(value) {
                 selectElement.value = value;
@@ -261,6 +269,7 @@
                 document.getElementById("pre").innerHTML = "";
                 // 清空文件控件中的文件
                 document.getElementById("fileUpload").value = "";
+                document.getElementById("fileInfo").innerHTML = "";
 
                 // 失真算法名
                 let distortionAudioAlgName = document.getElementById("distortionAudioAlgName").value;
@@ -458,7 +467,7 @@
 
                 if (audioType.includes(fileExtension)) {
                     // 文件名，扩展名
-                    document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                    document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 15px; text-align: center\"> <span>" +
                         "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
                     const fileExtension = fileName.split(".").pop().toLowerCase();
                     displayAudio()
@@ -493,188 +502,184 @@
 </head>
 <body>
 <div class="wrapper wrapper-content">
-
-    <div class="col-sm-12">
-        <div class="tabs-container">
-            <ul id="tab-type" class="nav nav-tabs" style="left: 50%; font-size: 20px;">
-                <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">失真</a>
-                </li>
-                <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">非失真</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div id="tab-1" class="tab-pane active" style="text-align: center;">
-                    <div>
-                        <table style="margin: auto; font-size: 20px">
-                            <thead>
-                            <tr>
-                                <th>请选择音频失真脱敏算法</th>
-                            </tr>
-                            </thead>
-                            <tbody id="table1">
-                            <tr>
-                                <td><select id="distortionAudioAlgName">
-                                    <!--                                        <option th:value="${algoInfo.value}" th:selected="${algoInfo.value eq defaultOption}"-->
-                                    <!--                                                th:each="algoInfo : ${distortionAudioAlgoList}"-->
-                                    <!--                                                th:text="${algoInfo.name}"></option>-->
-                                    <option value="dpAudio">差分-基于差分隐私的声纹特征脱敏算法</option>
-                                    <option value="voice_replace">置换-声纹替换算法</option>
-                                    <option value="apply_audio_effects">置换-音频变形</option>
-                                    <option value="audio_reshuffle">置换-音频重排</option>
-                                    <option value="audio_floor">泛化-音频取整</option>
-                                    <option value="audio_spec">泛化-频域遮掩</option>
-                                    <option value="audio_augmentation">泛化-音频失真</option>
-                                    <option value="audio_median">泛化-基于均值的采样点替换</option>
-                                </select></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="privacyLevel" style="text-align: center; ">
-                        <div>
-                            <table style="margin: auto; font-size: 20px">
-                                <thead>
-                                <tr>
-                                    <th>请选择隐私保护等级</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table3">
-                                <tr>
-                                    <td><select id="distortionaudio_privacyLevel">
-                                        <option value="0"> 低程度</option>
-                                        <option value="1" selected> 中程度</option>
-                                        <option value="2"> 高程度</option>
-                                    </select></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!--                     <div class="ibox-content" id="audioTime" style="text-align: center; display: none">-->
-                    <!--                         <div style=" font-size: 20px">-->
-                    <!--                             <form>&ndash;&gt;-->
-                    <!--                                 <label for="start">开始时间:</label>-->
-                    <!--                                 <input type="text" id="start" name="input1" placeholder="单位：秒">-->
-                    <!--                                 <label for="chixu">持续时间:</label>-->
-                    <!--                                 <input type="text" id="chixu" name="input2" placeholder="单位：秒">-->
-                    <!--                             </form>-->
-                    <!--                         </div>-->
-                    <!--                     </div>-->
-
-                    <input type="file" id="fileUpload" accept=".mp3, .wav" style="display: none;">
-                    <label for="fileUpload" class="upload-btn">
-                        选择文件
-                    </label>
-
-                    <div id="fileInfo"></div>
-
-
-                    <div class="btn2">
-                        <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
-                        <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm">
-                            设置当前算法为默认算法
-                        </button>
-                    </div>
-                    <div class="row m-t">
-                        <!--前后文件-->
-                        <!--                        <div class="ibox col-sm-offset2 col-sm-4">-->
-                        <div class="col-sm-4 col-sm-offset-2">
-                            <div class="ibox float-e-margins" style="min-height:50px">
-                                <div class="ibox-title">
-                                    <h5>脱敏前文件</h5>
-                                </div>
-                                <div class="ibox-content">
-                                    <div id=pre>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="tabs-container">
+                <ul id="tab-type" class="nav nav-tabs" style="left: 50%; font-size: 20px;">
+                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">失真</a>
+                    </li>
+                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">非失真</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane active">
+                        <div class="panel-body">
+                            <form role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="distortionAudioAlgName">
+                                        请选择音频失真脱敏算法
+                                    </label>
+                                    <div class="col-lg-3">
+                                        <select class=" form-control" name="distortionAudioAlgName"
+                                                id="distortionAudioAlgName">
+                                            <option value="dpAudio">差分-基于差分隐私的声纹特征脱敏算法</option>
+                                            <option value="voice_replace">置换-声纹替换算法</option>
+                                            <option value="apply_audio_effects">置换-音频变形</option>
+                                            <option value="audio_reshuffle">置换-音频重排</option>
+                                            <option value="audio_floor">泛化-音频取整</option>
+                                            <option value="audio_spec">泛化-频域遮掩</option>
+                                            <option value="audio_augmentation">泛化-音频失真</option>
+                                            <option value="audio_median">泛化-基于均值的采样点替换</option>
+                                        </select>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="ibox float-e-margins" style="min-height:50px">
-                                <div class="ibox-title">
-                                    <h5>脱敏后文件</h5>
-                                </div>
-                                <div class="ibox-content">
-                                    <div id=after>
+
+                                <div class="form-group" id="privacyLevel">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label"
+                                           for="distortionaudio_privacyLevel">请选择隐私保护等级</label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" name="distortionaudio_privacyLevel"
+                                                id="distortionaudio_privacyLevel">
+                                            <option value="0"> 低程度</option>
+                                            <option value="1" selected> 中程度</option>
+                                            <option value="2"> 高程度</option>
+                                        </select>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="tab-2" class="tab-pane" style="text-align: center;">
-                    <div>
-                        <table style="margin: auto; font-size: 20px">
-                            <thead>
-                            <tr>
-                                <th>请选择音频非失真脱敏算法</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <select id="audio-nondistortion">
-                                        <option value="voice-similarity" selected> 密文声纹相似度计算</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="audio-match" class="content-container" style="visibility: visible">
-                        <div class="section" id="registration">
-                            <h2>用户注册</h2>
-                            <div class="section-box">
-                                <label for="registerUsername">用户名:</label>
-                                <input type="text" id="registerUsername" name="username">
-                                <label for="fileUpload">选择文件:</label>
-                                <input type="text" id="registerFilePath" placeholder="文件路径" readonly>
-                                <input type="file" id="registerFileSelector" accept=".mp3, .wav"
-                                       style="display:none"
-                                       onchange="document.getElementById('registerFilePath').value = this.value">
-                                <label for="registrationMessage">消息:</label>
-                                <textarea id="registrationMessage" rows="4" readonly></textarea>
-                                <div class="buttons">
-                                    <button type="button" id="register-button">注册</button>
-                                    <button type="button" class="audio-match-button"
-                                            onclick="document.getElementById('registerFileSelector').click();">
+
+                                <div class="form-group text-center">
+                                    <input type="file" id="fileUpload" accept=".mp3, .wav" style="display: none;">
+                                    <label for="fileUpload" class="btn btn-white">
                                         选择文件
-                                    </button>
-
-                                    <button class="m-l" type="button" id="download-encrypted-voice">
-                                        下载加密后的声纹模板
-                                    </button>
+                                    </label>
                                 </div>
 
-                            </div>
+                                <div id="fileInfo"></div>
+
+                                <div class="form-group text-center">
+                                    <button type="button" class="btn btn-primary" id="submit"> 提交脱敏</button>
+                                    <button type="button" class="btn btn-primary m-l" id="setDefaultAlgorithm">
+                                        设置当前算法为默认算法
+                                    </button>
+                                </div>
+                            </form>
+
+                                <div class="row m-t">
+                                    <!--前后文件-->
+                                    <!--                        <div class="ibox col-lg-offset2 col-lg-4">-->
+                                    <div class="col-lg-4 col-lg-offset-2">
+                                        <div class="panel panel-info">
+                                            <div class="panel-heading">
+                                                脱敏前文件
+                                            </div>
+                                            <div class="panel-body">
+                                                <div id=pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="panel panel-success">
+                                            <div class="panel-heading">
+                                                脱敏后文件
+                                            </div>
+                                            <div class="panel-body">
+                                                <div id=after>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
-                        <div class="section" id="login">
-                            <h2>用户登录</h2>
-                            <div class="section-box">
-                                <label for="loginUsername">用户名:</label>
-                                <input type="text" id="loginUsername" name="loginUsername">
-                                <label for="loginFilePath">选择文件:</label>
-                                <input type="text" id="loginFilePath" placeholder="文件路径" readonly>
-                                <input type="file" id="loginFileSelector" accept=".mp3, .wav"
-                                       style="display:none"
-                                       onchange="document.getElementById('loginFilePath').value = this.value">
-                                <label for="loginMessage">消息:</label>
-                                <textarea id="loginMessage" rows="4" readonly></textarea>
-                                <div class="buttons">
-                                    <button type="button" id="login-button">登录</button>
-                                    <button type="button" class="audio-match-button"
-                                            onclick="document.getElementById('loginFileSelector').click();">选择文件
-                                    </button>
+                    </div>
+                    <div id="tab-2" class="tab-pane" style="text-align: center;">
+                        <div class="panel-body">
+                            <form role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="audio-nondistortion">
+                                        请选择音频非失真脱敏算法
+                                    </label>
+                                    <div class="col-lg-2">
+                                        <select class=" form-control" name="audio-nondistortion"
+                                                id="audio-nondistortion">
+                                            <option value="voice-similarity" selected> 密文声纹相似度计算</option>
+                                        </select>
+                                    </div>
                                 </div>
+<!--                            <div>-->
+<!--                                <table style="margin: auto; font-size: 20px">-->
+<!--                                    <thead>-->
+<!--                                    <tr>-->
+<!--                                        <th>请选择音频非失真脱敏算法</th>-->
+<!--                                    </tr>-->
+<!--                                    </thead>-->
+<!--                                    <tbody>-->
+<!--                                    <tr>-->
+<!--                                        <td>-->
+<!--                                            <select id="audio-nondistortion">-->
+<!--                                                <option value="voice-similarity" selected> 密文声纹相似度计算</option>-->
+<!--                                            </select>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    </tbody>-->
+<!--                                </table>-->
+<!--                            </div>-->
+                            <div id="audio-match" class="content-container" style="visibility: visible">
+                                <div class="section" id="registration">
+                                    <h2>用户注册</h2>
+                                    <div class="section-box">
+                                        <label for="registerUsername">用户名:</label>
+                                        <input type="text" id="registerUsername" name="username">
+                                        <label for="fileUpload">选择文件:</label>
+                                        <input type="text" id="registerFilePath" placeholder="文件路径" readonly>
+                                        <input type="file" id="registerFileSelector" accept=".mp3, .wav"
+                                               style="display:none"
+                                               onchange="document.getElementById('registerFilePath').value = this.value">
+                                        <label for="registrationMessage">消息:</label>
+                                        <textarea id="registrationMessage" rows="4" readonly></textarea>
+                                        <div class="buttons">
+                                            <button type="button" id="register-button">注册</button>
+                                            <button type="button" class="audio-match-button"
+                                                    onclick="document.getElementById('registerFileSelector').click();">
+                                                选择文件
+                                            </button>
 
+                                            <button class="m-l" type="button" id="download-encrypted-voice">
+                                                下载加密后的声纹模板
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="section" id="login">
+                                    <h2>用户登录</h2>
+                                    <div class="section-box">
+                                        <label for="loginUsername">用户名:</label>
+                                        <input type="text" id="loginUsername" name="loginUsername">
+                                        <label for="loginFilePath">选择文件:</label>
+                                        <input type="text" id="loginFilePath" placeholder="文件路径" readonly>
+                                        <input type="file" id="loginFileSelector" accept=".mp3, .wav"
+                                               style="display:none"
+                                               onchange="document.getElementById('loginFilePath').value = this.value">
+                                        <label for="loginMessage">消息:</label>
+                                        <textarea id="loginMessage" rows="4" readonly></textarea>
+                                        <div class="buttons">
+                                            <button type="button" id="login-button">登录</button>
+                                            <button type="button" class="audio-match-button"
+                                                    onclick="document.getElementById('loginFileSelector').click();">选择文件
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
-
     </div>
-
+</div>
 </body>
 </html>

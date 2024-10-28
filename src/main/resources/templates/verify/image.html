@@ -2,14 +2,14 @@
 <html lang="ch" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Insert title here</title>
-    <link th:href="@{favicon.ico}" rel="shortcut icon" />
+    <title>Image Tool</title>
+    <link th:href="@{favicon.ico}" rel="shortcut icon"/>
     <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet"/>
     <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet"/>
     <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet"/>
     <link th:href="@{/css/animate.css}" rel="stylesheet"/>
     <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css"/>
-    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css"/>
     <link th:href="@{/css/style.css?v=4.1.0}" rel="stylesheet"/>
     <!-- 全局js -->
     <script th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
@@ -26,75 +26,130 @@
     <script th:src="@{/js/multiple-select.min.js}"></script>
     <!-- 自定义js -->
     <script th:src="@{/js/content.js?v=1.0.0}"></script>
-    <script type="text/javascript">
-        let defaultOption = 'meanValueImage'; // 预设的默认选项
-        document.addEventListener('DOMContentLoaded', function() {
-            let privacy_level = document.getElementById("privacyLevel");
+    <script type="text/javascript" th:inline="javascript">
+        let defaultOption = [[${defaultAlgName}]];
+        // let defaultOption = 'meanValueImage'; // 预设的默认选项
+        document.addEventListener('DOMContentLoaded', function () {
+            let privacyLevelBlock = document.getElementById("privacyLevel");
             let uploadForm = document.getElementById("uploadForm");
             let facesubUploadControlGroup = document.getElementById("facesub-upload");
+            let twoImgsBlock = document.getElementById("twoImgs");
+            let threeImgsBlock = document.getElementById("threeImgs");
             let submitBtn = $("#submit");
             // 失真算法选择控件
             let selectedAlgoName = document.getElementById('algonames');
-            fetch('/toolset/getDefaultSelection?toolsetName=' + 'image')
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to fetch');
-                    }
-                })
-                .then(data => {
-                    if (data.code === 200 && data.message) {
-                        setDefaultOption(data.data);
-                        defaultOption = data.data;
 
-                        if ($("ul .active").index() === 0) {
-                            switch (defaultOption) {
-                                case "image_face_sub":
-                                    console.log("image_face_sub");
-                                    privacy_level.style.display = "none";
-                                    facesubUploadControlGroup.style.display = "block";
-                                    uploadForm.style.display = "none";
-                                    // submitBtn.removeEventListener("click", submitOriginMethod);
-                                    submitBtn.off("click").on("click", () => {
-                                        imageFaceSubUpload();
-                                    });
-                                    break;
-                                case "image_exchange_channel":
-                                    privacy_level.style.display = "none";
-                                    facesubUploadControlGroup.style.display = "none";
-                                    uploadForm.style.display = "block";
-                                    submitBtn.off("click").on("click", () => {
-                                        submitOriginMethod();
-                                    });
-                                    break;
-                                default:
-                                    privacy_level.style.display = "block";
-                                    facesubUploadControlGroup.style.display = "none";
-                                    uploadForm.style.display = "block";
-                                    submitBtn.off("click").on("click", () => {
-                                        submitOriginMethod();
-                                    });
-                                    break;
-                            }
-                        } else {
-                            // privacy_level.style.display = "none";
-                            facesubUploadControlGroup.style.display = "none";
-                            uploadForm.style.display = "block";
-                            document.getElementById("algonames").value = defaultOption;
-                            submitBtn.off("click").on("click", () => {
-                                submitOriginMethod();
-                            });
-                        }
-                    } else {
-                        setDefaultOption(defaultOption);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("获取默认算法失败");
-                    setDefaultOption(defaultOption);
+            setDefaultOption(defaultOption);
+            if ($("ul .active").index() === 0) {
+                switch (defaultOption) {
+                    case "image_face_sub":
+                        console.log("image_face_sub");
+                        privacyLevelBlock.style.display = "none";
+                        facesubUploadControlGroup.style.display = "block";
+                        uploadForm.style.display = "none";
+                        twoImgsBlock.style.display = "none";
+                        threeImgsBlock.style.display = "block";
+                        // submitBtn.removeEventListener("click", submitOriginMethod);
+                        submitBtn.off("click").on("click", () => {
+                            imageFaceSubUpload();
+                        });
+                        break;
+                    case "image_exchange_channel":
+                        privacyLevelBlock.style.display = "none";
+                        facesubUploadControlGroup.style.display = "none";
+                        uploadForm.style.display = "block";
+                        twoImgsBlock.style.display = "block";
+                        threeImgsBlock.style.display = "none";
+                        submitBtn.off("click").on("click", () => {
+                            originSubmitMethod();
+                        });
+                        break;
+                    default:
+                        privacyLevelBlock.style.display = "block";
+                        facesubUploadControlGroup.style.display = "none";
+                        uploadForm.style.display = "block";
+                        twoImgsBlock.style.display = "block";
+                        threeImgsBlock.style.display = "none";
+                        submitBtn.off("click").on("click", () => {
+                            originSubmitMethod();
+                        });
+                        break;
+                }
+            } else {
+                // privacy_level.style.display = "none";
+                facesubUploadControlGroup.style.display = "none";
+                uploadForm.style.display = "block";
+                document.getElementById("algonames").value = defaultOption;
+                submitBtn.off("click").on("click", () => {
+                    originSubmitMethod();
                 });
+            }
+            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'image')
+            //     .then(response => {
+            //         if (response.ok) {
+            //             return response.json();
+            //         } else {
+            //             throw new Error('Failed to fetch');
+            //         }
+            //     })
+            //     .then(data => {
+            //         if (data.code === 200 && data.message) {
+            //             setDefaultOption(data.data);
+            //             defaultOption = data.data;
+            //
+            //             if ($("ul .active").index() === 0) {
+            //                 switch (defaultOption) {
+            //                     case "image_face_sub":
+            //                         console.log("image_face_sub");
+            //                         privacyLevelBlock.style.display = "none";
+            //                         facesubUploadControlGroup.style.display = "block";
+            //                         uploadForm.style.display = "none";
+            //                         twoImgsBlock.style.display = "none";
+            //                         threeImgsBlock.style.display = "block";
+            //                         // submitBtn.removeEventListener("click", submitOriginMethod);
+            //                         submitBtn.off("click").on("click", () => {
+            //                             imageFaceSubUpload();
+            //                         });
+            //                         break;
+            //                     case "image_exchange_channel":
+            //                         privacyLevelBlock.style.display = "none";
+            //                         facesubUploadControlGroup.style.display = "none";
+            //                         uploadForm.style.display = "block";
+            //                         twoImgsBlock.style.display = "block";
+            //                         threeImgsBlock.style.display = "none";
+            //                         submitBtn.off("click").on("click", () => {
+            //                             originSubmitMethod();
+            //                         });
+            //                         break;
+            //                     default:
+            //                         privacyLevelBlock.style.display = "block";
+            //                         facesubUploadControlGroup.style.display = "none";
+            //                         uploadForm.style.display = "block";
+            //                         twoImgsBlock.style.display = "block";
+            //                         threeImgsBlock.style.display = "none";
+            //                         submitBtn.off("click").on("click", () => {
+            //                             originSubmitMethod();
+            //                         });
+            //                         break;
+            //                 }
+            //             } else {
+            //                 // privacy_level.style.display = "none";
+            //                 facesubUploadControlGroup.style.display = "none";
+            //                 uploadForm.style.display = "block";
+            //                 document.getElementById("algonames").value = defaultOption;
+            //                 submitBtn.off("click").on("click", () => {
+            //                     originSubmitMethod();
+            //                 });
+            //             }
+            //         } else {
+            //             setDefaultOption(defaultOption);
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         alert("获取默认算法失败");
+            //         setDefaultOption(defaultOption);
+            //     });
 
             function setDefaultOption(value) {
                 selectedAlgoName.value = value;
@@ -102,14 +157,19 @@
         });
 
         window.onload = function () {
-            let preArea = document.getElementById("pre");
-            let afterArea = document.getElementById("after");
-            let replaceResultArea = document.getElementById("replace-result");
+            let preArea = document.getElementById("preImg");
+            let afterArea = document.getElementById("afterImg");
             let selectedAlgoName = document.getElementById('algonames');
+            let twoImgsBlock = document.getElementById("twoImgs");
+            let threeImgsBlock = document.getElementById("threeImgs");
+            // 用于展示换脸算法的图片区域
+            let preImg3 = document.getElementById("preImg3");
+            let midImg3 = document.getElementById("midImg3");
+            let replaceResultImg3 = document.getElementById("replaceResultImg3");
 
             let submitBtn = $("#submit");
             submitBtn.off("click").on("click", () => {
-                submitOriginMethod();
+                originSubmitMethod();
             });
             // 非换脸算法的文件上传入口
             const originalFileUpload = document.getElementById("fileUpload");
@@ -118,16 +178,16 @@
             const faceSrc = document.getElementById("image_face_sub_src_fileupload");
             // 换脸目标
             const faceTarget = document.getElementById("image_face_sub_target_fileupload");
-            let privacy_level = document.getElementById("privacyLevel");
+            let privacyLevel = document.getElementById("privacyLevel");
             let uploadForm = document.getElementById("uploadForm");
-            let facesubUploadControlGroup = document.getElementById("facesub-upload");
+            let faceSubUploadControlGroup = document.getElementById("facesub-upload");
 
             $("#downloadEigenvector").hide();
 
             $("#image_face_sub_src_fileupload")
                 .on("change", function (event) {
                     // 清空
-                    document.getElementById("pre").innerHTML = "";
+                    revokeImage(preImg3);
                     // document.getElementById("video_remove_bg_img").innerHTML = "";
                     const imageType = ["jpg", "jpeg", "png"];
                     //读取文件
@@ -139,17 +199,11 @@
                         console.log(fileExtension);
 
                         if (imageType.includes(fileExtension)) {
-                            let input = document.getElementById(
-                                "image_face_sub_src_fileupload"
-                            );
-                            let pre = document.getElementById("pre");
-                            let file = input.files[0];
+                            let file = faceSrc.files[0];
                             let reader = new FileReader();
                             reader.readAsDataURL(file);
                             reader.onload = function (e) {
-                                let img = new Image();
-                                img.src = e.target.result;
-                                pre.appendChild(img);
+                                preImg3.src = e.target.result;
                             };
                         }
                     }
@@ -158,7 +212,7 @@
             $("#image_face_sub_target_fileupload")
                 .on("change", function (event) {
                     // 清空
-                    afterArea.innerHTML = "";
+                    revokeImage(midImg3);
                     // 图片格式
                     const imageType = ["jpg", "jpeg", "png"];
                     //读取文件
@@ -170,17 +224,11 @@
                         console.log(fileExtension);
 
                         if (imageType.includes(fileExtension)) {
-                            let input = document.getElementById(
-                                "image_face_sub_target_fileupload"
-                            );
-                            let file = input.files[0];
-                            let after = document.getElementById("after");
+                            let file = faceTarget.files[0];
                             let reader = new FileReader();
                             reader.readAsDataURL(file);
                             reader.onload = function (e) {
-                                let img = new Image();
-                                img.src = e.target.result;
-                                after.appendChild(img);
+                                midImg3.src = e.target.result;
                             };
                         }
                     }
@@ -189,54 +237,69 @@
             $("#algonames")
                 .on("change", function (event) {
                     console.log("algoname-change event triggered");
-
+                    // 清除上传的文件
                     faceSrc.value = "";
                     faceTarget.value = "";
                     originalFileUpload.value = "";
 
-                    preArea.innerHTML = "";
-                    afterArea.innerHTML = "";
-                    replaceResultArea.innerHTML = "";
+                    // preArea.src = "";
+                    // afterArea.src = "";
+                    //
+                    // midImg3.src = "";
+                    // preImg3.src = "";
+                    // replaceResultImg3.src = "";
+                    revokeImage(preArea);
+                    revokeImage(afterArea);
+                    revokeImage(midImg3);
+                    revokeImage(preImg3);
+                    revokeImage(replaceResultImg3);
 
                     if ($("ul .active").index() === 0) {
                         switch (event.target.value) {
                             case "image_face_sub":
                                 console.log("image_face_sub");
-                                privacy_level.style.display = "none";
-                                facesubUploadControlGroup.style.display = "block";
+                                privacyLevel.style.display = "none";
+                                faceSubUploadControlGroup.style.display = "block";
                                 uploadForm.style.display = "none";
+                                twoImgsBlock.style.display = "none";
+                                threeImgsBlock.style.display = "block";
                                 // submitBtn.removeEventListener("click", submitOriginMethod);
                                 submitBtn.off("click").on("click", () => {
                                     imageFaceSubUpload();
                                 });
                                 break;
                             case "image_exchange_channel":
-                                privacy_level.style.display = "none";
-                                facesubUploadControlGroup.style.display = "none";
+                                privacyLevel.style.display = "none";
+                                faceSubUploadControlGroup.style.display = "none";
                                 uploadForm.style.display = "block";
+                                twoImgsBlock.style.display = "block";
+                                threeImgsBlock.style.display = "none";
                                 submitBtn.off("click").on("click", () => {
-                                    submitOriginMethod();
+                                    originSubmitMethod();
                                 });
                                 // submitBtn.removeEventListener("click", image_face_sub_upload);
                                 break;
                             default:
-                                privacy_level.style.display = "block";
-                                facesubUploadControlGroup.style.display = "none";
+                                privacyLevel.style.display = "block";
+                                faceSubUploadControlGroup.style.display = "none";
                                 uploadForm.style.display = "block";
+                                twoImgsBlock.style.display = "block";
+                                threeImgsBlock.style.display = "none";
                                 submitBtn.off("click").on("click", () => {
-                                    submitOriginMethod();
+                                    originSubmitMethod();
                                 });
                                 // submitBtn.removeEventListener("click", image_face_sub_upload);
                                 break;
                         }
                     } else {
-                        // privacy_level.style.display = "none";
-                        facesubUploadControlGroup.style.display = "none";
+                        privacyLevel.style.display = "none";
+                        faceSubUploadControlGroup.style.display = "none";
                         uploadForm.style.display = "block";
-
+                        twoImgsBlock.style.display = "block";
+                        threeImgsBlock.style.display = "none";
                         selectedAlgoName.value = defaultOption;
                         submitBtn.off("click").on("click", () => {
-                            submitOriginMethod();
+                            originSubmitMethod();
                         });
                         // submitBtn.removeEventListener("click", image_face_sub_upload);
                     }
@@ -247,9 +310,17 @@
 
                 let isSelected = $("#tab-2").hasClass("active");
                 // 清空显示区域的图片
-                preArea.innerHTML = "";
-                afterArea.innerHTML = "";
-                replaceResultArea.innerHTML = "";
+                // preArea.src = "";
+                // afterArea.src = "";
+                //
+                // midImg3.src = "";
+                // preImg3.src = "";
+                // replaceResultImg3.src = "";
+                revokeImage(preArea);
+                revokeImage(afterArea);
+                revokeImage(midImg3);
+                revokeImage(preImg3);
+                revokeImage(replaceResultImg3);
 
                 // 清空失真脱敏算法中所有文件上传控件中的文件
                 originalFileUpload.value = "";
@@ -257,44 +328,54 @@
                 faceTarget.value = "";
 
                 console.log("defaultOption: " + defaultOption);
-
-                if (defaultOption !== "image_exchange_channel" && defaultOption !== "image_face_sub") {
-                    privacy_level.style.display = "block";
-                } else {
-                    privacy_level.style.display = "none";
-                }
-
-                if (defaultOption === "image_face_sub") {
-                    facesubUploadControlGroup.style.display = "block";
-                    uploadForm.style.display = "none";
-                    submitBtn.off("click").on("click", () => {
-                        imageFaceSubUpload();
-                    });
-
-                } else {
-                    facesubUploadControlGroup.style.display = "none";
-                    uploadForm.style.display = "block";
-
-                }
-                $("#downloadEigenvector").hide();
-                $("#setDefaultAlgorithm").show();
-
-                // 设置非失真脱敏算法选项卡显示默认值
-                selectedAlgoName.value = defaultOption;
                 if (isSelected) {
                     // 设置展示的控件组
-                    facesubUploadControlGroup.style.display = "none";
+                    faceSubUploadControlGroup.style.display = "none";
                     uploadForm.style.display = "block";
                     $("#downloadEigenvector").show();
                     $("#setDefaultAlgorithm").hide();
+                    threeImgsBlock.style.display = "none";
+                    twoImgsBlock.style.display = "block";
                     console.log("Tab 2 is now active!");
                     submitBtn.off("click").on("click", () => {
-                        submitOriginMethod();
+                        originSubmitMethod();
                     });
                     // 在这里编写你想在切换到 Tab 2 时执行的代码
-                }
-            });
+                } else {
+                    if (defaultOption !== "image_exchange_channel" && defaultOption !== "image_face_sub") {
+                        privacyLevel.style.display = "block";
+                    } else {
+                        privacyLevel.style.display = "none";
+                    }
 
+                    if (defaultOption === "image_face_sub") {
+                        faceSubUploadControlGroup.style.display = "block";
+                        threeImgsBlock.style.display = "block";
+                        twoImgsBlock.style.display = "none";
+                        uploadForm.style.display = "none";
+                        submitBtn.off("click").on("click", () => {
+                            imageFaceSubUpload();
+                        });
+
+                    } else {
+                        threeImgsBlock.style.display = "none";
+                        twoImgsBlock.style.display = "block";
+                        faceSubUploadControlGroup.style.display = "none";
+                        uploadForm.style.display = "block";
+
+                    }
+                    $("#downloadEigenvector").hide();
+                    $("#setDefaultAlgorithm").show();
+
+                    // 设置非失真脱敏算法选项卡显示默认值
+                    selectedAlgoName.value = defaultOption;
+                }
+
+
+            });
+            /**
+             * 非失真脱敏后下载加密后的特征向量
+             */
             $("#downloadEigenvector").on("click", function (e) {
                 fetch("/imageRetrieval/downloadEigenVector")
                     .then((response) => {
@@ -324,72 +405,56 @@
                     });
             });
 
-            // 设置默认算法
+            /**
+             * 设置默认算法
+             */
             $("#setDefaultAlgorithm").on("click", function (e) {
-               let postData = new URLSearchParams();
-               postData.set("toolsetName", "image");
-               postData.set("defaultAlgName", $("#algonames").val());
-               console.log("postData: " + postData);
+                let postData = new URLSearchParams();
+                postData.set("toolsetName", "image");
+                postData.set("defaultAlgName", $("#algonames").val());
+                console.log("postData: " + postData);
 
-               fetch ("/toolset/setDefaultToolset", {
-                   method: "POST",
-                   body: postData,
-               })
-                   .then(response => response.json())
-                   .then(data => {
-                       if (data.code === 200) {
-                           alert("设置默认算法成功！");
-                           defaultOption = $("#algonames").val();
-                       } else {
-                           throw new Error("设置默认算法失败！");
-                       }
-                   })
-                   .catch((error) => {
-                       alert(error);
-                       console.log(error);
-                   })
+                fetch("/toolset/setDefaultToolset", {
+                    method: "POST",
+                    body: postData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert("设置默认算法成功！");
+                            defaultOption = $("#algonames").val();
+                        } else {
+                            throw new Error("设置默认算法失败！");
+                        }
+                    })
+                    .catch((error) => {
+                        alert(error);
+                        console.log(error);
+                    })
             });
-            // $("#downloadEigenvector").on("click", function (e) {
-            //         fetch("/imageRetrieval/downloadEigenVector")
-            //             .then((response) => {
-            //                 if (response.status === 200) {
-            //                     return response.json();
-            //                 } else {
-            //                     throw new Error("Receive file failed");
-            //                 }
-            //             })
-            //             .then((data) => {
-            //                 let imageFilename = data.imageFileName;
-            //                 let eigenVectorFileName = data.eigenVectorFileName;
-            //
-            //                 fetch("/imageRetrieval/downloadFile") {
-            //
-            //                 }
-            //                 let timeStamp = Date.now();
-            //                 const url = URL.createObjectURL(data);
-            //                 const a = document.createElement('a');
-            //                 a.style.display = 'none';
-            //                 a.href = url;
-            //                 a.download = timeStamp + 'result.txt';
-            //                 document.body.appendChild(a);
-            //                 a.click();
-            //                 setTimeout(() => {
-            //                     document.body.removeChild(a);
-            //                     window.URL.revokeObjectURL(url);
-            //                 }, 0);
-            //             })
-            //             .catch((error) => {
-            //                 console.error("Error:", error);
-            //                 alert(error);
-            //             });
-            //     })
         };
 
-        function submitOriginMethod(event) {
-            let after = document.getElementById("after");
-            after.innerHTML = "";
-            let replaceResult = document.getElementById("replace-result");
-            replaceResult.innerHTML = "";
+        /**
+         * 释放图片资源
+         * @param imgElement 图片元素
+         */
+        function revokeImage(imgElement) {
+            if (imgElement.src === undefined) {
+                return;
+            }
+            if (imgElement.src !== null && imgElement.src !== "") {
+                URL.revokeObjectURL(imgElement.src);
+            }
+            imgElement.src = "";
+        }
+
+        /**
+         * 非换脸算法使用的提交方法
+         */
+        function originSubmitMethod() {
+            let after = document.getElementById("afterImg");
+            revokeImage(after);
+
             let formData = new FormData();
 
             let fileInput = document.getElementById("fileUpload");
@@ -406,16 +471,16 @@
             if (idx === 0) {
                 // 获取保护级别
                 url = "/File/desenFile";
-                let level_selections;
+                let levelSelections;
                 let param;
-                let algonames = document.getElementById("algonames");
-                let type1 = algonames.value;
+                let algoNames = document.getElementById("algonames");
+                let type1 = algoNames.value;
                 if (type1 !== "img_face_sub") {
                     if (type1 === "image_exchange_channel") {
                         param = 1;
                     } else {
-                        level_selections = document.getElementById("level-selection");
-                        param = level_selections.value;
+                        levelSelections = document.getElementById("level-selection");
+                        param = levelSelections.value;
                     }
                     formData.set("params", param);
                     formData.set("sheet", type1);
@@ -448,9 +513,7 @@
                     return response.blob();
                 })
                 .then((blob) => {
-                    let dealedImg = new Image();
-                    dealedImg.src = URL.createObjectURL(blob);
-                    after.appendChild(dealedImg);
+                    after.src = URL.createObjectURL(blob);
                     console.log("Image Retrieval");
                 })
                 .catch((error) => {
@@ -459,10 +522,16 @@
                 });
         }
 
+        /**
+         * 选择文件
+         * @param event
+         */
         function chooseFile(event) {
             // 清空
-            document.getElementById("pre").innerHTML = "";
-            document.getElementById("after").innerHTML = "";
+            let preImg = document.getElementById("preImg");
+            let afterImg = document.getElementById("afterImg");
+            revokeImage(preImg);
+            revokeImage(afterImg);
 
             // 图像格式
             const imageType = ["jpg", "jpeg", "png"];
@@ -484,21 +553,22 @@
             }
         }
 
-        let displayImage = function () {
+        /**
+         * 显示上传的图片
+         */
+        function displayImage () {
             let input = document.getElementById("fileUpload");
-            let pre = document.getElementById("pre");
+            let pre = document.getElementById("preImg");
             let file = input.files[0];
             let reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = function (e) {
-                let img = new Image();
-                img.src = e.target.result;
-                pre.appendChild(img);
+                pre.src = e.target.result;
             };
-        };
+        }
 
         function imageFaceSubUpload() {
-            document.getElementById("replace-result").innerHTML = "";
+            let replaceResult = document.getElementById("replaceResultImg3");
             // debugger
             // 清空
             // 目标面孔
@@ -537,9 +607,7 @@
                     imageType.includes(imgTargetFileNameExtension)
                 ) {
 
-                    //提交脱敏参数，请求脱敏
-                    let replaceResult = document.getElementById("replace-result");
-                    replaceResult.innerHTML = "";
+                    revokeImage(replaceResult);
                     // 获取保护级别
                     let param = "1";
 
@@ -561,9 +629,8 @@
                             }
                         })
                         .then((blob) => {
-                            let dealtImg = new Image();
-                            dealtImg.src = URL.createObjectURL(blob);
-                            replaceResult.appendChild(dealtImg);
+                            replaceResult.src = URL.createObjectURL(blob);
+                            // replaceResult.appendChild(dealtImg);
                         })
                         .catch((error) => {
                             console.error("Error:", error);
@@ -576,101 +643,21 @@
         }
     </script>
     <style>
-        th {
-            text-align: center;
-        }
-
-        /*标题*/
-        /*.ibox-title {*/
-        /*    height: 200px;*/
-        /*    border-color: #edf1f2;*/
-        /*    background-color: #dbeafe;*/
-        /*    color: black;*/
-        /*    display: flex;*/
-        /*    align-items: center;*/
-        /*    justify-content: center;*/
-        /*}*/
-
-        .ibox-title span {
-            font-size: 50px;
-        }
-
-        .btn2 > button{
-            background-color: #347aa9;
-            padding: 5px 20px;
-            cursor: pointer;
-            color: black;
-            font-size: 20px;
-            display: inline-block;
-            text-align: center;
-            /*margin-right: 50px;*/
-        }
-
-        .btn2 {
-            line-height: 30px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        /*选择框居中*/
-        .midtile {
-            line-height: 30px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        /*上传按钮*/
-        .upload-btn {
-            background-color: #347aa9;
-            color: white;
-            cursor: pointer;
-            padding: 5px 20px;
-            text-align: center;
-            font-size: 20px;
-            display: inline-block;
-            margin: 30px;
-        }
-
-        #pre {
-            text-align: center;
-        }
-
-        #replace-result img,
-        #after img,
-        #pre img {
-            display: inline-block;
-            max-width: 50%;
-            height: auto;
-        }
-
-        #after {
-            text-align: center;
-        }
-
-        .showFile {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-        }
-
         .tabs-container ul {
             height: 50px;
             display: flex;
             flex-direction: row;
             justify-content: center;
         }
+
+
     </style>
 
 </head>
 <body>
-<div class="row">
-    <div class="col-sm-12">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title"></div>
-
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-12">
             <div class="tabs-container">
                 <ul
                         id="tab-type"
@@ -689,22 +676,15 @@
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div
-                            id="tab-1"
-                            class="tab-pane active"
-                            style="text-align: center"
-                    >
-                        <div>
-                            <table style="margin: auto; font-size: 20px">
-                                <thead>
-                                <tr>
-                                    <th>请选择图像失真脱敏算法</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table1">
-                                <tr>
-                                    <td>
-                                        <select id="algonames">
+                    <div id="tab-1" class="tab-pane active" style="text-align: center">
+                        <div class="panel-body">
+                            <form role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="algonames">
+                                        请选择图像失真脱敏算法
+                                    </label>
+                                    <div class="col-lg-3">
+                                        <select class=" form-control" name="algonames" id="algonames">
                                             <option value="dpImage">
                                                 DP-基于差分隐私的图像加噪方法
                                             </option>
@@ -736,73 +716,68 @@
                                                 替换-图像人脸替换算法
                                             </option>
                                         </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="ibox-content" style="text-align: center">
-                            <div id="privacyLevel">
-                                <table style="margin: auto; font-size: 20px">
-                                    <thead>
-                                    <tr>
-                                        <th>请选择隐私保护等级</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="table3">
-                                    <tr>
-                                        <td>
-                                            <select id="level-selection">
-                                                <option value="0">低程度</option>
-                                                <option value="1" selected>中程度</option>
-                                                <option value="2">高程度</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
+                                    </div>
+                                </div>
+                                <div class="form-group" id="privacyLevel">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label"
+                                           for="level-selection">请选择隐私保护等级</label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" name="level-selection"
+                                                id="level-selection">
+                                            <option value="0"> 低程度</option>
+                                            <option value="1" selected> 中程度</option>
+                                            <option value="2"> 高程度</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div id="tab-2" class="tab-pane" style="text-align: center">
-                        <div>
-                            <table style="margin: auto; font-size: 20px">
-                                <thead>
-                                <tr>
-                                    <th>请选择图像非失真脱敏算法</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table2">
-                                <tr>
-                                    <td>
-                                        <select id="non-distortion-algos">
+                        <div class="panel-body">
+                            <form role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="non-distortion-algos">
+                                        请选择图像非失真脱敏算法
+                                    </label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" name="non-distortion-algos"
+                                                id="non-distortion-algos">
                                             <option value="retrieval">
                                                 相似医疗图像安全检索
                                             </option>
                                         </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="midtile">
-                <div class="col-sm-5 m-b-xs">
-                    <div id="uploadForm">
-                        <input type="file" id="fileUpload" accept=".jpg, .jpeg, .png" style="display: none"/>
-                        <label for="fileUpload" class="upload-btn"> 选择文件 </label>
+        </div>
+
+    </div>
+    <div class="row m-t">
+        <div class="col-lg-12">
+            <form role="form" class="form-horizontal">
+                <div id="uploadForm" class="form-group text-center">
+                    <div class="col-lg-12 ">
+                        <input type="file" id="fileUpload" accept=".jpg, .jpeg, .png"
+                               style="display: none"/>
+                        <label for="fileUpload" class="btn btn-white"> 选择文件 </label>
                     </div>
-                    <div id="facesub-upload" style="display: none">
+                </div>
+
+                <div id="facesub-upload" class="col-lg-12 form-group text-center" style="display: none">
+                    <div class="col-lg-12 ">
                         <input
                                 type="file"
                                 id="image_face_sub_src_fileupload"
                                 accept=".jpg, .jpeg, .png"
                                 style="display: none"
                         />
-                        <label for="image_face_sub_src_fileupload" class="upload-btn">
+                        <label for="image_face_sub_src_fileupload"
+                               class="btn btn-default">
                             选择目标面孔
                         </label>
                         <input
@@ -811,27 +786,93 @@
                                 accept=".jpg, .jpeg, .png"
                                 style="display: none"
                         />
-                        <label for="image_face_sub_target_fileupload" class="upload-btn">
+                        <label for="image_face_sub_target_fileupload"
+                               class="btn btn-default">
                             选择源文件
                         </label>
                     </div>
                 </div>
-                <div id="fileInfo"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <form role="form" class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-lg-12 text-center">
+                        <button type="button" class="btn btn-primary" id="submit">
+                            提交脱敏
+                        </button>
+                        <button type="button" class="btn btn-primary m-l" id="setDefaultAlgorithm">
+                            设置当前算法为默认算法
+                        </button>
+                        <button type="button" class="btn btn-primary m-l" id="downloadEigenvector">
+                            获取原始图片特征向量文件
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <div id="twoImgs" class="row m-t">
+        <!--前后文件-->
+        <div class="col-lg-offset-3 col-lg-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    原始图像
+                </div>
+                <div class="panel-body">
+                    <img id="preImg" class="img-responsive center-block" src="" alt=""/>
+                </div>
             </div>
-            <div class="btn2">
-                <button type="button" class="btn btn-sm btn-primary" id="submit">
-                    提交脱敏
-                </button>
-                <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm"> 设置当前算法为默认算法</button>
-                <button type="button" class="btn btn-sm btn-primary m-l" id="downloadEigenvector">
-                    获取原始图片特征向量文件
-                </button>
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    脱敏后图像
+                </div>
+                <div class="panel-body">
+                    <img id="afterImg" class="img-responsive center-block" src="" alt=""/>
+                </div>
             </div>
-            <div class="showFile">
-                <!--前后文件-->
-                <div id="pre"></div>
-                <div id="after"></div>
-                <div id="replace-result"></div>
+        </div>
+    </div>
+    <div id="threeImgs" class="row m-t" style="display: none;">
+        <!--前后文件-->
+        <div class="col-lg-offset-2 col-lg-3">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    目标面孔
+                </div>
+                <div class="panel-body">
+                    <img id="preImg3" class="img-responsive center-block" src="" alt=""/>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    原始图像
+                </div>
+                <div class="panel-body">
+                    <img id="midImg3" class="img-responsive center-block" src="" alt=""/>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    脱敏后图像
+                </div>
+                <div class="panel-body">
+                    <img id="replaceResultImg3" class="img-responsive center-block" src="" alt=""/>
+                </div>
             </div>
         </div>
     </div>

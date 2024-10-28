@@ -4,12 +4,14 @@ import com.lu.gademo.entity.ga.SceneInfo;
 import com.lu.gademo.service.impl.SceneInfoDaoServiceImpl;
 import com.lu.gademo.service.impl.ToolsetService;
 import com.lu.gademo.utils.Result;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@Slf4j
 @Controller
 public class GaController extends BaseController {
 
@@ -63,6 +65,9 @@ public class GaController extends BaseController {
 //            model.addAttribute("distortionAudioAlgoList", audioAlgorithmInfoDtoList);
 //            model.addAttribute("defaultOption", "audio_spec");
 //        }
+        String defaultAlgName = toolsetService.getDefaultTool(name);
+        log.info("defaultAlgName: {}", defaultAlgName);
+        model.addAttribute("defaultAlgName", defaultAlgName);
 
         return "verify/" + name;
     }

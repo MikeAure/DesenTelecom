@@ -40,7 +40,7 @@
     <script th:src="@{/js/plugins/layer/layer.min.js}" defer></script>
     <script th:src="@{/js/multiple-select.min.js}" defer></script>
     <script src="https://webapi.amap.com/maps?v=2.0&key=8a74dc88024b50b5b4d94a407ab49b8d" defer></script>
-    <script type="text/javascript">
+    <script type="text/javascript" th:inline="javascript">
         let allAlgorithms = {
             "date": [
                 {value: "dpDate", label: "基于差分隐私的日期加噪算法"},
@@ -123,43 +123,49 @@
             return null; // 如果没有找到匹配的键，返回null
         }
 
-        let defaultOption = "nameHide_name"; // 预设的默认选项
+        // let defaultOption = "nameHide_name"; // 预设的默认选项
+        let defaultOption = [[${defaultAlgName}]];
 
         // 设置算法默认选项
         document.addEventListener('DOMContentLoaded', function () {
-            fetch('/toolset/getDefaultSelection?toolsetName=' + 'text')
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to fetch');
-                    }
-                })
-                .then(data => {
-                    if (data.code === 200 && data.message) {
-                        defaultOption = data.data;
-                        console.log("defaultOption: " + defaultOption);
-                        let defaultOptionParts = defaultOption.split("_");
-                        let textAlgo = defaultOptionParts[0];
-                        let textType = defaultOptionParts[defaultOptionParts.length - 1];
+            let defaultOptionParts = defaultOption.split("_");
+            let textAlgo = defaultOptionParts[0];
+            let textType = defaultOptionParts[defaultOptionParts.length - 1];
 
-                        setDefaultOption(textType, textAlgo);
-
-                    } else {
-                        let defaultOptionParts = defaultOption.split("_");
-                        let textAlgo = defaultOptionParts[0];
-                        let textType = defaultOptionParts[defaultOptionParts.length - 1];
-                        setDefaultOption(textType, textAlgo);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("获取默认算法失败");
-                    let defaultOptionParts = defaultOption.split("_");
-                    let textAlgo = defaultOptionParts[0];
-                    let textType = defaultOptionParts[defaultOptionParts.length - 1];
-                    setDefaultOption(textType, textAlgo);
-                });
+            setDefaultOption(textType, textAlgo);
+            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'text')
+            //     .then(response => {
+            //         if (response.ok) {
+            //             return response.json();
+            //         } else {
+            //             throw new Error('Failed to fetch');
+            //         }
+            //     })
+            //     .then(data => {
+            //         if (data.code === 200 && data.message) {
+            //             defaultOption = data.data;
+            //             console.log("defaultOption: " + defaultOption);
+            //             let defaultOptionParts = defaultOption.split("_");
+            //             let textAlgo = defaultOptionParts[0];
+            //             let textType = defaultOptionParts[defaultOptionParts.length - 1];
+            //
+            //             setDefaultOption(textType, textAlgo);
+            //
+            //         } else {
+            //             let defaultOptionParts = defaultOption.split("_");
+            //             let textAlgo = defaultOptionParts[0];
+            //             let textType = defaultOptionParts[defaultOptionParts.length - 1];
+            //             setDefaultOption(textType, textAlgo);
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         alert("获取默认算法失败");
+            //         let defaultOptionParts = defaultOption.split("_");
+            //         let textAlgo = defaultOptionParts[0];
+            //         let textType = defaultOptionParts[defaultOptionParts.length - 1];
+            //         setDefaultOption(textType, textAlgo);
+            //     });
 
             function setDefaultOption(type, algo) {
                 // const defaultOptionTextType = getKeyByValue(value);
@@ -233,239 +239,6 @@
             });
 
             document.getElementById("fileUpload").addEventListener("change", choose_file);
-            // 获取非失真脱敏的测试文件
-            document.getElementById('generateTestData').addEventListener('click', function () {
-                let fileName = Date.now() + "testData.txt";
-                fetch('/Encrypt/generateTestData')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'ok') {
-                            const message = data.message;
-                            downloadTestFile(message, fileName, 'text/plain');
-                        } else {
-                            console.error('Failed to generate test data:', data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-            });
-
-            // document.getElementById('generateDistortionTestData').addEventListener('click', function () {
-            //     let fileName = Date.now() + "testData.txt";
-            //     let totalNumber = 500000;
-            //     fetch('/File/generateTextTestData?totalNumber=' + totalNumber)
-            //         .then(response => {
-            //             if (response.status === 500) {
-            //                 // Handle server error
-            //                 return response.text().then(failedMsg => {
-            //                     alert(failedMsg);
-            //                     throw new Error(failedMsg); // Throw an error to stop further processing
-            //                 });
-            //             }
-            //             // console.log(response.headers.get('Content-Disposition'));
-            //             // let fileName = response.headers.get('Content-Disposition').split('filename=')[1].split(';')[0];
-            //             // fileName = fileName.replaceAll('"', '')
-            //             // console.log(fileName);
-            //             // return response.blob().then(blob => ({ blob, fileName }));  // If the status is not 500, proceed to handle the file blob
-            //             return response.blob();
-            //         })
-            //         .then(blob => {
-            //             const url = URL.createObjectURL(blob);
-            //
-            //             // 创建一个隐藏的a标签并点击它来触发下载
-            //             const a = document.createElement('a');
-            //             a.style.display = 'none';
-            //             a.href = url;
-            //             a.download = fileName;
-            //
-            //             // 将a标签添加到DOM并触发点击
-            //             document.body.appendChild(a);
-            //             a.click();
-            //
-            //             // 下载完成后移除a标签和URL对象
-            //             document.body.removeChild(a);
-            //             URL.revokeObjectURL(url);
-            //         })
-            //         .catch(error => console.error('Error:', error));
-            // });
-
-            // 获取失真脱敏的测试文件
-            // document.getElementById('selectDistortionTestData').addEventListener('change', function (event) {
-            //     const file = event.target.files[0];
-            //     if (file && file.type === 'text/plain') {
-            //         const reader = new FileReader();
-            //         reader.onload = function (e) {
-            //             // const textArea = document.getElementById('testData');
-            //             // textArea.value = e.target.result;
-            //             document.getElementById('selectDistortionTestData').textContent = file.name + '已选择';
-            //         };
-            //         reader.readAsText(file);
-            //     } else {
-            //         alert('请选择一个txt格式的文件');
-            //     }
-            // });
-
-            // document.getElementById('startDistortionPerformanceTest').addEventListener('click', function () {
-            //     const fileInput = document.getElementById('selectDistortionTestData');
-            //     const file = fileInput.files[0];
-            //     let formData = new FormData();
-            //     let privacyLevel = document.getElementById("distortionPrivacyLevel").value;
-            //     // 算法名
-            //     let algName = document.getElementById("distortionAlg").value;
-            //     // formData.append("params", privacyLevel)
-            //     // 保证params字段唯一值唯一
-            //     formData.set("params", privacyLevel);
-            //     formData.set("algName", algName);
-            //     formData.set("file", file);
-            //
-            //     if (!file) {
-            //         alert('请先选择一个测试文件。');
-            //         return;
-            //     }
-            //     fetch('/File/textFilePerformenceTest', {
-            //         method: 'POST',
-            //         body: formData,
-            //     })
-            //         .then(response => response.blob())
-            //         .then(blob => {
-            //             const fileName = Date.now() + 'desenResult.txt';
-            //             const fileSizeInBytes = blob.size;
-            //             const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
-            //
-            //             // 输出文件大小（以字节为单位）
-            //             console.log("File size: " + fileSizeInBytes + " bytes");
-            //             console.log("File size: " + fileSizeInMegabytes.toFixed(2) + " MB");
-            //
-            //             const url = URL.createObjectURL(blob);
-            //
-            //             // 创建一个隐藏的a标签并点击它来触发下载
-            //             const a = document.createElement('a');
-            //             a.style.display = 'none';
-            //             a.href = url;
-            //             a.download = fileName;
-            //
-            //             // 将a标签添加到DOM并触发点击
-            //             document.body.appendChild(a);
-            //             a.click();
-            //
-            //             // 下载完成后移除a标签和URL对象
-            //             document.body.removeChild(a);
-            //             URL.revokeObjectURL(url);
-            //
-            //         })
-            //         .catch(error => console.error('Error:', error));
-            // });
-
-            function downloadTestFile(content, fileName, contentType) {
-                const blob = new Blob([content], {type: contentType});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 0);
-            }
-
-            // 获取非失真脱敏的测试文件
-            document.getElementById('selectTestData').addEventListener('change', function (event) {
-                const file = event.target.files[0];
-                if (file && file.type === 'text/plain') {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const textArea = document.getElementById('testData');
-                        textArea.value = e.target.result;
-                        document.getElementById('fileName').textContent = file.name + '已选择';
-                    };
-                    reader.readAsText(file);
-                } else {
-                    alert('请选择一个txt格式的文件');
-                }
-            });
-
-            document.getElementById('startPerformanceTest').addEventListener('click', function () {
-                const fileInput = document.getElementById('selectTestData');
-                const file = fileInput.files[0];
-
-                if (!file) {
-                    alert('请先选择一个测试文件。');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const content = e.target.result.trim();
-                    const points = content.split('\n').map(line => line.split(' ').map(Number));
-
-                    fetch('/Encrypt/performenceTest', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json;charset=UTF-8'
-                        },
-                        body: JSON.stringify(points)
-                    })
-                        .then(response => response.blob())
-                        .then(blob => {
-                            const fileSizeInBytes = blob.size;
-                            const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
-
-                            // 输出文件大小（以字节为单位）
-                            console.log("File size: " + fileSizeInBytes + " bytes");
-                            console.log("File size: " + fileSizeInBytes.toFixed(2) + " MB");
-
-                            // 判断文件大小以执行不同的操作
-                            if (fileSizeInMegabytes > 100) {
-                                // 如果文件大于100M，仅保存文件内容，不显示
-                                alert('文件过大 (>100MB)，仅保存文件内容，不显示。');
-                                window.downloadBlob = blob;
-                            } else if (fileSizeInMegabytes > 10) {
-                                // 如果文件大于10M但小于等于100M，只显示前100行
-                                const fileReader = new FileReader();
-                                fileReader.onload = function (event) {
-                                    const content = event.target.result;
-                                    const lines = content.split('\n');
-                                    const first100Lines = lines.slice(0, 100).join('\n');
-                                    document.getElementById('desenTestData').value = first100Lines;
-
-                                    // 保存blob用于下载
-                                    window.downloadBlob = blob;
-                                };
-                                fileReader.readAsText(blob);
-                            } else {
-                                // 文件小于等于10M，完整显示内容（或者根据需求调整显示方式）
-                                const fileReader = new FileReader();
-                                fileReader.onload = function (event) {
-                                    document.getElementById('desenTestData').value = event.target.result;
-                                    // 保存blob用于下载
-                                    window.downloadBlob = blob;
-                                };
-                                fileReader.readAsText(blob);
-                            }
-                        })
-                        .catch(error => console.error('Error:', error));
-                };
-                reader.readAsText(file);
-            });
-
-            document.getElementById('downloadTestResult').addEventListener('click', function () {
-                if (window.downloadBlob) {
-                    const url = window.URL.createObjectURL(window.downloadBlob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = 'result.txt';
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                    }, 0);
-                } else {
-                    alert('请先进行性能测试以生成结果文件。');
-                }
-            });
 
             // 设置默认算法
             $("#setDefaultAlgorithm").on("click", function (e) {
@@ -512,10 +285,8 @@
             const fileExtension = fileName.split('.').pop().toLowerCase();
             if (file) {
                 if ("txt" === fileExtension) {
-                    let fileLoad = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                    document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
                         "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
-                    document.getElementById("fileInfo").innerHTML = fileLoad;
-                    //console.log(fileExtension)
                     //构建formData,发送给后端
                     let formData = new FormData();
                     formData.set("file", file);
@@ -523,22 +294,14 @@
                     //提交脱敏参数，请求脱敏
                     document.getElementById("submitBtn").onclick = function () {
                         // 选择脱敏程度
-                        let table_body = document.getElementById("table3")
-                        let tr = table_body.rows[0];
-                        console.log(tr);
-                        //let privacyLevel = tr.childNodes[0].firstChild.value;
                         let privacyLevel = document.getElementById("distortionPrivacyLevel").value;
                         // 保证params字段唯一值唯一
                         formData.set("params", privacyLevel)
-
                         // 算法名
                         let alg_name;
                         let idx = $("ul .active").index();
                         if (idx === 0) {
-                            //formData.append("distortion", "distortion");
-                            let selections = document.getElementById("distortionAlg");
-                            alg_name = selections.value;
-                            //formData.append("sheet", type1);
+                            alg_name = document.getElementById("distortionAlg").value;
                         }
 
                         // 发送算法名、隐私保护等级、脱敏文件
@@ -562,13 +325,6 @@
                                 /*  document.getElementById("preData").innerHTML="脱敏前数据"*/
                                 let reader = new FileReader();
                                 reader.onload = function (e) {
-                                    // let data = new Uint8Array(e.target.result);
-                                    // let workbook = XLSX.read(data, {type: 'array'});
-                                    //
-                                    // let sheetName = workbook.SheetNames[0];
-                                    // let sheet = workbook.Sheets[sheetName];
-                                    //
-                                    // let lines = XLSX.utils.sheet_to_json(sheet, {header: 1});
                                     let data = e.target.result;
                                     if (typeof data !== 'string') {
                                         data = new TextDecoder('utf-8').decode(new Uint8Array(data));
@@ -779,7 +535,6 @@
         /*}*/
 
         .tabs-container ul {
-            height: 70px;
             display: flex;
             flex-direction: row;
             justify-content: center;
@@ -892,7 +647,7 @@
             /*width: 500px; !* 原有大小 *!*/
             /*height: 300px; !* 原有大小 *!*/
             /*background-color: #EEE; !* 仅为了可视化，实际使用时应去除 *!*/
-            font-size: 20px;
+            font-size: 15px;
             flex: 1; /* 使.map和.map-info元素占据相同的空间比例 */
             display: flex;
             flex-direction: column; /* 如果需要，确保其内部内容也能垂直排列 */
@@ -943,7 +698,7 @@
 <body>
 <div class="wrapper wrapper-content">
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-lg-12">
             <div class="tabs-container">
                 <ul id="tab-type" class="nav nav-tabs" style="font-size: 20px">
                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
@@ -953,241 +708,237 @@
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div id="tab-1" class="tab-pane active" style="text-align: center;">
-                        <div class="form-group">
-                            <label class="control-label block" for="textType"
-                                   style="font-size: 20px">请选择文本类型</label>
-                            <select name="type" id="textType"
-                                    style="font-size: 20px">
-                                <option value="111" selected>请选择文本类型</option>
-                                <option value="date">日期</option>
-                                <option value="time">时间</option>
-                                <option value="address">地址</option>
-                                <option value="number">编号</option>
-                                <option value="value">数值</option>
-                                <option value="name">名称</option>
-                                <option value="email">邮箱</option>
-                                <option value="code">编码</option>
-                                <option value="ip">IP地址</option>
-                            </select>
-                        </div>
+                    <div id="tab-1" class="tab-pane active">
+                        <div class="panel-body">
+                            <form role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="textType">
+                                        请选择文本类型
+                                    </label>
+                                    <div class="col-lg-3">
 
-                        <div class="form-group">
-                            <table style="margin: auto; font-size: 20px">
-                                <thead>
-                                <tr>
-                                    <th>请选择文本失真脱敏算法</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table1">
-                                <tr>
-                                    <td>
-                                        <select id="distortionAlg">
+                                        <select class="form-control" name="type" id="textType">
+                                            <option value="111" selected>请选择文本类型</option>
+                                            <option value="date">日期</option>
+                                            <option value="time">时间</option>
+                                            <option value="address">地址</option>
+                                            <option value="number">编号</option>
+                                            <option value="value">数值</option>
+                                            <option value="name">名称</option>
+                                            <option value="email">邮箱</option>
+                                            <option value="code">编码</option>
+                                            <option value="ip">IP地址</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label"
+                                           for="distortionAlg">请选择文本失真脱敏算法</label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" name="distortionAlg" id="distortionAlg">
                                             <option value="default">请选择脱敏算法</option>
                                         </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="form-group">
-                            <div id="privacyLevel">
-                                <table style="margin: auto; font-size: 20px">
-                                    <thead>
-                                    <tr>
-                                        <th>请选择隐私保护等级</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="table3">
-                                    <tr>
-                                        <td>
-                                            <label for="distortionPrivacyLevel"></label>
-                                            <select id="distortionPrivacyLevel">
-                                                <option value="1"> 低程度</option>
-                                                <option value="2" selected> 中程度</option>
-                                                <option value="3"> 高程度</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div id="fileInfo"></div>
-
-                        <div class="btn1">
-                            <input type="file" accept=".txt" id="fileUpload" style="display: none;">
-                            <label for="fileUpload" class="btn btn-sm btn-primary upload-btn">
-                                选择文件
-                            </label>
-                        </div>
-
-                        <div class="btn2">
-                            <button type="button" class="btn btn-sm btn-primary" id="submitBtn">提交脱敏
-                            </button>
-                            <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm">
-                                设置当前算法为默认算法
-                            </button>
-                        </div>
-
-                        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-                            <!-- 第一个表格 -->
-                            <div id="dataTableContainer" style="width: 50%; overflow-x: auto;">
-                                <table id="dataTable" class="table table-bordered">
-                                    <!-- 这里将用 JavaScript 动态创建表格内容 -->
-                                </table>
-                                <div id="paginationContainer" class="mt-3" style="display: none;">
-                                    <nav>
-                                        <div id="paginationInfo"
-                                             class="d-flex justify-content-between align-items-center">
-                                            <ul class="pagination mb-0" id="pagination"></ul>
-                                            <div class="form-group mb-0 text-center">
-                                                <span id="totalPages"></span>
-                                                <label for="pageInput">跳转至：</label>
-                                                <input type="number" class="form-control" id="pageInput"
-                                                       min="1">
-                                                <button class="btn btn-primary" id="goToPage">跳转</button>
-                                            </div>
-                                        </div>
-                                    </nav>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- 第二个表格 -->
-                            <div id="dataTableContainer1" style="width: 50%; overflow-x: auto;">
-                                <table id="dataTable1" class="table table-bordered">
-                                    <!-- 这里将用 JavaScript 动态创建表格内容 -->
-                                </table>
-                                <div id="paginationContainer1" class="mt-3" style="display: none;">
-                                    <nav>
-                                        <div id="paginationInfo1"
-                                             class="d-flex justify-content-between align-items-center">
-                                            <ul class="pagination mb-0" id="pagination1"></ul>
-                                            <div class="form-group mb-0 text-center">
-                                                <span id="totalPages1"></span>
-                                                <label for="pageInput1">跳转至：</label>
-                                                <input type="number" class="form-control" id="pageInput1"
-                                                       min="1">
-                                                <button class="btn btn-primary" id="goToPage1">跳转</button>
-
-                                            </div>
-                                        </div>
-                                    </nav>
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label"
+                                           for="distortionPrivacyLevel">请选择隐私保护等级</label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" name="distortionPrivacyLevel"
+                                                id="distortionPrivacyLevel">
+                                            <option value="1"> 低程度</option>
+                                            <option value="2" selected> 中程度</option>
+                                            <option value="3"> 高程度</option>
+                                        </select>
+                                    </div>
                                 </div>
+                                <div id="fileInfo"></div>
+                                <div class="form-group text-center">
+                                    <input type="file" accept=".txt" id="fileUpload" style="display: none;">
+                                    <label for="fileUpload" class="btn btn-white">
+                                        选择文件
+                                    </label>
+                                </div>
+
+                                <div class="form-group text-center">
+                                    <button type="button" class="btn btn-primary" id="submitBtn">提交脱敏
+                                    </button>
+                                    <button type="button" class="btn btn-primary m-l" id="setDefaultAlgorithm">
+                                        设置当前算法为默认算法
+                                    </button>
+                                </div>
+                            </form>
+
+
+                            <!--                            <div style="display: flex; flex-wrap: wrap; justify-content: center;">-->
+                            <div class="row">
+                                <div class="col-lg-4 col-lg-offset-2">
+                                    <!-- 第一个表格 -->
+                                    <!--                            <div id="dataTableContainer" style="width: 50%; overflow-x: auto;">-->
+                                    <div id="dataTableContainer" class="panel panel-info">
+                                        <div class="panel-heading">
+                                            脱敏前文件内容
+                                        </div>
+
+                                        <table id="dataTable" class="table table-bordered">
+                                            <!-- 这里将用 JavaScript 动态创建表格内容 -->
+                                        </table>
+                                        <div id="paginationContainer" class="mt-3" style="display: none;">
+                                            <nav>
+                                                <div id="paginationInfo"
+                                                     class="d-flex justify-content-between align-items-center">
+                                                    <ul class="pagination mb-0" id="pagination"></ul>
+                                                    <div class="form-group mb-0 text-center">
+                                                        <span id="totalPages"></span>
+                                                        <label for="pageInput">跳转至：</label>
+                                                        <input type="number" class="form-control" id="pageInput"
+                                                               min="1">
+                                                        <button class="btn btn-primary" id="goToPage">跳转</button>
+                                                    </div>
+                                                </div>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <!-- 第二个表格 -->
+                                    <!--                                <div id="dataTableContainer1" style="width: 50%; overflow-x: auto;">-->
+                                    <div id="dataTableContainer1" class="panel panel-success">
+                                        <div class="panel-heading">
+                                            脱敏后文件内容
+                                        </div>
+                                        <table id="dataTable1" class="table table-bordered">
+                                            <!-- 这里将用 JavaScript 动态创建表格内容 -->
+                                        </table>
+                                        <div id="paginationContainer1" class="mt-3" style="display: none;">
+                                            <nav>
+                                                <div id="paginationInfo1"
+                                                     class="d-flex justify-content-between align-items-center">
+                                                    <ul class="pagination mb-0" id="pagination1"></ul>
+                                                    <div class="form-group mb-0 text-center">
+                                                        <span id="totalPages1"></span>
+                                                        <label for="pageInput1">跳转至：</label>
+                                                        <input type="number" class="form-control" id="pageInput1"
+                                                               min="1">
+                                                        <button class="btn btn-primary" id="goToPage1">跳转</button>
+
+                                                    </div>
+                                                </div>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
 
                     <div id="tab-2" class="tab-pane">
-                        <div id="selection-area">
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>请选择文本非失真脱敏算法</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table2">
-                                <tr>
-                                    <td>
-                                        <select id="nodistortionAlg">
+                        <div class="panel-body">
+                            <div role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="nodistortionAlg">
+                                        请选择文本非失真脱敏算法
+                                    </label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" name="nodistortionAlg" id="nodistortionAlg">
                                             <option value="trace" selected>在线打车外包查询算法</option>
+
                                         </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div id="nondistortion-module-container" class="tab-pane">
-
-                            <div id="trace-module" style="visibility: visible">
-                                <div class="map-container" id="driverMap1-container">
-                                    <div class="map-title">司机1</div> <!-- 标题元素 -->
-                                    <div class="map-content"> <!-- 新增的包裹容器 -->
-                                        <div class="map" id="driverMap1"></div>
-                                        <div class="map-info">
-                                            <span>当前经纬度: <div id="driver1Coord"></div></span>
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="lockDriver1">确定
-                                            </button>
-                                            <div class="log-area" id="driver1Log">
-                                                <textarea id="driver1LogArea" rows="5" cols="33"></textarea>
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="driver1Stop">停止
-                                            </button>
-
-                                        </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="map-container" id="driverMap2-container">
-                                    <div class="map-title">司机2</div> <!-- 标题元素 -->
-                                    <div class="map-content"> <!-- 新增的包裹容器 -->
-                                        <div class="map" id="driverMap2"></div>
-                                        <div class="map-info">
-                                            <span>当前经纬度: <div id="driver2Coord"></div></span>
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="lockDriver2">确定
-                                            </button>
-                                            <div class="log-area" id="driver2Log">
-                                                <textarea id="driver2LogArea" rows="5" cols="33"></textarea>
+                            <div id="nondistortion-module-container" class="tab-pane">
+                                <div id="trace-module" style="visibility: visible">
+                                    <div class="map-container" id="driverMap1-container">
+                                        <div class="map-title">司机1</div> <!-- 标题元素 -->
+                                        <div class="map-content"> <!-- 新增的包裹容器 -->
+                                            <div class="map" id="driverMap1"></div>
+                                            <div class="map-info">
+                                                <span>当前经纬度: <div id="driver1Coord"></div></span>
+                                                <button type="button" class="btn btn-primary"
+                                                        id="lockDriver1">确定
+                                                </button>
+                                                <div class="log-area" id="driver1Log">
+                                                    <textarea id="driver1LogArea" rows="5" cols="33"></textarea>
+                                                </div>
+                                                <button type="button" class="btn btn-primary"
+                                                        id="driver1Stop">停止
+                                                </button>
+
                                             </div>
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="driver2Stop">停止
-                                            </button>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="map-container" id="customerMap-container">
-                                    <div class="map-title">乘客</div> <!-- 标题元素 -->
-                                    <div class="map-content"> <!-- 新增的包裹容器 -->
-                                        <div class="map" id="customerMap"></div>
-                                        <div class="map-info">
-                                            <div class="coordinates">
-                                                <span>出发点经纬度: <div id="startCoord"></div></span>
-                                                <button type="button" class="btn btn-sm btn-primary"
-                                                        id="lockStart">
-                                                    确定
+                                    <div class="map-container" id="driverMap2-container">
+                                        <div class="map-title">司机2</div> <!-- 标题元素 -->
+                                        <div class="map-content"> <!-- 新增的包裹容器 -->
+                                            <div class="map" id="driverMap2"></div>
+                                            <div class="map-info">
+                                                <span>当前经纬度: <div id="driver2Coord"></div></span>
+                                                <button type="button" class="btn btn-primary"
+                                                        id="lockDriver2">确定
+                                                </button>
+                                                <div class="log-area" id="driver2Log">
+                                                    <textarea id="driver2LogArea" rows="5" cols="33"></textarea>
+                                                </div>
+                                                <button type="button" class="btn btn-primary"
+                                                        id="driver2Stop">停止
                                                 </button>
                                             </div>
-                                            <div class="coordinates">
-                                                <span>目的地经纬度: <div id="endCoord"></div></span>
-                                                <button type="button" class="btn btn-sm btn-primary"
-                                                        id="lockEnd">确定
-                                                </button>
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="sendRequest">
-                                                发送打车请求
-                                            </button>
-                                            <div class="log-area" id="customerLog">
-                                                <textarea id="customerLogArea" rows="5" cols="33"></textarea>
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="customerStop">
-                                                停止
-                                            </button>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="server-container" id="serverInfo-container">
-                                    <div class="server-title">服务器</div>
-                                    <div class="server-content">
-                                        <div class="log-area" id="serverLog">
-                                            <textarea id="serverLogArea" rows="5" cols="33"></textarea>
+                                    <div class="map-container" id="customerMap-container">
+                                        <div class="map-title">乘客</div> <!-- 标题元素 -->
+                                        <div class="map-content"> <!-- 新增的包裹容器 -->
+                                            <div class="map" id="customerMap"></div>
+                                            <div class="map-info">
+                                                <div class="coordinates">
+                                                    <span>出发点经纬度: <div id="startCoord"></div></span>
+                                                    <button type="button" class="btn btn-primary"
+                                                            id="lockStart">
+                                                        确定
+                                                    </button>
+                                                </div>
+                                                <div class="coordinates">
+                                                    <span>目的地经纬度: <div id="endCoord"></div></span>
+                                                    <button type="button" class="btn btn-primary"
+                                                            id="lockEnd">确定
+                                                    </button>
+                                                </div>
+                                                <button type="button" class="btn btn-primary m-b"
+                                                        id="sendRequest">
+                                                    发送打车请求
+                                                </button>
+                                                <div class="log-area m-t" id="customerLog">
+                                                    <textarea id="customerLogArea" rows="5" cols="33"></textarea>
+                                                </div>
+                                                <button type="button" class="btn btn-primary"
+                                                        id="customerStop">
+                                                    停止
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="buttons-row">
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="serverStart">启动
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-primary"
-                                                    id="serverStop">停止
-                                            </button>
+                                    </div>
+
+                                    <div class="server-container" id="serverInfo-container">
+                                        <div class="server-title">服务器</div>
+                                        <div class="server-content">
+                                            <div class="log-area" id="serverLog">
+                                                <textarea id="serverLogArea" rows="5" cols="33"></textarea>
+                                            </div>
+                                            <div class="buttons-row">
+                                                <button type="button" class="btn btn-primary"
+                                                        id="serverStart">启动
+                                                </button>
+                                                <button type="button" class="btn btn-primary"
+                                                        id="serverStop">停止
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

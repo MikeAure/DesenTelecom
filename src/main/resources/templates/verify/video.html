@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Insert title here</title>
-    <link th:href="@{favicon.ico}" rel="shortcut icon" />
+    <link th:href="@{favicon.ico}" rel="shortcut icon"/>
     <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet"/>
     <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet"/>
     <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet"/>
     <link th:href="@{/css/animate.css}" rel="stylesheet"/>
     <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css"/>
-    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css"/>
     <link th:href="@{/css/style.css?v=4.1.0}" rel="stylesheet"/>
     <!-- 全局js -->
     <script th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
@@ -26,69 +26,110 @@
     <script th:src="@{/js/multiple-select.min.js}"></script>
     <!-- 自定义js -->
     <script th:src="@{/js/content.js?v=1.0.0}"></script>
-    <script type="text/javascript">
-        let defaultOption = 'meanValueVideo'; // 预设的默认选项
+    <script type="text/javascript" th:inline="javascript">
+        let defaultOption = [[${defaultAlgName}]];
 
-        document.addEventListener('DOMContentLoaded', function() {
+        // let defaultOption = 'meanValueVideo'; // 预设的默认选项
+
+        document.addEventListener('DOMContentLoaded', function () {
             let defaultBtns = document.getElementById("default-choosefile-btn");
             let videoBgBtns = document.getElementById("video-bg-sub-btns");
             let videoFaceSubBtns = document.getElementById("video-face-sub-btns");
             let privacyLevel = document.getElementById("privacyLevel");
+            let midImageArea = document.getElementById("midImageArea");
             let submitBtn = $('#submit');
 
             let selectElement = document.getElementById('distortion-types');
-            fetch('/toolset/getDefaultSelection?toolsetName=' + 'video')
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Failed to fetch');
-                    }
-                })
-                .then(data => {
-                    if (data.code === 200 && data.data) {
-                        setDefaultOption(data.data);
-                        defaultOption = data.data;
+            setDefaultOption(defaultOption)
+            switch (defaultOption) {
+                case "video_remove_bg":
+                    defaultBtns.style.display = "none";
+                    videoBgBtns.style.display = "block";
+                    videoFaceSubBtns.style.display = "none"
+                    privacyLevel.style.display = "block";
+                    midImageArea.style.display = "block";
+                    // submitBtn.removeEventListener("click", originalSubmit);
+                    // submitBtn.removeEventListener("click", faceSubSubmit);
+                    submitBtn.off('click').on("click", removeBgSubmit);
+                    break;
 
-                        switch (defaultOption) {
-                            case "video_remove_bg":
-                                defaultBtns.style.display = "none";
-                                videoBgBtns.style.display = "flex";
-                                videoFaceSubBtns.style.display = "none"
-                                privacyLevel.style.display = "block";
-                                // submitBtn.removeEventListener("click", originalSubmit);
-                                // submitBtn.removeEventListener("click", faceSubSubmit);
-                                submitBtn.off('click').on("click", removeBgSubmit);
-                                break;
+                case "video_face_sub":
+                    defaultBtns.style.display = "none";
+                    videoBgBtns.style.display = "none";
+                    videoFaceSubBtns.style.display = "block"
+                    privacyLevel.style.display = "none";
+                    midImageArea.style.display = "block";
+                    // submitBtn.removeEventListener("click", originalSubmit);
+                    // submitBtn.removeEventListener("click", removeBgSubmit);
+                    submitBtn.off('click').on("click", faceSubSubmit);
+                    break;
 
-                            case "video_face_sub":
-                                defaultBtns.style.display = "none";
-                                videoBgBtns.style.display = "none";
-                                videoFaceSubBtns.style.display = "flex"
-                                privacyLevel.style.display = "none";
-                                // submitBtn.removeEventListener("click", originalSubmit);
-                                // submitBtn.removeEventListener("click", removeBgSubmit);
-                                submitBtn.off('click').on("click", faceSubSubmit);
-                                break;
-
-                            default:
-                                defaultBtns.style.display = "flex";
-                                videoBgBtns.style.display = "none";
-                                videoFaceSubBtns.style.display = "none"
-                                privacyLevel.style.display = "block";
-                                // submitBtn.addEventListener("click", originalSubmit);
-                                // submitBtn.removeEventListener("click", removeBgSubmit);
-                                submitBtn.off('click').on("click", originalSubmit);
-                                break;
-                        }
-                    } else {
-                        setDefaultOption(defaultOption);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    setDefaultOption(defaultOption);
-                });
+                default:
+                    defaultBtns.style.display = "block";
+                    videoBgBtns.style.display = "none";
+                    videoFaceSubBtns.style.display = "none"
+                    privacyLevel.style.display = "block";
+                    midImageArea.style.display = "none";
+                    // submitBtn.addEventListener("click", originalSubmit);
+                    // submitBtn.removeEventListener("click", removeBgSubmit);
+                    submitBtn.off('click').on("click", originalSubmit);
+                    break;
+            }
+            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'video')
+            //     .then(response => {
+            //         if (response.ok) {
+            //             return response.json();
+            //         } else {
+            //             throw new Error('Failed to fetch');
+            //         }
+            //     })
+            //     .then(data => {
+            //         if (data.code === 200 && data.data) {
+            //             setDefaultOption(data.data);
+            //             defaultOption = data.data;
+            //
+            //             switch (defaultOption) {
+            //                 case "video_remove_bg":
+            //                     defaultBtns.style.display = "none";
+            //                     videoBgBtns.style.display = "block";
+            //                     videoFaceSubBtns.style.display = "none"
+            //                     privacyLevel.style.display = "block";
+            //                     midImageArea.style.display = "block";
+            //                     // submitBtn.removeEventListener("click", originalSubmit);
+            //                     // submitBtn.removeEventListener("click", faceSubSubmit);
+            //                     submitBtn.off('click').on("click", removeBgSubmit);
+            //                     break;
+            //
+            //                 case "video_face_sub":
+            //                     defaultBtns.style.display = "none";
+            //                     videoBgBtns.style.display = "none";
+            //                     videoFaceSubBtns.style.display = "block"
+            //                     privacyLevel.style.display = "none";
+            //                     midImageArea.style.display = "block";
+            //                     // submitBtn.removeEventListener("click", originalSubmit);
+            //                     // submitBtn.removeEventListener("click", removeBgSubmit);
+            //                     submitBtn.off('click').on("click", faceSubSubmit);
+            //                     break;
+            //
+            //                 default:
+            //                     defaultBtns.style.display = "block";
+            //                     videoBgBtns.style.display = "none";
+            //                     videoFaceSubBtns.style.display = "none"
+            //                     privacyLevel.style.display = "block";
+            //                     midImageArea.style.display = "none";
+            //                     // submitBtn.addEventListener("click", originalSubmit);
+            //                     // submitBtn.removeEventListener("click", removeBgSubmit);
+            //                     submitBtn.off('click').on("click", originalSubmit);
+            //                     break;
+            //             }
+            //         } else {
+            //             setDefaultOption(defaultOption);
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         setDefaultOption(defaultOption);
+            //     });
 
             function setDefaultOption(value) {
                 selectElement.value = value;
@@ -99,9 +140,13 @@
             let fileUpload = document.getElementById("fileUpload");
             // 非失真脱敏算法
             let distortionTypes = document.getElementById("distortion-types");
-            let preArea = document.getElementById("pre");
-            let afterArea = document.getElementById("after");
-            let midImageArea = document.getElementById("mid-image");
+            // 图像视频的展示区域
+            let preVideo = document.getElementById("pre");
+            let afterVideo = document.getElementById("after");
+            let midImage = document.getElementById("mid-image");
+
+            let midImageArea = document.getElementById("midImageArea");
+
             let defaultBtns = document.getElementById("default-choosefile-btn");
             let videoBgBtns = document.getElementById("video-bg-sub-btns");
             let videoFaceSubBtns = document.getElementById("video-face-sub-btns");
@@ -140,9 +185,9 @@
             // });
             // 监测标签的切换事件
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                preArea.innerHTML = "";
-                afterArea.innerHTML = "";
-                midImageArea.innerHTML = "";
+                preVideo.innerHTML = "";
+                afterVideo.innerHTML = "";
+                midImage.innerHTML = "";
 
                 originalFile.value = "";
                 bgVideoFile.value = "";
@@ -158,25 +203,28 @@
                 switch (defaultOption) {
                     case "video_remove_bg":
                         defaultBtns.style.display = "none";
-                        videoBgBtns.style.display = "flex";
+                        videoBgBtns.style.display = "block";
                         videoFaceSubBtns.style.display = "none"
                         privacyLevel.style.display = "block";
+                        midImageArea.style.display = "block";
                         submitBtn.off('click').on("click", removeBgSubmit);
                         break;
 
                     case "video_face_sub":
                         defaultBtns.style.display = "none";
                         videoBgBtns.style.display = "none";
-                        videoFaceSubBtns.style.display = "flex"
+                        videoFaceSubBtns.style.display = "block"
                         privacyLevel.style.display = "none";
+                        midImageArea.style.display = "block";
                         submitBtn.off('click').on("click", faceSubSubmit);
                         break;
 
                     default:
-                        defaultBtns.style.display = "flex";
+                        defaultBtns.style.display = "block";
                         videoBgBtns.style.display = "none";
                         videoFaceSubBtns.style.display = "none"
                         privacyLevel.style.display = "block";
+                        midImageArea.style.display = "none";
                         submitBtn.off('click').on("click", originalSubmit);
                         break;
                 }
@@ -206,7 +254,6 @@
                         reader.onload = function (e) {
                             let video = document.createElement("video");
                             video.src = e.target.result;
-                            /*video.style.width = '300px';*/
                             video.controls = true;
                             pre.appendChild(video);
                         };
@@ -292,8 +339,6 @@
                             //console.log(data)
                             video.src = e.target.result;
                             video.type = "video/mp4";
-                            video.style.maxWidth = "50%";
-                            video.style.height = "auto";
                             video.controls = true;
 
                             pre.appendChild(video);
@@ -312,7 +357,7 @@
                 postData.set("defaultAlgName", $("#distortion-types").val());
                 console.log("postData: " + postData);
 
-                fetch ("/toolset/setDefaultToolset", {
+                fetch("/toolset/setDefaultToolset", {
                     method: "POST",
                     body: postData,
                 })
@@ -496,8 +541,6 @@
                             //console.log(data)
                             video.src = URL.createObjectURL(blob);
                             video.type = "video/mp4";
-                            video.style.maxWidth = "50%";
-                            video.style.height = "auto";
                             video.controls = true;
                             after.appendChild(video);
                         })
@@ -633,6 +676,8 @@
             let videoFaceSubBtns = document.getElementById("video-face-sub-btns");
             let privacyLevel = document.getElementById("privacyLevel");
 
+            let midImageArea = document.getElementById("midImageArea");
+
             const originalFile = document.getElementById("fileUpload");
             const bgVideoFile = document.getElementById("video_remove_bg_fileupload");
             const bgImageFile = document.getElementById("video_remove_bg_img_fileupload");
@@ -654,25 +699,28 @@
             switch (algoName) {
                 case "video_remove_bg":
                     defaultBtns.style.display = "none";
-                    videoBgBtns.style.display = "flex";
+                    videoBgBtns.style.display = "block";
                     videoFaceSubBtns.style.display = "none"
                     privacyLevel.style.display = "block";
+                    midImageArea.style.display = "block";
                     submitBtn.off('click').on("click", removeBgSubmit);
                     break;
 
                 case "video_face_sub":
                     defaultBtns.style.display = "none";
                     videoBgBtns.style.display = "none";
-                    videoFaceSubBtns.style.display = "flex"
+                    videoFaceSubBtns.style.display = "block"
                     privacyLevel.style.display = "none";
+                    midImageArea.style.display = "block";
                     submitBtn.off('click').on("click", faceSubSubmit);
                     break;
 
                 default:
-                    defaultBtns.style.display = "flex";
+                    defaultBtns.style.display = "block";
                     videoBgBtns.style.display = "none";
                     videoFaceSubBtns.style.display = "none"
                     privacyLevel.style.display = "block";
+                    midImageArea.style.display = "none";
                     submitBtn.off('click').on("click", originalSubmit);
                     break;
             }
@@ -831,8 +879,8 @@
         #showRawVideo video,
         #showDecryptedVideo video,
         #after video {
-            display: inline-block;
-            max-width: 50%;
+            display: block;
+            max-width: 100%;
             height: auto
         }
 
@@ -848,21 +896,20 @@
         }
 
         #mid-image img {
-            display: inline-block;
-            max-width: 50%;
+            display: block;
+            max-width: 100%;
             height: auto;
+            margin-right:auto;
+            margin-left:auto
         }
     </style>
 
 </head>
 <body>
+<div class="wrapper wrapper-content">
 
-<div class="row">
-    <div class="col-sm-12">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-            </div>
-
+    <div class="row">
+        <div class="col-lg-12">
             <div class="tabs-container">
                 <ul id="tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
@@ -871,18 +918,15 @@
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div id="tab-1" class="tab-pane active" style="text-align: center;">
-                        <div>
-                            <table style="margin: auto; font-size: 20px">
-                                <thead>
-                                <tr>
-                                    <th> 请选择视频失真脱敏算法</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table1">
-                                <tr>
-                                    <td>
-                                        <select id="distortion-types">
+                    <div id="tab-1" class="tab-pane active">
+                        <div class="panel-body">
+                            <form role="form" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="distortion-types">
+                                        请选择视频失真脱敏算法
+                                    </label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" id="distortion-types">
                                             <option value="meanValueVideo">泛化-基于均值滤波器的视频帧像素替换方法
                                             </option>
                                             <option value="pixelate_video">泛化-基于像素化滤波器的视频帧像素替换方法
@@ -900,114 +944,145 @@
                                             <option value="video_face_sub">替换-视频人脸替换算法
                                             </option>
                                         </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div id="privacyLevel">
-                            <table style="margin: auto; font-size: 20px">
-                                <thead>
-                                <tr>
-                                    <th>请选择隐私保护等级</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table3">
-                                <tr>
-                                    <td><select id="privacy-levels">
+                                    </div>
+                                </div>
+                                <div class="form-group" id="privacyLevel">
+                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="distortion-types">
+                                        请选择隐私保护等级
+                                    </label>
+                                    <div class="col-lg-3">
+                                        <select class="form-control" id="privacy-levels">
                                             <option value="0"> 低程度</option>
                                             <option value="1" selected> 中程度</option>
                                             <option value="2"> 高程度</option>
-                                        </select></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                        </select>
+                                    </div>
+                                </div>
 
-                        <div id="default-choosefile-btn" class="midtile">
-                            <div class="col-sm-5 m-b-xs">
-                                <form action="/upload" method="post" enctype="multipart/form-data">
+                                <div id="default-choosefile-btn" class="form-group text-center">
                                     <input type="file" id="fileUpload" style="display: none;" accept=".mp4">
-                                    <label for="fileUpload" class="upload-btn">
+                                    <label for="fileUpload" class="btn btn-white">
                                         选择文件
                                     </label>
-                                </form>
-                            </div>
-                        </div>
+                                </div>
 
-                        <div id="video-bg-sub-btns" class="midtile" style="display: none">
-                            <div class="align-items-center">
-                                <form enctype="multipart/form-data">
+                                <div id="video-bg-sub-btns" class="form-group text-center" style="display: none">
                                     <input type="file" id="video_remove_bg_img_fileupload" style="display: none;"
                                            accept=".jpg, .jpeg, .png">
-                                    <label for="video_remove_bg_img_fileupload" class="upload-btn">
+                                    <label for="video_remove_bg_img_fileupload" class="btn btn-white">
                                         选择背景图片
                                     </label>
                                     <input type="file" id="video_remove_bg_fileupload" style="display: none;"
                                            accept=".mp4">
-                                    <label for="video_remove_bg_fileupload" class="upload-btn">
+                                    <label for="video_remove_bg_fileupload" class="btn btn-white">
                                         选择视频文件
                                     </label>
-                                </form>
-                            </div>
-                        </div>
+                                </div>
 
-                        <div id="video-face-sub-btns" class="midtile" style="display: none">
-                            <div class="align-items-center">
-                                <form id="uploadForm" enctype="multipart/form-data">
-                                    <input type="file" id="video_face_sub_src_fileupload" accept=".jpg, .jpeg, .png" style="display: none;">
-                                    <label for="video_face_sub_src_fileupload" class="upload-btn">
+                                <div id="video-face-sub-btns" class="form-group text-center" style="display: none">
+                                    <input type="file" id="video_face_sub_src_fileupload" accept=".jpg, .jpeg, .png"
+                                           style="display: none;">
+                                    <label for="video_face_sub_src_fileupload" class="btn btn-white">
                                         选择换脸源文件（图片）
                                     </label>
-                                    <input type="file" id="video_face_sub_target_fileupload" accept=".mp4" style="display: none;">
-                                    <label for="video_face_sub_target_fileupload"  class="upload-btn">
+                                    <input type="file" id="video_face_sub_target_fileupload" accept=".mp4"
+                                           style="display: none;">
+                                    <label for="video_face_sub_target_fileupload" class="btn btn-white">
                                         选择目标视频
                                     </label>
-                                </form>
+                                </div>
+
+                                <div id=fileInfo>
+                                </div>
+
+                                <div class="form-group text-center">
+                                    <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
+                                    <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm">
+                                        设置当前算法为默认算法
+                                    </button>
+                                </div>
+                            </form>
+                            <!--文件上传信息-->
+
+                            <!--                            <div class="showFile">-->
+                            <!--                                &lt;!&ndash;前后文件&ndash;&gt;-->
+                            <!--                                <div id=pre>-->
+                            <!--                                </div>-->
+                            <!--                                <div id=mid-image>-->
+                            <!--                                </div>-->
+                            <!--                                <div id=after>-->
+                            <!--                                </div>-->
+                            <!--                            </div>-->
+                            <div class="showFile row m-t">
+                                <div class="col-lg-3" id="midImageArea" style="display: none;">
+                                    <div class="panel panel-warning">
+                                        <div class="panel-heading">
+                                            选择的图像
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id=mid-image>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3" id="rawVideoArea">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading">
+                                            原始视频
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id=pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3" id="desenVideoArea">
+                                    <div class="panel panel-success">
+                                        <div class="panel-heading">
+                                            脱敏后视频
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id=after>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div id=fileInfo>
-                        </div>
-
-                        <div class="btn2">
-                            <button type="button" class="btn btn-sm btn-primary" id="submit"> 提交脱敏</button>
-                            <button type="button" class="btn btn-sm btn-primary m-l" id="setDefaultAlgorithm"> 设置当前算法为默认算法</button>
-                        </div>
-
-                        <!--文件上传信息-->
-
-                        <div class="showFile">
-                            <!--前后文件-->
-                            <div id=pre>
-                            </div>
-                            <div id=mid-image>
-                            </div>
-                            <div id=after>
-                            </div>
-                        </div>
-
                     </div>
                     <div id="tab-2" class="tab-pane" style="text-align: center;">
-                        <div>
-                            <table style="margin: auto; font-size: 20px">
-                                <thead>
-                                <tr>
-                                    <th>请选择视频非失真脱敏算法</th>
-                                </tr>
-                                </thead>
-                                <tbody id="table2">
-                                <tr>
-                                    <td>
-                                        <select id="nodistortionAlg">
-
-                                            <option value="videoAesEncrypt" selected> AES视频加密</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <form role="form" class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-lg-3 col-lg-offset-3 control-label" for="distortion-types">
+                                    请选择视频非失真脱敏算法
+                                </label>
+                                <div class="col-lg-3">
+                                    <select class="form-control" id="nodistortionAlg">
+                                        <option value="videoAesEncrypt" selected>AES视频加密</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                        <!--                        <div>-->
+                        <!--                            <table style="margin: auto; font-size: 20px">-->
+                        <!--                                <thead>-->
+                        <!--                                <tr>-->
+                        <!--                                    <th>请选择视频非失真脱敏算法</th>-->
+                        <!--                                </tr>-->
+                        <!--                                </thead>-->
+                        <!--                                <tbody id="table2">-->
+                        <!--                                <tr>-->
+                        <!--                                    <td>-->
+                        <!--                                        <select id="nodistortionAlg">-->
+                        <!--                                            <option value="videoAesEncrypt" selected> AES视频加密</option>-->
+                        <!--                                        </select>-->
+                        <!--                                    </td>-->
+                        <!--                                </tr>-->
+                        <!--                                </tbody>-->
+                        <!--                            </table>-->
+                        <!--                        </div>-->
                         <div id="default-module" style="visibility: visible"></div>
 
                         <div class="m-t" id="videoAesEncrypt">
@@ -1018,9 +1093,9 @@
                                 <div class="ibox-content">
 
                                     <div class="form-group">
-                                        <label class="col-sm-2 control-label">请输入加密密钥</label>
+                                        <label class="col-lg-2 control-label">请输入加密密钥</label>
 
-                                        <div class="col-sm-10">
+                                        <div class="col-lg-10">
                                             <input type="text" class="form-control" id="encryptKey"/>
                                         </div>
                                     </div>
@@ -1041,13 +1116,18 @@
 
                                     </div>
                                     <div class="row m-t">
-                                        <div id="aesRawVideoInfo">
+                                        <div class="col-lg-12">
+                                            <div id="aesRawVideoInfo">
 
+                                            </div>
                                         </div>
+
                                     </div>
                                     <div class="row m-t">
-                                        <div id="showRawVideo">
+                                        <div class="col-lg-12">
+                                            <div id="showRawVideo">
 
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1060,9 +1140,9 @@
                                 <div class="ibox-content">
 
                                     <div class="form-group m-b">
-                                        <label class="col-sm-2 control-label">请输入解密密钥</label>
+                                        <label class="col-lg-2 control-label">请输入解密密钥</label>
 
-                                        <div class="col-sm-10">
+                                        <div class="col-lg-10">
                                             <input type="text" class="form-control" id="decryptKey"/>
                                         </div>
                                     </div>
@@ -1100,9 +1180,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-</div>
 
 </div>
 </body>

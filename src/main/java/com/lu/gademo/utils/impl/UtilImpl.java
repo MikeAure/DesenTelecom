@@ -2,9 +2,7 @@ package com.lu.gademo.utils.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
 import com.lu.gademo.utils.Util;
-import freemarker.template.SimpleDate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -14,11 +12,9 @@ import org.bouncycastle.util.encoders.Hex;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;

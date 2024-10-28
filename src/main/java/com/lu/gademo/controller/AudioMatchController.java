@@ -91,49 +91,6 @@ public class AudioMatchController {
         return rawFilePath;
     }
 
-//    @PostMapping(value = "signUp", produces = "application/json;charset=UTF-8")
-//    public ServerResponse signUp(@RequestPart MultipartFile file, @RequestParam String name) {
-//        String rawFilePath;
-//        // Save the file sent by frontend
-//        try {
-//            rawFilePath = saveFile(file);
-//            System.out.println(rawFilePath);
-//        } catch (IOException e) {
-//            log.error(e.getMessage());
-//            return new ServerResponse("error", "Save file failed");
-//        }
-//        // Invoke Python script to verify if the user has signed up
-//        try {
-//            String username = name + "&&" + "0" + "@@";
-//            String parameter = "\"" + username + "\"" + " " + rawFilePath;
-//
-//            // 根据当前操作系统类型决定是否使用conda环境
-////            if(!util.isLinux()){
-////                String conda = "conda run -n torch_env ";
-////                command = conda + command;
-////            }
-//            Process signUpProcess = Runtime.getRuntime().exec(command + " " + parameter);
-//            System.out.println(command + " " + parameter);
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(signUpProcess.getInputStream()));
-//            // 获得python脚本进程的输出
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                System.out.println("Python Output: " + line);
-//                if (line.contains("status")) {
-//                    break;
-//                }
-//            }
-//            // 等待进程结束并获取退出码
-//            boolean exitCode = signUpProcess.waitFor(60, TimeUnit.SECONDS);
-//            System.out.println("Terminated normally : " + exitCode);
-//            final ObjectMapper objectMapper = new ObjectMapper();
-//            return objectMapper.readValue(line, ServerResponse.class);
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//            return new ServerResponse("error", "Server returns message error");
-//        }
-//    }
-
     @PostMapping(value = "signUp", produces = "application/json;charset=UTF-8")
     public ServerResponse signUp(@RequestPart MultipartFile file, @RequestParam String name) throws IOException {
         Path rawFileDirectory = Paths.get("raw_files");
@@ -191,16 +148,9 @@ public class AudioMatchController {
                     break;
                 }
             }
-//            while ((line = reader.readLine()) != null) {
-//                log.info("Python Output: {}", line);
-//                if (line.contains("status")) {
-//                    break;
-//                }
-//            }
+
             // 等待进程结束并获取退出码
-//            int exitCode = signUpProcess.waitFor();
             String endTime = util.getTime();
-//            log.info("Exited with code : {}", exitCode);
             String evidenceID = util.getSM3Hash((new String(rawFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
             // 对于非失真脱敏，脱敏前后文件信息是相同的
             logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,

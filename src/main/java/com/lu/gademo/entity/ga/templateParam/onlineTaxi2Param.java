@@ -12,8 +12,7 @@ import java.io.IOException;
 @Table(name = "onlinetaxi2_param")
 @Data
 @NoArgsConstructor
-public class onlineTaxi2Param extends BaseEntity {
-    private static final long serialVersionUID = 1L;
+public class onlineTaxi2Param {
     //数据存储id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

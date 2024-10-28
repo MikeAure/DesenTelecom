@@ -10,7 +10,6 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
-@ToString
 @Table(name = "rec_eva_result_inv")
 // 脱敏效果测评结果无效异常消息
 public class RecEvaResultInv {

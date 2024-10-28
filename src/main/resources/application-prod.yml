@@ -35,29 +35,17 @@ spring:
                     autoRegisterUserTypes: true
         show-sql: true
 
-#    devtools:
-#        add-properties: false
-
-    freemarker:
-        charset: UTF-8
-        check-template-location: true
-        content-type: text/html
-        expose-request-attributes: true
-        expose-session-attributes: true
-        request-context-attribute: request
-        settings:
-            template_update_delay: 0
-        suffix: .ftl
-        template-loader-path: classpath:/templates/
-
     servlet:
         multipart:
             maxFileSize: 100MB
             maxRequestSize: 100MB
 
     thymeleaf:
+        cache: false
         encoding: UTF-8
-        mode: ftl
+        servlet:
+            content-type: text/html
+
 mybatis:
     configuration:
         log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl

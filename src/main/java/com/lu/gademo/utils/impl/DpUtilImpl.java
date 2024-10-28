@@ -258,37 +258,37 @@ public class DpUtilImpl implements DpUtil {
     //数值型数据处理()
     public List<Double> laplaceToValue(List<Object> datas, Integer privacyLevel) {
         log.info("LaplaceToValue Algorithm Start");
-        List<Double> re_data = new ArrayList<>();
+        List<Double> reData = new ArrayList<>();
         //读取数据
         for (Object data : datas) {
             if (data == null) {
-                re_data.add(null);
+                reData.add(null);
             } else {
                 if (data instanceof Cell) {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
                         double numericValue = currentCell.getNumericCellValue();
-                        re_data.add(numericValue);
+                        reData.add(numericValue);
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
                             double numericValue = Double.parseDouble(stringValue);
-                            re_data.add(numericValue);
+                            reData.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
                             log.error("LaplaceToValue error: {}", e.getMessage());
                         }
                     }
                 } else {
-                    re_data.add(Double.valueOf(data.toString()));
+                    reData.add(Double.valueOf(data.toString()));
                 }
             }
         }
         //privacyLevel直接返回
         if (privacyLevel == 0)
-            return re_data;
+            return reData;
         //执行laplace加噪
-        return NumberCode_s(re_data, privacyLevel);
+        return NumberCode_s(reData, privacyLevel);
     }
 
     //数值型处理
@@ -311,10 +311,10 @@ public class DpUtilImpl implements DpUtil {
             epsilon = new BigDecimal(1);
         }
 
-        log.info("Epsilon: " + epsilon);
+        log.info("Epsilon: {}", epsilon);
         BigDecimal beta = sensitivity.divide(epsilon, 6, RoundingMode.HALF_UP);
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
-        log.info("Beta: " + beta);
+        log.info("Beta: {}", beta);
 
         //循环处理数据
         for (int i = 0; i < reData.size(); i++) {
