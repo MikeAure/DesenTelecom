@@ -1,7 +1,8 @@
 package com.lu.gademo.controller;
 
 import com.lu.gademo.entity.ga.SceneInfo;
-import com.lu.gademo.service.impl.SceneInfoDaoServiceImpl;
+import com.lu.gademo.service.SceneInfoDaoService;
+import com.lu.gademo.service.impl.ExcelAlgorithmsDaoServiceImpl;
 import com.lu.gademo.service.impl.ToolsetService;
 import com.lu.gademo.utils.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -10,21 +11,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
 public class GaController extends BaseController {
 
     private final ToolsetService toolsetService;
-    private final SceneInfoDaoServiceImpl sceneInfoDaoService;
+    private final SceneInfoDaoService sceneInfoDaoService;
     private final List<SceneInfo> allSceneInfos;
-
+    private final ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService;
 
     @Autowired
-    public GaController(ToolsetService toolsetService, SceneInfoDaoServiceImpl sceneInfoDaoService) {
+    public GaController(ToolsetService toolsetService, SceneInfoDaoService sceneInfoDaoService, List<SceneInfo> allSceneInfos, ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService) {
         this.toolsetService = toolsetService;
         this.sceneInfoDaoService = sceneInfoDaoService;
         this.allSceneInfos = sceneInfoDaoService.getAllSceneInfos();
+        this.excelAlgorithmsDaoService = excelAlgorithmsDaoService;
     }
 
     @RequestMapping(value = {"/", "/index"})
@@ -65,7 +68,29 @@ public class GaController extends BaseController {
 //            model.addAttribute("distortionAudioAlgoList", audioAlgorithmInfoDtoList);
 //            model.addAttribute("defaultOption", "audio_spec");
 //        }
-        String defaultAlgName = toolsetService.getDefaultTool(name);
+        Map<String, List<Map<String, Object>>> algorithmsByType = excelAlgorithmsDaoService.getAlgorithmsByType();
+        String defaultAlgName = "";
+        if (!name.equals("graph")) {
+            defaultAlgName = toolsetService.getDefaultTool(name);
+        }
+        switch (name) {
+            case "text":
+                break;
+            case "excel":
+                model.addAttribute("scenes", allSceneInfos);
+                model.addAttribute("algorithmsByType", algorithmsByType);
+                break;
+            case "audio":
+                break;
+            case "image":
+                break;
+            case "video":
+                break;
+            case "graph":
+                break;
+            default:
+                break;
+        }
         log.info("defaultAlgName: {}", defaultAlgName);
         model.addAttribute("defaultAlgName", defaultAlgName);
 

@@ -8,23 +8,23 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-
+        #  电信CRM客经系统数据库
         crm:
-            jdbc-url: jdbc:mysql://172.28.72.223:3306/crmdb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-            password: LOOK@MYSQL
+            jdbc-url: jdbc:mysql://localhost:3306/crm?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-
+        # 电信大数据平台数据库，用于读取脱敏前数据
         dataplatform:
-            jdbc-url: jdbc:mysql://172.28.160.99:13306/userlogdtl?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-            password: RAkj#7853
-            username: duser
+            jdbc-url: jdbc:mysql://localhost:3306/userlogdtl?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-
+        # 电信大数据平台数据库，用于写入脱敏后数据
         userlog:
-            jdbc-url: jdbc:mysql://172.28.160.99:13306/userlog1?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-            password: RAkj#7853
-            username: duser
+            jdbc-url: jdbc:mysql://localhost:3306/userlog1?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
 
         jmtlogstock:
@@ -32,6 +32,7 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
+
     jpa:
         hibernate:
             ddl-auto: update
@@ -43,8 +44,8 @@ spring:
 
     servlet:
         multipart:
-            maxFileSize: 100MB
-            maxRequestSize: 100MB
+            max-file-size: 200MB
+            max-request-size: 200MB
 
     thymeleaf:
         cache: false
@@ -73,19 +74,23 @@ logging:
             hibernate.SQL: WARN
 
 effectEva:
-    address: 172.28.72.223
-#    address: 127.0.0.1
+    #    address: 192.168.37.192
+    address: 192.168.1.21
     port: 10005
 evidence:
-    localAddress: 172.28.72.214
+    #    localAddress: 172.28.72.214
+    localAddress: 127.0.0.1
     localPort: 50004
-    remoteAddress: 172.28.72.214
+    #    remoteAddress: 172.28.72.214
+    remoteAddress: 127.0.0.1
     remotePort: 50005
 ruleCheck:
-    address: 172.28.72.224
+    #    address: 172.28.72.224
+    address: 127.0.0.1
     port: 30002
 splitReconstruct:
-    address: 172.28.72.225
+    #    address: 172.28.72.225
+    address: 127.0.0.1
     port: 40011
 
 evidenceSystem:
@@ -114,7 +119,7 @@ systemId:
 
 logSenderManager:
     ifSendToEvaFirst: true
-    ifSaveToDatabase: true
+    ifSaveToDatabase: false
     ifSendFile: true
     ifPerformenceTest: false
 
@@ -133,7 +138,6 @@ fetch:
             jdTableName: t_user_info
             jdTargetTableName: t_user_info_desen
             ifSendToEvaluationSystem: true
-
         pageSize:
             localDatabase: 50000
             jdDatabase: 50000

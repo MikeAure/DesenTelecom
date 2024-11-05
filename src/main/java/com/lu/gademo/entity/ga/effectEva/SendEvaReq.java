@@ -1,6 +1,7 @@
 package com.lu.gademo.entity.ga.effectEva;
 
 import com.lu.gademo.entity.ga.support.BaseEntity;
+import com.lu.gademo.service.EvaluationSystemLogSender;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 

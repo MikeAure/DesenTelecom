@@ -76,7 +76,7 @@ public class MeetingDataTableDaoServiceImpl implements MeetingDataTableDaoServic
         if (meetingDataTableDao.getItemTotalNumberByTableName(tableName) > 0) {
             meetingDataTableDao.deleteAll(tableName);
         }
-        // 分批次插入，一次性插入大量数据数据库会报错
+
         insertList(tableName, list);
     }
 }

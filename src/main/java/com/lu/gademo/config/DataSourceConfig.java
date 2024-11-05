@@ -41,4 +41,11 @@ public class DataSourceConfig {
     public DataSource userLogDataSource() {
         return DataSourceBuilder.create().build();
     }
+
+    @Bean(name = "jmtLogStockDataSource")
+    @Qualifier("jmtLogStockDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.jmtlogstock")
+    public DataSource jmtLogStockLogDataSource() {
+        return DataSourceBuilder.create().build();
+    }
 }

@@ -1,6 +1,5 @@
 package com.lu.gademo.mapper.ga;
 
-import com.lu.gademo.entity.crm.TypeWithAlgoNames;
 import com.lu.gademo.entity.ga.TypeAlgoMapping;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;

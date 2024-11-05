@@ -155,14 +155,11 @@ def replace_voice_print_fixed(file_path, newFilePath):
 def add_beep(input_file, input_format, output_file, output_format, start_time_sec, duration_sec, beep_frequency=1000):
     # Load the input audio file
     audio = AudioSegment.from_file(input_file, format=input_format)
-
     # Generate beep audio
     beep = Sine(beep_frequency).to_audio_segment(duration=duration_sec * 1000)
-
     # Add the beep to the specified start time
     start_time_ms = int(start_time_sec * 1000)
     audio = audio.overlay(beep, position=start_time_ms)
-
     # Export the result to a new file
     audio.export(output_file, format=output_format)
 
@@ -170,14 +167,11 @@ def add_beep(input_file, input_format, output_file, output_format, start_time_se
 def remove_audio(input_file, input_format, output_file, output_format, start_time_sec, duration_sec):
     # Load the input audio file
     audio = AudioSegment.from_file(input_file, format=input_format)
-
     # Convert start and end times to milliseconds
     start_time_ms = int(start_time_sec * 1000)
     end_time_ms = int((start_time_sec + duration_sec) * 1000)
-
     # Cut out the specified part of the audio
     final_audio = audio[:start_time_ms] + audio[end_time_ms:]
-
     # Export the result to a new file
     final_audio.export(output_file, format=output_format)
 

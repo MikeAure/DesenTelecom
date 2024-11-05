@@ -307,15 +307,12 @@ public class MockEva {
             chooseNum = 2;
         }
         List<String> selectedList = new ArrayList<>(desenInfoPreIden.subList(0, chooseNum));
-        if (selectedList.contains("CUST_ID")) {
-            selectedList.remove("CUST_ID");
-        }
+        selectedList.remove("CUST_ID");
+        selectedList.remove("sid");
+        selectedList.remove("id");
         // 对于大数据平台的测试
         if (jsonNodes.get("data").get("content").get("fileType").asText().contains("sada")) {
             selectedList = Arrays.asList("f_srcip", "f_dstip");
-        }
-        if (selectedList.contains("sid")) {
-            selectedList.remove("sid");
         }
 //        if (selectedList.contains("手机号码")) {
 //            selectedList.remove("手机号码");

@@ -26,6 +26,13 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
+
+        jmtlogstock:
+            jdbc-url: jdbc:mysql://localhost:3306/jmt_log_stock?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            password: BRysj0725HhRhL##
+            username: root
+            driver-class-name: com.mysql.cj.jdbc.Driver
+
     jpa:
         hibernate:
             ddl-auto: update
@@ -37,8 +44,8 @@ spring:
 
     servlet:
         multipart:
-            maxFileSize: 200MB
-            maxRequestSize: 200MB
+            max-file-size: 200MB
+            max-request-size: 200MB
 
     thymeleaf:
         cache: false
@@ -65,10 +72,11 @@ logging:
         org:
             hibernate: WARN
             hibernate.SQL: WARN
+#        com.lu.gademo.mapper: DEBUG
 
 effectEva:
 #    address: 192.168.37.192
-    address: 127.0.0.1
+    address: 192.168.1.21
     port: 10005
 evidence:
 #    localAddress: 172.28.72.214
@@ -128,8 +136,9 @@ fetch:
             fixedRate: 180000    # 间隔时间（毫秒）
             localTableName: meeting_datatable_copy1
             localTargetTableName: meeting_datatable_desen_copy1
-            jdTableName: t_userinfo
-            jdTargetTableName: t_userinfo_desen
+            jdTableName: t_user_info
+            jdTargetTableName: t_user_info_desen
+            ifSendToEvaluationSystem: false
         pageSize:
             localDatabase: 50000
             jdDatabase: 50000

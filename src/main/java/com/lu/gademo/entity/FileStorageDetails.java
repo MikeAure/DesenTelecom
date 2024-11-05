@@ -27,6 +27,4 @@ public class FileStorageDetails {
     private String desenFilePathString;
     private byte[] desenFileBytes;
     private Long desenFileSize;
-
-
 }

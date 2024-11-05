@@ -282,7 +282,8 @@ public class DpTest {
         String[] chosenList = new String[]{"A", "B", "C", "D", "E"};
 
         List<String> newRawData = new ArrayList<>();
-        for (int i = 0; i < 50000; i++) {
+        for (int i = 0; i < 20; i++) {
+            newRawData.add(null);
             newRawData.add(chosenList[random.nextInt(5)]);
         }
         List<String> rawData = Arrays.asList("A", "B", "C", "D", "E");

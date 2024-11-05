@@ -26,6 +26,14 @@ public class DPController {
     Dp dp;
     Util util;
 
+    /**
+     * 用于算法设置部分的接口
+     * @param rawData 用户输入的原始数据
+     * @param samples
+     * @param algName
+     * @param params
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String desenValue(@RequestParam String rawData,

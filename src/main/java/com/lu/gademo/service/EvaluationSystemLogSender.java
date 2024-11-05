@@ -9,7 +9,7 @@ import java.nio.file.Path;
 /**
  * 向评测系统发送日志
  */
-public interface  EvaluationSystemLogSender {
+public interface EvaluationSystemLogSender {
     EvaluationSystemReturnResult send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
                                                 byte[] desenFileData, Boolean ifSendFile);
     EvaluationSystemReturnResult send2EffectEva(SendEvaReq sendEvaReq, Path rawFileData,

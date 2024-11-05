@@ -62,7 +62,7 @@ public class ParamController {
         }
     }
 
-    //删除数据库中的数，场景管理中用到
+    //删除数据库中的数据，场景管理中用到
     @DeleteMapping("/deleteData/{id}")
     public ResponseEntity<String> deleteData(@RequestParam String tableName,@PathVariable int id) {
         try {

@@ -46,9 +46,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Data
 @Slf4j
 @Service
-@Data
 public class FileServiceImpl implements FileService {
     private final SendEvaReqService sendEvaReqService;
 
@@ -72,7 +72,6 @@ public class FileServiceImpl implements FileService {
     private Path currentDirectory;
     private Path rawFileDirectory;
     private Path desenFileDirectory;
-
 
     private final ObjectMapper objectMapper;
     private final Boolean ifSendToEvaFirst;
@@ -505,7 +504,16 @@ public class FileServiceImpl implements FileService {
                 .infoBuilders(infoBuilders).rawFileSuffix(rawFileSuffix).build();
     }
 
-    private LogInfo processSingleColumnTextFile(FileStorageDetails fileStorageDetails, String params, String algName,
+    /**
+     * 处理单列文本文件
+     * @param fileStorageDetails 封装的文件信息
+     * @param level 脱敏等级
+     * @param algName 脱敏算法名称
+     * @param ifSkipFirstRow 是否跳过第一行，在非性能测试场景下，需要跳过第一行
+     * @return
+     * @throws IOException
+     */
+    private LogInfo processSingleColumnTextFile(FileStorageDetails fileStorageDetails, String level, String algName,
                                                 boolean ifSkipFirstRow) throws IOException {
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
@@ -530,7 +538,7 @@ public class FileServiceImpl implements FileService {
         // 保存脱敏后文件
         // 脱敏文件路径
         BufferedWriter writer = new BufferedWriter(new FileWriter(desenFilePathString));      // 保存参数文件
-        int desenParam = Integer.parseInt(String.valueOf(params.charAt(params.length() - 1)));
+        int desenParam = Integer.parseInt(String.valueOf(level.charAt(level.length() - 1)));
         // 数据行数
         int totalRowNum = dataList.size();
 
@@ -566,90 +574,7 @@ public class FileServiceImpl implements FileService {
             infoBuilders.desenRequirements.append(rawFileName).append(algorithmInfo.getRequirement()).append(",");
 
             // 脱敏
-
             desenResult.put(columnIndex, getDsList(algorithmInfo, dsObject, desenParam));
-
-//
-//            switch (algName.trim()) {
-//                case "dpDate": {
-//                    // 脱敏要求
-//                    break;
-//                }
-//                case "dpCode": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("随机扰动,");
-//
-//                    break;
-//                }
-//                case "laplaceToValue": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("添加差分隐私Laplace噪声,");
-//
-//                    break;
-//                }
-//                case "randomUniformToValue": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("添加随机均匀噪声,");
-//
-//                    break;
-//                }
-//                case "randomLaplaceToValue": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("添加随机laplace噪声,");
-//
-//                    break;
-//                }
-//                case "randomGaussianToValue": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("添加随机高斯噪声,");
-//
-//                    break;
-//                }
-//                case "valueShift": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("数值偏移,");
-//
-//                    break;
-//                }
-//                case "floor": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("数值取整,");
-//                    break;
-//                }
-//                case "valueMapping": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("数值映射,");
-//
-//                    break;
-//                }
-//                case "truncation": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("截断,");
-//
-//                    break;
-//                }
-//
-//                case "floorTime":
-//                case "suppressEmail":
-//                case "addressHide":
-//                case "nameHide":
-//                case "numberHide":
-//                case "suppressIpRandomParts":
-//                case "suppressAllIp": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("抑制,");
-//                    break;
-//                }
-//
-//                case "SHA512":
-//                case "passReplace":
-//                case "value_hide": {
-//                    // 脱敏要求
-//                    infoBuilders.desenRequirements.append(rawFileName).append("置换,");
-//
-//                    break;
-//                }
-//            }
         }
 
         // 结束时间
@@ -3363,8 +3288,6 @@ public class FileServiceImpl implements FileService {
             logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_PLAIN);
-//            headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
-//            headers.setContentDisposition(ContentDisposition.attachment().filename(desenFileName).build());
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + desenFileName);
             responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
         }
@@ -3955,7 +3878,14 @@ public class FileServiceImpl implements FileService {
         infoBuilders.desenAlg.append(algoNum).append(",");
     }
 
-    // 从DSObject获取脱敏结果
+    /**
+     * 从Excel脱敏参数中获取脱敏等级
+     * @param algorithmInfo 封装脱敏结果的算法信息类
+     * @param rawData 原始数据
+     * @param excelParam Excel脱敏参数
+     * @return 包含脱敏结果的List
+     * @param <T>
+     */
     public static <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
         log.info("当前列脱敏算法名称: " + algorithmInfo.getName());
         log.info("当前列脱敏算法编号: " + algorithmInfo.getId());
@@ -3965,6 +3895,14 @@ public class FileServiceImpl implements FileService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 使用对应的脱敏算法执行脱敏并获取结果
+     * @param algorithmInfo
+     * @param rawData
+     * @param param
+     * @return 包含脱敏结果的List
+     * @param <T>
+     */
     public static <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, int param) {
         return algorithmInfo.execute(rawData, param).getList()
                 .stream()

@@ -118,7 +118,6 @@ public class FileController extends BaseController {
         String fileType = getFileSuffix(fileName);
         log.info("File Type: " + fileType);
         log.info("AlgName: " + algName);
-//        log.info("Params: {}", params);
         log.info("Sheet: {}", sheet);
 
         // 判断数据模态
@@ -137,13 +136,12 @@ public class FileController extends BaseController {
     }
 
     @PostMapping("desenSingleColumn")
-    public ResponseEntity<byte[]> desenSingleColumnExcel(@RequestPart("file") MultipartFile file,
-                                                         @RequestParam("params") String params,
-                                                         @RequestParam("algName") String algName) throws IOException, ParseException {
+    public ResponseEntity<byte[]> desenSingleColumn(@RequestPart("file") MultipartFile file,
+                                                    @RequestParam("params") String params,
+                                                    @RequestParam("algName") String algName) throws IOException, ParseException {
         log.info("Params: {}", params);
         log.info("AlgName: {}", algName);
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
-//        return fileService.dealSingleExcel(fileStorageDetails, params, algName);
         return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, true);
     }
 
@@ -191,11 +189,8 @@ public class FileController extends BaseController {
             throws IOException {
         log.info("开始生成失真文本算法测试文件");
         HttpHeaders headers = new HttpHeaders();
-
         FileStorageDetails fileStorageDetails = fileService.generateTextTestFile(totalNumber);
         log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
-//            HttpSession httpSession = request.getSession();
-//            httpSession.setAttribute("testTextFileName", fileStorageDetails.getRawFileName());
         headers.setContentType(MediaType.TEXT_PLAIN);
         headers.setContentDispositionFormData("attachment", fileStorageDetails.getRawFileName());
         Resource resource = new InputStreamResource(Files.newInputStream(fileStorageDetails.getRawFilePath()));
@@ -224,9 +219,7 @@ public class FileController extends BaseController {
     public ResponseEntity<byte[]> textFilePerformenceTest(@RequestPart("file") MultipartFile file,
                                                           @RequestParam("params") String params,
                                                           @RequestParam("algName") String algName) {
-//        HttpHeaders headers = new HttpHeaders();
-//        HttpSession httpSession = request.getSession();
-//        String fileName = httpSession.getAttribute("testTextFileName").toString();
+
         try {
             FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
             return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, false);
@@ -278,7 +271,6 @@ public class FileController extends BaseController {
         String fileType = getFileSuffix(fileName);
         log.info("File Type: " + fileType);
         log.info("AlgName: " + algName);
-//        log.info("Params: {}", params);
         log.info("Sheet: {}", sheet);
         List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
         Map<String, ExcelParam> config = excelParamList.parallelStream()

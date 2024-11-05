@@ -47,27 +47,12 @@ public class DpUtilImpl implements DpUtil {
         this.ipv6Parts = new String[]{"$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8"};
         this.random = new SecureRandom();
     }
-//    private final WsAlgorithmLogService wsLogService;
-//
-//    @Autowired
-//    public DpUtilImpl(WsAlgorithmLogService logService) {
-//        this.wsLogService = logService;
-//    }
 
-//    private final List<SimpleDateFormat> dataFormats = Arrays.asList(
-//            new SimpleDateFormat("dd/MM/yyyy HH:mm:ss"),
-//            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
-//            new SimpleDateFormat("yyyyMMddHHmmss"),
-//            new SimpleDateFormat("yyyy.MM.dd HH:mm:ss"),
-//            new SimpleDateFormat("yyyy-MM-dd"),
-//            new SimpleDateFormat("yyyyMMdd"),
-//            new SimpleDateFormat("MM/dd/yyyy"),
-//            new SimpleDateFormat("dd-MM-yyyy"),
-//            new SimpleDateFormat("dd/MM/yyyy"),
-//            new SimpleDateFormat("yyyy/MM/dd")
-//    );
+    /**
+     * @deprecated 请使用 {@link #kNumNew(List, int)} 方法
+     */
 
-    //k-匿名算法
+    @Deprecated
     public List<Double> kNum(List<Double> array, int k) {
         HashMap<Integer, Double> hashMap = new HashMap<>();
         // 将每个值的索引和值存储在哈希表中
@@ -131,6 +116,12 @@ public class DpUtilImpl implements DpUtil {
         return updatedArray;
     }
 
+    /**
+     * 用于日期分组置换中的k匿名实现
+     * @param array 待分组的数据
+     * @param k 分组大小
+     * @return 分组后的List
+     */
     public List<Double> kNumNew(List<Double> array, int k) {
         HashMap<Integer, Double> indexValueMap = new HashMap<>();
         // 将每个值的索引和值存储在哈希表中
@@ -153,8 +144,6 @@ public class DpUtilImpl implements DpUtil {
             Double min = entries.get(start).getValue();
             Double max = entries.get(end - 1).getValue();
             Double average = (min + max) / 2;
-//            System.out.println("Min: " + min);
-//            System.out.println();
             for (int j = start; j < end; j++) {
                 entries.get(j).setValue(average);
             }
@@ -171,25 +160,30 @@ public class DpUtilImpl implements DpUtil {
         return updatedArray;
     }
 
+    /**
+     * GRR实现，用于处理单编码数据
+     * @param dataList 原始数据
+     * @param privacyLevel 脱敏等级
+     * @return 经过GRR后的数据
+     */
     @Override
-    //单编码数据的处理
-    public List<String> dpCode(List<Object> datas, Integer privacyLevel) {
+    public List<String> dpCode(List<Object> dataList, Integer privacyLevel) {
         List<String> reData = new ArrayList<>();
         //privacyLeve为0则返回
         if (privacyLevel == 0) {
-            for (Object data : datas) {
-                if (data == null) {
+            for (Object datum : dataList) {
+                if (datum == null) {
                     reData.add(null);
                 } else {
-                    reData.add(data + "");
+                    reData.add(datum + "");
                 }
             }
             return reData;
         }
-        //读取数据，null为-1，方便处理
-        for (Object data : datas) {
+        //读取数据，null为-9999，方便处理
+        for (Object data : dataList) {
             if (data == null) {
-                reData.add("-1");
+                reData.add("-9999");
             } else {
                 reData.add(data + "");
             }
@@ -197,7 +191,7 @@ public class DpUtilImpl implements DpUtil {
         Set<Object> uniqueSet = new HashSet<>(reData);
         List<String> code1 = new ArrayList<>();
         List<Integer> count1 = new ArrayList<>();
-        List<String> data2 = new ArrayList<>();
+        List<String> resultList = new ArrayList<>();
         //处理前去重并统计
         for (Object temp : uniqueSet) {
             count1.add(Collections.frequency(reData, temp));
@@ -205,8 +199,8 @@ public class DpUtilImpl implements DpUtil {
         }
         //这种情况未执行脱敏
         if (code1.size() == 1) {
-            if (Objects.equals(reData.get(0), "-1")) {
-                reData.replaceAll(null);
+            if (Objects.equals(reData.get(0), "-9999")) {
+                reData.replaceAll(x->null);
             }
             return reData;
         } else {
@@ -223,35 +217,35 @@ public class DpUtilImpl implements DpUtil {
             }
             log.info("dpCode chosen epsilon: {}", epsilon);
             //扰动概率p
-            double temp = Math.exp(epsilon);
-            p = new BigDecimal(temp).divide(new BigDecimal(temp + code1.size() - 1), 6,
+            double epsilonTemp = Math.exp(epsilon);
+            p = new BigDecimal(epsilonTemp).divide(new BigDecimal(epsilonTemp + code1.size() - 1), 6,
                     RoundingMode.HALF_UP).doubleValue();
             log.info("perturbation probability p: {}", p);
             //循环处理数据
             for (int i = 0; i < reData.size(); i++) {
                 //		获取一个小数 区间为 (0,1)若大于p，执行扰动
                 double rr = r.nextDouble();
-                // 随即相应
+                // 随机响应
                 if (rr >= p) {
                     String s = reData.get(i);
                     // 移除当前访问的元素
                     code1.remove(s);
                     // 从剩余元素中随机选择一个
-                    data2.add(code1.get(r.nextInt(code1.size())));
+                    resultList.add(code1.get(r.nextInt(code1.size())));
                     code1.add(s);
                 } else {
                     // 使用真实数据作为应答
-                    data2.add(reData.get(i));
+                    resultList.add(reData.get(i));
                 }
             }
-            //将-1值恢复null
-            for (int i = 0; i < data2.size(); i++) {
-                if (Objects.equals(data2.get(i), "-1")) {
-                    data2.set(i, null);
+            //将-9999值恢复null
+            for (int i = 0; i < resultList.size(); i++) {
+                if (Objects.equals(resultList.get(i), "-9999")) {
+                    resultList.set(i, null);
                 }
             }
         }
-        return data2;
+        return resultList;
     }
 
     @Override
@@ -388,43 +382,42 @@ public class DpUtilImpl implements DpUtil {
         }
         List<Double> newData;
         //执行k-匿名
-        newData = kNum(reData, k);
-
+        newData = kNumNew(reData, k);
         return newData;
     }
 
     // 数值取整
     @Override
-    public List<Double> getInt(List<Object> datas, Integer privacyLevel) {
+    public List<Double> getInt(List<Object> dataList, Integer privacyLevel) {
         List<Double> result = new ArrayList<>();
-        List<Double> re_data = new ArrayList<>();
+        List<Double> reDataList = new ArrayList<>();
         //读取数据
-        for (Object data : datas) {
+        for (Object data : dataList) {
             if (data == null) {
-                re_data.add(0.0);
+                reDataList.add(0.0);
             } else {
                 if (data instanceof Cell) {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
                         double numericValue = currentCell.getNumericCellValue();
-                        re_data.add(numericValue);
+                        reDataList.add(numericValue);
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
                             double numericValue = Double.parseDouble(stringValue);
-                            re_data.add(numericValue);
+                            reDataList.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
                             log.error(e.getMessage());
                         }
                     }
                 } else {
-                    re_data.add(Double.valueOf(data.toString()));
+                    reDataList.add(Double.valueOf(data.toString()));
                 }
             }
         }
         // 遍历原始列表，并将个位数置为0后添加到新的列表中
-        for (Double value : re_data) {
+        for (Double value : reDataList) {
             double newValue = value.intValue(); // 获取整数部分
             double decimalPart = value - newValue; // 获取小数部分
             result.add(newValue + Math.floor(decimalPart / 10) * 10); // 将个位数置为0
@@ -435,7 +428,8 @@ public class DpUtilImpl implements DpUtil {
     // 基于高斯机制差分隐私的数值加噪算法gaussianToValue
     @Override
     public List<Double> gaussianToValue(List<Object> datas, Integer privacyLevel) {
-
+        // 保留三位小数
+        DecimalFormat df = new DecimalFormat("#.###");
         List<Double> reData = new ArrayList<>();
         List<Double> newData = new ArrayList<>();
         //读取数据
@@ -492,22 +486,17 @@ public class DpUtilImpl implements DpUtil {
 
         Random random = new Random();
         //循环处理数据
-        for (int i = 0; i < reData.size(); i++) {
+        for (Double reDatum : reData) {
             // 生成高斯噪声
             double noise = random.nextGaussian() * scale;
-
-            //null值不处理
-            if (reData.get(i) == null) {
+            if (reDatum == null) {
                 newData.add(null);
             } else {
-                double d = noise + reData.get(i);
+                double d = noise + reDatum;
                 // 将添加差分隐私后的值保留三位小数
-                DecimalFormat df = new DecimalFormat("#.###");
                 String roundedValue = df.format(d);
-
                 // 将字符串转换为 double 类型
                 double result = Double.parseDouble(roundedValue);
-
                 newData.add(result);
             }
         }
@@ -515,13 +504,19 @@ public class DpUtilImpl implements DpUtil {
         return newData;
     }
 
+    /**
+     * 编号类型数据脱敏，向其中一部分加星
+     * @param dataList 原始数据列表
+     * @param privacyLevel 脱敏等级
+     * @return 加星后的数据
+     */
     @Override
     //电话号码或编号的处理，136****1203
-    public List<String> numberHide(List<Object> telephones, Integer privacyLevel) {
+    public List<String> numberHide(List<Object> dataList, Integer privacyLevel) {
         List<String> reData = new ArrayList<>();
         StringBuilder substr2 = new StringBuilder();
         //提取数据
-        for (Object name : telephones) {
+        for (Object name : dataList) {
             if (name == null)
                 reData.add(null);
             else {
@@ -565,7 +560,6 @@ public class DpUtilImpl implements DpUtil {
                 int index = l / denominator;
                 int index2 = reDatum.length() - index;
 
-
                 for (int j = 0; j < index2 - index; j++) {
                     substr2.append("*");
                 }
@@ -596,11 +590,11 @@ public class DpUtilImpl implements DpUtil {
         //privacyLevel为0，直接返回
         if (privacyLevel == 0)
             return reData;
-        List<String> nameC = new ArrayList<>();
+        List<String> resultList = new ArrayList<>();
 
         for (String reDatum : reData) {
             if (StringUtils.isEmpty(reDatum)) {
-                nameC.add(null);
+                resultList.add(null);
             } else {
                 StringBuilder str = new StringBuilder(reDatum.substring(0, 1));
                 if (privacyLevel == 1) {
@@ -612,25 +606,25 @@ public class DpUtilImpl implements DpUtil {
                         }
                         str.append(reDatum.substring(reDatum.length() - 1));
                     }
-                    nameC.add(str.toString());
+                    resultList.add(str.toString());
                 }
                 if (privacyLevel == 2) {
                     for (int j = 0; j < reDatum.length() - 1; j++) {
                         str.append("*");
                     }
-                    nameC.add(str.toString());
+                    resultList.add(str.toString());
                 }
                 if (privacyLevel == 3) {
                     str.delete(0, str.length());
                     for (int j = 0; j < reDatum.length(); j++) {
                         str.append("*");
                     }
-                    nameC.add(str.toString());
+                    resultList.add(str.toString());
                 }
             }
         }
 
-        return nameC;
+        return resultList;
     }
 
     @Override

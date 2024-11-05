@@ -53,39 +53,12 @@
     <script th:src="@{/js/content.js?v=1.0.0}"></script>
     <script type="text/javascript" th:inline="javascript">
         let defaultOption = [[${defaultAlgName}]];
-        // let defaultOption = "onlinepayment_low";
         let sheet = "";
         let suffix = "";
         let sceneName = "";
 
         document.addEventListener('DOMContentLoaded', function () {
             setDefaultOption(defaultOption)
-
-            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'excel')
-            //     .then(response => {
-            //         if (response.ok) {
-            //             return response.json();
-            //         } else {
-            //             throw new Error('Failed to fetch');
-            //         }
-            //     })
-            //     .then(data => {
-            //         if (data.code === 200 && data.message) {
-            //             defaultOption = data.data;
-            //             console.log("defaultOption: " + defaultOption);
-            //             setDefaultOption(defaultOption)
-            //
-            //         } else {
-            //             setDefaultOption(defaultOption);
-            //         }
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //         alert("获取默认算法失败");
-            //         setDefaultOption(defaultOption);
-            //     });
-
-
         });
 
         function setDefaultOption(value) {
@@ -126,36 +99,10 @@
                 3: "高程度"
             };
 
-            const desensitizationAlgorithms = {
-                0: [
-                    {value: 3, label: "基于拉普拉斯差分隐私的数值加噪算法"},
-                    {value: 5, label: "基于随机均匀噪声的数值加噪算法"},
-                    {value: 6, label: "基于随机拉普拉斯噪声的数值加噪算法"},
-                    {value: 7, label: "基于随机高斯噪声的数值加噪算法"},
-                    {value: 8, label: "数值偏移"},
-                    {value: 9, label: "数值取整"},
-                    {value: 10, label: "数值映射"}
-                ],
-                1: [{value: 2, label: "编码型数据差分隐私脱敏算法"}],
-                3: [
-                    {value: 11, label: "尾部截断"},
-                    {value: 13, label: "邮箱抑制算法"},
-                    {value: 14, label: "地址抑制算法"},
-                    {value: 15, label: "名称抑制算法"},
-                    {value: 16, label: "编号抑制算法"},
-                    {value: 17, label: "假名化-哈希算法"},
-                    {value: 19, label: "密码随机置换"},
-                    {value: 20, label: "数值替换"},
-                    {value: 21, label: "IP地址全抑制"},
-                    {value: 22, label: "IP地址随机抑制"}
-                ],
-                4: [
-                    {value: 1, label: "基于差分隐私的日期加噪算法"},
-                    {value: 18, label: "日期分组置换"}
-                ]
-            };
+            const desensitizationAlgorithms = [[${algorithmsByType}]];
+            console.log("desensitizationAlgorithms: " + desensitizationAlgorithms);
 
-            // 用于生成场景模板的表格
+                // 用于生成场景模板的表格
             function generateTable(data, headers, ifAll = true) {
                 // 创建表格元素
                 let $table = $("<table></table>").addClass("table table-striped").attr("id", "table2");
@@ -192,13 +139,6 @@
 
                         // 创建“隐私保护等级”列的 <select> 下拉框
                         let $privacySelect = $("<select></select>");
-                        // Object.keys(privacyProtectionLevels).forEach(level => {
-                        //     let $option = $("<option></option>")
-                        //         .val(level)
-                        //         .text(privacyProtectionLevels[level]);
-                        //     if (parseInt(level) === item.tmParam) $option.attr("selected", "selected");
-                        //     $privacySelect.append($option);
-                        // });
                         Object.keys(privacyProtectionLevels).forEach(level => {
                             let $option = $("<option></option>")
                                 .val(level)
@@ -1350,62 +1290,65 @@
                                                 id="choose_template_sheet"
                                         >
                                             <option value="111" selected>请选择应用场景</option>
-                                            <option value="map">地图导航类场景</option>
-                                            <option value="onlinetaxi">网络约车类场景</option>
-                                            <option value="communication">即时通信场景</option>
-                                            <option value="community">网络社区类场景</option>
-                                            <option value="onlinepayment">网络支付类场景</option>
-                                            <option value="onlineshopping">网上购物类场景</option>
-                                            <option value="transportationticket">交通票务类场景</option>
-                                            <option value="marry">婚恋相亲类场景</option>
-                                            <option value="employment">求职招聘类场景</option>
-                                            <option value="onlinelending">网络借贷类场景</option>
-                                            <option value="house">房屋租售类场景</option>
-                                            <option value="usedcar">二手车交易类场景</option>
-                                            <option value="consultation">问诊挂号类场景</option>
-                                            <option value="travel">旅游服务类场景</option>
-                                            <option value="hotel">酒店服务类场景</option>
-                                            <option value="express">邮件快件寄递类场景</option>
-                                            <option value="game">网络游戏类场景</option>
-                                            <option value="education">学习教育类场景</option>
-                                            <option value="locallife">本地生活类场景</option>
-                                            <option value="woman">女性健康类场景</option>
-                                            <option value="usecar">用车服务类场景</option>
-                                            <option value="investment">投资理财类场景</option>
-                                            <option value="bank">手机银行类场景</option>
-                                            <option value="mailbox">邮箱云盘类场景</option>
-                                            <option value="meeting">远程会议类场景</option>
-                                            <option value="webcast">网络直播类场景</option>
-                                            <option value="takeaway">餐饮外卖类场景</option>
-                                            <option value="onlinemovie">在线影音类场景</option>
-                                            <option value="shortvideo">短视频类场景</option>
-                                            <option value="news">新闻资讯类场景</option>
-                                            <option value="sports">运动健身类场景</option>
-                                            <option value="browser">浏览器类场景</option>
-                                            <option value="input">输入法类场景</option>
-                                            <option value="security">安全管理类场景</option>
-                                            <option value="ebook">电子图书类场景</option>
-                                            <option value="capture">拍摄美化类场景</option>
-                                            <option value="appstore">应用商店类场景</option>
-                                            <option value="tools">实用工具类场景</option>
-                                            <option value="performanceticket">演出票务类场景</option>
-                                            <option value="networkaccess">
-                                                电话/有线电视入网类场景
-                                            </option>
-                                            <option value="telecommunication">
-                                                电信业务使用类场景
-                                            </option>
-                                            <option value="monitor">安防监控类场景</option>
-                                            <option value="pay">生活缴费类场景</option>
-                                            <option value="customerservice">客服类场景</option>
-                                            <option value="schoolservice">校园服务类场景</option>
-                                            <option value="smarthome">智慧家居类场景</option>
-                                            <option value="autonomousdriving">自动驾驶类场景</option>
-                                            <option value="telemedicine">远程诊疗类场景</option>
-                                            <option value="vr">虚拟现实类场景</option>
-                                            <option value="onlinevoting">网上投票类场景</option>
-                                            <option value="homerepair">家庭维修类场景</option>
-                                            <option value="petcare">宠物照顾类场景</option>
+                                            <option th:value="${scene.sceneName}"
+                                                    th:each="scene : ${scenes}"
+                                                    th:text="${scene.sceneChineseName}"></option>
+<!--                                            <option value="map">地图导航类场景</option>-->
+<!--                                            <option value="onlinetaxi">网络约车类场景</option>-->
+<!--                                            <option value="communication">即时通信场景</option>-->
+<!--                                            <option value="community">网络社区类场景</option>-->
+<!--                                            <option value="onlinepayment">网络支付类场景</option>-->
+<!--                                            <option value="onlineshopping">网上购物类场景</option>-->
+<!--                                            <option value="transportationticket">交通票务类场景</option>-->
+<!--                                            <option value="marry">婚恋相亲类场景</option>-->
+<!--                                            <option value="employment">求职招聘类场景</option>-->
+<!--                                            <option value="onlinelending">网络借贷类场景</option>-->
+<!--                                            <option value="house">房屋租售类场景</option>-->
+<!--                                            <option value="usedcar">二手车交易类场景</option>-->
+<!--                                            <option value="consultation">问诊挂号类场景</option>-->
+<!--                                            <option value="travel">旅游服务类场景</option>-->
+<!--                                            <option value="hotel">酒店服务类场景</option>-->
+<!--                                            <option value="express">邮件快件寄递类场景</option>-->
+<!--                                            <option value="game">网络游戏类场景</option>-->
+<!--                                            <option value="education">学习教育类场景</option>-->
+<!--                                            <option value="locallife">本地生活类场景</option>-->
+<!--                                            <option value="woman">女性健康类场景</option>-->
+<!--                                            <option value="usecar">用车服务类场景</option>-->
+<!--                                            <option value="investment">投资理财类场景</option>-->
+<!--                                            <option value="bank">手机银行类场景</option>-->
+<!--                                            <option value="mailbox">邮箱云盘类场景</option>-->
+<!--                                            <option value="meeting">远程会议类场景</option>-->
+<!--                                            <option value="webcast">网络直播类场景</option>-->
+<!--                                            <option value="takeaway">餐饮外卖类场景</option>-->
+<!--                                            <option value="onlinemovie">在线影音类场景</option>-->
+<!--                                            <option value="shortvideo">短视频类场景</option>-->
+<!--                                            <option value="news">新闻资讯类场景</option>-->
+<!--                                            <option value="sports">运动健身类场景</option>-->
+<!--                                            <option value="browser">浏览器类场景</option>-->
+<!--                                            <option value="input">输入法类场景</option>-->
+<!--                                            <option value="security">安全管理类场景</option>-->
+<!--                                            <option value="ebook">电子图书类场景</option>-->
+<!--                                            <option value="capture">拍摄美化类场景</option>-->
+<!--                                            <option value="appstore">应用商店类场景</option>-->
+<!--                                            <option value="tools">实用工具类场景</option>-->
+<!--                                            <option value="performanceticket">演出票务类场景</option>-->
+<!--                                            <option value="networkaccess">-->
+<!--                                                电话/有线电视入网类场景-->
+<!--                                            </option>-->
+<!--                                            <option value="telecommunication">-->
+<!--                                                电信业务使用类场景-->
+<!--                                            </option>-->
+<!--                                            <option value="monitor">安防监控类场景</option>-->
+<!--                                            <option value="pay">生活缴费类场景</option>-->
+<!--                                            <option value="customerservice">客服类场景</option>-->
+<!--                                            <option value="schoolservice">校园服务类场景</option>-->
+<!--                                            <option value="smarthome">智慧家居类场景</option>-->
+<!--                                            <option value="autonomousdriving">自动驾驶类场景</option>-->
+<!--                                            <option value="telemedicine">远程诊疗类场景</option>-->
+<!--                                            <option value="vr">虚拟现实类场景</option>-->
+<!--                                            <option value="onlinevoting">网上投票类场景</option>-->
+<!--                                            <option value="homerepair">家庭维修类场景</option>-->
+<!--                                            <option value="petcare">宠物照顾类场景</option>-->
 
                                         </select>
                                     </div>
@@ -1448,7 +1391,6 @@
                             <div id="after"></div>
 
                             <div id="table_body" class="table-responsive">
-
                             </div>
 
 
@@ -1532,7 +1474,6 @@
                     </div>
                     <div id="tab-2" class="tab-pane">
                         <div class="panel-body">
-
                             <div class="row">
                                 <div class="col-lg-12">
                                     <form role="form" class="form-horizontal">

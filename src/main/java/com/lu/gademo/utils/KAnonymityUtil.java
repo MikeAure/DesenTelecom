@@ -308,6 +308,15 @@ public class KAnonymityUtil {
             Point other = (Point) obj;
             return id == other.id;
         }
+
+        @Override
+        public String toString() {
+            return "Point{" +
+                    "id=" + id +
+                    ", x=" + x +
+                    ", y=" + y +
+                    '}';
+        }
     }
 
     // 用于存储点的集合
@@ -334,6 +343,34 @@ public class KAnonymityUtil {
         // 添加新的点，其标识符为集合当前大小加一
         v.add(new Point(v.size() + 1, x, y));
     }
+    private static void initial(double x, double y, int kMin, double xMin, double yMin, double xMax, double yMax) {
+        // 添加一系列预定义的点
+//        v.add(new Point(1, 39.962555, 116.228719));
+//        v.add(new Point(2, 39.946548, 116.289783));
+//        v.add(new Point(3, 39.953864, 116.210864));
+//        v.add(new Point(4, 39.954031, 116.269265));
+//        v.add(new Point(5, 39.921459, 116.230495));
+//        v.add(new Point(6, 39.952159, 116.249069));
+//        v.add(new Point(7, 39.932648, 116.291789));
+//        v.add(new Point(8, 39.951485, 116.250649));
+//        v.add(new Point(9, 39.950485, 116.270649));
+//        v.add(new Point(10, 39.949485, 116.261649));
+        // 添加新的点，其标识符为集合当前大小加一
+        for (int i = 0; i < kMin - 1; i++) {
+            double randX = xMin + (xMax - xMin) * Math.random();
+            double randY = yMin + (yMax - yMin) * Math.random();
+            v.add(new Point(v.size() + 1, randX, randY));
+        }
+
+
+        for (int i = 0; i < kMin; i++) {
+            double randX = xMin + (xMax - xMin) * Math.random();
+            double randY = yMin + (yMax - yMin) * Math.random();
+            v.add(new Point(v.size() + 1, randX, randY));
+        }
+        v.add(new Point(v.size() + 1, x, y));
+
+    }
 
     /**
      * 采用自适应区间隐藏算法对点集进行处理
@@ -349,6 +386,7 @@ public class KAnonymityUtil {
      * @return 如果找不到指定id的点，则返回-1；否则返回0
      */
     public static int adaptiveIntervalCloakingAlgorithm(List<Point> qprev, int id, List<Point> rst, int kMin, double xMin, double yMin, double xMax, double yMax) {
+        Random random = new Random();
         Point req = new Point(id, 0, 0);
         List<Point> q = new ArrayList<>(qprev);
 
@@ -357,6 +395,7 @@ public class KAnonymityUtil {
                 .filter(p -> p.id == id)
                 .findFirst()
                 .orElse(null);
+        log.info("requestedPoint: {}", requestedPoint);
 
         if (requestedPoint == null) {
             return -1;
@@ -408,6 +447,12 @@ public class KAnonymityUtil {
 
         rst.clear();
         rst.addAll(qprev);
+        log.info("rst.size() = {}", rst.size());
+        int index = rst.indexOf(requestedPoint);
+        Collections.swap(rst, index, kMin - 1);
+        log.info("rst: {}", rst);
+//        rst.remove(index);
+//        rst.add(requestedPoint);
         return 0;
     }
 
@@ -428,9 +473,11 @@ public class KAnonymityUtil {
      */
     public static int adaptiveIntervalCloakingWrapper(double x, double y, int kMin, double xMin, double yMin, double xMax, double yMax, double[] ret_arr_x, double[] ret_arr_y) {
         // 初始化点集
-        initial(x, y);
+//        initial(x, y);
+        initial(x, y, kMin, xMin, yMin, xMax, yMax);
         // 获取新添加的点的标识符
         int id = v.size();
+        log.info("id = {}", id);
         // 用于存储算法结果的点集
         List<Point> rst = new ArrayList<>();
 
