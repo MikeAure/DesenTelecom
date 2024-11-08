@@ -2,11 +2,9 @@ package com.lu.gademo.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.model.LogSenderManager;
-import com.lu.gademo.service.impl.FileStorageService;
 import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.DesenInfoStringBuilders;
 import com.lu.gademo.utils.Util;
-import com.lu.gademo.utils.impl.UtilImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,21 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.crypto.Cipher;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import static com.lu.gademo.utils.VideoUtil.videoAESEncOrDec;
 
 @Slf4j
 @RestController
@@ -43,14 +34,14 @@ public class AudioMatchController {
     // 脱敏程序路径
     String desenApp;
     String command;
-    private FileStorageService fileStorageService;
+
     private LogSenderManager logSenderManager;
     private Random randomNum = new Random();
 
     @Autowired
-    public AudioMatchController(Util util, FileStorageService fileStorageService, LogSenderManager logSenderManager) {
+    public AudioMatchController(Util util, LogSenderManager logSenderManager) {
         this.util = util;
-        this.fileStorageService = fileStorageService;
+
         this.logSenderManager = logSenderManager;
 
         if (this.util.isCondaInstalled(this.util.isLinux())) {
@@ -108,7 +99,6 @@ public class AudioMatchController {
         String rawFileName = fileTimeStamp + file.getOriginalFilename();
         String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
-        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
         byte[] rawFileBytes = file.getBytes();
         Long rawFileSize = file.getSize();
         // 保存源文件

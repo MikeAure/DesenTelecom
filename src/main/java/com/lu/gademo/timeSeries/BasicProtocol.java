@@ -58,7 +58,6 @@ public class BasicProtocol {
         // server s2
         BigInteger encryptSign = SymHomSch.EncInt(data, Param);
 
-
         //server s1
         BigInteger result1 = c1.multiply(encryptSign).mod(N);
         BigInteger result2 = c2.multiply(cipherOne.add(encryptSign.multiply(cipherMiunsOne))).mod(N);
@@ -82,17 +81,20 @@ public class BasicProtocol {
 
 
         SecureRandom rnd = new SecureRandom();
+        BigInteger divided = L.divide(BigInteger.valueOf(2));
         System.out.println("在密文上进行计算：");
         BigInteger c = c1.add(c2.multiply(cipherMiunsOne)).mod(N);
         System.out.println("c1:" + c1);
         System.out.println("c2:" + c2);
         System.out.println("c:" + c);
         System.out.println("解密后的明文：");
-        System.out.println("c1:" + SymHomSch.Dec(c1, Param));
-        BigInteger decC2 = SymHomSch.Dec(c2, Param);
-        BigInteger divided = N.divide(BigInteger.valueOf(2));
+        BigInteger decC1 = SymHomSch.Dec(c1, Param).compareTo(divided) == -1 ? SymHomSch.Dec(c1, Param) : SymHomSch.Dec(c1, Param).subtract(L);
+
+        BigInteger decC2 = SymHomSch.Dec(c2, Param).compareTo(divided) == -1 ? SymHomSch.Dec(c2, Param) : SymHomSch.Dec(c2, Param).subtract(L);
+        BigInteger decC = SymHomSch.Dec(c, Param).compareTo(divided) == -1 ? SymHomSch.Dec(c, Param) : SymHomSch.Dec(c, Param).subtract(L);
+        System.out.println("c1:" + decC1);
         System.out.println("c2:" + decC2);
-        System.out.println("c:" + SymHomSch.Dec(c, Param));
+        System.out.println("c:" + decC);
         int sign = signComputeProtocol(c, Param);
 
         BigInteger result = BigInteger.ONE;

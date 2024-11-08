@@ -297,7 +297,7 @@ public class LogSenderManager {
         SendSplitDesenData sendSplitDesenData = logCollectUtil.buildSendSplitReq(infoBuilders.desenInfoAfterIden, infoBuilders.desenAlg,
                 rawFileHash, desenFileHash, infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom);
-
+        log.info("Build logCollectResults successfully");
         return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, sendEvaReq, sendRuleReq, sendSplitDesenData);
     }
 

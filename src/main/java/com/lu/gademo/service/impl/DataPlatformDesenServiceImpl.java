@@ -30,7 +30,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @Getter
-public class DataPlatformDesenServiceImpl {
+public class DataPlatformDesenServiceImpl implements com.lu.gademo.service.DataPlatformDesenService {
     private final SadaGdpiClickDtlParamUserLogDao sadaGdpiClickDtlParamUserLogDao;
     private final SadaGdpiClickDtlParamDao sadaDtlDao;
 
@@ -57,15 +57,18 @@ public class DataPlatformDesenServiceImpl {
         columnMapping.put("f_dataid", "fDataid");
     }
 
+    @Override
     public int deleteById(String tableName, Long id) {
         return sadaGdpiClickDtlParamUserLogDao.deleteById(tableName, id);
     }
 
+    @Override
     public int deleteAll(String tableName) {
         return sadaGdpiClickDtlParamUserLogDao.deleteAll(tableName);
     }
 
     // 批量插入
+    @Override
     public void insertListInBatch(String tableName, List<SadaGdpiClickDtl> list, int batchSize) {
         for (int i = 0; i < list.size(); i += batchSize) {
             List<SadaGdpiClickDtl> batchList = list.subList(i, Math.min(i + batchSize, list.size()));
@@ -82,6 +85,7 @@ public class DataPlatformDesenServiceImpl {
 //    }
     // 删除与插入
     @Transactional(transactionManager = "dataPlatformMybatisTransactionManager")
+    @Override
     public void deleteAndInsert(String tableName, List<SadaGdpiClickDtl> list) {
         if (sadaGdpiClickDtlParamUserLogDao.getItemTotalNumberByTabelName(tableName) > 0) {
             sadaGdpiClickDtlParamUserLogDao.deleteAll(tableName);
@@ -91,15 +95,18 @@ public class DataPlatformDesenServiceImpl {
     }
 
     // 使用指向另一个数据的Dao进行插入
+    @Override
     public int insertList(String tableName, List<SadaGdpiClickDtl> list) {
         return sadaGdpiClickDtlParamUserLogDao.insertList(tableName, list);
     }
 
     // 从dtl中读取记录
+    @Override
     public List<SadaGdpiClickDtl> getAllRecordsByTableName(String tableName) {
         return sadaDtlDao.getAllRecordsByTableName(tableName);
     }
 
+    @Override
     public void writeToExcel(List<SadaGdpiClickDtl> dataList, Map<String, String> columnMapping, Path filePath) throws IOException, IllegalAccessException, FileNotFoundException {
         DateTimeFormatter ldtFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         ThreadLocal<SimpleDateFormat> sdfWithTime = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));

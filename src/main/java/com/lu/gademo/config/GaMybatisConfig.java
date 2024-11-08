@@ -21,8 +21,6 @@ public class GaMybatisConfig {
     public SqlSessionFactory gaSqlSessionFactory(@Qualifier("gaDataSource")DataSource gaDataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(gaDataSource);
-//        sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-//                .getResources("classpath:mapper/primary/*.xml"));
         return sqlSessionFactoryBean.getObject();
     }
 

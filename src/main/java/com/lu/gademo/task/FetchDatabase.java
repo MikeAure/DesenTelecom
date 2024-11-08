@@ -7,18 +7,9 @@ import com.lu.gademo.entity.ClassificationResult;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
-import com.lu.gademo.mapper.ga.TypeAlgoMappingDao;
-import com.lu.gademo.service.ExcelParamService;
-import com.lu.gademo.service.FileService;
-import com.lu.gademo.service.impl.DataPlatformDesenServiceImpl;
-import com.lu.gademo.service.impl.FileStorageService;
+import com.lu.gademo.service.*;
 import com.lu.gademo.utils.Course2Communication;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.keyverifier.AcceptAllServerKeyVerifier;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.scp.client.ScpClient;
-import org.apache.sshd.scp.client.ScpClientCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -43,71 +33,70 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnProperty(name = "fetch.database.dataPlatformTask.enabled", havingValue = "true", matchIfMissing = false)
 public class FetchDatabase {
 
-    private final DataPlatformDesenServiceImpl dataPlatformDesenService;
+    private final DataPlatformDesenService dataPlatformDesenService;
     private final FileService fileService;
     private final FileStorageService fileStorageService;
     private final ExcelParamService excelParamService;
 
     // 远程服务器信息
-    private final String remoteHost; // 远程服务器地址
-    private final String userName;
-    private final String password;
-    private final String remoteFilePath;  // 远程文件路径
+    private final String remoteFilePath;        // 远程文件路径
     private final Path localFilePath;           // 本地存储路径
     private final ObjectMapper objectMapper;
 
-    private final TypeAlgoMappingDao typeAlgoMappingDao;
+    private final TypeAlgoMappingDaoService algoMappingDaoService;
     private final Course2Communication course2Communication;
 
     @Autowired
-    public FetchDatabase(DataPlatformDesenServiceImpl dataPlatformDesenService,
+    public FetchDatabase(DataPlatformDesenService dataPlatformDesenService,
                          FileService fileService, FileStorageService fileStorageService,
                          ExcelParamService excelParamService,
-                         TypeAlgoMappingDao typeAlgoMappingDao,
-                         Course2Communication course2Communication
+                         TypeAlgoMappingDaoService typeAlgoMappingDao,
+                         Course2Communication course2Communication,
+                         @Value("${fetch.database.dataPlatformTask.remoteConfigPath}") String remoteFilePath
 
-    ) {
+                         ) {
         this.dataPlatformDesenService = dataPlatformDesenService;
         this.fileService = fileService;
         this.fileStorageService = fileStorageService;
         this.excelParamService = excelParamService;
         this.localFilePath = Paths.get("dataplatform_config.json");           // 本地存储路径
         this.objectMapper = new ObjectMapper();
-        this.typeAlgoMappingDao = typeAlgoMappingDao;
+        this.algoMappingDaoService = typeAlgoMappingDao;
         this.course2Communication = course2Communication;
+        this.remoteFilePath = remoteFilePath;
 
     }
 
     @Scheduled(initialDelayString = "${fetch.database.task.initialDelay}", fixedRateString = "${fetch.database.task.fixedRate}")
     public boolean fetchDatabaseAndDesen() throws IOException, IllegalAccessException {
-        log.info("定时任务：拉取电信数据平台数据库数据并脱敏");
+        String sheetName = "sada_gdpi_click_dtl";
+        String mediumStrategy = sheetName + "_medium";
+        Scanner scanner = new Scanner(System.in);
+        Path tempFilePath = Paths.get(sheetName + "_temp.xlsx");
 
+        log.info("定时任务：拉取电信数据平台数据库数据并脱敏");
         // 检查本地是否已经存在文件
         if (Files.exists(localFilePath)) {
             log.info("分类分级文件 {} 已存在", localFilePath);
         } else {
             // 使用 SCP 从远程服务器下载文件
             log.info("分类分级文件不存在，开始从课题二远程服务器下载分类分级文件...");
-            course2Communication.downloadFileFromRemote(localFilePath);
+            course2Communication.downloadFileFromRemote(remoteFilePath, localFilePath);
         }
-        Scanner scanner = new Scanner(System.in);
+
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
 
-        String sheetName = "sada_gdpi_click_dtl";
         // 1. 从目标数据库获取数据
         List<SadaGdpiClickDtl> allRecordsByTableName = dataPlatformDesenService.getAllRecordsByTableName(sheetName);
         log.info("已从电信数据平台数据库获取数据");
         // 2. 对数据进行脱敏处理并写入文件
-        Path tempFilePath = Paths.get(sheetName + "_temp.xlsx");
         dataPlatformDesenService.writeToExcel(allRecordsByTableName, dataPlatformDesenService.getColumnMapping(), tempFilePath);
 
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
 
         FileStorageDetails fileStorageDetails2 = null;
-
-        String mediumStrategy = sheetName + "_medium";
 
         log.info("正在读取课程二脱敏策略");
         Map<String, Integer> courseTwoMap = readFromCourseTwo();
@@ -131,7 +120,6 @@ public class FetchDatabase {
             return false;
         }
         try {
-
             log.info("正在使用脱敏策略进行脱敏");
             ResponseEntity<byte[]> mediumResponseEntity = fileService.dealExcel(fileStorageDetails2, mediumStrategyConfigString,
                     mediumStrategy, false);
@@ -159,10 +147,10 @@ public class FetchDatabase {
         JsonNode columnList = objectMapper.readTree(path.toFile()).get("columnList");
         List<ClassificationResult> courseTwoList = objectMapper.readValue(columnList.toString(),
                 new TypeReference<List<ClassificationResult>>() {
-        });
+                });
         for (ClassificationResult item : courseTwoList) {
-            log.info("{} 对应的分类：{}, 可选算法：{}", "f_"+item.getColumnName(), item.getColumnType(),
-                    typeAlgoMappingDao.getAlgNamesByTypeName(item.getColumnType()));
+            log.info("{} 对应的分类：{}, 可选算法：{}", "f_" + item.getColumnName(), item.getColumnType(),
+                    algoMappingDaoService.getAlgNamesByTypeName(item.getColumnType()));
         }
         Map<String, Integer> courseTwoMap = new HashMap<>();
 

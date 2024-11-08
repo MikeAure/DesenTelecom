@@ -7,7 +7,7 @@ import com.lu.gademo.entity.ga.Meeting;
 import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
-import com.lu.gademo.service.impl.FileStorageService;
+import com.lu.gademo.service.FileStorageService;
 import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;

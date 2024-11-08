@@ -21,8 +21,6 @@ public class JmtLogStockMybatisConfig {
     public SqlSessionFactory jmtLogStockSqlSessionFactory(@Qualifier("jmtLogStockDataSource") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
-//        sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-//                .getResources("classpath:mapper/primary/*.xml"));
         return sqlSessionFactoryBean.getObject();
     }
 

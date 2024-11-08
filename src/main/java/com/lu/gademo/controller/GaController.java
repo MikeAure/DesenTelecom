@@ -3,7 +3,7 @@ package com.lu.gademo.controller;
 import com.lu.gademo.entity.ga.SceneInfo;
 import com.lu.gademo.service.SceneInfoDaoService;
 import com.lu.gademo.service.impl.ExcelAlgorithmsDaoServiceImpl;
-import com.lu.gademo.service.impl.ToolsetService;
+import com.lu.gademo.service.impl.ToolsetServiceImpl;
 import com.lu.gademo.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,14 @@ import java.util.Map;
 @Controller
 public class GaController extends BaseController {
 
-    private final ToolsetService toolsetService;
+    private final ToolsetServiceImpl toolsetServiceImpl;
     private final SceneInfoDaoService sceneInfoDaoService;
     private final List<SceneInfo> allSceneInfos;
     private final ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService;
 
     @Autowired
-    public GaController(ToolsetService toolsetService, SceneInfoDaoService sceneInfoDaoService, List<SceneInfo> allSceneInfos, ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService) {
-        this.toolsetService = toolsetService;
+    public GaController(ToolsetServiceImpl toolsetServiceImpl, SceneInfoDaoService sceneInfoDaoService, List<SceneInfo> allSceneInfos, ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService) {
+        this.toolsetServiceImpl = toolsetServiceImpl;
         this.sceneInfoDaoService = sceneInfoDaoService;
         this.allSceneInfos = sceneInfoDaoService.getAllSceneInfos();
         this.excelAlgorithmsDaoService = excelAlgorithmsDaoService;
@@ -71,7 +71,7 @@ public class GaController extends BaseController {
         Map<String, List<Map<String, Object>>> algorithmsByType = excelAlgorithmsDaoService.getAlgorithmsByType();
         String defaultAlgName = "";
         if (!name.equals("graph")) {
-            defaultAlgName = toolsetService.getDefaultTool(name);
+            defaultAlgName = toolsetServiceImpl.getDefaultTool(name);
         }
         switch (name) {
             case "text":
@@ -117,7 +117,7 @@ public class GaController extends BaseController {
     @ResponseBody
     @GetMapping(value = "/toolset/getDefaultSelection")
     public Result<?> getDefaultSelectionView(String toolsetName) {
-        String defaultAlgName = toolsetService.getDefaultTool(toolsetName);
+        String defaultAlgName = toolsetServiceImpl.getDefaultTool(toolsetName);
         if (defaultAlgName != null) {
             return new Result<>(200, "success", defaultAlgName);
         }
@@ -127,7 +127,7 @@ public class GaController extends BaseController {
     @ResponseBody
     @PostMapping(value = {"/toolset/setDefaultToolset"})
     public Result<?> setDefaultToolset(String toolsetName, String defaultAlgName) {
-        if (toolsetService.setDefaultTool(toolsetName, defaultAlgName)) {
+        if (toolsetServiceImpl.setDefaultTool(toolsetName, defaultAlgName)) {
             return new Result<>(200, "success", null);
         }
         return new Result<>(500, "failed", null);

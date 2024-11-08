@@ -9,9 +9,14 @@ import org.springframework.stereotype.Service;
  * 对数据库中工具集默认工具进行操作
  */
 @Service
-public class ToolsetService {
-    @Autowired
+public class ToolsetServiceImpl implements com.lu.gademo.service.ToolsetService {
+
     private ToolsetDefaultToolDao toolsetDefaultToolDao;
+
+    @Autowired
+    public ToolsetServiceImpl(ToolsetDefaultToolDao toolsetDefaultToolDao) {
+        this.toolsetDefaultToolDao = toolsetDefaultToolDao;
+    }
 
     /**
      * 根据工具集名称获取默认工具

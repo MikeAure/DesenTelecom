@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Slf4j
 public class DesenResultConverter<T> {
-    private InstanceFactory<T> factory;
+    private final InstanceFactory<T> factory;
 
     public DesenResultConverter(InstanceFactory<T> factory) {
         this.factory = factory;

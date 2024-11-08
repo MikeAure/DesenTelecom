@@ -6,7 +6,7 @@ import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.mapper.ga.TypeAlgoMappingDao;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
-import com.lu.gademo.service.impl.FileStorageService;
+import com.lu.gademo.service.FileStorageService;
 import com.lu.gademo.utils.LogCollectUtil;
 import com.lu.gademo.utils.Result;
 import lombok.AllArgsConstructor;
@@ -19,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 用于接收电信Agent的请求

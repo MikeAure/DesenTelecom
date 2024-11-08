@@ -17,7 +17,7 @@ increment = int(1e5)
 tolerance = 1e-10
 scaling_factor = 1e10
 k1, k2, k3, k4 = 512, 200, 128, 128
-train_path = 'train_data.csv'
+train_path = './train_data.csv'
 # test_features_path = 'test_features_part_1.csv'
 # test_labels_path = 'test_labels_part_1.csv'
 

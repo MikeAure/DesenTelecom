@@ -1,27 +1,23 @@
 from model import *
 import torch
 import librosa
-import numpy as np
-import wave
 import os
+from audio_processing import *
 
-
-# print(device)
-# print(speakermodel)
 def extract_voiceprint(audiofilename, sr):
     dim_voiceprint = 512
     num_class = 1211
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # print("loading")
-    # the_model = DeepSpeakerModel()
 
-    speakermodel = DeepSpeakerModel(dim_voiceprint, num_class)
-    speakermodel.load_state_dict(
+    speaker_model = DeepSpeakerModel(dim_voiceprint, num_class)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    pkl_path = os.path.join(script_dir, 'new_deepspeaker_dict.pkl')
+    speaker_model.load_state_dict(
         torch.load(
-            os.path.dirname(os.path.dirname(audiofilename)) + os.sep + 'audio' + os.sep + 'new_deepspeaker_dict.pkl',
+            pkl_path,
             map_location='cpu'))  # .to(device)) #, map_location='cpu')
-    speakermodel = speakermodel.to(device)
-    speakermodel.eval()
+    speaker_model = speaker_model.to(device)
+    speaker_model.eval()
 
     embedding_size = 512
     # ==========提取声纹代码(封装成函数，输入audiofilename，输出voiceprint)=========
@@ -40,26 +36,12 @@ def extract_voiceprint(audiofilename, sr):
     fbank = torch.unsqueeze(fbank, 0)
     # print(mfcc)
     with torch.no_grad():
-        voiceprint = speakermodel(fbank)
+        voiceprint = speaker_model(fbank)
     # 随机生成一个512维的tensor数组
     # voiceprint = torch.randn(1,512)
     # print(voiceprint.size())
     return voiceprint
 
-
-# def judge():
-# flag = sck.identifier[1]
-# voiceprint_a = ertract_voiceprint(sck.filename,sr=16000)
-# if(flag == 0):
-#     save(sck.identifier[0],voiceprint=voiceprint_a)
-# else:
-#     voiceprint_e = findvoice(sck.identifier[0])
-#     Euclideandist = PairwiseDistance(2)
-#     distance = Euclideandist(voiceprint_e, voiceprint_a)
-#     if distance <= 0.71:
-#         ret = True
-#     else:
-#         ret = False
 # 欧式距离
 def oup(a, b):
     sum = 0

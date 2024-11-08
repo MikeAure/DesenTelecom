@@ -76,7 +76,7 @@ logging:
 
 effectEva:
 #    address: 192.168.37.192
-    address: 192.168.1.21
+    address: 127.0.0.1
     port: 10005
 evidence:
 #    localAddress: 172.28.72.214
@@ -130,20 +130,20 @@ fetch:
             enabled: false
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
+            remoteConfigPath: /root/env_fenjifenlei/dataplatform_config.json
         jdPlatformTask:
             enabled: false
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
-            localTableName: meeting_datatable_copy1
-            localTargetTableName: meeting_datatable_desen_copy1
             jdTableName: t_user_info
             jdTargetTableName: t_user_info_desen
-            ifSendToEvaluationSystem: false
+            ifSendToEvaluationSystem: true
+            configFileName: jd_config
+            remoteConfigPath: /root/env_fenjifenlei/jd_config.json
         pageSize:
-            localDatabase: 50000
             jdDatabase: 50000
 course2:
-    host: 172.28.72.218
+    host: 127.0.0.1
     username: root
     password: GDS&123softswitch
-    remotePath: /root/env_fenjifenlei/dataplatform_config.json
+    port: 9090

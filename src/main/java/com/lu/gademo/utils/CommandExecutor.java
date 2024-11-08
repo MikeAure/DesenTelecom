@@ -142,9 +142,6 @@ public class CommandExecutor {
                     synchronized (outputList) {
                         outputList.add(line);
                     }
-//                    if (line.contains("Error") || line.contains("Traceback")) {
-//                        // You can set a flag or handle error output here if needed
-//                    }
                 }
             } catch (Exception e) {
                 log.error(e.getMessage());

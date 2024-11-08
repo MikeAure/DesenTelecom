@@ -1,0 +1,74 @@
+{
+  "dataBase" : "jmt_log_stock",
+  "dataSheet" : "t_user_info",
+  "totalColumnNum" : 17,
+  "columnList" : [ {
+    "columnName" : "user_id",
+    "columnType" : "个人身份信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "auth_flag",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "wx_open_id",
+    "columnType" : "个人账户信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "name",
+    "columnType" : "个人身份信息",
+    "columnLevel" : "4"
+  }, {
+    "columnName" : "sex",
+    "columnType" : "个人身份信息",
+    "columnLevel" : "3"
+  }, {
+    "columnName" : "birthday",
+    "columnType" : "个人身份信息",
+    "columnLevel" : "3"
+  }, {
+    "columnName" : "in_Beijing",
+    "columnType" : "个人位置信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "status_type",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "3"
+  }, {
+    "columnName" : "create_user",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "create_time",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "create_app",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "modify_user",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "modify_time",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "modify_app",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  }, {
+    "columnName" : "del_stat",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "1"
+  }, {
+    "columnName" : "version_no",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "1"
+  }, {
+    "columnName" : "last_login",
+    "columnType" : "个人上网信息",
+    "columnLevel" : "2"
+  } ]
+}

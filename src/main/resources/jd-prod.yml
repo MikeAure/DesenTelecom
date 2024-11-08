@@ -8,19 +8,19 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-        #  电信CRM客经系统数据库
+
         crm:
             jdbc-url: jdbc:mysql://localhost:3306/crm?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-        # 电信大数据平台数据库，用于读取脱敏前数据
+
         dataplatform:
             jdbc-url: jdbc:mysql://localhost:3306/userlogdtl?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-        # 电信大数据平台数据库，用于写入脱敏后数据
+
         userlog:
             jdbc-url: jdbc:mysql://localhost:3306/userlog1?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
@@ -32,7 +32,6 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-
     jpa:
         hibernate:
             ddl-auto: update
@@ -44,8 +43,8 @@ spring:
 
     servlet:
         multipart:
-            max-file-size: 200MB
-            max-request-size: 200MB
+            maxFileSize: 100MB
+            maxRequestSize: 100MB
 
     thymeleaf:
         cache: false
@@ -74,23 +73,18 @@ logging:
             hibernate.SQL: WARN
 
 effectEva:
-    #    address: 192.168.37.192
-    address: 192.168.1.21
+    address: 10.30.0.137
     port: 10005
 evidence:
-    #    localAddress: 172.28.72.214
-    localAddress: 127.0.0.1
+    localAddress: 10.30.0.11
     localPort: 50004
-    #    remoteAddress: 172.28.72.214
-    remoteAddress: 127.0.0.1
+    remoteAddress: 10.30.0.11
     remotePort: 50005
 ruleCheck:
-    #    address: 172.28.72.224
-    address: 127.0.0.1
+    address: 10.30.0.3
     port: 30002
 splitReconstruct:
-    #    address: 172.28.72.225
-    address: 127.0.0.1
+    address: 10.30.0.5
     port: 40011
 
 evidenceSystem:
@@ -119,7 +113,7 @@ systemId:
 
 logSenderManager:
     ifSendToEvaFirst: true
-    ifSaveToDatabase: false
+    ifSaveToDatabase: true
     ifSendFile: true
     ifPerformenceTest: false
 
@@ -129,20 +123,20 @@ fetch:
             enabled: false
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
+            remoteConfigPath: /root/env_fenjifenlei/dataplatform_config.json
         jdPlatformTask:
             enabled: true
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
-            localTableName: meeting_datatable_copy1
-            localTargetTableName: meeting_datatable_desen_copy1
             jdTableName: t_user_info
             jdTargetTableName: t_user_info_desen
-            ifSendToEvaluationSystem: true
+            ifSendToEvaluationSystem: false
+            configFileName: jd_config
+            remoteConfigPath: /root/env_fenjifenlei/jd_config.json
         pageSize:
-            localDatabase: 50000
             jdDatabase: 50000
 course2:
-    host: 172.28.72.218
+    host: 127.0.0.1
     username: root
     password: GDS&123softswitch
-    remotePath: /root/env_fenjifenlei/dataplatform_config.json
+    port: 9090

@@ -22,10 +22,7 @@ speakermodel.load_state_dict(
     torch.load(pkl_path, map_location='cpu'))  # .to(device)) #, map_location='cpu')
 speakermodel = speakermodel.to(device)
 speakermodel.eval()
-#
-# speakermodel =the_model.load_state_dict(torch.load('new_deepspeaker.pkl', map_location='cpu'))
-# print(type(speakermodel))
-# print(type(speakermodel))
+
 embedding_size = 512
 
 

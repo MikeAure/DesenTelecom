@@ -2,30 +2,22 @@ package com.lu.gademo.service.impl;
 
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.crm.CustomerDesenMsg;
-import com.lu.gademo.entity.crm.CustomerDesenMsgHigh;
-import com.lu.gademo.entity.crm.CustomerDesenMsgLow;
-import com.lu.gademo.entity.crm.CustomerDesenMsgMedium;
 import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
 import com.lu.gademo.event.SaveExcelToDatabaseEvent;
-import com.lu.gademo.mapper.crm.CrmParamDao;
-import com.lu.gademo.mapper.dataplatform.SadaGdpiClickDtlParamDao;
+import com.lu.gademo.service.CrmDesenService;
+import com.lu.gademo.service.DataPlatformDesenService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import javax.persistence.Column;
 import java.io.FileInputStream;
 import java.lang.reflect.Field;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -37,14 +29,15 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @Slf4j
 public class ExcelToDatatableServiceImpl {
-    @Autowired
-    private ApplicationContext applicationContext;
+
+    private CrmDesenService crmDesenService;
+    private DataPlatformDesenService dataPlatformDesenService;
 
     @Autowired
-    private CrmDesenServiceImpl crmDesenService;
-
-    @Autowired
-    private DataPlatformDesenServiceImpl dataPlatformDesenService;
+    public ExcelToDatatableServiceImpl(CrmDesenService crmDesenService, DataPlatformDesenService dataPlatformDesenService) {
+        this.crmDesenService = crmDesenService;
+        this.dataPlatformDesenService = dataPlatformDesenService;
+    }
 
     @EventListener
     public void saveToDatabaseAfterEvaluation(SaveExcelToDatabaseEvent saveExcelToDatabaseEvent) {
@@ -55,7 +48,6 @@ public class ExcelToDatatableServiceImpl {
         String entityClassName = saveExcelToDatabaseEvent.getEntityClassName();
 
         log.info("EntityName: {}", entityClassName);
-//        log.info("DesenFilePathString: {}", fileStorageDetails.getDesenFilePathString());
 
         if (entityClassName.contains("sada_gdpi_click_dtl")) {
             try {
@@ -100,79 +92,79 @@ public class ExcelToDatatableServiceImpl {
 //        futureResult.complete(responseEntity);
     }
 
-    /**
-     * 获取用于表示CustomerDesenMsg数据表不同脱敏策略的实体类
-     * @param entityName 实体类名称，根据其中的部分字符串确定脱敏策略的种类
-     * @return 所选策略对应的CustomerDesenMsg实体类
-     */
-    private Class<?> getEntityByName(String entityName) {
-        if (entityName.contains("Low")) {
-            return CustomerDesenMsgLow.class;
-        } else if (entityName.contains("Medium")) {
-            return CustomerDesenMsgMedium.class;
-        } else {
-            return CustomerDesenMsgHigh.class;
-        }
-    }
+//    /**
+//     * 获取用于表示CustomerDesenMsg数据表不同脱敏策略的实体类
+//     * @param entityName 实体类名称，根据其中的部分字符串确定脱敏策略的种类
+//     * @return 所选策略对应的CustomerDesenMsg实体类
+//     */
+//    private Class<?> getEntityByName(String entityName) {
+//        if (entityName.contains("Low")) {
+//            return CustomerDesenMsgLow.class;
+//        } else if (entityName.contains("Medium")) {
+//            return CustomerDesenMsgMedium.class;
+//        } else {
+//            return CustomerDesenMsgHigh.class;
+//        }
+//    }
 
-    public <T, ID> JpaRepository<T, ID> getRepository(Class<T> entityClass) {
-        String repositoryName = entityClass.getSimpleName() + "Dao";
-        repositoryName = Character.toLowerCase(repositoryName.charAt(0)) + repositoryName.substring(1);
-        try {
-            return (JpaRepository<T, ID>) applicationContext.getBean(repositoryName);
-        } catch (Exception e) {
-            log.error("Failed to get repository: {}", e.getMessage());
-        }
-        return null;
-    }
+//    public <T, ID> JpaRepository<T, ID> getRepository(Class<T> entityClass) {
+//        String repositoryName = entityClass.getSimpleName() + "Dao";
+//        repositoryName = Character.toLowerCase(repositoryName.charAt(0)) + repositoryName.substring(1);
+//        try {
+//            return (JpaRepository<T, ID>) applicationContext.getBean(repositoryName);
+//        } catch (Exception e) {
+//            log.error("Failed to get repository: {}", e.getMessage());
+//        }
+//        return null;
+//    }
 
-    /**
-     * 从Excel导出数据到数据库
-     *
-     * @param entityClass 数据库表对应的JPA实体类
-     * @param filePath    Excel文件字符串
-     * @param <T>         泛型类型
-     */
-    public <T> void exportExcelToDatabase(Class<T> entityClass, String filePath) throws Exception {
-        try (FileInputStream fis = new FileInputStream(filePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
-
-            Sheet sheet = workbook.getSheetAt(0);
-            List<T> entities = new ArrayList<>();
-
-            // 获取列名到字段的映射
-            Map<String, Field> fieldMap = getFieldMap(entityClass);
-
-            // 解析Excel数据
-            int rowCount = 0;
-            for (Row row : sheet) {
-                if (rowCount++ == 0) {
-                    continue; // Skip header row
-                }
-                T entity = entityClass.getDeclaredConstructor().newInstance();
-
-                for (Cell cell : row) {
-                    String columnName = sheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
-                    Field field = fieldMap.get(columnName);
-                    if (field != null) {
-                        field.setAccessible(true);
-                        Object value = getCellValueAsType(cell, field.getType());
-                        field.set(entity, value);
-                    }
-                }
-                entities.add(entity);
-            }
-
-            // 获取对应的repository
-            JpaRepository<T, ?> repository = getRepository(entityClass);
-            repository.deleteAll();
-            repository.saveAll(entities);
-
-        } catch (Exception e) {
-            log.error("将Excel文件存储到数据库中出现错误");
-            throw new Exception(e);
-        }
-    }
+//    /**
+//     * 从Excel导出数据到数据库
+//     *
+//     * @param entityClass 数据库表对应的JPA实体类
+//     * @param filePath    Excel文件字符串
+//     * @param <T>         泛型类型
+//     */
+//    public <T> void exportExcelToDatabase(Class<T> entityClass, String filePath) throws Exception {
+//        try (FileInputStream fis = new FileInputStream(filePath);
+//             Workbook workbook = new XSSFWorkbook(fis)) {
+//
+//            Sheet sheet = workbook.getSheetAt(0);
+//            List<T> entities = new ArrayList<>();
+//
+//            // 获取列名到字段的映射
+//            Map<String, Field> fieldMap = getFieldMap(entityClass);
+//
+//            // 解析Excel数据
+//            int rowCount = 0;
+//            for (Row row : sheet) {
+//                if (rowCount++ == 0) {
+//                    continue; // Skip header row
+//                }
+//                T entity = entityClass.getDeclaredConstructor().newInstance();
+//
+//                for (Cell cell : row) {
+//                    String columnName = sheet.getRow(0).getCell(cell.getColumnIndex()).getStringCellValue();
+//                    Field field = fieldMap.get(columnName);
+//                    if (field != null) {
+//                        field.setAccessible(true);
+//                        Object value = getCellValueAsType(cell, field.getType());
+//                        field.set(entity, value);
+//                    }
+//                }
+//                entities.add(entity);
+//            }
+//
+//            // 获取对应的repository
+//            JpaRepository<T, ?> repository = getRepository(entityClass);
+//            repository.deleteAll();
+//            repository.saveAll(entities);
+//
+//        } catch (Exception e) {
+//            log.error("将Excel文件存储到数据库中出现错误");
+//            throw new Exception(e);
+//        }
+//    }
 
     // 使用MyBatis做数据持久化
     public void exportCustomerDesenMsgExcelToDatabase(String filePath, String tableName) throws Exception {
@@ -298,17 +290,17 @@ public class ExcelToDatatableServiceImpl {
         return fieldMap;
     }
 
-    private <T> Map<String, Field> getFieldMap(Map<String, String> fieldMap, Class<T> entityClass) {
-
-        Map<String, Field> fieldMapResult = new HashMap<>();
-        for (Field field : entityClass.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Column.class)) {
-                Column column = field.getAnnotation(Column.class);
-                fieldMapResult.put(column.name(), field);
-            }
-        }
-        return fieldMapResult;
-    }
+//    private <T> Map<String, Field> getFieldMap(Map<String, String> fieldMap, Class<T> entityClass) {
+//
+//        Map<String, Field> fieldMapResult = new HashMap<>();
+//        for (Field field : entityClass.getDeclaredFields()) {
+//            if (field.isAnnotationPresent(Column.class)) {
+//                Column column = field.getAnnotation(Column.class);
+//                fieldMapResult.put(column.name(), field);
+//            }
+//        }
+//        return fieldMapResult;
+//    }
 
     /**
      * 获取单元格的值并转换为指定类型

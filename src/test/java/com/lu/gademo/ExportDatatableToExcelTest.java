@@ -2,16 +2,12 @@ package com.lu.gademo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.crm.CustomerDesenMsg;
-import com.lu.gademo.entity.crm.CustomerDesenMsgLow;
-import com.lu.gademo.entity.crm.CustomerMsg;
 import com.lu.gademo.mapper.crm.CrmParamDao;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
-import com.lu.gademo.service.impl.FileStorageService;
+import com.lu.gademo.service.FileStorageService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -217,10 +213,6 @@ public class ExportDatatableToExcelTest {
         return null;
     }
 
-    @Test
-    void writeExcel() {
-        exportToExcel(CustomerMsg.class, "customerMsgReflect2.xlsx");
-    }
 
 //    @Test
 //    void testDatatableToExcel() throws IOException, SQLException, InterruptedException, ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -236,12 +228,6 @@ public class ExportDatatableToExcelTest {
 //
 //    }
 
-    @Test
-//    @Transactional(transactionManager = "crmMybatisTransactionManager")
-    void testExcelToDatatable() {
-        Path desenFilePath = Paths.get("desen_files").resolve("1723121007221_customerMsgReflect2_1723128149665.xlsx");
-        importExcelToDatabase(CustomerDesenMsgLow.class, desenFilePath.toString(), "customer_desen_msg_low");
 
-    }
 
 }

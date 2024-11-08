@@ -1,7 +1,7 @@
 package com.lu.gademo;
 
 import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
-import com.lu.gademo.service.impl.DataPlatformDesenServiceImpl;
+import com.lu.gademo.service.DataPlatformDesenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +13,7 @@ import java.util.List;
 @SpringBootTest
 public class DataPlatformTest {
     @Autowired
-    private DataPlatformDesenServiceImpl sadaDao;
+    private DataPlatformDesenService sadaDao;
 
     @Test
     void testGetAllRecordsFromTable() throws IOException, IllegalAccessException {

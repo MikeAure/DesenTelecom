@@ -34,6 +34,8 @@ public class TypeAlgoMappingMybatisTest {
         List<String> algNames4 = typeAlgoMappingDao.getAlgNamesByTypeName("日期时间");
         List<String> algNames5 = typeAlgoMappingDao.getAlgNamesByTypeName("个人上网信息");
         List<String> algNames6 = typeAlgoMappingDao.getAlgNamesByTypeName("个人终端设备信息");
+        List<String> algNames7 = typeAlgoMappingDao.getAlgNamesByTypeName("个人身份信息");
+        List<String> algNames9 = typeAlgoMappingDao.getAlgNamesByTypeName("个人账户信息");
 
         System.out.println("标识信息");
         algNames1.forEach(System.out::println);
@@ -47,5 +49,9 @@ public class TypeAlgoMappingMybatisTest {
         algNames5.forEach(System.out::println);
         System.out.println("个人终端设备信息");
         algNames6.forEach(System.out::println);
+        System.out.println("个人身份信息:");
+        algNames7.forEach(System.out::println);
+        System.out.println("个人账户信息:");
+        algNames9.forEach(System.out::println);
     }
 }

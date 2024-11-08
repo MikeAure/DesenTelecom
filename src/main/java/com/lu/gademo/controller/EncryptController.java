@@ -1,7 +1,6 @@
 package com.lu.gademo.controller;
 
 import com.lu.gademo.model.LogSenderManager;
-import com.lu.gademo.service.impl.FileStorageService;
 import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.common.Vertex;
 import com.lu.gademo.trace.client.user.Customer;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

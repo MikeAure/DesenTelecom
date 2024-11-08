@@ -11,7 +11,6 @@ import java.sql.SQLException;
 public class UserDao {
 
     public DbUtil dbu = new DbUtil();
-
     public UserDao() {
 
     }

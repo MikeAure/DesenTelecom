@@ -116,9 +116,6 @@ public class RecvFiles {
 
     public void updateTaxiParams() {
         onlineTaxi2Param columnNameFromTable = onlineTaxi2Dao.getOne(1);
-//        for (onlineTaxi2Param name : columnNameFromTable) {
-//            System.out.println(name);
-//        }
         System.out.println(columnNameFromTable.getColumnName());
 
     }

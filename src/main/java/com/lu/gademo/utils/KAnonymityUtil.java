@@ -62,7 +62,7 @@ public class KAnonymityUtil {
         int k = (level * length / 10) <= 1 ? 2 : level * length / 10;
         log.info("k = {}", k);
         config.addPrivacyModel(new KAnonymity(k));
-        config.setSuppressionLimit(0.04d);
+        config.setSuppressionLimit(0d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
         DataHandle optimal = result.getOutput();

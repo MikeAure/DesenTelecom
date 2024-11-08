@@ -10,8 +10,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity
-@Table(name = "customer_desen_msg", schema = "crm")
+
 public class CustomerDesenMsg {
     @Id
     @Column(name = "CUST_ID", length = 255,  nullable = false)

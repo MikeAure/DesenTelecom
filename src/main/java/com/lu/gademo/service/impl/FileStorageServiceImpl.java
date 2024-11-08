@@ -1,6 +1,5 @@
 package com.lu.gademo.service.impl;
 
-import com.lu.gademo.controller.FileController;
 import com.lu.gademo.entity.FileStorageDetails;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +12,12 @@ import java.nio.file.*;
 @Slf4j
 @Data
 @Service
-public class FileStorageService {
+public class FileStorageServiceImpl implements com.lu.gademo.service.FileStorageService {
     private Path currentDirectory;
     private Path rawFileDirectory;
     private Path desenFileDirectory;
 
-    public FileStorageService() throws IOException {
+    public FileStorageServiceImpl() throws IOException {
         this.currentDirectory = Paths.get("");
         this.rawFileDirectory = Paths.get("raw_files");
         this.desenFileDirectory = Paths.get("desen_files");
@@ -40,6 +39,7 @@ public class FileStorageService {
      * @return 包含原始文件路径信息和文件内容、脱敏文件路径信息的FileStorageDetails
      * @throws IOException
      */
+    @Override
     public FileStorageDetails saveRawFileWithDesenInfo(MultipartFile file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -87,6 +87,7 @@ public class FileStorageService {
      * @return 包含原始文件路径信息和文件内容、脱敏文件路径信息的FileStorageDetails
      * @throws IOException
      */
+    @Override
     public FileStorageDetails saveRawFileWithDesenInfoForBigFile(MultipartFile file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -134,6 +135,7 @@ public class FileStorageService {
      * @return 包含原始文件路径信息和文件内容、脱敏后文件路径信息的FileStorageDetails
      * @throws IOException
      */
+    @Override
     public FileStorageDetails saveRawFileWithDesenInfo(Path file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -182,6 +184,7 @@ public class FileStorageService {
      * @return 仅包含原始文件信息的FileStorageDetails
      * @throws IOException
      */
+    @Override
     public FileStorageDetails saveRawFile(MultipartFile file) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -218,6 +221,7 @@ public class FileStorageService {
      * @return 仅包含原始文件信息的FileStorageDetails
      * @throws IOException
      */
+    @Override
     public FileStorageDetails saveRawFile(String fileName, byte[] rawFileBytes) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -245,6 +249,7 @@ public class FileStorageService {
      * @return 仅包含原始文件存储路径信息的FileStorageDetails
      * @throws IOException
      */
+    @Override
     public FileStorageDetails saveRawFile(String fileName) throws IOException {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
 
@@ -262,6 +267,7 @@ public class FileStorageService {
     }
 
 
+    @Override
     public void saveDesenFile(Path desenFilePath, byte[] desenFileBytes) throws IOException {
         // 确保父目录存在
         if (Files.notExists(desenFilePath.getParent())) {
@@ -271,6 +277,7 @@ public class FileStorageService {
         Files.write(desenFilePath, desenFileBytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
     }
 
+    @Override
     public void saveDesenFile(FileStorageDetails fileStorageDetails, byte[] desenFileBytes) throws IOException {
         // 确保父目录存在
         Path desenFilePath = fileStorageDetails.getDesenFilePath();
