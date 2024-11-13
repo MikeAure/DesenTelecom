@@ -159,7 +159,7 @@ public class EncryptController {
 
             Boolean desenCom = true;
             DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
-            String objectMode = "graph";
+            String objectMode = "text";
             // 设置文件时间戳
             String fileTimeStamp = String.valueOf(System.currentTimeMillis());
             // 设置原文件信息

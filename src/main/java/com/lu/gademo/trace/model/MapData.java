@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 @SuppressWarnings("serial")
 public class MapData implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     /**
      * Eighty Four Encrypted Maps 84个加密的地图数据
      */

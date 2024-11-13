@@ -369,6 +369,7 @@ function pollServerForStatus() {
                             clearInterval(pollingInterval);
                             pollingInterval = null; // 重置轮询间隔控制变量
                             customerLogArea.value += "寻找司机失败" + "\n";
+                            counter = 0;
                         } else {
                             customerLogArea.value += data.message + "\n";
                             counter++;

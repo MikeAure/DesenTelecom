@@ -144,35 +144,39 @@
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_1_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_1_id" class="form-control" placeholder="请输入用户id"
-                                       style="font-size: 20px">
-                            </div>
-                            <div class="input-group">
-                                <input type="text" id="mixzone_1_time" class="form-control"
-                                       placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_1_points" class="form-control"
-                                       placeholder="请输入用户点集, 格式 x1,y1;x2,y2 ..." style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="mixzone_1_submitBtn" type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                </span>
-                            </div>
+                            <form role="form">
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="mixzone_1_position" class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="mixzone_1_id" class="form-control" placeholder="请输入用户id"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="mixzone_1_time" class="form-control"
+                                           placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="mixzone_1_points" class="form-control"
+                                           placeholder="请输入矩形区域右上、左上、右下、左下四个点的坐标, 格式 x1,y1;x2,y2;x3,y3;x4,y4" style="font-size: 20px">
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="mixzone_1_submitBtn" type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
 
                             <div class="text-center">
                                 <label for="mixzone_1_outputText"
                                        style="display: block; font-size: 20px;justify-content: center; align-items: center; ">脱敏结果:</label>
                                 <div style="display: flex; flex-direction: column; align-items: center;">
                                     <textarea id="mixzone_1_outputText" rows="4" cols="50" readonly
-                                              style="margin-top: 10px;"></textarea>
+                                              style="margin-top: 10px;">
+
+                                    </textarea>
                                 </div>
                             </div>
                         </div>
@@ -204,28 +208,31 @@
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id"
-                                       style="font-size: 20px">
-                            </div>
-                            <div class="input-group">
-                                <input type="text" id="mixzone_3_time" class="form-control"
-                                       placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="mixzone_3_points" class="form-control"
-                                       placeholder="请输入用户点集, 格式 x1,y1;x2,y2 ..." style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="mixzone_3_submitBtn" type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                </span>
-                            </div>
+                            <form role="form">
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="mixzone_3_position" class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="mixzone_3_time" class="form-control"
+                                           placeholder="请输入进入区域的时间，格式：X.X" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="mixzone_3_points" class="form-control"
+                                           placeholder="请输入矩形区域右上、左上、右下、左下四个点的坐标, 格式 x1,y1;x2,y2;x3,y3;x4,y4" style="font-size: 20px">
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="mixzone_3_submitBtn" type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
+
 
                             <div class="text-center">
                                 <label for="mixzone_3_outputText"

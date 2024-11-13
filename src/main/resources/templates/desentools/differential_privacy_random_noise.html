@@ -360,9 +360,9 @@
                         <div style="margin: auto; font-size: 20px">
                             请选择隐私保护等级
                             <select id="noisy_hist1_privacyLevel">
-                                <option value="1"> 低程度</option>
-                                <option value="2" selected> 中程度</option>
-                                <option value="3"> 高程度</option>
+                                <option value="0"> 低程度</option>
+                                <option value="1" selected> 中程度</option>
+                                <option value="2"> 高程度</option>
                             </select>
                         </div>
                     </div>
@@ -417,9 +417,9 @@
                             <div style="margin: auto; font-size: 20px">
                                 请选择隐私保护等级
                                 <select id="noisy_hist2_privacyLevel">
-                                    <option value="1"> 低程度</option>
-                                    <option value="2" selected> 中程度</option>
-                                    <option value="3"> 高程度</option>
+                                    <option value="0"> 低程度</option>
+                                    <option value="1" selected> 中程度</option>
+                                    <option value="2"> 高程度</option>
                                 </select>
                             </div>
                         </div>
@@ -458,51 +458,15 @@
 
 </body>
 <style>
-    .ibox-title {
-        height: 200px;
-        border-color: #edf1f2;
-        background-color: #dbeafe;
-        color: black;
-        display: flex;
-    }
-
     textarea {
         font-size: 1.5em;
     }
 
     /*选择框居中*/
-    .midtile {
-        line-height: 30px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
-
-    #dpImage_pre, #dpImage_after {
-        text-align: center;
-    }
-
-    #dpImage_pre image, #dpImage_after image, #dpAudio_pre, #dpAudio_after {
+    #dpImage_pre image, #dpImage_after image {
         display: inline-block;
         max-width: 50%;
         height: auto
-    }
-
-    /*上传按钮*/
-    .upload-btn, #dpImage_submit, #dpAudio_submit, #dpGraph_submit {
-        background-color: #347aa9;
-        color: white;
-        cursor: pointer;
-        padding: 5px 20px;
-        text-align: center;
-        font-size: 20px;
-        display: inline-block;
-        margin: 30px;
-    }
-
-    .showFile {
-        display: flex;
-        justify-content: center;
     }
 
     .tabs-container ul {
@@ -512,19 +476,10 @@
         justify-content: center;
     }
 
-    .algo-description {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 50%;
-        margin: 0 auto;
-    }
-
     .description-item > p {
         font-size: 1.5em;
         text-align: justify;
     }
 
 </style>
-
 </html>

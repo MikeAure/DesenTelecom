@@ -159,9 +159,15 @@ public class LogSenderManager {
     @Value("${logSenderManager.ifSaveToDatabase}")
     private Boolean ifSaveToDatabase;
     @Value("${logSenderManager.ifSendFile}")
-    private Boolean ifSaveFile;
+    private Boolean ifSendFile;
     @Autowired
     private LogCollectUtil logCollectUtil;
+
+    @Value("${pythonMock.evaSendFile}")
+    private boolean evaMockSendFile;
+
+    @Value("${pythonMock.splitSendFile}")
+    private boolean splitMockSendFile;
 
     @EventListener
     @Async
@@ -186,7 +192,7 @@ public class LogSenderManager {
         log.info("fileSuffix: {}", fileSuffix);
 
         EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(
-                sendEvaReq, rawFileBytes, desenFileBytes, ifSaveFile);
+                sendEvaReq, rawFileBytes, desenFileBytes, ifSendFile);
         if (evaluationSystemReturnResult != null) {
             RecEvaResult recEvaResult = evaluationSystemReturnResult.getRecEvaResult();
             RecEvaResultInv recEvaResultInv = evaluationSystemReturnResult.getRecEvaResultInv();
@@ -321,13 +327,13 @@ public class LogSenderManager {
             evidenceSystemLogSender.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
         });
         executorService.submit(() -> {
-            evaluationSystemLogSender.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes, true);
+            evaluationSystemLogSender.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes, evaMockSendFile);
         });
         executorService.submit(() -> {
             ruleCheckSystemLogSender.send2RuleCheck(sendRuleReq);
         });
         executorService.submit(() -> {
-            splitSystemLogSender.send2Split(sendSplitDesenData, desenFileBytes);
+            splitSystemLogSender.send2Split(sendSplitDesenData, desenFileBytes, splitMockSendFile);
         });
         executorService.shutdown();
     }

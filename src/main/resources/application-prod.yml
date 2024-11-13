@@ -117,6 +117,10 @@ logSenderManager:
     ifSendFile: true
     ifPerformenceTest: false
 
+pythonMock:
+    evaSendFile: false
+    splitSendFile: false
+
 fetch:
     database:
         dataPlatformTask:
@@ -125,12 +129,12 @@ fetch:
             fixedRate: 180000    # 间隔时间（毫秒）
             remoteConfigPath: /root/env_fenjifenlei/dataplatform_config.json
         jdPlatformTask:
-            enabled: true
+            enabled: false
             initialDelay: 5000   # 初始延迟时间（毫秒）
             fixedRate: 180000    # 间隔时间（毫秒）
             jdTableName: t_user_info
             jdTargetTableName: t_user_info_desen
-            ifSendToEvaluationSystem: false
+            ifSendToEvaluationSystem: true
             configFileName: jd_config
             remoteConfigPath: /root/env_fenjifenlei/jd_config.json
         pageSize:

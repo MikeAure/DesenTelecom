@@ -8,5 +8,5 @@ import com.lu.gademo.event.ThreeSystemsEvent;
  */
 public interface SplitSystemLogSender {
     void splitHandleThreeSystemEvent(ThreeSystemsEvent logManagerEvent);
-    void send2Split(SendSplitDesenData sendSplitDesenData, byte[] rawFileData);
+    void send2Split(SendSplitDesenData sendSplitDesenData, byte[] rawFileData, boolean ifSendFile);
 }

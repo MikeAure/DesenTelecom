@@ -124,6 +124,10 @@ logSenderManager:
     ifSendFile: false
     ifPerformenceTest: false
 
+pythonMock:
+    evaSendFile: false
+    splitSendFile: false
+
 fetch:
     database:
         dataPlatformTask:

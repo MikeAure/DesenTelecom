@@ -84,72 +84,6 @@
                     originSubmitMethod();
                 });
             }
-            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'image')
-            //     .then(response => {
-            //         if (response.ok) {
-            //             return response.json();
-            //         } else {
-            //             throw new Error('Failed to fetch');
-            //         }
-            //     })
-            //     .then(data => {
-            //         if (data.code === 200 && data.message) {
-            //             setDefaultOption(data.data);
-            //             defaultOption = data.data;
-            //
-            //             if ($("ul .active").index() === 0) {
-            //                 switch (defaultOption) {
-            //                     case "image_face_sub":
-            //                         console.log("image_face_sub");
-            //                         privacyLevelBlock.style.display = "none";
-            //                         facesubUploadControlGroup.style.display = "block";
-            //                         uploadForm.style.display = "none";
-            //                         twoImgsBlock.style.display = "none";
-            //                         threeImgsBlock.style.display = "block";
-            //                         // submitBtn.removeEventListener("click", submitOriginMethod);
-            //                         submitBtn.off("click").on("click", () => {
-            //                             imageFaceSubUpload();
-            //                         });
-            //                         break;
-            //                     case "image_exchange_channel":
-            //                         privacyLevelBlock.style.display = "none";
-            //                         facesubUploadControlGroup.style.display = "none";
-            //                         uploadForm.style.display = "block";
-            //                         twoImgsBlock.style.display = "block";
-            //                         threeImgsBlock.style.display = "none";
-            //                         submitBtn.off("click").on("click", () => {
-            //                             originSubmitMethod();
-            //                         });
-            //                         break;
-            //                     default:
-            //                         privacyLevelBlock.style.display = "block";
-            //                         facesubUploadControlGroup.style.display = "none";
-            //                         uploadForm.style.display = "block";
-            //                         twoImgsBlock.style.display = "block";
-            //                         threeImgsBlock.style.display = "none";
-            //                         submitBtn.off("click").on("click", () => {
-            //                             originSubmitMethod();
-            //                         });
-            //                         break;
-            //                 }
-            //             } else {
-            //                 // privacy_level.style.display = "none";
-            //                 facesubUploadControlGroup.style.display = "none";
-            //                 uploadForm.style.display = "block";
-            //                 document.getElementById("algonames").value = defaultOption;
-            //                 submitBtn.off("click").on("click", () => {
-            //                     originSubmitMethod();
-            //                 });
-            //             }
-            //         } else {
-            //             setDefaultOption(defaultOption);
-            //         }
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //         alert("获取默认算法失败");
-            //         setDefaultOption(defaultOption);
-            //     });
 
             function setDefaultOption(value) {
                 selectedAlgoName.value = value;
@@ -168,9 +102,9 @@
             let replaceResultImg3 = document.getElementById("replaceResultImg3");
 
             let submitBtn = $("#submit");
-            submitBtn.off("click").on("click", () => {
-                originSubmitMethod();
-            });
+            // submitBtn.off("click").on("click", () => {
+            //     originSubmitMethod();
+            // });
             // 非换脸算法的文件上传入口
             const originalFileUpload = document.getElementById("fileUpload");
             originalFileUpload.addEventListener("change", chooseFile);

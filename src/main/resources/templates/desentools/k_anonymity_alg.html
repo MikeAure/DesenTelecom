@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link th:href="@{favicon.ico}" rel="shortcut icon" >
+    <link th:href="@{favicon.ico}" rel="shortcut icon">
     <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet">
     <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet">
     <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet">
     <link th:href="@{/css/animate.css}" rel="stylesheet">
-    <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css" >
+    <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet">
     <link th:href="@{/css/plugins/chosen/chosen.css}" rel="stylesheet">
     <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css">
@@ -601,7 +601,7 @@
                         包含k-1个匿名位置和1个真实位置的匿名位置集，并且位置集中位置点的分布近似于圆形
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度 匿名度k、匿名区域的面积s_cd、确定圆环内径的系数rho
+                        输入：经度，纬度、 匿名度k、匿名区域的面积s_cd（0-100之间）、确定圆环内径的系数rho（0-1之间）
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：坐标数组
@@ -614,28 +614,32 @@
                         <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
 
-                            <div class="input-group">
-                                <input type="text" id="CirDummy_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="CirDummy_k" class="form-control" placeholder="请输入匿名度k"
-                                       style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="CirDummy_s_cd" class="form-control" placeholder="匿名区域的面积"
-                                       style="font-size: 20px">
-                            </div>
-                            <div class="input-group">
-                                <input type="text" id="CirDummy_rho" class="form-control"
-                                       placeholder="请输入圆环内径系数" style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="CirDummy_submitBtn" type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                </span>
-                            </div>
+                            <form role="form">
+                                <div class="form-group">
+                                    <input type="text" id="CirDummy_position" class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="CirDummy_k" class="form-control" placeholder="请输入匿名度k"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="CirDummy_s_cd" class="form-control"
+                                           placeholder="匿名区域的面积（0＜s_cd≤100）"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="CirDummy_rho" class="form-control"
+                                           placeholder="请输入圆环内径系数（0≤rho＜1）" style="font-size: 20px">
+
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="CirDummy_submitBtn" type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
 
                             <div class="text-center">
                                 <label for="CirDummy_outputText"
@@ -675,24 +679,28 @@
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
+                            <form role="form">
+                                <div class="form-group">
+                                    <input type="text" id="GridDummy_position" class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="GridDummy_k" class="form-control" placeholder="请输入匿名度k"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="GridDummy_s_cd" class="form-control"
+                                           placeholder="匿名区域的面积"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="GridDummy_submitBtn" type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
 
-                            <div class="input-group">
-                                <input type="text" id="GridDummy_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="GridDummy_k" class="form-control" placeholder="请输入匿名度k"
-                                       style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="GridDummy_s_cd" class="form-control"
-                                       placeholder="匿名区域的面积"
-                                       style="font-size: 20px">
-                                <button class="btn btn-default" id="GridDummy_submitBtn" type="button"
-                                        style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                    提交脱敏
-                                </button>
-                            </div>
                         </div>
 
                         <div class="text-center">
@@ -723,7 +731,7 @@
                         分结果作为最终的矩形区域，输出该区域中所包含的缓存位置信息以及真实的用户位置信息。最终为用户形成一个包含用户数量刚好大于最小匿名度、且不可再分的隐藏区域。
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度 匿名度k 矩形区域左下角和右上角坐标
+                        输入：维度，经度、 匿名度k、矩形区域左下角和右上角坐标
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：坐标数组
@@ -734,37 +742,33 @@
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
-                            <!-- 新加的两个文本输入框 -->
-<!--                            <div class="input-group" style="margin-top: 10px;">-->
-<!--                                  <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">-->
-<!--                              </div>-->
-<!--                              <div class="input-group" style="margin-top: 10px;">-->
-<!--                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">-->
-<!--                              </div>-->
-                            <div class="input-group">
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_position"
-                                       class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_k" class="form-control"
-                                       placeholder="请输入匿名度k" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_min" class="form-control"
-                                       placeholder="矩形左下角坐标" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="adaptiveIntervalCloakingWrapper_max" class="form-control"
-                                       placeholder="矩形右上角坐标" style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="adaptiveIntervalCloakingWrapper_submitBtn"
-                                                type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                </span>
-                            </div>
+                            <form role="form">
+                                <div class="form-group">
+                                    <input type="text" id="adaptiveIntervalCloakingWrapper_position"
+                                           class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="adaptiveIntervalCloakingWrapper_k" class="form-control"
+                                           placeholder="请输入匿名度k" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="adaptiveIntervalCloakingWrapper_min" class="form-control"
+                                           placeholder="矩形左下角坐标" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="adaptiveIntervalCloakingWrapper_max" class="form-control"
+                                           placeholder="矩形右上角坐标" style="font-size: 20px">
+
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="adaptiveIntervalCloakingWrapper_submitBtn"
+                                            type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
 
                             <div class="text-center">
                                 <label for="adaptiveIntervalCloakingWrapper_outputText"
@@ -793,10 +797,10 @@
                         最后从上述2k个单元格中选出对缓存贡献最大的k-1个单元格，注意当此子集个数较多时，只随机选择S个子集。从而生成了包含k-1个单元格和1个包含真实位置的单元格的匿名位置集。
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度、算法类型（1表示CaDSA、2表示enhanced CaDSA）
+                        输入：经度，纬度、算法类型（1表示CaDSA、2表示enhanced CaDSA）
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输出：经度向量、纬度向量
+                        输出：坐标数组
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
@@ -805,22 +809,23 @@
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="CaDSA_id" class="form-control" placeholder="请输入算法类型"
-                                       style="font-size: 20px">
-                            </div>
+                            <form role="form">
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="CaDSA_id" class="form-control" placeholder="请输入算法类型"
+                                           style="font-size: 20px">
+                                </div>
 
-                            <div class="input-group">
-                                <input type="text" id="CaDSA_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="CaDSA_submitBtn" type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                    </span>
-                            </div>
-
+                                <div class="form-group">
+                                    <input type="text" id="CaDSA_position" class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="CaDSA_submitBtn" type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
 
                             <div class="text-center">
                                 <label for="CaDSA_outputText"
@@ -845,10 +850,10 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：从预先生成的虚拟位置库中随机选择K-1个匿名位置，与真实位置一起形成K-匿名位置集合。
+                        说明：从预先生成的虚拟位置库中随机选择K-1个匿名位置，与真实位置一起形成K-匿名位置集合。（经度范围：[116.251772, 116.51892], 维度范围：[39.854504, 39.991843]
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度 匿名度 k
+                        输入：经度，纬度、匿名度k
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：坐标数组
@@ -860,27 +865,31 @@
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
-<!--                            <div class="input-group" style="margin-top: 10px;">-->
-<!--                                  <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">-->
-<!--                              </div>-->
-<!--                              <div class="input-group" style="margin-top: 10px;">-->
-<!--                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">-->
-<!--                              </div>-->
-                            <div class="input-group">
-                                <input type="text" id="K_anonymity_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="K_anonymity_position_k" class="form-control"
-                                       placeholder="请输入匿名度k" style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="K_anonymity_position_submitBtn"
-                                                type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                </span>
-                            </div>
+                            <!--                            <div class="input-group" style="margin-top: 10px;">-->
+                            <!--                                  <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">-->
+                            <!--                              </div>-->
+                            <!--                              <div class="input-group" style="margin-top: 10px;">-->
+                            <!--                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">-->
+                            <!--                              </div>-->
+                            <form role="form">
+                                <div class="form-group">
+                                    <input type="text" id="K_anonymity_position" class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="K_anonymity_position_k" class="form-control"
+                                           placeholder="请输入匿名度k" style="font-size: 20px">
+
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="K_anonymity_position_submitBtn"
+                                            type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
+
 
                             <div class="text-center">
                                 <label for="K_anonymity_position_outputText"

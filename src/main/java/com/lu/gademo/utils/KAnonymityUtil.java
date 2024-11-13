@@ -1,5 +1,12 @@
 package com.lu.gademo.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import org.deidentifier.arx.*;
+import org.deidentifier.arx.AttributeType.Hierarchy;
+import org.deidentifier.arx.criteria.*;
+import org.deidentifier.arx.io.CSVHierarchyInput;
+import org.deidentifier.arx.metric.Metric;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -7,13 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import lombok.extern.slf4j.Slf4j;
-import org.deidentifier.arx.*;
-import org.deidentifier.arx.AttributeType.Hierarchy;
-import org.deidentifier.arx.criteria.*;
-import org.deidentifier.arx.io.CSVHierarchyInput;
-import org.deidentifier.arx.metric.Metric;
 
 @Slf4j
 public class KAnonymityUtil {
@@ -343,6 +343,7 @@ public class KAnonymityUtil {
         // 添加新的点，其标识符为集合当前大小加一
         v.add(new Point(v.size() + 1, x, y));
     }
+
     private static void initial(double x, double y, int kMin, double xMin, double yMin, double xMax, double yMax) {
         // 添加一系列预定义的点
 //        v.add(new Point(1, 39.962555, 116.228719));
@@ -368,6 +369,7 @@ public class KAnonymityUtil {
             double randY = yMin + (yMax - yMin) * Math.random();
             v.add(new Point(v.size() + 1, randX, randY));
         }
+        // 将真实的坐标填入List中
         v.add(new Point(v.size() + 1, x, y));
 
     }
@@ -499,7 +501,6 @@ public class KAnonymityUtil {
     }
 
 
-
     private static final int N = 4; // N*N grid
     private static final int K = 3; // Size of dummy set
     private static final int L = 1; // Normalization factor
@@ -518,7 +519,7 @@ public class KAnonymityUtil {
     public static void caDsaAlgorithm(double x, double y, int op, List<Double> retArrX, List<Double> retArrY) {
         // 将(x, y)转换为网格中的一个单元格索引
         int Cr = xyToCeil(x, y, 4, 4);
-//        System.out.printf("Current location cell: %d%n", Cr);
+        System.out.printf("Current location cell: %d%n", Cr);
 
         // 构造虚拟集的单元格列表
         List<Cell> v = constructCells();
@@ -537,111 +538,15 @@ public class KAnonymityUtil {
         }
     }
 
-    /**
-     * 核心算法函数，用于计算和选择最佳的细胞集合
-     *
-     * @param v       细胞列表，包含所有可选的细胞
-     * @param Cr      当前参考细胞的索引，用于定位参考细胞在列表中的位置
-     * @param S       算法处理步骤的数量，用于限制组合数量
-     * @param x       x 坐标，用于计算偏移量
-     * @param y       y 坐标，用于计算偏移量
-     * @param retArrX x 坐标偏移结果列表，将计算出的x偏移量存储在此列表中
-     * @param retArrY y 坐标偏移结果列表，将计算出的y偏移量存储在此列表中
-     * @return 返回0表示执行成功，-1表示未找到参考细胞
-     */
-//    private static int CaDSA(List<Cell> v, int Cr, int S, double x, double y, List<Double> retArrX, List<Double> retArrY) {
-//        // 创建一个临时细胞，用于比较以找到参考细胞
-//        Cell cellTmp = new Cell(Cr, 0, 0, 0, 0);
-//        int cnt = 0;
-//        List<Cell> Cc = new ArrayList<>();
-//        Iterator<Cell> it, it1;
-//        // 对细胞列表按Q值进行排序
-//        v.sort(Comparator.comparingDouble(Cell::getQ));
-//        // 查找参考细胞
-//        it = v.iterator();
-//        while (it.hasNext() && !it.next().equals(cellTmp)) ;
-//        if (!it.hasNext()) {
-//            System.out.println("Cr not found");
-//            return -1;
-//        }
-//
-//        // 选取参考细胞前2k个细胞（不包括参考细胞）
-//        it = v.iterator();
-//        while (it.hasNext() && cnt < K * 2) {
-//            Cell cell = it.next();
-//            if (!cell.equals(cellTmp)) {
-//                Cc.add(cell);
-//                cnt++;
-//            }
-//        }
-//
-//        // 选取参考细胞后2k个细胞（不包括参考细胞）
-//        it = v.iterator();
-//        while (it.hasNext() && !it.next().equals(cellTmp)) ;
-//        cnt = 0;
-//        while (it.hasNext() && cnt < K * 2) {
-//            Cc.add(it.next());
-//            cnt++;
-//        }
-//
-//        // 打乱细胞列表顺序
-//        Collections.shuffle(Cc);
-//
-//        //指向第2k+1个
-//        it1 = Cc.iterator();
-//
-//
-//        // 移除超出2k范围的细胞
-//        for (int i = 0; i <= 2 * K - 1; i++) {
-//            Cc.remove(0);
-//        }
-//
-//        // 生成细胞列表的所有子集
-//        List<List<Cell>> Cc1 = new ArrayList<>();
-//        subsets(Cc, K - 1, Cc1);
-//
-//        // 如果子集数量超过S，则移除部分子集
-//        if (combination(2 * K, K - 1) > S) {
-//            for (int i = 0; i <= S; i++) {
-//                Cc1.remove(Cc1.size() - 1);
-//            }
-//        }
-//
-//        // 寻找最佳细胞组合
-//        double maxSum = -1;
-//        List<Cell> itrst = null;
-//        for (List<Cell> subset : Cc1) {
-//            double sumcon = 0;
-//            for (Cell cell : subset) {
-//                double contribution = cell.getQ() * (cell.isFlag() ? 1 : 0);
-//                sumcon += contribution;
-//            }
-//            if (sumcon >= maxSum) {
-//                maxSum = sumcon;
-//                itrst = subset;
-//            }
-//        }
-//
-//        // 计算并存储每个细胞的偏移量
-//        for (Cell cell : itrst) {
-//            double fidX = ((int) x % 4 - cell.getX() % 4) * 0.1 + x;
-//            double fidY = ((int) y / 4 - cell.getX() / 4) * 0.006 + y;
-//            retArrX.add(fidX);
-//            retArrY.add(fidY);
-//        }
-//
-//        return 0;
-//    }
-
     public static int CaDSA(List<Cell> v, int Cr, int S, double x, double y, List<Double> ret_arr_x, List<Double> ret_arr_y) {
         Cell cell_tmp = new Cell();
         cell_tmp.x = Cr;
         int cnt = 0;
         List<Cell> Cc = new ArrayList<>(); // candidate set
-
+        System.out.println("Cr: " + Cr);
         Collections.sort(v, (a, b) -> Double.compare(a.q, b.q)); // 按q排序
         Iterator<Cell> it = v.iterator();
-        while (it.hasNext() && !it.next().equals(cell_tmp));
+        while (it.hasNext() && !it.next().equals(cell_tmp)) ;
         if (!it.hasNext()) {
             System.out.println("未找到Cr");
             return -1;
@@ -658,11 +563,8 @@ public class KAnonymityUtil {
         listIt = v.listIterator(v.indexOf(cell_tmp));
         cnt = 0;
         while (listIt.hasNext() && cnt < K * 2) {
-            listIt.next(); // Skip Cr
-            if (listIt.hasNext()) {
-                Cc.add(listIt.next());
-                cnt++;
-            }
+            Cc.add(listIt.next());
+            cnt++;
         }
 
         // 随机排序
@@ -678,6 +580,7 @@ public class KAnonymityUtil {
 
         // 求Cc的所有K-1个元素子集 Cc1是结果
         subsets(Cc, K - 1, Cc1);
+        System.out.println("subsets in CaDSA: " + Cc1);
 
         if (combination(2 * K, K - 1) > S) {
             // 保留前s个子集
@@ -718,10 +621,10 @@ public class KAnonymityUtil {
     }
 
     /**
-     * 增强版的CaDSA算法,该方法用于在给定的细胞列表中进行筛选，以找到最优的细胞组合
+     * 增强版的CaDSA算法,该方法用于在给定的单元列表中进行筛选，以找到最优的单元组合
      *
-     * @param v       细胞列表
-     * @param Cr      当前参考细胞的索引
+     * @param v       单元列表
+     * @param Cr      当前参考单元的索引
      * @param S       采样大小
      * @param x       用于计算的坐标
      * @param y       用于计算的坐标
@@ -730,62 +633,65 @@ public class KAnonymityUtil {
      * @return 如果Cr未找到则返回-1，否则返回0
      */
     private static int enhancedCaDSA(List<Cell> v, int Cr, int S, double x, double y, List<Double> retArrX, List<Double> retArrY) {
-        // 创建一个临时细胞，用于后续的比较操作
+        // 创建一个临时单元，用于后续的比较操作
         Cell cellTmp = new Cell(Cr, 0, 0, 0, 0);
-        // 用于计数细胞的数目
+        // 用于计数单元的数目
         int cnt = 0;
-        // Cc用于存储候选细胞
+        // Cc用于存储候选单元
         List<Cell> Cc = new ArrayList<>();
-        // 迭代器，用于遍历细胞列表
+        // 迭代器，用于遍历单元列表
         Iterator<Cell> it, it1;
 
-        // 根据细胞的质量Q对列表进行排序
+        // 根据单元的质量Q对列表进行排序
         v.sort(Comparator.comparingDouble(Cell::getQ));
-        // 寻找当前参考细胞Cr的位置
-        it = v.iterator();
-        while (it.hasNext() && !it.next().equals(cellTmp)) ;
-        // 如果找不到Cr，则输出错误信息并返回
-        if (!it.hasNext()) {
+        // 寻找当前参考单元Cr的位置
+//        it = v.iterator();
+
+//        while (it.hasNext() && !it.next().equals(cellTmp)) ;
+//        // 如果找不到Cr，则输出错误信息并返回
+//        if (!it.hasNext()) {
+//            System.out.println("Cr not found");
+//            return -1;
+//        }
+
+        // 获取到实际的参考单元
+        int idx = -1;
+        idx = v.lastIndexOf(cellTmp);
+        if (idx == -1) {
             System.out.println("Cr not found");
             return -1;
         }
+        Cell real = v.get(idx);
+        System.out.println("real: " + real);
 
-        // 获取到实际的参考细胞
-        Cell real = it.next();
-
-        // 从Cr之前选取2k个细胞
-        it = v.iterator();
-        while (it.hasNext() && cnt < K * 2) {
-            Cell cell = it.next();
-            if (!cell.equals(cellTmp)) {
-                Cc.add(cell);
-                cnt++;
-            }
+        // 从Cr之前选取2k个单元
+        ListIterator<Cell> listIt = v.listIterator(v.indexOf(cellTmp));
+        while (listIt.hasPrevious() && cnt < K * 2) {
+            Cc.add(listIt.previous());
+            cnt++;
         }
 
-        // 从Cr之后选取2k个细胞
-        it = v.iterator();
-        while (it.hasNext() && !it.next().equals(cellTmp)) ;
+        // 取cr后面2k个(不含cr块)
+        listIt = v.listIterator(v.indexOf(cellTmp));
         cnt = 0;
-        while (it.hasNext() && cnt < K * 2) {
-            Cell cell = it.next();
-            if (!cell.equals(cellTmp)) {
-                Cc.add(cell);
-                cnt++;
-            }
+        while (listIt.hasNext() && cnt < K * 2) {
+            Cc.add(listIt.next());
+            cnt++;
         }
-
-        // 打乱Cc列表，以随机化顺序
         Collections.shuffle(Cc);
 
-        // 移除超出2k范围的细胞
-        for (int i = 0; i <= 2 * K - 1; i++) {
-            Cc.remove(0);
+        // 打乱Cc列表，以随机化顺序
+        if (Cc.size() > 2 * K) {
+            Cc = new ArrayList<>(Cc.subList(0, 2 * K));
         }
+        
+        // 移除超出2k范围的单元
+        Cc.subList(0, 2 * K);
 
         // 生成Cc的所有子集
         List<List<Cell>> Cc1 = new ArrayList<>();
         subsets(Cc, K - 1, Cc1);
+        System.out.println("All subsets: " + Cc1);
 
         // 如果子集数量超过S，则移除部分子集
         if (combination(2 * K, K - 1) > S) {
@@ -795,7 +701,7 @@ public class KAnonymityUtil {
             }
         }
 
-        // 寻找最大贡献值和对应的细胞集合
+        // 寻找最大贡献值和对应的单元集合
         double maxContribution = -1;
         List<Cell> itrst = null;
         for (List<Cell> subset : Cc1) {
@@ -830,10 +736,11 @@ public class KAnonymityUtil {
             }
         }
 
-        // 根据最优细胞集合更新结果数组
+        // 根据最优单元集合更新结果数组
         for (Cell cell : itrst) {
             double fidX = ((int) x % 4 - cell.getX() % 4) * 0.1 + x;
             double fidY = ((int) y / 4 - cell.getX() / 4) * 0.006 + y;
+            System.out.println("第" + cell.getX() + "块");
             retArrX.add(fidX);
             retArrY.add(fidY);
         }
@@ -886,6 +793,7 @@ public class KAnonymityUtil {
             item.remove(item.size() - 1);
             select(nums, m, idx + 1, rst, item);
         }
+        return;
     }
 
     private static void subsets(List<Cell> nums, int m, List<List<Cell>> rst) {
@@ -904,9 +812,9 @@ public class KAnonymityUtil {
 
     /**
      * 构建并返回一个Cell对象列表
-     * 该方法主要用于初始化或配置细胞集合，为后续的操作提供数据源
+     * 该方法主要用于初始化或配置单元集合，为后续的操作提供数据源
      *
-     * @return 返回一个List类型的细胞集合，包含所有细胞对象
+     * @return 返回一个List类型的单元集合，包含所有单元对象
      */
     private static List<Cell> constructCells() {
         List<Cell> v = new ArrayList<>();
@@ -922,7 +830,7 @@ public class KAnonymityUtil {
 //                v.add(new Cell(8, 0.12, 1, 8, 7));
 //                v.add(new Cell(9, 0.34, 0, 6.5, 4.5));
 //                break;
-            case 3:
+            case 3: {
                 for (int i = 1; i <= 16; i++) {
                     v.add(new Cell(i, 0.03, 1, 9, 6.5));
                 }
@@ -932,6 +840,19 @@ public class KAnonymityUtil {
                     v.set(i - 1, new Cell(i, 0.1, 1, 9, 6.5));
                 }
                 break;
+            }
+
+            case 4: {
+                for (int i = 1; i <= 16; i++) {
+                    v.add(new Cell(i, 0.03, 1, 9, 6.5));
+                }
+                v.set(7, new Cell(8, 0.01, 1, 9, 6.5));
+                v.set(8, new Cell(9, 0.08, 1, 9, 6.5));
+                for (int i = 10; i <= 16; i++) {
+                    v.set(i - 1, new Cell(i, 0.1, 1, 9, 6.5));
+                }
+                break;
+            }
         }
         return v;
     }
@@ -951,12 +872,11 @@ public class KAnonymityUtil {
             this.t = t;
         }
 
-        public Cell(int x)
-        {
+        public Cell(int x) {
             this.x = x;
         }
 
-        public Cell(){
+        public Cell() {
         }
 
         public int getX() {
@@ -988,9 +908,18 @@ public class KAnonymityUtil {
         public int hashCode() {
             return Objects.hash(x);
         }
+
+        @Override
+        public String toString() {
+            return "Cell{" +
+                    "x=" + x +
+                    ", q=" + q +
+                    ", flag=" + flag +
+                    ", T=" + T +
+                    ", t=" + t +
+                    '}';
+        }
     }
-
-
 
 
     // 虚拟位置库。当前的虚拟位置库是基于北京城区的经纬度坐标构建的，参考的是北京市出租车轨迹数据。
@@ -1282,8 +1211,6 @@ public class KAnonymityUtil {
 
         return 0;
     }
-
-
 
 
 }

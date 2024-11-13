@@ -229,7 +229,6 @@ if __name__ == '__main__':
         from myDP import *
         from myStart2 import *
         from mystt1 import *
-
         replace_voice_print_fixed(file_path, newFilePath)
     elif algName == "apply_audio_effects":
         effects_param = [(-3, 0.7, -5, 5), (2, 0.8, -10, 10), (5, 0.9, -20, 20)][param]
@@ -239,15 +238,3 @@ if __name__ == '__main__':
         block = [5, 10, 15][int(sys.argv[5])]
         # block = int(sys.argv[5])
         audio_reshuffle(file_path, newFilePath, block)
-
-    # from myextraction import *
-    # from myDP import *
-    # from myStart2 import *
-    # from mystt1 import *
-
-    # # dpAudio("D:\\Programming\\Desen\\raw_files\\1710382610951audiotest.wav", 
-    # #         "D:\\Programming\\Desen\\desen_files\\desen_1710382610951audiotest.wav", 
-    # #         0.5)
-
-    # replace_voice_print_fixed("D:\\Programming\\Desen\\raw_files\\17127445577770001.wav", 
-    #                   "D:\\Programming\\Desen\\desen_files\\desen_17127445577770001.wav")

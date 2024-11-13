@@ -46,11 +46,11 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
     @Override
     public void splitHandleThreeSystemEvent(ThreeSystemsEvent logManagerEvent) {
         // 发送给拆分重构系统
-        send2Split(logManagerEvent.getSendSplitDesenData(), logManagerEvent.getDesenFileData());
+        send2Split(logManagerEvent.getSendSplitDesenData(), logManagerEvent.getDesenFileData(), true);
     }
 
     @Override
-    public void send2Split(SendSplitDesenData sendSplitDesenData, byte[] desenFileData) {
+    public void send2Split(SendSplitDesenData sendSplitDesenData, byte[] desenFileData, boolean ifSendFile) {
         // 保存sendSplitDesenData
         if (sendSplitDesenDataDao.existsById(sendSplitDesenData.getDesenInfoAfterID())) {
             sendSplitDesenDataDao.deleteById(sendSplitDesenData.getDesenInfoAfterID());
@@ -65,8 +65,12 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
         dataJson.set("data", allSplitJsonData);
         log.info("拆分重构请求数据: {}", dataJson.toPrettyString());
         TcpPacketSplit tcpPacketSplit = new TcpPacketSplit(dataJson.toPrettyString());
-        byte[] tcpBytePacket = tcpPacketSplit.buildPacket(desenFileData);
-
+        byte[] tcpBytePacket = new byte[0];
+        if (ifSendFile) {
+            tcpBytePacket = tcpPacketSplit.buildPacket(desenFileData);
+        } else {
+            tcpBytePacket = tcpPacketSplit.buildPacket(new byte[0]);
+        }
         try (
                 Socket socket = new Socket(splitReconstructAddress, splitReconstructPort);
                 InputStream inputStream = socket.getInputStream();

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Insert title here</title>
-    <link th:href="@{favicon.ico}" rel="shortcut icon" >
+    <link th:href="@{favicon.ico}" rel="shortcut icon">
     <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet">
     <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet">
     <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet">
     <link th:href="@{/css/animate.css}" rel="stylesheet">
-    <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css" >
+    <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css">
     <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet">
     <link th:href="@{/css/plugins/chosen/chosen.css}" rel="stylesheet">
     <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css">
@@ -548,10 +548,10 @@
                         说明：将用户的真实位置转换为Hilbert曲线上的值，然后找到Hilbert曲线上相邻的K个点，转换为真实坐标后输出。
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度，匿名度k
+                        输入：用户横纵坐标，大小在0-16之间、匿名度k
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输出：坐标数组
+                        输出：匿名后的坐标数组，大小为k
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 
@@ -559,27 +559,23 @@
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
-                            <!-- 新加的两个文本输入框 -->
-<!--                            <div class="input-group" style="margin-top: 10px;">-->
-<!--                                  <input type="text" id="mixzone_3_position" class="form-control" placeholder="请输入经纬度，以,分隔" style="font-size: 20px">-->
-<!--                              </div>-->
-<!--                              <div class="input-group" style="margin-top: 10px;">-->
-<!--                                  <input type="text" id="mixzone_3_id" class="form-control" placeholder="请输入用户id" style="font-size: 20px">-->
-<!--                              </div>-->
-                            <div class="input-group">
-                                <input type="text" id="Hilbert_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="Hilbert_k" class="form-control" placeholder="请输入匿名度k"
-                                       style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="Hilbert_submitBtn" type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                </span>
-                            </div>
+                            <form role="form">
+                                <div class="form-group">
+                                    <input type="text" id="Hilbert_position" class="form-control"
+                                           placeholder="请输入横纵坐标，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="Hilbert_k" class="form-control" placeholder="请输入匿名度k"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-default" id="Hilbert_submitBtn" type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
+
 
                             <div class="text-center">
                                 <label for="Hilbert_outputText"
@@ -604,12 +600,12 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：用于返回距离用户最近的k个POI，并且不暴露用户的真实位置。该算法可以概括为：首先生成一个虚拟位置qfake，将所有检索点按照距离qfake从近到远排序；
+                        说明：用于返回距离用户最近的k个POI（经纬度坐标），并且不暴露用户的真实位置。该算法可以概括为：首先生成一个虚拟位置qfake，将所有检索点按照距离qfake从近到远排序；
                         然后将排序后的检索点中的前k个放进结果集中，遍历后续所有点，若与真实位置q间的距离小于结果集中与q距离最大的点，则替换。结束条件为检索点集合遍历完毕或者
                         当前点到真实位置q的距离大于distance(q,qfake)与结果集中的点与q的最远距离之和。
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度
+                        输入：经度，纬度、匿名度k、POI列表（元素数量需要大于匿名度k）
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：坐标数组
@@ -620,24 +616,28 @@
                 <div class="container">
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
-                            <div class="input-group">
-                                <input type="text" id="SpaceTwist_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="SpaceTwist_k" class="form-control" placeholder="请输入匿名度k"
-                                       style="font-size: 20px">
-                            </div>
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="SpaceTwist_poi" class="form-control"
-                                       placeholder="请输入poi: x1,y1;x2,y2;..." style="font-size: 20px">
-                                <span class="input-group-btn">
-                                        <button class="btn btn-default" id="SpaceTwist_submitBtn" type="button"
-                                                style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
-                                            提交脱敏
-                                        </button>
-                                </span>
-                            </div>
+                            <form role="form">
+                                <div class="form-group">
+                                    <input type="text" id="SpaceTwist_position" class="form-control"
+                                           placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="SpaceTwist_k" class="form-control" placeholder="请输入匿名度k"
+                                           style="font-size: 20px">
+                                </div>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <input type="text" id="SpaceTwist_poi" class="form-control"
+                                           placeholder="请输入poi: x1,y1;x2,y2;..." style="font-size: 20px">
+
+                                </div>
+                                <div class="form-group text-center" style="margin-top: 10px;">
+                                    <button class="btn btn-default" id="SpaceTwist_submitBtn" type="button"
+                                            style="font-size: 20px;">
+                                        提交脱敏
+                                    </button>
+                                </div>
+                            </form>
+
 
                             <div class="text-center">
                                 <label for="SpaceTwist_outputText"

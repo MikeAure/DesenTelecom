@@ -410,6 +410,7 @@ public class Customer {
             this.longitude = longitude;
         }
 
+        // 利用resultMap存储结果
         @Override
         public void run() {
             resultMap.put(this.index, encryptedCalculatedData(this.latitude, this.longitude));
