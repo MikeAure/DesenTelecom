@@ -1,5 +1,8 @@
 package com.lu.gademo.utils;
 
+import lombok.ToString;
+
+
 public enum AlgorithmType {
     DP(1),
     GENERALIZATION(2),
@@ -15,6 +18,13 @@ public enum AlgorithmType {
 
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return "AlgorithmType{" +
+                "value=" + value +
+                '}';
     }
 
     public static AlgorithmType fromValue(int value) {

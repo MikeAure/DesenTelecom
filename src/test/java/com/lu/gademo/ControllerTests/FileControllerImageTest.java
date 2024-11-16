@@ -25,13 +25,13 @@ public class FileControllerImageTest {
     private static final String URL = "/File/desenFile";
     private static final String PARAMS = "1";
     private static final String SHEET = "yourSheet";
-    private static final String IMAGE_FILE_PATH = "src/test/resources/test_data/image/test.png";
-    private static final String IMAGE_FILE_PATH2 = "src/test/resources/test_data/image/square.jpg";
-    private static final String IMAGE_FILE_NAME = "test.png";
-    private static final String IMAGE_FILE_TYPE = String.valueOf(MediaType.IMAGE_PNG);
+    private static final String IMAGE_FILE_PATH = "src/test/resources/test_data/image/test8.jpg";
+    private static final String IMAGE_FILE_PATH2 = "src/test/resources/test_data/image/test_square.jpg";
+    private static final String IMAGE_FILE_NAME = "test8.jpg";
+    private static final String IMAGE_FILE_TYPE = String.valueOf(MediaType.IMAGE_JPEG);
 
-    private static final String FACE_IMAGE_FILE_PATH = "src/test/resources/test_data/image/3.png";
-    private static final String FACE_IMAGE_FILE_NAME = "3.png";
+    private static final String FACE_IMAGE_FILE_PATH = "src/test/resources/test_data/image/replace_face2.png";
+    private static final String FACE_IMAGE_FILE_NAME = "replace_face2.png";
     private static final String FACE_IMAGE_FILE_TYPE = String.valueOf(MediaType.IMAGE_PNG);
 
     private static final String RAW_FORM_FIELD = "file";

@@ -1,14 +1,18 @@
 package com.lu.gademo.utils;
 
+import com.lu.gademo.dto.AlgorithmInfoParamDto;
+import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import lombok.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * 算法信息类，用于存储算法的相关信息，方便调用统一接口
+ * 算法信息类，用于存储算法名称、id、算法类型、统一接口中的id、算法参数列表、脱敏需求
  */
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class AlgorithmInfo {
     // 算法名称
@@ -56,14 +60,24 @@ public class AlgorithmInfo {
         this.requirement = requirement;
     }
 
+    /**
+     * 对于统一接口中execute方法的代理
+     * @param rawData 封装后的原始数据
+     * @param params 算法对应的参数
+     * @return 封装后的脱敏数据
+     */
     public DSObject execute(DSObject rawData, Number... params) {
         return executor.service(rawData, originalId, params);
     }
 
-    // 获取分类表中的算法ID
+    /**
+     * 获取算法的原始ID信息
+     * @return 算法的原始ID信息
+     */
     public String getOriginalIdInfo() {
         return String.valueOf(type.getValue()) + originalId;
     }
+
 
     @Override
     public boolean equals(Object obj) {

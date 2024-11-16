@@ -193,7 +193,7 @@ def second_round_process(supports: np.ndarray, bias: np.ndarray, split_idx: int,
         else:
             m = (alpha * beta * supports[i] * paraU[i]) % modulus
             paraM.append(m)
-
+    # m+1, m+2, m+3, m+4
     mask = []
     for i in range(4):
         w = number.getRandomNBitInteger(k4)

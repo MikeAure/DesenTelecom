@@ -27,7 +27,7 @@ public interface FileService {
 
     FileStorageDetails generateTextTestFile(int totalNumber) throws IOException;
 
-    ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException;
+    ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ExecutionException, InterruptedException, TimeoutException;
 
     ResponseEntity<byte[]> dealImage(MultipartFile file, String params, String algName) throws IOException;
 

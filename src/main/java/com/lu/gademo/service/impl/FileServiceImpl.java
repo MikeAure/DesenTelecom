@@ -17,6 +17,7 @@ import com.lu.gademo.service.FileService;
 import com.lu.gademo.utils.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -322,7 +323,7 @@ public class FileServiceImpl implements FileService {
 
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName.trim());
             DSObject dsObject = new DSObject(objs);
-            infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
+            infoBuilders.desenAlgParam.append(CollectionUtils.isEmpty(algorithmInfo.getParams()) ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
 
             switch (algName.trim()) {
                 case "dpDate": {
@@ -570,7 +571,7 @@ public class FileServiceImpl implements FileService {
 
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName.trim());
             DSObject dsObject = ifSkipFirstRow ? new DSObject(dataList.subList(1, dataList.size())) : new DSObject(dataList);
-            infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
+            infoBuilders.desenAlgParam.append(CollectionUtils.isEmpty(algorithmInfo.getParams()) ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
             infoBuilders.desenAlg.append(algorithmInfo.getId());
             infoBuilders.desenRequirements.append(rawFileName).append(algorithmInfo.getRequirement()).append(",");
 
@@ -678,7 +679,7 @@ public class FileServiceImpl implements FileService {
 
         infoBuilders.desenAlg.append(algorithmInfo.getId());
         infoBuilders.desenLevel.append(reqDesenParam + 1);
-        if (algorithmInfo.getParams() == null) {
+        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
             infoBuilders.desenAlgParam.append("无参");
         } else {
             infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(reqDesenParam).toString());
@@ -755,7 +756,7 @@ public class FileServiceImpl implements FileService {
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         // 脱敏算法
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (algorithmInfo.getParams() == null) {
+        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
             infoBuilders.desenAlgParam.append("无参");
         } else {
             infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
@@ -833,7 +834,7 @@ public class FileServiceImpl implements FileService {
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (algorithmInfo.getParams() == null) {
+        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
             infoBuilders.desenAlgParam.append("无参");
         } else {
             infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
@@ -1561,7 +1562,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException {
+    public ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         // 处理图片
@@ -1591,23 +1592,8 @@ public class FileServiceImpl implements FileService {
             headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
             responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
         }
-        // 在此处等待响应返回
-        // TODO: Controller Advice
-        try {
-            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
-        } catch (TimeoutException e) {
-            log.error("等待处理结果超时：{}", e.getMessage());
-            String errorMsg = "等待处理结果超时";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (InterruptedException e) {
-            log.error("等待处理结果时异常中断：{}", e.getMessage());
-            String errorMsg = "等待处理结果时异常中断";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (ExecutionException e) {
-            log.error("等待处理结果时执行异常：{}", e.getMessage());
-            String errorMsg = "等待处理结果时执行异常";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        }
+
+        return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
 
     }
 
@@ -1663,7 +1649,7 @@ public class FileServiceImpl implements FileService {
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
 
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (algorithmInfo.getParams() == null) {
+        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
             infoBuilders.desenAlgParam.append("无参");
         } else {
             infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
@@ -2207,7 +2193,7 @@ public class FileServiceImpl implements FileService {
 //                    if (excelParam.getTmParam() == 0) {
 //                        infoBuilders.desenAlgParam.append("没有脱敏,");
 //                    } else {
-//                        infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参，"
+//                        infoBuilders.desenAlgParam.append(CollectionUtils.isEmpty(algorithmInfo.getParams()) ? "无参，"
 //                                : algorithmInfo.getParams().get(excelParam.getTmParam()).toString() + ",");
 //                    }
                     switch (algoNum) {
@@ -2448,7 +2434,7 @@ public class FileServiceImpl implements FileService {
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         // 脱敏算法
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (algorithmInfo.getParams() == null) {
+        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
             infoBuilders.desenAlgParam.append("无参");
         } else {
             infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
@@ -2468,7 +2454,8 @@ public class FileServiceImpl implements FileService {
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
         logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
-                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix,
+                startTime, endTime);
 
         // 读取文件返回
         HttpHeaders headers = new HttpHeaders();
@@ -2566,7 +2553,7 @@ public class FileServiceImpl implements FileService {
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (algorithmInfo.getParams() == null) {
+        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
             infoBuilders.desenAlgParam.append("无参");
         } else {
             infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
@@ -2588,7 +2575,8 @@ public class FileServiceImpl implements FileService {
         String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
 
         logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
-                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
+                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix,
+                startTime, endTime);
 
         // 设置HTTP响应头部信息
         HttpHeaders headers = new HttpHeaders();
@@ -3032,7 +3020,7 @@ public class FileServiceImpl implements FileService {
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName(algName.trim());
             DSObject dsObject = new DSObject(objs);
 
-            infoBuilders.desenAlgParam.append(algorithmInfo.getParams() == null ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
+            infoBuilders.desenAlgParam.append(CollectionUtils.isEmpty(algorithmInfo.getParams()) ? "无参" : algorithmInfo.getParams().get(desenParam - 1));
 
             switch (algName.trim()) {
                 case "dpDate": {

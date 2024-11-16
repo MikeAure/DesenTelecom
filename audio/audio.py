@@ -140,17 +140,17 @@ if __name__ == '__main__':
         sys.exit(1)
 
     algName = sys.argv[1]
-    input_video = sys.argv[2]
-    output_video = sys.argv[3]
+    input_audio = sys.argv[2]
+    output_audio = sys.argv[3]
     param = sys.argv[4]
 
     if algName == "floor":
         floor_params = [3, 2, 1][int(param)]
-        audio_floor(input_video, floor_params, output_video)
+        audio_floor(input_audio, floor_params, output_audio)
     elif algName == "median":
         block_num = [5, 10, 15][int(param)]
-        audio_median(input_video, block_num, output_video)
+        audio_median(input_audio, block_num, output_audio)
     elif algName == "augmentation":
-        audio_augmentation_audio(input_video, output_video, int(param))
+        audio_augmentation_audio(input_audio, output_audio, int(param))
     elif algName == "spec":
-        spec_augmentation_audio(input_video, output_video, int(param))
+        spec_augmentation_audio(input_audio, output_audio, int(param))

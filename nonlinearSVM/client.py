@@ -128,8 +128,14 @@ def get_result(sock: socket, modulus: int, inv_s: int, alpha: int) -> Tuple[int,
     result = json.loads(result_bytes.decode('utf-8'))
 
     posN, negN, posM, negM = (result[k] for k in ['posN', 'negN', 'posM', 'negM'])
+    print("解除可逆加扰前: ")
+    print(f"posM: {posM[0:10]}")
+    print(f"negM: {negM[0:10]}")
     posW = (inv_s * posM) % modulus
     negW = (inv_s * negM) % modulus
+    print("解除可逆加扰后: ")
+    print(f"posW: {posW[0:10]}")
+    print(f"negW: {negW[0:10]}")
 
     square_alpha = int(pow(alpha, 2))
     tmp1 = posN - negN
