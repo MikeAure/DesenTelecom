@@ -892,7 +892,7 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         // 脱敏开始时间
         long startTimePoint = System.currentTimeMillis();
-        dp.service(dsObject, 7, Integer.parseInt(desenParam));
+        algorithmsFactory.getAlgorithmInfoFromId(7).execute(dsObject, Integer.parseInt(desenParam));
 
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -1830,6 +1830,7 @@ public class FileServiceImpl implements FileService {
                             algorithmInfo.getParams().get(excelParam.getTmParam() - 1) + ","
             );
             infoBuilders.desenRequirements.append(columnName).append(algorithmInfo.getRequirement()).append(",");
+            // 这里的类型信息是否需要注意下
             desenResult.put(columnIndex, getDsList(algorithmInfo, new DSObject(objs), excelParam));
         }
 
@@ -2655,7 +2656,7 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         // 脱敏开始时间
         long startTimePoint = System.currentTimeMillis();
-        dp.service(dsObject, 7, Integer.parseInt(desenParam));
+        algorithmsFactory.getAlgorithmInfoFromId(7).execute(dsObject, Integer.parseInt(desenParam));
 
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -3063,19 +3064,7 @@ public class FileServiceImpl implements FileService {
                     util.write2Excel(sheet, totalRowNum, columnIndex, datas);
                     break;
                 }
-                case "gaussianToValue": {
-                    // 脱敏要求
-                    infoBuilders.desenRequirements.append(colName).append("添加差分隐私高斯噪声,");
-                    infoBuilders.desenAlg.append(4);
 
-                    List<Double> datas = dp.service(dsObject, 27, desenParam).getList()
-                            .stream()
-                            .map(obj -> obj == null ? null : (Double) obj)
-                            .collect(Collectors.toList());
-
-                    util.write2Excel(sheet, totalRowNum, columnIndex, datas);
-                    break;
-                }
                 case "randomUniformToValue": {
                     // 脱敏要求
                     infoBuilders.desenRequirements.append(colName).append("添加随机均匀噪声,");

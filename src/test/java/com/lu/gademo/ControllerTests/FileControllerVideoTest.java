@@ -25,14 +25,14 @@ public class FileControllerVideoTest {
     private static final String URL = "/File/desenFile";
     private static final String PARAMS = "1";
     private static final String SHEET = "yourSheet";
-    private static final String VIDEO_FILE_PATH = "src/test/resources/test_data/video/3.mp4";
-    private static final String VIDEO_FILE_NAME = "3.mp4";
+    private static final String VIDEO_FILE_PATH = "src/test/resources/test_data/video/test_1.mp4";
+    private static final String VIDEO_FILE_NAME = "test_1.mp4";
     private static final String VIDEO_FILE_TYPE = "video/mp4";
     private static final String RAW_FORM_FIELD = "file";
     private static final String FACE_FORM_FIELD = "sheet";
 
-    private static final String FACE_IMAGE_FILE_PATH = "src/test/resources/test_data/image/3.png";
-    private static final String FACE_IMAGE_FILE_NAME = "3.png";
+    private static final String FACE_IMAGE_FILE_PATH = "src/test/resources/test_data/image/replace_face2.png";
+    private static final String FACE_IMAGE_FILE_NAME = "replace_face2.png";
     private static final String FACE_IMAGE_FILE_TYPE = String.valueOf(MediaType.IMAGE_PNG);
 
     MockMultipartFile videoFile;

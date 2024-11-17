@@ -6,6 +6,32 @@ import numpy as np
 import os
 import argparse
 
+def adjust_region(image, x, y, w, h):
+    # 确保坐标不越界
+    x = max(0, x)
+    y = max(0, y)
+    w = max(0, min(image.width - x, w))
+    h = max(0, min(image.height - y, h))
+    return x, y, w, h
+
+
+def parse_param(input_string):
+    """Parse input parameter as either an integer or a tuple."""
+    if "," in input_string:
+        # Split the string by ',' and convert to integers
+        try:
+            return tuple(map(int, input_string.split(",")))
+        except ValueError:
+            raise argparse.ArgumentTypeError(
+                "Invalid tuple format. Use comma-separated integers, e.g., 100,100,200,200"
+            )
+    else:
+        # Parse as a single integer
+        try:
+            return int(input_string)
+        except ValueError:
+            raise argparse.ArgumentTypeError("Parameter must be an integer or a tuple.")
+
 
 def pixelate(image: Image.Image, block_size: int = 5):
     width, height = image.size
@@ -19,7 +45,7 @@ def pixelate(image: Image.Image, block_size: int = 5):
 def pixelate_region(
     image: Image.Image, region_x, region_y, region_w, region_h, block_size: int = 5
 ):
-    x, y, w, h = region_x, region_y, region_w, region_h
+    x, y, w, h = adjust_region(image, region_x, region_y, region_w, region_h)
     region = image.crop((x, y, x + w, y + h))
     region = pixelate(region, block_size)
     image.paste(region, (x, y, x + w, y + h))
@@ -37,7 +63,7 @@ def gaussian_blur(image: Image.Image, radius: int = 2):
 def gaussian_blur_region(
     image: Image.Image, region_x, region_y, region_w, region_h, radius: int = 2
 ):
-    x, y, w, h = region_x, region_y, region_w, region_h
+    x, y, w, h = adjust_region(image, region_x, region_y, region_w, region_h)
     region = image.crop((x, y, x + w, y + h))
     region = gaussian_blur(region, radius)
     image.paste(region, (x, y, x + w, y + h))
@@ -51,7 +77,7 @@ def box_blur(image: Image.Image, radius: int = 2):
 def box_blur_region(
     image: Image.Image, region_x, region_y, region_w, region_h, radius: int = 2
 ):
-    x, y, w, h = region_x, region_y, region_w, region_h
+    x, y, w, h = adjust_region(image, region_x, region_y, region_w, region_h)
     region = image.crop((x, y, x + w, y + h))
     region = box_blur(region, radius)
     image.paste(region, (x, y, x + w, y + h))
@@ -65,7 +91,7 @@ def replace(image: Image.Image):
 
 
 def replace_region(image: Image.Image, region_x, region_y, region_w, region_h):
-    x, y, w, h = region_x, region_y, region_w, region_h
+    x, y, w, h = adjust_region(image, region_x, region_y, region_w, region_h)
     region = image.crop((x, y, x + w, y + h))
     region = replace(region)
     image.paste(region, (x, y, x + w, y + h))
@@ -165,7 +191,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("input_file", type=str)
     parser.add_argument("out_file", type=str)
-    parser.add_argument("param", type=int, default=0, nargs="?")
+    parser.add_argument("param", type=parse_param, default=0, nargs="?")
+    parser.add_argument("area", type=parse_param, default=0, nargs="?")
     args = parser.parse_args()
 
     # algName
@@ -182,14 +209,14 @@ if __name__ == "__main__":
     # param = int(sys.argv[4].split(",")[-1])
 
     # Choose parameters for each effect
-    pixelate_block_size = [15, 25, 35][args.param]
-    gaussian_blur_radius = [16, 32, 64][args.param]
-    box_blur_radius = [4, 8, 16][args.param]
-    rectangle_range = [(100, 100, 200, 200), (50, 50, 300, 300), (25, 25, 400, 400)][
-        args.param
-    ]
-    color_offset = [20, 50, 100][args.param]
-    mean_filter_kernel_size = [15, 21, 27][args.param]
+    pixelate_block_size = args.param
+    gaussian_blur_radius = args.param
+    box_blur_radius = args.param
+    replace_region_rectangle_range = args.param
+    rectangle_range = args.area
+    
+    color_offset = args.param
+    mean_filter_kernel_size = args.param
     # Example rectangle range (x, y, width, height)
 
     # 执行算法,并保存
@@ -223,7 +250,7 @@ if __name__ == "__main__":
         replaced_image = replace(original_image.copy())
         replaced_image.save(output_image_path)
     elif algName == "replace_region":
-        region_replaced_image = replace_region(original_image.copy(), *rectangle_range)
+        region_replaced_image = replace_region(original_image.copy(), *replace_region_rectangle_range)
         region_replaced_image.save(output_image_path)
     elif algName == "image_add_color_offset":
         image_add_color_offset(input_image_path, output_image_path, color_offset)

@@ -160,17 +160,11 @@ public class DpUtilImpl implements DpUtil {
         return updatedArray;
     }
 
-    /**
-     * GRR实现，用于处理单编码数据
-     * @param dataList 原始数据
-     * @param privacyLevel 脱敏等级
-     * @return 经过GRR后的数据
-     */
     @Override
-    public List<String> dpCode(List<Object> dataList, Integer privacyLevel) {
+    public List<String> dpCode(List<Object> dataList, double epsilon) {
         List<String> reData = new ArrayList<>();
         //privacyLeve为0则返回
-        if (privacyLevel == 0) {
+        if (epsilon == 0) {
             for (Object datum : dataList) {
                 if (datum == null) {
                     reData.add(null);
@@ -206,15 +200,15 @@ public class DpUtilImpl implements DpUtil {
         } else {
             //执行脱敏 获取参数epsilon
             Random r = new Random();
-            double epsilon = 0.7;
+//            double epsilon = 0.7;
             double p;
-            if (privacyLevel == 1) {
-                epsilon = 3.6;
-            } else if (privacyLevel == 2) {
-                epsilon = 2;
-            } else if (privacyLevel == 3) {
-                epsilon = 0.7;
-            }
+//            if (privacyLevel == 1) {
+//                epsilon = 3.6;
+//            } else if (privacyLevel == 2) {
+//                epsilon = 2;
+//            } else if (privacyLevel == 3) {
+//                epsilon = 0.7;
+//            }
             log.info("dpCode chosen epsilon: {}", epsilon);
             //扰动概率p
             double epsilonTemp = Math.exp(epsilon);
@@ -250,7 +244,7 @@ public class DpUtilImpl implements DpUtil {
 
     @Override
     //数值型数据处理()
-    public List<Double> laplaceToValue(List<Object> datas, Integer privacyLevel) {
+    public List<Double> laplaceToValue(List<Object> datas, double epsilon) {
         log.info("LaplaceToValue Algorithm Start");
         List<Double> reData = new ArrayList<>();
         //读取数据
@@ -279,14 +273,14 @@ public class DpUtilImpl implements DpUtil {
             }
         }
         //privacyLevel直接返回
-        if (privacyLevel == 0)
+        if (epsilon == 0)
             return reData;
         //执行laplace加噪
-        return NumberCode_s(reData, privacyLevel);
+        return NumberCode_s(reData, epsilon);
     }
 
     //数值型处理
-    private List<Double> NumberCode_s(List<Double> reData, Integer privacyLevel) {
+    private List<Double> NumberCode_s(List<Double> reData, double epsilon) {
 
         List<Double> newData = new ArrayList<>();
         double max, min;
@@ -298,15 +292,15 @@ public class DpUtilImpl implements DpUtil {
         BigDecimal sensitivity = new BigDecimal(max - min);
         log.info("Sensitivity: " + sensitivity);
 
-        BigDecimal epsilon = new BigDecimal("0.1");
-        if (privacyLevel == 1) {
-            epsilon = new BigDecimal(10);
-        } else if (privacyLevel == 2) {
-            epsilon = new BigDecimal(1);
-        }
+        BigDecimal bigEpsilon = new BigDecimal(epsilon);
+//        if (privacyLevel == 1) {
+//            bigEpsilon = new BigDecimal(10);
+//        } else if (privacyLevel == 2) {
+//            bigEpsilon = new BigDecimal(1);
+//        }
 
-        log.info("Epsilon: {}", epsilon);
-        BigDecimal beta = sensitivity.divide(epsilon, 6, RoundingMode.HALF_UP);
+        log.info("Epsilon: {}", bigEpsilon);
+        BigDecimal beta = sensitivity.divide(bigEpsilon, 6, RoundingMode.HALF_UP);
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
         log.info("Beta: {}", beta);
 
@@ -504,15 +498,9 @@ public class DpUtilImpl implements DpUtil {
         return newData;
     }
 
-    /**
-     * 编号类型数据脱敏，向其中一部分加星
-     * @param dataList 原始数据列表
-     * @param privacyLevel 脱敏等级
-     * @return 加星后的数据
-     */
     @Override
     //电话号码或编号的处理，136****1203
-    public List<String> numberHide(List<Object> dataList, Integer privacyLevel) {
+    public List<String> numberHide(List<Object> dataList, int denominator) {
         List<String> reData = new ArrayList<>();
         StringBuilder substr2 = new StringBuilder();
         //提取数据
@@ -523,7 +511,7 @@ public class DpUtilImpl implements DpUtil {
                 if (name instanceof Cell) {
                     Cell currentCell = (Cell) name;
                     DataFormatter dataFormatter = new DataFormatter();
-                    reData.add(name + "");
+                    reData.add(dataFormatter.formatCellValue(currentCell));
                 } else {
                     reData.add(String.valueOf(name));
                 }
@@ -531,25 +519,25 @@ public class DpUtilImpl implements DpUtil {
         }
 //        System.out.println(reData.get(0));
         //privacyLevel为0，直接返回
-        if (privacyLevel == 0)
+        if (denominator == 0)
             return reData;
         List<String> num = new ArrayList<>();
 
-        int denominator = 3;
-        switch (privacyLevel) {
-            case 1: {
-                denominator = 3;
-                break;
-            }
-            case 2: {
-                denominator = 4;
-                break;
-            }
-            case 3: {
-                denominator = 5;
-                break;
-            }
-        }
+//        int denominator = 3;
+//        switch (privacyLevel) {
+//            case 1: {
+//                denominator = 3;
+//                break;
+//            }
+//            case 2: {
+//                denominator = 4;
+//                break;
+//            }
+//            case 3: {
+//                denominator = 5;
+//                break;
+//            }
+//        }
 
         //循环处理数据  方式是加*
         for (String reDatum : reData) {
@@ -628,156 +616,27 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> addressHide(List<Object> addrs, Integer privacyLevel) {
+    public List<String> addressHide(List<Object> addresses, Integer privacyLevel) {
         // 取数据
-        List<String> re_data = new ArrayList<>();
-        for (Object addr : addrs) {
+        List<String> reData = new ArrayList<>();
+        for (Object addr : addresses) {
             if (addr == null)
-                re_data.add(null);
+                reData.add(null);
             else
-                re_data.add(addr + "");
+                reData.add(addr + "");
         }
         //privacyLevel为0，直接返回
         if (privacyLevel == 0)
-            return re_data;
-        List<String> newAddrs = new ArrayList<>();
+            return reData;
+        List<String> newAddresses = new ArrayList<>();
         // 脱敏
-        for (int i = 0; i < re_data.size(); i++) {
-            newAddrs.add(dealAddress(re_data.get(i), privacyLevel));
+        for (String reDatum : reData) {
+            newAddresses.add(dealAddress(reDatum, privacyLevel));
         }
-        return newAddrs;
+        return newAddresses;
     }
 
-    //    private String dealAddress(String addr, int privacyLevel) {
-////        log.info("Address: {}", addr);
-//        if (addr != null && !addr.isEmpty()) {
-//            int length = addr.length();
-//            StringBuilder newAddr = new StringBuilder();
-//
-//            if (addr.contains("省")) {
-//                int index = addr.indexOf("省");
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 3) {
-//                    return newAddr.toString();
-//                }
-//                index = addr.indexOf("市");
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 2) {
-//                    return newAddr.toString();
-//                }
-//                index = addr.indexOf("区");
-//                if (index == -1) {
-//                    index = addr.indexOf("县");
-//                }
-//                if (index == -1) {
-//                    index = addr.indexOf("市");
-//                }
-//                newAddr.append(addr, 0, index + 1);
-//                return newAddr.toString();
-//
-//            } else if (addr.contains("自治区")) {
-//                int index = addr.indexOf("自治区") + 2;
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 3) {
-//                    return newAddr.toString();
-//                }
-//                index = addr.indexOf("市");
-//                if (index == -1) {
-//                    index = addr.indexOf("盟");
-//                }
-//                if (index == -1) {
-//                    if (addr.contains("地区")) {
-//                        index = addr.indexOf("地区") + 1;
-//                    } else if (addr.contains("自治州")) {
-//                        index = addr.indexOf("自治州") + 2;
-//                    }
-//                }
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 2) {
-//                    return newAddr.toString();
-//                }
-//                index = addr.indexOf("县");
-//                if (index == -1) {
-//                    index = addr.indexOf("旗");
-//                }
-//                if (index == -1) {
-//                    index = addr.indexOf("区");
-//                }
-//                if (index == -1) {
-//                    index = addr.indexOf("市");
-//                }
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 1) {
-//                    return newAddr.toString();
-//                }
-//            } else if (addr.contains("北京") || addr.contains("上海") || addr.contains("重庆") || addr.contains("天津")) {
-//                int index = addr.indexOf("市");
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 3) {
-//                    return newAddr.toString();
-//                }
-//                index = addr.indexOf("县");
-//                if (index == -1) {
-//                    index = addr.indexOf("区");
-//                }
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 2) {
-//                    return newAddr.toString();
-//                }
-//                index = addr.indexOf("道");
-//                if (index == -1) {
-//                    index = addr.indexOf("镇");
-//                }
-//                if (index == -1) {
-//                    index = addr.indexOf("乡");
-//                }
-//                newAddr.append(addr, 0, index + 1);
-//                return newAddr.toString();
-//            } else if (addr.contains("特别行政区") || addr.contains("香港") || addr.contains("澳门")) {
-//                int index = -1;
-//                if (addr.contains("特别行政区")) {
-//                    index = addr.indexOf("特别行政区") + 4;
-//                } else if (addr.contains("香港")) {
-//                    index = addr.indexOf("香港") + 1;
-//                } else if (addr.contains("澳门")) {
-//                    index = addr.indexOf("澳门") + 1;
-//                }
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 3) {
-//                    return newAddr.toString();
-//                }
-//                index = addr.indexOf("区");
-//                newAddr.append(addr, 0, index + 1);
-//                addr = addr.substring(index + 1);
-//                if (privacyLevel == 2) {
-//                    return newAddr.toString();
-//                }
-//                if (addr.contains("街道")) {
-//                    index = addr.indexOf("街道") + 1;
-//                } else if (addr.contains("道")) {
-//                    index = addr.indexOf("道");
-//                } else {
-//                    index = -1;
-//                }
-//                newAddr.append(addr, 0, index + 1);
-//                if (privacyLevel == 1) {
-//                    return newAddr.toString();
-//                }
-//            }
-//            return newAddr.toString();
-//        }
-//        return addr;
-//    }
     private String dealAddress(String addr, int privacyLevel) {
-//        log.info("Address: {}", addr);
         String regex = "(?<province>[^省市]+省|[^自治区]+自治区|[^澳门]+澳门|[^香港]+香港|[^特别行政区]+特别行政区)?" +
                 "(?<city>[^自治州特别行政区]+自治州|[^市地区行政单位]+市|[^道]+地区|[^道]+行政单位|[^盟]+盟|[^县]+县)?" +
                 "(?<county>[^县市镇区乡]+县|[^市镇区]+市|[^镇区]+镇|[^区]+区|[^乡]+乡|[^场]+场|[^旗]+旗|[^海域]+海域|[^岛]+岛|[^道]+道|[^街道]+街道)?(?<address>.*)";
@@ -974,7 +833,7 @@ public class DpUtilImpl implements DpUtil {
 //    }
 
     @Override
-    public List<Date> dpDate(List<Object> datas, Integer privacyLevel) throws ParseException {
+    public List<Date> dpDate(List<Object> datas, double epsilon) throws ParseException {
         List<Date> reData = new ArrayList<>();
         java.util.Date tempDate;
         ThreadLocal<SimpleDateFormat> fmt = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -994,19 +853,14 @@ public class DpUtilImpl implements DpUtil {
             }
         }
         //不保护，直接返回
-        if (privacyLevel == 0) {
+        if (epsilon == 0) {
             return reData;
         }
         List<Date> newDate = new ArrayList<>();
-        BigDecimal si = new BigDecimal(1);
-        BigDecimal epsilon = new BigDecimal("0.001");
-        //获取epsilon值
-        if (privacyLevel == 1) {
-            epsilon = new BigDecimal("0.1");
-        } else if (privacyLevel == 2) {
-            epsilon = new BigDecimal("0.01");
-        }
-        BigDecimal beta = si.divide(epsilon, 6, RoundingMode.HALF_UP);
+        BigDecimal sensitivity = new BigDecimal(1);
+        BigDecimal bigDecimalEpsilon = new BigDecimal(epsilon);
+
+        BigDecimal beta = sensitivity.divide(bigDecimalEpsilon, 6, RoundingMode.HALF_UP);
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
         //添加噪声，依次加day、hour、minute
         LaplaceDistribution ld = new LaplaceDistribution(0, betad);
@@ -1060,7 +914,7 @@ public class DpUtilImpl implements DpUtil {
     }
 
     //日期分组置换
-    public List<Date> dateGroupReplace(List<Object> datas, Integer privacyLevel) throws ParseException {
+    public List<Date> dateGroupReplace(List<Object> datas, int k) throws ParseException {
         //日期格式
         ThreadLocal<SimpleDateFormat> dateFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
         //毫秒list
@@ -1079,8 +933,8 @@ public class DpUtilImpl implements DpUtil {
             }
         }
         //判断匿名组k大小
-        int k = 1;
-        if (privacyLevel == 0) {
+
+        if (k == 0) {
             List<Date> reData = new ArrayList<>();
             for (Object data : datas) {
                 if (data == null) {
@@ -1099,13 +953,6 @@ public class DpUtilImpl implements DpUtil {
         }
 
         //获取参数k
-        if (privacyLevel == 1) {
-            k = 1;
-        } else if (privacyLevel == 2) {
-            k = 3;
-        } else {
-            k = 5;
-        }
         //执行k-匿名
         List<Double> newMilliseconds = kNumNew(milliseconds, k);
         //毫秒转为日期
@@ -1140,7 +987,7 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> passReplace(List<Object> passwords, Integer privacyLevel) {
+    public List<String> passReplace(List<Object> passwords, int max) {
         List<String> reData = new ArrayList<>();
         //提取数据
         for (Object password : passwords) {
@@ -1150,28 +997,14 @@ public class DpUtilImpl implements DpUtil {
                 reData.add(password + "");
         }
         //privacyLevel为0，直接返回
-        if (privacyLevel == 0)
+        if (max == 0)
             return reData;
         List<String> newPasswords = new ArrayList<>();
 
         Random random = new Random();
         // 生成5到20之间的随机数
         int min = 5;
-        int max = 15;
-        switch (privacyLevel) {
-            case 1: {
-                max = 15;
-                break;
-            }
-            case 2: {
-                max = 20;
-                break;
-            }
-            case 3: {
-                max = 25;
-                break;
-            }
-        }
+
         //循环处理数据  方式是加*
         for (String reDatum : reData) {
             if (reDatum == null) {
@@ -1197,31 +1030,14 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> truncation(List<Object> dataList, Integer privacyLevel) {
+    public List<String> truncation(List<Object> dataList, int remains) {
         List<String> reBoxedData;
 
         List<String> result = new ArrayList<>();
 
         reBoxedData = dataList.stream().map(o -> o == null ? null : o + "").collect(Collectors.toList());
 
-        int remains = 3;
-        switch (privacyLevel) {
-            case 1: {
-                remains = 3;
-                break;
-            }
-            case 2: {
-                remains = 2;
-                break;
-            }
-
-            case 3: {
-                remains = 1;
-                break;
-            }
-        }
-
-        if (privacyLevel == 0) return reBoxedData;
+        if (remains == 0) return reBoxedData;
 
         for (String reBoxedDatum : reBoxedData) {
             if (reBoxedDatum == null) {
@@ -1311,7 +1127,7 @@ public class DpUtilImpl implements DpUtil {
 //    }
 
     @Override
-    public List<String> floor(List<Object> dataList, Integer privacyLevel) {
+    public List<String> floor(List<Object> dataList, String privacyLevel) {
         List<String> result = new ArrayList<>();
         List<BigDecimal> reData = new ArrayList<>();
 
@@ -1355,7 +1171,7 @@ public class DpUtilImpl implements DpUtil {
                     } else {
                         BigDecimal flooredValue2 = item.divide(BigDecimal.valueOf(100), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(100));
                         if (maxData.compareTo(BigDecimal.valueOf(1000)) <= 0) {
-                            if (privacyLevel == 1) {
+                            if (privacyLevel.equals("1")) {
                                 flooredValue = flooredValue1;
                             } else {
                                 flooredValue = flooredValue2;
@@ -1363,19 +1179,19 @@ public class DpUtilImpl implements DpUtil {
                         } else {
                             BigDecimal flooredValue3 = item.divide(BigDecimal.valueOf(1000), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(1000));
                             if (maxData.compareTo(BigDecimal.valueOf(10000)) <= 0) {
-                                if (privacyLevel == 1) {
+                                if (privacyLevel.equals("1")) {
                                     flooredValue = flooredValue1;
-                                } else if (privacyLevel == 2) {
+                                } else if (privacyLevel.equals("2")) {
                                     flooredValue = flooredValue2;
-                                } else if (privacyLevel == 3) {
+                                } else if (privacyLevel.equals("3")) {
                                     flooredValue = flooredValue3;
                                 }
                             } else {
-                                if (privacyLevel == 1) {
+                                if (privacyLevel.equals("1")) {
                                     flooredValue = flooredValue2;
-                                } else if (privacyLevel == 2) {
+                                } else if (privacyLevel.equals("2")) {
                                     flooredValue = flooredValue3;
-                                } else if (privacyLevel == 3) {
+                                } else if (privacyLevel.equals("3")) {
                                     flooredValue = item.divide(BigDecimal.valueOf(10000), 0, RoundingMode.FLOOR).multiply(BigDecimal.valueOf(10000));
                                 }
                             }
@@ -1460,9 +1276,9 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<Double> valueMapping(List<Object> dataList, Integer privacyLevel) {
-        ArrayList<Double> result = new ArrayList<>();
-        List<Double> reData = new ArrayList<>();
+    public List<String> valueMapping(List<Object> dataList, int scale) {
+        List<String> result = new ArrayList<>();
+        List<BigDecimal> reData = new ArrayList<>();
         //读取数据
         for (Object data : dataList) {
             if (data == null) {
@@ -1472,45 +1288,29 @@ public class DpUtilImpl implements DpUtil {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
                         double numericValue = currentCell.getNumericCellValue();
-                        reData.add(numericValue);
+                        reData.add(new BigDecimal(numericValue));
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
                             double numericValue = Double.parseDouble(stringValue);
-                            reData.add(numericValue);
+                            reData.add(new BigDecimal(numericValue));
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
                             e.printStackTrace();
                         }
                     }
                 } else {
-                    reData.add(Double.valueOf(data.toString()));
+                    reData.add(new BigDecimal(data.toString()));
                 }
             }
         }
-        if (privacyLevel == 0) return reData;
+        if (scale == 0) return reData.stream().map(BigDecimal::toString).collect(Collectors.toList());
 
-        int scale = 1;
-        switch (privacyLevel) {
-            case 1: {
-                scale = 20;
-                break;
-            }
-            case 2: {
-                scale = 30;
-                break;
-            }
-            case 3: {
-                scale = 50;
-                break;
-            }
-        }
-
-        for (Object data : reData) {
+        for (BigDecimal data : reData) {
             if (data == null) {
                 result.add(null);
             } else {
-                result.add((double) data * scale);
+                result.add(data.multiply(new BigDecimal(scale)).toString());
             }
         }
         return result;
@@ -1616,61 +1416,52 @@ public class DpUtilImpl implements DpUtil {
 
     // 基于随机高斯噪声的数值加噪算法
     @Override
-    public List<Double> randomGaussianToValue(List<Object> datas, Integer privacyLevel) {
+    public List<Double> randomGaussianToValue(List<Object> datas, double stdDev) {
         System.out.println(datas.size());
-        List<Double> re_data = new ArrayList<>();
+        List<Double> reData = new ArrayList<>();
         //读取数据
         for (Object data : datas) {
             if (data == null) {
-                re_data.add(null);
+                reData.add(null);
             } else {
                 if (data instanceof Cell) {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
                         double numericValue = currentCell.getNumericCellValue();
-                        re_data.add(numericValue);
+                        reData.add(numericValue);
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
                             double numericValue = Double.parseDouble(stringValue);
-                            re_data.add(numericValue);
+                            reData.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
                             e.printStackTrace();
                         }
                     }
                 } else {
-                    re_data.add(Double.valueOf(data.toString()));
+                    reData.add(Double.valueOf(data.toString()));
                 }
             }
         }
         //privacyLevel直接返回
-        if (privacyLevel == 0)
-            return re_data;
+        if (stdDev == 0)
+            return reData;
 
         List<Double> newData = new ArrayList<>();
         //设置参数sensitivety和epsilon
-        double mean = 1.0; // 均值
-        double stdDev = 2.0; // 标准差
-        if (privacyLevel == 2) {
-            stdDev = 5.0;
-        } else if (privacyLevel == 3) {
-            stdDev = 10.0;
-        }
-
         Random random = new Random();
 
-
         //循环处理数据
-        for (int i = 0; i < re_data.size(); i++) {
+        for (Double reDatum : reData) {
             // 生成高斯噪声
             double noise = random.nextGaussian() * stdDev;
 
             //null值不处理
-            if (re_data.get(i) == null) {
+            if (reDatum == null) {
                 newData.add(null);
             } else {
-                double d = noise + re_data.get(i);
+                double d = noise + reDatum;
                 // 值保留三位小数
                 DecimalFormat df = new DecimalFormat("#.###");
                 String roundedValue = df.format(d);
@@ -1686,55 +1477,55 @@ public class DpUtilImpl implements DpUtil {
 
     // 基于随机拉普拉斯噪声的数值加噪算法
     @Override
-    public List<Double> randomLaplaceToValue(List<Object> datas, Integer privacyLevel) {
-        List<Double> re_data = new ArrayList<>();
+    public List<Double> randomLaplaceToValue(List<Object> datas, double betad) {
+        List<Double> reData = new ArrayList<>();
         List<Double> newData = new ArrayList<>();
         //读取数据
         for (Object data : datas) {
             if (data == null) {
-                re_data.add(null);
+                reData.add(null);
             } else {
                 if (data instanceof Cell) {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
                         double numericValue = currentCell.getNumericCellValue();
-                        re_data.add(numericValue);
+                        reData.add(numericValue);
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
                             double numericValue = Double.parseDouble(stringValue);
-                            re_data.add(numericValue);
+                            reData.add(numericValue);
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
                             e.printStackTrace();
                         }
                     }
                 } else {
-                    re_data.add(Double.valueOf(data.toString()));
+                    reData.add(Double.valueOf(data.toString()));
                 }
             }
         }
         //privacyLevel直接返回
-        if (privacyLevel == 0)
-            return re_data;
+        if (betad == 0)
+            return reData;
         //执行laplaces加噪
-        double betad = 1.0;
-        if (privacyLevel == 2) {
-            betad = 5.0;
-        } else if (privacyLevel == 3) {
-            betad = 10.0;
-        }
-        Random r = new Random();
+//        double betad = 1.0;
+//        if (privacyLevel == 2) {
+//            betad = 5.0;
+//        } else if (privacyLevel == 3) {
+//            betad = 10.0;
+//        }
+
         //循环处理数据
-        for (int i = 0; i < re_data.size(); i++) {
+        for (int i = 0; i < reData.size(); i++) {
             LaplaceDistribution ld = new LaplaceDistribution(0, betad);
             double noise = ld.sample();//随机采样一个拉普拉斯分布值
             double d;
             //null值不处理
-            if (re_data.get(i) == null) {
+            if (reData.get(i) == null) {
                 newData.add(null);
             } else {
-                d = noise + re_data.get(i);
+                d = noise + reData.get(i);
                 BigDecimal b = new BigDecimal(d);
                 d = b.setScale(3, RoundingMode.HALF_UP).doubleValue();
                 newData.add(d);
@@ -1745,7 +1536,7 @@ public class DpUtilImpl implements DpUtil {
 
     // 基于随机均匀噪声的数值加噪算法
     @Override
-    public List<Double> randomUniformToValue(List<Object> datas, Integer privacyLevel) {
+    public List<Double> randomUniformToValue(List<Object> datas, double am) {
         List<Double> reData = new ArrayList<>();
         List<Double> newData = new ArrayList<>();
         //读取数据
@@ -1774,15 +1565,15 @@ public class DpUtilImpl implements DpUtil {
             }
         }
         //privacyLevel直接返回
-        if (privacyLevel == 0)
+        if (am == 0)
             return reData;
         //执行均匀加噪
-        double am = 2.0;
-        if (privacyLevel == 2) {
-            am = 10.0;
-        } else if (privacyLevel == 3) {
-            am = 20.0;
-        }
+//        double am = 2.0;
+//        if (privacyLevel == 2) {
+//            am = 10.0;
+//        } else if (privacyLevel == 3) {
+//            am = 20.0;
+//        }
 
         SecureRandom secureRandom = new SecureRandom();
         for (int i = 0; i < reData.size(); i++) {
@@ -1798,9 +1589,9 @@ public class DpUtilImpl implements DpUtil {
 
     //
     @Override
-    public List<Double> valueShift(List<Object> datas, Integer privacyLevel) {
-        List<Double> reData = new ArrayList<>();
-        List<Double> newData = new ArrayList<>();
+    public List<String> valueShift(List<Object> datas, double shift) {
+        List<BigDecimal> reData = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         //读取数据
         for (Object data : datas) {
             if (data == null) {
@@ -1810,40 +1601,34 @@ public class DpUtilImpl implements DpUtil {
                     Cell currentCell = (Cell) data;
                     if (currentCell.getCellType() == CellType.NUMERIC) {
                         double numericValue = currentCell.getNumericCellValue();
-                        reData.add(numericValue);
+                        reData.add(new BigDecimal(numericValue));
                     } else if (currentCell.getCellType() == CellType.STRING) {
                         String stringValue = currentCell.getStringCellValue();
                         try {
                             double numericValue = Double.parseDouble(stringValue);
-                            reData.add(numericValue);
+                            reData.add(new BigDecimal(numericValue));
                         } catch (NumberFormatException e) {
                             // 处理转换失败的情况，例如输出错误日志或采取其他适当措施
                             e.printStackTrace();
                         }
                     }
                 } else {
-                    reData.add(Double.valueOf(data.toString()));
+                    reData.add(new BigDecimal(data.toString()));
                 }
             }
         }
         //privacyLevel直接返回
-        if (privacyLevel == 0)
-            return reData;
-        double shift = 2.3;
-        if (privacyLevel == 2) {
-            shift = 11.3;
-        } else if (privacyLevel == 3) {
-            shift = 23.1;
-        }
+        if (shift == 0)
+            return reData.stream().map(BigDecimal::toString).collect(Collectors.toList());
 
-        for (int i = 0; i < reData.size(); i++) {
-            if (reData.get(i) == null) {
-                newData.add(null);
+        for (BigDecimal reDatum : reData) {
+            if (reDatum == null) {
+                result.add(null);
             } else {
-                newData.add(shift + reData.get(i));
+                result.add(reDatum.add(new BigDecimal(shift)).toString());
             }
         }
-        return newData;
+        return result;
     }
 
     @Override

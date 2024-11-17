@@ -7,6 +7,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,11 +50,6 @@ public class AlgorithmInfoDaoServiceTest {
     }
 
     @Test
-    void getAllAlgorithmInfoTest() {
-        System.out.println(algorithmInfoDaoService.getAllAlgorithmInfo());
-    }
-
-    @Test
     void getAlgorithmInfoByIdTest() {
         System.out.println(algorithmInfoDaoService.getAlgorithmInfoById(2));
     }
@@ -74,16 +70,19 @@ public class AlgorithmInfoDaoServiceTest {
     }
 
     @Test
+    @Transactional(transactionManager = "gaMybatisTransactionManager")
     void updateAlgorithmParamsTest() {
         System.out.println(algorithmInfoDaoService.updateAlgorithmParams(10, "114", "514", "191"));
     }
 
     @Test
+    @Transactional(transactionManager = "gaMybatisTransactionManager")
     void updateAlgorithmParamsTest2() {
         System.out.println(algorithmInfoDaoService.updateAlgorithmParams(11, "114", "514", "191"));
     }
 
     @Test
+    @Transactional(transactionManager = "gaMybatisTransactionManager")
     void updateAlgorithmParamsInBatch() {
         AlgorithmInfoParamDto algorithmInfoParamDto = new AlgorithmInfoParamDto(1, "2", "3", "5");
         AlgorithmInfoParamDto algorithmInfoParamDto1 = new AlgorithmInfoParamDto(2, "2", "1", "3");

@@ -1,5 +1,6 @@
 package com.lu.gademo.entity.ga;
 
+import com.lu.gademo.model.ModalTypes;
 import com.lu.gademo.utils.AlgorithmType;
 import lombok.*;
 
@@ -34,7 +35,7 @@ public class DesensitizationAlgorithm {
 
     private Integer originalId;
 
-    private Integer modal;
+    private ModalTypes modal;
 
     private String requirement;
 

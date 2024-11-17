@@ -24,7 +24,7 @@ public class AnonymityImpl implements Anonymity {
 //        String path = Paths.get(currentPath, locationPrivacy).toString();
     }
 
-    public DSObject service(DSObject object, Integer alg, Number... params) {
+    public DSObject service(DSObject object, Integer alg, String... params) {
         log.info("调用匿名算法统一接口");
 //        System.out.println(path);
         if (object == null) return null;
@@ -40,7 +40,7 @@ public class AnonymityImpl implements Anonymity {
             case 1: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                String param = Integer.toString(params[0].intValue());
+                String param = params[0];
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
@@ -87,9 +87,9 @@ public class AnonymityImpl implements Anonymity {
 
                     double x = Double.parseDouble(s[0]);
                     double y = Double.parseDouble(s[1]);
-                    int k = params[0].intValue();
-                    double sCd = params[1].doubleValue();
-                    double rho = params[2].doubleValue();
+                    int k = Integer.parseInt(params[0]);
+                    double sCd = Double.parseDouble(params[1]);
+                    double rho = Double.parseDouble(params[2]);
                     double[] retArrX = new double[k];
                     double[] retArrY = new double[k];
 
@@ -143,8 +143,8 @@ public class AnonymityImpl implements Anonymity {
 
                     double x = Double.parseDouble(s[0]);
                     double y = Double.parseDouble(s[1]);
-                    int k = params[0].intValue();
-                    double sCd = params[1].doubleValue();
+                    int k = Integer.parseInt(params[0]);
+                    double sCd = Double.parseDouble(params[1]);
                     int len = (int) Math.ceil(Math.sqrt(k)) * (int) Math.ceil(Math.sqrt(k));
                     double[] retArrX = new double[len];
                     double[] retArrY = new double[len];
@@ -197,7 +197,7 @@ public class AnonymityImpl implements Anonymity {
                 String[] s1 = value.get(0).toString().split(",");
                 String[] s2 = value.get(1).toString().split(",");
                 try {
-                    double KMin = params[0].doubleValue();
+                    double KMin = Double.parseDouble(params[0]);
                     int kMin = (int) Math.ceil(KMin);
                     double x = Double.parseDouble(s[0]);
                     double y = Double.parseDouble(s[1]);
@@ -246,7 +246,7 @@ public class AnonymityImpl implements Anonymity {
                 if (params.length != 1) return null;
                 String position = object.getStringVal();
                 String[] s = position.split(",");
-                int op = params[0].intValue();
+                int op = Integer.parseInt(params[0]);
                 double x = Double.parseDouble(s[0]);
                 double y = Double.parseDouble(s[1]);
                 List<Double> vecRetArrX = new ArrayList<>();
@@ -278,7 +278,7 @@ public class AnonymityImpl implements Anonymity {
 
                 double x = Double.parseDouble(s[0]);
                 double y = Double.parseDouble(s[1]);
-                int k = params[0].intValue();
+                int k = Integer.parseInt(params[0]);
                 double[] retArrX = new double[k];
                 double[] retArrY = new double[k];
                 KAnonymityUtil.kAnonymityAlgorithm(x, y, k, retArrX, retArrY);
@@ -301,7 +301,7 @@ public class AnonymityImpl implements Anonymity {
             case 7: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                String param = Integer.toString(params[0].intValue());
+                String param = params[0];
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
@@ -327,7 +327,7 @@ public class AnonymityImpl implements Anonymity {
                 if (params.length != 1) return null;
 //                int[] l_diversity_param = new int[]{2, 4, 6};
                 List<?> value = object.getList();
-                String param = Integer.toString(params[0].intValue());
+                String param = params[0];
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
@@ -353,7 +353,7 @@ public class AnonymityImpl implements Anonymity {
                 if (params.length != 1) return null;
 //                int[] l_diversity_param = new int[]{2, 4, 6};
                 List<?> value = object.getList();
-                String param = Integer.toString(params[0].intValue());
+                String param = params[0];
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
@@ -377,7 +377,7 @@ public class AnonymityImpl implements Anonymity {
             case 10: {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
-                String param = Integer.toString(params[0].intValue());
+                String param = params[0];
                 String baseName = value.get(0).toString();
                 String dir = value.get(1).toString();
                 String attribute = value.get(2).toString();
@@ -408,7 +408,7 @@ public class AnonymityImpl implements Anonymity {
 
                 double x = Double.parseDouble(s[0]);
                 double y = Double.parseDouble(s[1]);
-                int k = params[0].intValue();
+                int k = Integer.parseInt(params[0]);
                 double[] retArrX = new double[k];
                 double[] retArrY = new double[k];
                 KAnonymityUtil.hilbertAlgorithm(x, y, k, retArrX, retArrY);
@@ -450,7 +450,7 @@ public class AnonymityImpl implements Anonymity {
                 double x = Double.parseDouble(s[0]);
                 double y = Double.parseDouble(s[1]);
 
-                int k = params[0].intValue();
+                int k = Integer.parseInt(params[0]);
                 double[] retArrX = new double[k];
                 double[] retArrY = new double[k];
 

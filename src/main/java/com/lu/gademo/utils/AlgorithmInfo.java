@@ -2,6 +2,7 @@ package com.lu.gademo.utils;
 
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
+import com.lu.gademo.model.ModalTypes;
 import lombok.*;
 
 import java.util.Arrays;
@@ -30,8 +31,10 @@ public class AlgorithmInfo {
 
     private String requirement;
 
+    private ModalTypes modalType;
+
     public AlgorithmInfo(String name, int id, AlgorithmType type, int originalId,
-                         List<Object> params, BaseDesenAlgorithm executor, String requirement) {
+                         List<Object> params, BaseDesenAlgorithm executor, String requirement, ModalTypes modalType) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -58,6 +61,7 @@ public class AlgorithmInfo {
         }
         this.executor = executor;
         this.requirement = requirement;
+        this.modalType = modalType;
     }
 
     /**
@@ -67,7 +71,17 @@ public class AlgorithmInfo {
      * @return 封装后的脱敏数据
      */
     public DSObject execute(DSObject rawData, Number... params) {
-        return executor.service(rawData, originalId, params);
+        int idx = params[0].intValue();
+        if (this.modalType == ModalTypes.SHEET) {
+            if (idx == 0) {
+                return executor.service(rawData, originalId, "0");
+            } else {
+                return executor.service(rawData, originalId, this.params.get(idx - 1).toString());
+            }
+        }
+        else {
+            return executor.service(rawData, originalId, this.params.get(idx).toString());
+        }
     }
 
     /**
@@ -85,7 +99,7 @@ public class AlgorithmInfo {
             AlgorithmInfo algInfo = (AlgorithmInfo) obj;
             // params可能为空
             boolean six = name.equals(algInfo.name) && id == algInfo.id && type == algInfo.type
-                    && originalId == algInfo.originalId && params == algInfo.params && requirement.equals(algInfo.requirement);
+                    && originalId == algInfo.originalId && params == algInfo.params && requirement.equals(algInfo.requirement) && modalType == algInfo.modalType;
             boolean executorEquals = algInfo.executor.getClass().equals(this.executor.getClass());
             return six && executorEquals;
         } else {

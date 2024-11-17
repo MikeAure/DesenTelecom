@@ -3,6 +3,36 @@ import sys
 import cv2           # Importing the OpenCV library for computer vision tasks
 from cvzone.SelfiSegmentationModule import SelfiSegmentation
 import ffmpegcv
+import argparse
+
+
+def adjust_region(frame, x, y, w, h):
+    # 确保坐标不越界
+    height, width, _  = frame.shape
+    x = max(0, x)
+    y = max(0, y)
+    w = max(0, min(width - x, w))
+    h = max(0, min(height - y, h))
+    return x, y, w, h
+
+
+def parse_param(input_string):
+    """Parse input parameter as either an integer or a tuple."""
+    if "," in input_string:
+        # Split the string by ',' and convert to integers
+        try:
+            return tuple(map(int, input_string.split(",")))
+        except ValueError:
+            raise argparse.ArgumentTypeError(
+                "Invalid tuple format. Use comma-separated integers, e.g., 100,100,200,200"
+            )
+    else:
+        # Parse as a single integer
+        try:
+            return int(input_string)
+        except ValueError:
+            raise argparse.ArgumentTypeError("Parameter must be an integer or a tuple.")
+
 
 def add_color_offset(img, offset: int):
     offset = offset % 256
@@ -348,49 +378,59 @@ def substitude_background(video: str, new_video:str, background: str, cut_thresh
     return new_video
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
-        print("Usage: python your_script.py algName input_file out_file param")
-        sys.exit(1)
+    parser = argparse.ArgumentParser()
 
-    # algName
-    algName = sys.argv[1]
-
-    # input video path
-    input_video_path = sys.argv[2]
-
-    # output video
-    output_video_path = sys.argv[3]
-
-    # 操作参数
-    param = int(sys.argv[4].split(",")[-1])
+    parser.add_argument(
+        "algName",
+        type=str,
+        choices=[
+            "pixelate_video",
+            "pixelate_region_video",
+            "gaussian_blur_video",
+            "gaussian_blur_region_video",
+            "box_blur_video",
+            "box_blur_region_video",
+            "replace_video",
+            "replace_region_video",
+            "meanValueVideo",
+            "video_add_color_offset",
+        ],
+    )
+    parser.add_argument("input_file", type=str)
+    parser.add_argument("out_file", type=str)
+    parser.add_argument("param", type=parse_param, default=0, nargs="?")
+    parser.add_argument("area", type=parse_param, default=0, nargs="?")
+    args = parser.parse_args()
     # Choose parameters for each effect
-    pixelize_block_size = [5, 10, 15][param]
-    blur_radius = [2, 4, 8][param]
-    rectangle_range = [(100, 100, 200, 200), (50, 50, 300, 300), (25, 25, 400, 400)][param]  # Example rectangle range (x, y, width, height)
-    kernel_size = [9, 16, 25][param]
-    color_offsets = [20, 50, 100][param]
-    outline_params = [0.4, 0.6, 0.8][param]
+    pixelize_block_size = args.param
+    blur_radius = args.param
+    kernel_size = args.param
+    color_offsets = args.param
+    outline_params = args.param
+    replace_region_video_rectangle_range = args.param
+    rectangle_range = args.area # Example rectangle range (x, y, width, height)
+
     # 执行算法,并保存
-    if algName == "pixelate_video":
-        pixelate_video(input_video_path, output_video_path, block_size=pixelize_block_size)
-    elif algName == "pixelate_region_video":
-        pixelate_region_video(input_video_path, output_video_path, *rectangle_range, block_size=pixelize_block_size)
-    elif algName == "gaussian_blur_video":
-        gaussian_blur_video(input_video_path, output_video_path, radius=blur_radius)
-    elif algName == "gaussian_blur_region_video":
-        gaussian_blur_region_video(input_video_path, output_video_path, *rectangle_range, radius=blur_radius)
-    elif algName == "box_blur_video":
-        box_blur_video(input_video_path, output_video_path, radius=blur_radius)
-    elif algName == "box_blur_region_video":
-        box_blur_region_video(input_video_path, output_video_path, *rectangle_range, radius=blur_radius)
-    elif algName == "replace_video":
-        replace_video(input_video_path, output_video_path)
-    elif algName == "replace_region_video":
-        replace_region_video(input_video_path, output_video_path, *rectangle_range)
-    elif algName == "meanValueVideo":
-        meanValueVideo(input_video_path, output_video_path, kernel_size)
-    elif algName == "video_add_color_offset":
-        video_add_color_offset(input_video_path, output_video_path, color_offsets)
+    if args.algName == "pixelate_video":
+        pixelate_video(args.input_file, args.out_file, block_size=pixelize_block_size)
+    elif args.algName == "pixelate_region_video":
+        pixelate_region_video(args.input_file, args.out_file, *rectangle_range, block_size=pixelize_block_size)
+    elif args.algName == "gaussian_blur_video":
+        gaussian_blur_video(args.input_file, args.out_file, radius=blur_radius)
+    elif args.algName == "gaussian_blur_region_video":
+        gaussian_blur_region_video(args.input_file, args.out_file, *rectangle_range, radius=blur_radius)
+    elif args.algName == "box_blur_video":
+        box_blur_video(args.input_file, args.out_file, radius=blur_radius)
+    elif args.algName == "box_blur_region_video":
+        box_blur_region_video(args.input_file, args.out_file, *rectangle_range, radius=blur_radius)
+    elif args.algName == "replace_video":
+        replace_video(args.input_file, args.out_file)
+    elif args.algName == "replace_region_video":
+        replace_region_video(args.input_file, args.out_file, *replace_region_video_rectangle_range)
+    elif args.algName == "meanValueVideo":
+        meanValueVideo(args.input_file, args.out_file, kernel_size)
+    elif args.algName == "video_add_color_offset":
+        video_add_color_offset(args.input_file, args.out_file, color_offsets)
 
     # Destroy OpenCV windows
     cv2.destroyAllWindows()

@@ -197,15 +197,16 @@ def audio_reshuffle(audio, output_path, block_num):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 5:
+        print("Usage: python your_script.py algName input_file out_file param")
+        sys.exit(1)
     # 算法名
     algName = sys.argv[1]
     # 音频文件路径及脱敏参数
     file_path = sys.argv[2]
     newFilePath = sys.argv[3]
-    param = int(sys.argv[4])
+    # param = int(sys.argv[4])
     # 隐私预算
-    budgets = [5, 1, 0.2]
-    budget = budgets[param]
 
     # 音频分块数量
     # block_num = [5, 10, 15]
@@ -217,13 +218,13 @@ if __name__ == '__main__':
         from myStart2 import *
         from mystt1 import *
 
-        dpAudio(file_path, newFilePath, budget)
+        dpAudio(file_path, newFilePath, float(sys.argv[4]))
     elif algName == "add_beep":
         dealTime = int(sys.argv[5])
-        add_beep(file_path, format, newFilePath, "wav", param, dealTime)
+        add_beep(file_path, format, newFilePath, "wav", int(sys.argv[4]), dealTime)
     elif algName == "remove_audio":
         dealTime = int(sys.argv[5])
-        remove_audio(file_path, format, newFilePath, "wav", param, dealTime)
+        remove_audio(file_path, format, newFilePath, "wav", int(sys.argv[4]), dealTime)
     elif algName == "voice_replace":
         from myextraction import *
         from myDP import *
@@ -231,10 +232,10 @@ if __name__ == '__main__':
         from mystt1 import *
         replace_voice_print_fixed(file_path, newFilePath)
     elif algName == "apply_audio_effects":
-        effects_param = [(-3, 0.7, -5, 5), (2, 0.8, -10, 10), (5, 0.9, -20, 20)][param]
+        effects_param = tuple(map(float, sys.argv[4].split(',')))
         apply_audio_effects(file_path, newFilePath, *effects_param)
 
     elif algName == "audio_reshuffle":
-        block = [5, 10, 15][int(sys.argv[5])]
+        block = int(sys.argv[5])
         # block = int(sys.argv[5])
         audio_reshuffle(file_path, newFilePath, block)

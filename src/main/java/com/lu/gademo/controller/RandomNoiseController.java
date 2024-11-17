@@ -2,7 +2,7 @@ package com.lu.gademo.controller;
 
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
-import com.lu.gademo.utils.Util;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RandomNoiseController {
     Dp dp;
-    Util util;
 
     @ResponseBody
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -54,7 +53,7 @@ public class RandomNoiseController {
         }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        DSObject resultDS = dp.service(rawObject, algNum, Integer.parseInt(samples), Integer.parseInt(params));
+        DSObject resultDS = dp.service(rawObject, algNum, samples, params);
         StringBuilder resultString = new StringBuilder();
         resultDS.getList().forEach(s -> resultString.append(s).append("\n"));
         return resultString.toString();
@@ -96,7 +95,7 @@ public class RandomNoiseController {
 
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        DSObject resultDS = dp.service(rawObject, algNum, Integer.parseInt(c), Integer.parseInt(t), Integer.parseInt(params));
+        DSObject resultDS = dp.service(rawObject, algNum, c, t, params);
         StringBuilder resultString = new StringBuilder();
         resultDS.getList().forEach(s -> resultString.append(s).append("\n"));
         return resultString.toString();

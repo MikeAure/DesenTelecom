@@ -48,4 +48,13 @@ public enum ModalTypes {
         }
         return UNKNOWN;
     }
+
+    @Override
+    public String toString() {
+        return "ModalTypes{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

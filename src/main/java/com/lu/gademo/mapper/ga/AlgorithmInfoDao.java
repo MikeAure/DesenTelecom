@@ -4,7 +4,9 @@ import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.handler.AlgorithmTypeHandler;
 import com.lu.gademo.handler.ExecutorTypeHandler;
+import com.lu.gademo.handler.ModalTypesHandler;
 import com.lu.gademo.handler.ParamsTypeHandler;
+import com.lu.gademo.model.ModalTypes;
 import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.utils.AlgorithmType;
 import com.lu.gademo.utils.BaseDesenAlgorithm;
@@ -47,7 +49,7 @@ public interface AlgorithmInfoDao {
                     @Result(property = "high", column = "high"),
                     @Result(property = "type", column = "type", javaType=AlgorithmType.class, typeHandler = AlgorithmTypeHandler.class),
                     @Result(property = "originalId", column = "original_id"),
-                    @Result(property = "modal", column = "modal"),
+                    @Result(property = "modal", column = "modal", javaType= ModalTypes.class, typeHandler = ModalTypesHandler.class),
                     @Result(property = "requirement", column = "requirement"),
                     @Result(property = "ifModify", column = "if_modify"),
             })

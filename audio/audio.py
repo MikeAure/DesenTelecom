@@ -17,7 +17,7 @@ def apply_audio_effects(input_signal, sample_rate):
     return augmented_signal
 
 
-def audio_augmentation(input_signal, sample_rate, param_chosen=2):
+def audio_augmentation(input_signal, sample_rate,  min_freq=300, max_freq=8000, param_chosen=2,):
     # 定义增广效果列表
     augmentations = []
 
@@ -28,7 +28,7 @@ def audio_augmentation(input_signal, sample_rate, param_chosen=2):
             # LowPassFilter(min_cutoff_freq=0, mfax_cutoff_freq=3000, p=1),
 
             # 高通滤波 (下限频率设置为 300 Hz)
-            HighPassFilter(min_cutoff_freq=300, max_cutoff_freq=8000, p=1),
+            HighPassFilter(min_cutoff_freq=min_freq, max_cutoff_freq=max_freq, p=1),
         ]
     elif param_chosen == 1:
         print("param_chosen == 1")
@@ -37,7 +37,7 @@ def audio_augmentation(input_signal, sample_rate, param_chosen=2):
             # LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=3000, p=1),
             #
             # # 高通滤波 (下限频率设置为 300 Hz)
-            HighPassFilter(min_cutoff_freq=300, max_cutoff_freq=8000, p=1),
+            HighPassFilter(min_cutoff_freq=min_freq, max_cutoff_freq=max_freq, p=1),
 
             # 极性反转
             PolarityInversion(p=1),
@@ -52,7 +52,7 @@ def audio_augmentation(input_signal, sample_rate, param_chosen=2):
             # LowPassFilter(min_cutoff_freq=0, max_cutoff_freq=3000, p=1),
             #
             # # 高通滤波 (下限频率设置为 300 Hz)
-            HighPassFilter(min_cutoff_freq=300, max_cutoff_freq=8000, p=1),
+            HighPassFilter(min_cutoff_freq=min_freq, max_cutoff_freq=max_freq, p=1),
 
             # 极性反转
             PolarityInversion(p=1),
@@ -72,11 +72,11 @@ def audio_augmentation(input_signal, sample_rate, param_chosen=2):
     augmented_signal = augmenter(samples=input_signal, sample_rate=sample_rate)
     return augmented_signal
 
-def spec_augmentation(input_signal, sample_rate, param_chosen=1):
+def spec_augmentation(input_signal, sample_rate, params):
     params_group = [(0.1, 0.3), (0.3, 0.5), (0.5, 0.7)]
     input_spectrogram = librosa.feature.melspectrogram(y=input_signal, sr=sample_rate, n_mels=64)
     # 使用audiomentations库创建一个频率遮罩增强
-    min_mask, max_mask = params_group[param_chosen]
+    min_mask, max_mask = params
     transform = SpecFrequencyMask(
         fill_mode="mean",
         min_mask_fraction=min_mask,
@@ -87,10 +87,10 @@ def spec_augmentation(input_signal, sample_rate, param_chosen=1):
     return input_spectrogram, output_spectrogram
 
 
-def spec_augmentation_audio(input_audio, output_audio_spec, param=1):
+def spec_augmentation_audio(input_audio, output_audio_spec, params):
     # 使用librosa库加载音频文件，并返回音频信号和采样率
     signal, sr = librosa.load(input_audio)
-    _, augmented_spectrogram = spec_augmentation(signal, sr, param)
+    _, augmented_spectrogram = spec_augmentation(signal, sr, params)
 
     log_augmented_spectrogram = librosa.power_to_db(augmented_spectrogram, ref=numpy.max)
     inverse_mel_signal = librosa.feature.inverse.mel_to_audio(augmented_spectrogram, sr=sr)
@@ -111,10 +111,11 @@ def spec_augmentation_audio(input_audio, output_audio_spec, param=1):
     sf.write(output_audio_spec, inverse_mel_signal, sr)
 
 
-def audio_augmentation_audio(input_audio, output_audio, param_chosen=2):
+def audio_augmentation_audio(input_audio, output_audio, params):
     # 使用librosa库加载音频文件，并返回音频信号和采样率
     signal, sample_rate = librosa.load(input_audio)
-    augmented_signal = audio_augmentation(signal, sample_rate, param_chosen)
+    select, min_freq, max_freq = params
+    augmented_signal = audio_augmentation(signal, sample_rate, min_freq, max_freq, select)
     sf.write(output_audio, augmented_signal, sample_rate)
 
 
@@ -145,12 +146,14 @@ if __name__ == '__main__':
     param = sys.argv[4]
 
     if algName == "floor":
-        floor_params = [3, 2, 1][int(param)]
+        floor_params = int(param)
         audio_floor(input_audio, floor_params, output_audio)
     elif algName == "median":
-        block_num = [5, 10, 15][int(param)]
+        block_num = int(param)
         audio_median(input_audio, block_num, output_audio)
     elif algName == "augmentation":
-        audio_augmentation_audio(input_audio, output_audio, int(param))
+        params = tuple(map(float, param.split(',')))
+        audio_augmentation_audio(input_audio, output_audio, params)
     elif algName == "spec":
-        spec_augmentation_audio(input_audio, output_audio, int(param))
+        params = tuple(map(float, param.split(',')))
+        spec_augmentation_audio(input_audio, output_audio, params)

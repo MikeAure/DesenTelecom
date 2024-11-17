@@ -363,7 +363,8 @@ if __name__ == "__main__":
     output_path = sys.argv[2]
     param = sys.argv[3]
     
-    epsilon = [10, 1, 0.1][int(param)]
+    # epsilon = [10, 1, 0.1][int(param)]
+    epsilon = float(param)
     image_color = cv2.imread(img_path,cv2.IMREAD_COLOR)
     image_color_noise = copy.copy(image_color)
     # edges = cv2.Canny(image_1, 138, 200)

@@ -60,7 +60,7 @@ public class KAnonymityController {
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
                 dsObject.setIntVal(templates.size() - 1);
-                String output = anonymity.service(dsObject, 1, Integer.parseInt(params)).getStringVal();
+                String output = anonymity.service(dsObject, 1, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();
@@ -96,7 +96,7 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 7, Integer.parseInt(params)).getStringVal();
+                String output = anonymity.service(dsObject, 7, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();
@@ -133,7 +133,7 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 8, Integer.parseInt(params)).getStringVal();
+                String output = anonymity.service(dsObject, 8, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();
@@ -168,7 +168,7 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 9, Integer.parseInt(params)).getStringVal();
+                String output = anonymity.service(dsObject, 9, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + output);
@@ -202,7 +202,7 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 10, Integer.parseInt(params)).getStringVal();
+                String output = anonymity.service(dsObject, 10, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();

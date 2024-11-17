@@ -51,19 +51,18 @@ def gray_to_color(src, src_gray):
 
 
 def main(file_path, selection):
-    params = [1.0, 0.5, 0.1]
     img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
 
     if len(img.shape) == 2:
-        return add_noise(img, params[selection])
+        return add_noise(img, selection)
     else:
         arr1 = img[:, :, 0]
         arr2 = img[:, :, 1]
         arr3 = img[:, :, 2]
 
-        arr1_noise = add_noise(arr1, params[selection])
-        arr2_noise = add_noise(arr2, params[selection])
-        arr3_noise = add_noise(arr3, params[selection])
+        arr1_noise = add_noise(arr1, selection)
+        arr2_noise = add_noise(arr2, selection)
+        arr3_noise = add_noise(arr3, selection)
 
         return np.concatenate(
             (
@@ -80,6 +79,6 @@ if __name__ == "__main__":
         print("Usage: python your_script.py input_file out_file param")
         sys.exit(1)
 
-    noisy_img = main(sys.argv[1], int(sys.argv[3]))
+    noisy_img = main(sys.argv[1], float(sys.argv[3]))
     cv2.imwrite(sys.argv[2], noisy_img)
     print("dp over")

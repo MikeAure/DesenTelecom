@@ -28,7 +28,7 @@ public class ReplaceImpl implements Replace {
         this.path_audio = Paths.get(currentPath, "audio", "desenAudio.py").toString();
     }
 
-    public DSObject service(DSObject object, Integer alg, Number... params) {
+    public DSObject service(DSObject object, Integer alg, String... params) {
         log.info("调用数据置换算法统一接口");
         if (object == null) return null;
         switch (alg) {
@@ -43,7 +43,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.valueHide(value, params[0].intValue()));
+                return new DSObject(dpUtil.valueHide(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -57,7 +57,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.valueShift(value, params[0].intValue()));
+                return new DSObject(dpUtil.valueShift(value, Double.parseDouble(params[0])));
             }
 
             /*
@@ -71,7 +71,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.SHA512(value, params[0].intValue()));
+                return new DSObject(dpUtil.SHA512(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -85,7 +85,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.valueMapping(value, params[0].intValue()));
+                return new DSObject(dpUtil.valueMapping(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -99,7 +99,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.passReplace(value, params[0].intValue()));
+                return new DSObject(dpUtil.passReplace(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -113,7 +113,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.nameHide(value, params[0].intValue()));
+                return new DSObject(dpUtil.nameHide(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -127,7 +127,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.numberHide(value, params[0].intValue()));
+                return new DSObject(dpUtil.numberHide(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -140,7 +140,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.suppressEmail(value, params[0].intValue()));
+                return new DSObject(dpUtil.suppressEmail(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -153,7 +153,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.suppressAllIp(value, params[0].intValue()));
+                return new DSObject(dpUtil.suppressAllIp(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -166,7 +166,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.suppressIpRandomParts(value, params[0].intValue()));
+                return new DSObject(dpUtil.suppressIpRandomParts(value, Integer.parseInt(params[0])));
             }
 
             /*
@@ -227,7 +227,8 @@ public class ReplaceImpl implements Replace {
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
                 String path3 = Paths.get(currentPath, "video", "desenVideo.py").toString();
-                return new DSObject(CommandExecutor.executePython(rawData, "video_add_color_offset", path3, params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "video_add_color_offset",
+                        path3, params[0]));
             }
 
             /*
@@ -258,7 +259,8 @@ public class ReplaceImpl implements Replace {
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString() + " " + value.get(2).toString();
                 String path5 = Paths.get(currentPath, "video", "substitude_background.py").toString();
-                return new DSObject(CommandExecutor.executePython(rawData, "video_remove_bg", path5, params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "video_remove_bg", path5,
+                        params[0]));
             }
 
             /*
@@ -273,7 +275,8 @@ public class ReplaceImpl implements Replace {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommandExecutor.executePython(rawData, "audio_reshuffle", path_audio, "0", params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "audio_reshuffle", path_audio,
+                        "0", params[0]));
             }
 
             /*
@@ -288,7 +291,8 @@ public class ReplaceImpl implements Replace {
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
                 String rawData = value.get(0).toString() + " " + value.get(1).toString();
-                return new DSObject(CommandExecutor.executePython(rawData, "apply_audio_effects", path_audio, params[0].toString()));
+                return new DSObject(CommandExecutor.executePython(rawData, "apply_audio_effects",
+                        path_audio, params[0]));
             }
 
             /*

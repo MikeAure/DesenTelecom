@@ -45,6 +45,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     private final Util util;
     private final Anonymity anonymity;
     private final Generalization generalization;
+    private final AlgorithmsFactory algorithmsFactory;
 
     private static Map<Integer, XWPFRun> getPosToRuns(XWPFParagraph paragraph) {
         int pos = 0;
@@ -330,8 +331,10 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         // 构建脱敏算法输入数据
         DSObject rawData = new DSObject(Collections.singletonList(cellContent));
         // 使用编号脱敏算法
-        return algorithm.service(rawData, algoNum, privacyLevel);
+//        return algorithm.service(rawData, algoNum, privacyLevel);
+        return algorithmsFactory.getAlgorithmInfoFromId(algoNum).execute(rawData, privacyLevel);
     }
+
 
     /**
      * @param content
@@ -344,7 +347,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         // 构建脱敏算法输入数据
         DSObject rawData = new DSObject(Collections.singletonList(content));
         // 使用编号脱敏算法
-        return algorithm.service(rawData, algoNum, privacyLevel);
+        return algorithmsFactory.getAlgorithmInfoFromId(algoNum).execute(rawData, privacyLevel);
     }
 
     /**

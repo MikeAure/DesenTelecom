@@ -294,11 +294,11 @@ if __name__ == '__main__':
         print("Usage: python your_script.py input_file param")
         sys.exit(1)
     # 参数列表
-    param_list = [5, 1, 0.2]
+    # param_list = [5, 1, 0.2]
     # 脱敏参数
-    param = param_list[int(sys.argv[3])]
+    # param = param_list[int(sys.argv[3])]
     # 脱敏前文件
     input_file = sys.argv[1]
     # input_file = r"C:\Users\admin\OneDrive\课题3\Trajectory_synthesis\preprocessed_trajectory0"
     # param = 2
-    main(input_file, sys.argv[2], param)
+    main(input_file, sys.argv[2], float(sys.argv[3]))

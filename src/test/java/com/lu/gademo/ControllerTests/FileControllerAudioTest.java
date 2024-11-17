@@ -28,9 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class FileControllerAudioTest {
     private static final String URL = "/File/desenFile";
-    private static final String AUDIO_FILE_NAME = "0001.wav";
+    private static final String AUDIO_FILE_NAME = "english_0001.wav";
     private static final String AUDIO_FILE_TYPE = "audio/wav";
-    private static final String AUDIO_FILE_PATH = "src/test/resources/test_data/audio/0001.wav";
+    private static final String AUDIO_FILE_PATH = "src/test/resources/test_data/audio/english_0001.wav";
     private static final String PARAMS = "1";
     private static final String SHEET = "yourSheet";
     private MockMvc mvc;

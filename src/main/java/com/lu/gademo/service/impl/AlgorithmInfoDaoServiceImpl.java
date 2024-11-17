@@ -145,7 +145,8 @@ public class AlgorithmInfoDaoServiceImpl implements AlgorithmInfoDaoService {
                                 Collections.emptyList() :
                         Arrays.asList(algorithm.getLow(), algorithm.getMedium(), algorithm.getHigh()),
                         getExecutorByType(algorithm.getType()),
-                        algorithm.getRequirement()
+                        algorithm.getRequirement(),
+                        algorithm.getModal()
                 )
         ).collect(Collectors.toList());
     }
