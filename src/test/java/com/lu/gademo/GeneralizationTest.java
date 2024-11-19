@@ -48,16 +48,16 @@ public class GeneralizationTest {
         // // Generalization generalization = new GeneralizationImpl();
         List<String> rawData = Arrays.asList("REDIS", "MYSQL");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result0 = generalization.service(dsObject, 1, 0);
+        DSObject result0 = generalization.service(dsObject, 1, "3");
         for (Object string : result0.getList()) {
             System.out.println(string);
         }
-        DSObject result1 = generalization.service(dsObject, 1, 1);
+        DSObject result1 = generalization.service(dsObject, 1, "1");
         for (Object string : result1.getList()) {
             System.out.println(string);
         }
-        DSObject result2 = generalization.service(dsObject, 1, 2);
-        DSObject result3 = generalization.service(dsObject, 1, 3);
+        DSObject result2 = generalization.service(dsObject, 1, "2");
+        DSObject result3 = generalization.service(dsObject, 1, "3");
         result2.getList().forEach(System.out::println);
         result3.getList().forEach(System.out::println);
     }
@@ -67,10 +67,10 @@ public class GeneralizationTest {
         // // Generalization generalization = new GeneralizationImpl();
         List<Double> rawData = Arrays.asList(1.0, 123.0, 1234.0, 56789.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result0 = generalization.service(dsObject, 2, 0);
-        DSObject result1 = generalization.service(dsObject, 2, 1);
-        DSObject result2 = generalization.service(dsObject, 2, 2);
-        DSObject result3 = generalization.service(dsObject, 2, 3);
+        DSObject result0 = generalization.service(dsObject, 2, "0");
+        DSObject result1 = generalization.service(dsObject, 2, "1");
+        DSObject result2 = generalization.service(dsObject, 2, "2");
+        DSObject result3 = generalization.service(dsObject, 2, "3");
         for (Object num : result0.getList()) {
             System.out.println(num);
         }
@@ -90,11 +90,11 @@ public class GeneralizationTest {
         // Generalization generalization = new GeneralizationImpl();
         List<Object> rawData = Arrays.asList("12:30:45", "1:09:25");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 3, 1);
+        DSObject result = generalization.service(dsObject, 3, "1");
         for (Object num : result.getList()) {
             System.out.println(num);
         }
-        DSObject result0 = generalization.service(dsObject, 3, 0);
+        DSObject result0 = generalization.service(dsObject, 3, "0");
         for (Object num : result0.getList()) {
             System.out.println(num);
         }
@@ -110,10 +110,10 @@ public class GeneralizationTest {
                 "香港特别行政区7-11-裕旺大厦11号楼", "香港特别行政区中西区金钟添马添美道2号", "香港中西区金钟添马添美道2号",
                 "重庆市江北区建北四支路2号北辰名都8-11层重庆市信息产业局", "黑龙江省哈尔滨市道里区哈尔滨市公安局", "香港特别行政区香港特别行政区石芳楼");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result0 = generalization.service(dsObject, 4, 0);
-        DSObject result1 = generalization.service(dsObject, 4, 1);
-        DSObject result2 = generalization.service(dsObject, 4, 2);
-        DSObject result3 = generalization.service(dsObject, 4, 3);
+        DSObject result0 = generalization.service(dsObject, 4, "0");
+        DSObject result1 = generalization.service(dsObject, 4, "1");
+        DSObject result2 = generalization.service(dsObject, 4, "2");
+        DSObject result3 = generalization.service(dsObject, 4, "3");
         for (Object string : result0.getList()) {
             System.out.println(string);
         }
@@ -132,11 +132,11 @@ public class GeneralizationTest {
         System.out.println(newRawData);
 //        List<String> rawData = Arrays.asList("2024-3-18", "2024-6-1");
         DSObject dsObject = new DSObject(newRawData);
-        DSObject result = generalization.service(dsObject, 5, 3);
+        DSObject result = generalization.service(dsObject, 5, "3");
         for (Object string : result.getList().stream().limit(10).collect(Collectors.toList())) {
             System.out.println(string);
         }
-        DSObject result0 = generalization.service(dsObject, 5, 0);
+        DSObject result0 = generalization.service(dsObject, 5, "0");
         for (Object string : result.getList().stream().limit(10).collect(Collectors.toList())) {
             System.out.println(string);
         }
@@ -148,7 +148,7 @@ public class GeneralizationTest {
         String position = "116.435842,39.941626";
         List<String> rawData = Arrays.asList("116.435842,39.941626", "116.353714,39.939588", "116.435806,39.908501", "116.356866,39.907242");
         DSObject dsObject = new DSObject(position, rawData);
-        DSObject result = generalization.service(dsObject, 6, 115, 9.0);
+        DSObject result = generalization.service(dsObject, 6, "115", "9.0");
         for (Object string : result.getList()) {
             System.out.println(string);
         }
@@ -160,7 +160,7 @@ public class GeneralizationTest {
         String position = "116.435842,39.941626";
         List<String> rawData = Arrays.asList("116.435842,39.941626", "116.353714,39.939588", "116.435806,39.908501", "116.356866,39.907242");
         DSObject dsObject = new DSObject(position, rawData);
-        DSObject result = generalization.service(dsObject, 7, 115, 9.0);
+        DSObject result = generalization.service(dsObject, 7, "115", "9.0");
         for (Object string : result.getList()) {
             System.out.println(string);
         }
@@ -186,7 +186,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 9, 1);
+        DSObject result = generalization.service(dsObject, 9, "15");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -201,7 +201,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 10, 1);
+        DSObject result = generalization.service(dsObject, 10, "16");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -216,7 +216,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 11, 1);
+        DSObject result = generalization.service(dsObject, 11, "4");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -231,7 +231,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 12, 1);
+        DSObject result = generalization.service(dsObject, 12, "15");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -246,7 +246,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 13, 1);
+        DSObject result = generalization.service(dsObject, 13, "100,100,200,200");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -261,7 +261,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 14, 1);
+        DSObject result = generalization.service(dsObject, 14, "5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -276,7 +276,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 15, 1);
+        DSObject result = generalization.service(dsObject, 15, "5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -291,7 +291,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 16, 1);
+        DSObject result = generalization.service(dsObject, 16, "2");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -306,7 +306,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 17, 1);
+        DSObject result = generalization.service(dsObject, 17, "9");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -321,7 +321,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 18, 1);
+        DSObject result = generalization.service(dsObject, 18, "100,100,200,200");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -336,7 +336,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "audio", "0001_floor.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 19, 1);
+        DSObject result = generalization.service(dsObject, 19, "3");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -351,7 +351,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "audio", "0001_spec_mask.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 20, 1);
+        DSObject result = generalization.service(dsObject, 20, "0.1,0.3");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -366,7 +366,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "audio", "0001_aug.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 21, 1);
+        DSObject result = generalization.service(dsObject, 21, "0,300,9000");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -381,7 +381,7 @@ public class GeneralizationTest {
         String path2 = Paths.get(currentPath, "audio", "0001_median.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 22, 1);
+        DSObject result = generalization.service(dsObject, 22, "5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -414,8 +414,4 @@ public class GeneralizationTest {
         }
     }
 
-//    @Test
-    void testSubstring() {
-        System.out.println("广西壮族自治区北海市逢时花园重庆苑a区".indexOf("自治区"));
-    }
 }

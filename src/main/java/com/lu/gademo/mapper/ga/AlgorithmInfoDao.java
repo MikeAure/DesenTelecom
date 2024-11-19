@@ -1,5 +1,6 @@
 package com.lu.gademo.mapper.ga;
 
+import com.lu.gademo.dto.AlgorithmDisplayInfoDto;
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.handler.AlgorithmTypeHandler;
@@ -54,6 +55,19 @@ public interface AlgorithmInfoDao {
                     @Result(property = "ifModify", column = "if_modify"),
             })
     List<DesensitizationAlgorithm> getAllAlgorithmInfo();
+
+    @Select("SELECT id, algorithm_name, algorithm_abbreviation, low, medium, high, type, requirement FROM desensitization_algorithms where if_modify=1")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "algorithmName", column = "algorithm_name"),
+            @Result(property = "algorithmAbbreviation", column = "algorithm_abbreviation"),
+            @Result(property = "low", column = "low"),
+            @Result(property = "medium", column = "medium"),
+            @Result(property = "high", column = "high"),
+            @Result(property = "type", column = "type", javaType=AlgorithmType.class, typeHandler = AlgorithmTypeHandler.class),
+            @Result(property = "requirement", column = "requirement"),
+    })
+    List<AlgorithmDisplayInfoDto> getAllAlgorithmInfoDisplay();
 
     @Select("SELECT * FROM desensitization_algorithms WHERE id = #{id}")
     @ResultMap("DesensitizationAlgorithmMap")

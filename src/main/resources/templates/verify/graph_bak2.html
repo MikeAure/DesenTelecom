@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>详情查询</title>
+
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=3ec301cfc0baed14e8a4c2d1b61b1706&plugin=AMap.PlaceSearch"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<script type="text/javascript">
+    window._AMapSecurityConfig = {
+        securityJsCode: "120a27c95fe9d758fa109e700d2bfb97",
+    };
+</script>
+
+<script type="text/javascript">
+    const defaultMarkerImage = "https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png";
+
+    let lnglat = new AMap.LngLat(116.326936, 40.003213);
+    let map = new AMap.Map("container", {
+        resizeEnable: true,
+        center: lnglat,      // 地图中心点坐标
+        key: "3ec301cfc0baed14e8a4c2d1b61b1706",
+        /* key:"a356710cf98fab9a753bceb3f2dc3c96",*/
+        viewMode: '3D',   // 地图显示模式，'3D' 表示三维地图
+        /*  showBuildingBlock: true, // 是否显示楼块
+          showIndoorMap: true,  // 是否显示室内地图
+          pitch: 45,              // 地图俯仰角度，单位为度，范围 [0, 60]
+          rotation: 10,           // 地图旋转角度，单位为度，范围 [0, 360]*/
+        willReadFrequently: true, //
+        zoom: 10
+    });
+    // let placeSearch = new AMap.PlaceSearch({
+    //     city: 'beijing', // 兴趣点城市
+    //     citylimit: true,  //是否强制限制在设置的城市内搜索
+    //     pageSize: 10, // 单页显示结果条数
+    //     children: 0, //不展示子节点数据
+    //     pageIndex: 1, //页码
+    //     extensions: 'base' //返回基本地址信息
+    // });
+    // 显示轨迹
+    displayTrack("B000AA1YTA,141200;B000A80D2Q,060101;B000A8VQ1T,141300;B000A83HLX,160104;", map);
+
+    /**
+     * 根据原始轨迹显示路线和标记
+     * @param {string} rawLine - 原始轨迹点信息，格式为 "poiId,attr;poiId,attr;..."
+     * @param {object} map - 高德地图实例
+     * @param {string} outlineColor - 轨迹轮廓线颜色
+     * @param {string} strokeColor - 轨迹线颜色
+     * @param {string} markerImage - 标记点图标
+     * @param {string} windowContent - 信息窗体内容
+     */
+    function displayTrack(rawLine, map, outlineColor = '#f50b0b', strokeColor = 'red', markerImage = defaultMarkerImage, windowContent = "原始轨迹") {
+        // const placeSearch = new AMap.PlaceSearch({
+        //     pageSize: 10,
+        //     pageIndex: 1,
+        //     children: 0,
+        //     extensions: 'base',
+        //     autoFitView: true
+        // });
+        const placeSearch = new AMap.PlaceSearch({
+            city: 'beijing', // 兴趣点城市
+            citylimit: true,  //是否强制限制在设置的城市内搜索
+            pageSize: 10, // 单页显示结果条数
+            children: 0, //不展示子节点数据
+            pageIndex: 1, //页码
+            extensions: 'base' //返回基本地址信息
+        });
+
+        // 分割原始轨迹，去除空值
+        const rawPoints = rawLine.split(';').filter(item => item.trim() !== '');
+        console.log("轨迹点数量:", rawPoints.length);
+
+        // 处理每个POI点，返回Promise数组
+        const promises = rawPoints.map(point => fetchPoiDetails(point, placeSearch));
+
+        // 等待所有Promise完成后绘制
+        Promise.all(promises)
+            .then(rawPath => {
+                addMarkers(rawPath, map, markerImage);
+                addPolyline(rawPath, map, outlineColor, strokeColor);
+                addInfoWindow(rawPath[0], map, windowContent);
+            })
+            .catch(error => console.error('获取轨迹数据失败:', error));
+    }
+
+    /**
+     * 获取POI详情
+     * @param {string} point - 单个轨迹点信息，格式为 "poiId,attr"
+     * @param {object} placeSearch - AMap.PlaceSearch 实例
+     * @returns {Promise} - 返回包含经纬度的Promise
+     */
+    function fetchPoiDetails(point, placeSearch) {
+        return new Promise((resolve, reject) => {
+            const [poiId] = point.split(',');
+            placeSearch.getDetails(poiId, (status, result) => {
+                if (status === 'complete' && result.info === 'OK') {
+                    const location = result.poiList.pois[0].location;
+                    resolve([location.lng, location.lat]);
+                } else {
+                    reject(`POI信息获取失败，POI ID: `);
+                }
+            });
+        });
+    }
+
+    /**
+     * 添加标记点
+     * @param {Array} points - 经纬度数组
+     * @param {object} map - 高德地图实例
+     * @param {string} markerImage - 标记点图标
+     */
+    function addMarkers(points, map, markerImage) {
+        points.forEach(([lng, lat]) => {
+            const marker = new AMap.Marker({
+                icon: markerImage,
+                position: [lng, lat],
+                offset: new AMap.Pixel(-13, -30)
+            });
+            marker.setMap(map);
+        });
+    }
+
+    /**
+     * 添加折线
+     * @param {Array} points - 经纬度数组
+     * @param {object} map - 高德地图实例
+     * @param {string} outlineColor - 轮廓线颜色
+     * @param {string} strokeColor - 轨迹线颜色
+     */
+    function addPolyline(points, map, outlineColor, strokeColor) {
+        const polyline = new AMap.Polyline({
+            path: points,
+            isOutline: true,
+            outlineColor,
+            borderWeight: 1,
+            strokeColor,
+            strokeOpacity: 1,
+            strokeWeight: 6,
+            strokeStyle: "solid",
+            zIndex: 50,
+        });
+        polyline.setMap(map);
+    }
+
+    /**
+     * 添加信息窗体
+     * @param {Array} position - 信息窗体的位置
+     * @param {object} map - 高德地图实例
+     * @param {string} content - 信息窗体内容
+     */
+    function addInfoWindow(position, map, content) {
+        const infoWindow = new AMap.InfoWindow({
+            content,
+            position,
+            isCustom: true,
+            autoMove: true,
+        });
+        infoWindow.open(map, position);
+    }
+</script>
+</body>
+</html>

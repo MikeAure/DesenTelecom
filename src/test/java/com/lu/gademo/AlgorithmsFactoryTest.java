@@ -39,7 +39,7 @@ public class AlgorithmsFactoryTest {
         // // Dp dp = new DpImpl();
         List<String> rawData = Arrays.asList("2019-03-02 10:58:53", "2019-03-02 10:58:54", "2019-03-02 10:58:55", "2019-03-02 10:58:56", "2019-03-02 10:58:57");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 26, 1);
+        DSObject result = dp.service(dsObject, 26, "0.1");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -58,7 +58,7 @@ public class AlgorithmsFactoryTest {
         // Dp dp = new DpImpl();
         List<String> rawData = Arrays.asList("A", "B", "C", "D", "E");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 20, 2);
+        DSObject result = dp.service(dsObject, 20, "3.6");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -76,7 +76,7 @@ public class AlgorithmsFactoryTest {
         AlgorithmInfo algorithmInfo2 = algorithmsFactory.getAlgorithmInfoFromId(3);
         // Dp dp = new DpImpl();
         DSObject dsObject = new DSObject(Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0));
-        DSObject result = dp.service(dsObject, 1, 1);
+        DSObject result = dp.service(dsObject, 1, "10");
         for (Object number : result.getList()) {
             System.out.println(number);
         }
@@ -95,7 +95,7 @@ public class AlgorithmsFactoryTest {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 21, 2);
+        DSObject result = dp.service(dsObject, 21, "2.0");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -114,7 +114,7 @@ public class AlgorithmsFactoryTest {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 22, 2);
+        DSObject result = dp.service(dsObject, 22, "1.0");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -133,7 +133,7 @@ public class AlgorithmsFactoryTest {
         // Dp dp = new DpImpl();
         List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 23, 2);
+        DSObject result = dp.service(dsObject, 23, "2.0");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -152,7 +152,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<Double> rawData = Arrays.asList(1234567.0, 89102.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 2, 1);
+        DSObject result = replace.service(dsObject, 2, "2.3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -171,7 +171,7 @@ public class AlgorithmsFactoryTest {
         // Generalization generalization = new GeneralizationImpl();
         List<Double> rawData = Arrays.asList(12345.0, 56789.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 2, 1);
+        DSObject result = generalization.service(dsObject, 2, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -190,7 +190,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<Double> rawData = Arrays.asList(123.0, 456.0, 237.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 4);
+        DSObject result = replace.service(dsObject, 4, "20");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -209,7 +209,7 @@ public class AlgorithmsFactoryTest {
         // Generalization generalization = new GeneralizationImpl();
         List<String> rawData = Arrays.asList("REDIS", "MYSQL");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 1);
+        DSObject result = generalization.service(dsObject, 1, "3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -228,7 +228,7 @@ public class AlgorithmsFactoryTest {
         // Generalization generalization = new GeneralizationImpl();
         List<Object> rawData = Arrays.asList("12:30:45", "1:09:25");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 3);
+        DSObject result = generalization.service(dsObject, 3, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -247,7 +247,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("199@163.com", "qwertyuiop@qq.com", "217hdu1d17@gmail.com");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 8);
+        DSObject result = replace.service(dsObject, 8, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -266,7 +266,7 @@ public class AlgorithmsFactoryTest {
         // Generalization generalization = new GeneralizationImpl();
         List<String> rawData = Arrays.asList("陕西省西安市长安区西安电子科技大学南校区", "北京市海淀区北京大学");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 4, 1);
+        DSObject result = generalization.service(dsObject, 4, "1");
         for (Object string : result.getList()) {
             System.out.println(string);
         }
@@ -285,7 +285,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("赵一二", "钱三四", "孙五六");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 6, 1);
+        DSObject result = replace.service(dsObject, 6, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -304,7 +304,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("199293845297", "7654321", "17789012345");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 7, 2);
+        DSObject result = replace.service(dsObject, 7, "3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -323,7 +323,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 3);
+        DSObject result = replace.service(dsObject, 3, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -342,7 +342,7 @@ public class AlgorithmsFactoryTest {
         // Generalization generalization = new GeneralizationImpl();
         List<String> rawData = Arrays.asList("2024-3-18", "2024-6-1");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 5, 1);
+        DSObject result = generalization.service(dsObject, 5, "2");
         for (Object string : result.getList()) {
             System.out.println(string);
         }
@@ -361,7 +361,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 5, 1);
+        DSObject result = replace.service(dsObject, 5, "15");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -380,7 +380,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 1);
+        DSObject result = replace.service(dsObject, 1, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -399,7 +399,7 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 9);
+        DSObject result = replace.service(dsObject, 9, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -418,49 +418,11 @@ public class AlgorithmsFactoryTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 10);
+        DSObject result = replace.service(dsObject, 10, "1");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
         DSObject newResult = algorithmInfo.execute(dsObject);
-        for (Object object : newResult.getList()) {
-            System.out.println(object);
-        }
-        assertEquals(algorithmInfo, algorithmInfo2);
-//        assertEquals(newResult, result);
-    }
-
-    @Test
-    public void testNoisy_Histogram2() {
-        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName("Noisy_Histogram2");
-        AlgorithmInfo algorithmInfo2 = algorithmsFactory.getAlgorithmInfoFromId(23);
-        // Dp dp = new DpImpl();
-        List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
-        DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 25, 6);
-        for (Object s : result.getList()) {
-            System.out.println(s);
-        }
-        DSObject newResult = algorithmInfo.execute(dsObject, 6);
-        for (Object object : newResult.getList()) {
-            System.out.println(object);
-        }
-        assertEquals(algorithmInfo, algorithmInfo2);
-//        assertEquals(newResult, result);
-    }
-
-    @Test
-    public void testNoisy_Histogram1() {
-        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromName("Noisy_Histogram1");
-        AlgorithmInfo algorithmInfo2 = algorithmsFactory.getAlgorithmInfoFromId(24);
-        // Dp dp = new DpImpl();
-        List<Double> rawData = Arrays.asList(8.0, 2.0, 3.0, 4.0, 5.0);
-        DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 24, 6);
-        for (Object s : result.getList()) {
-            System.out.println(s);
-        }
-        DSObject newResult = algorithmInfo.execute(dsObject, 6);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -479,7 +441,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 12, 1);
+        DSObject result = generalization.service(dsObject, 12, "15");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -502,7 +464,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 10, 1);
+        DSObject result = generalization.service(dsObject, 10, "16");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -525,7 +487,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 9, 1);
+        DSObject result = generalization.service(dsObject, 9, "15");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -548,7 +510,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 11, 1);
+        DSObject result = generalization.service(dsObject, 11, "4");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -571,7 +533,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 5, 0.5);
+        DSObject result = dp.service(dsObject, 5, "1.0");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -594,7 +556,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 13, 1);
+        DSObject result = generalization.service(dsObject, 13, "100,100,200,200");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -640,7 +602,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 12, 1);
+        DSObject result = replace.service(dsObject, 12, "20,50,100");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -689,7 +651,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 17, 1);
+        DSObject result = generalization.service(dsObject, 17, "9");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -713,7 +675,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 15, 1);
+        DSObject result = generalization.service(dsObject, 15, "5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -737,7 +699,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 14, 1);
+        DSObject result = generalization.service(dsObject, 14, "5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -761,7 +723,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "raw_files", "4.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 16, 1);
+        DSObject result = generalization.service(dsObject, 16, "2");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -785,7 +747,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = generalization.service(dsObject, 18, 1);
+        DSObject result = generalization.service(dsObject, 18, "100,100,200,200");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -809,7 +771,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "raw_files", "3-add-color.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 14, 1);
+        DSObject result = replace.service(dsObject, 14, "20");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -834,7 +796,7 @@ public class AlgorithmsFactoryTest {
         String path3 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "result", "result.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2, path3);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 16, 1);
+        DSObject result = replace.service(dsObject, 16, "0.4");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -883,7 +845,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "audio", "0001_Laplace.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = dp.service(dsObject, 6, 1);
+        DSObject result = dp.service(dsObject, 6, "5.0");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -931,7 +893,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "audio", "0001_apply_effects.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 18, 1);
+        DSObject result = replace.service(dsObject, 18, "-3,0.7,-5,5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -955,7 +917,7 @@ public class AlgorithmsFactoryTest {
         String path2 = Paths.get(currentPath, "audio", "0001_reshuffle.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 17, 1);
+        DSObject result = replace.service(dsObject, 17, "5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }

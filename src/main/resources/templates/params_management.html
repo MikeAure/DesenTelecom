@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang=ch xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+
+    <title>Performance Test</title>
+
+    <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet">
+    <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet">
+    <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet">
+    <link th:href="@{/css/animate.css}" rel="stylesheet">
+    <link th:href="@{/css/plugins/chosen/chosen.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css?v=4.1.0}" rel="stylesheet">
+    <link th:href="@{/css/plugins/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet">
+
+    <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{/favicon.ico}" rel="shortcut icon">
+
+    <script th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
+    <script th:src="@{/js/xlsx.full.min.js}"></script>
+    <script th:src="@{/js/plugins/chosen/chosen.jquery.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/echarts.min.js}"></script>
+
+    <!-- Bootstrap table -->
+    <script th:src="@{/js/plugins/bootstrap-table/bootstrap-table.min.js}"></script>
+    <script th:src="@{/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js}"></script>
+    <script th:src="@{/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+
+    <!-- Peity -->
+    <script th:src="@{/js/plugins/peity/jquery.peity.min.js}"></script>
+
+    <!-- Map -->
+    <script th:src="@{/js/plugins/layer/layer.min.js}" defer></script>
+    <script th:src="@{/js/multiple-select.min.js}" defer></script>
+    <!-- 自定义js -->
+    <script th:src="@{/js/content.js?v=1.0.0}"></script>
+    <script type="text/javascript">
+        let originalData = [];
+
+        function validateParams(id, low, medium, high) {
+            return false;
+        }
+
+        function editInfo() {
+            // 获取模态框中的值
+            const id = $('#id').val();
+            const low = $('#low').val();
+            const medium = $('#medium').val();
+            const high = $('#high').val();
+            console.log(`id: ${id}, low: ${low}, medium: ${medium}, high: ${high}`);
+
+            // 校验输入的参数
+            // if (!validateParams(id, low, medium, high)) {
+            //     alert("参数校验失败，请检查输入！");
+            //     return;
+            // }
+
+            // 更新表格对应行的数据
+            const $table = $('#params-management'); // 表格 ID
+            const rowIndex = $table.bootstrapTable('getData').findIndex(row => row.id === parseInt(id)); // 找到对应行
+
+            if (rowIndex !== -1) {
+                // 更新数据
+                $table.bootstrapTable('updateRow', {
+                    index: rowIndex,
+                    row: {
+                        low: low,
+                        medium: medium,
+                        high: high
+                    }
+                });
+
+                // 关闭模态框
+                $('#editModal').modal('hide');
+                alert("参数更新成功！");
+            } else {
+                alert("未找到对应算法ID的表格行！");
+            }
+        }
+
+        function addButtons(value, row, index) {
+            return [
+                '<button id="set" type="button" class="btn btn-info" data-toggle="modal" data-target="#editModal">设置参数</button>',
+                '<button id="reset" type="button" class="btn btn-default m-l">重置参数</button>',
+            ].join('');
+        }
+
+        function formatType(value) {
+            const typeMap = {
+                1: "差分隐私",
+                2: "泛化",
+                3: "匿名",
+                4: "置换"
+            };
+            return typeMap[value];
+        }
+
+        function generateTable(tableId, results) {
+            let tablaTitle = [
+                {field: 'id', title: '算法ID',},  // 编号列，使用格式化函数 formatIndex
+                {field: 'algorithmName', title: '算法名称'},  // 数据字段列，允许排序
+                {field: 'algorithmAbbreviation', title: '算法中文名称'},  // 拆分前数据类型列，使用格式化函数 formatType
+                {field: 'low', title: '低等级脱敏参数'},  // 拆分后数据类型列
+                {field: 'medium', title: '中等级脱敏参数'},  // 拆分前平均值列
+                {field: 'high', title: '高等级脱敏参数'},  // 拆分后平均值列
+                {field: 'type', title: '算法类型', formatter: formatType},  // 拆分前最大值列
+                {field: 'requirement', title: '脱敏需求'},  // 拆分后最大值列
+                {
+                    field: 'operate', title: '操作', formatter: addButtons,
+                    events: {
+                        'click #set': function (e, value, row, index) {
+                            $('#id').val(row.id);
+                            $('#name').val(row.algorithmName);
+                            $('#low').val(row.low);
+                            $('#medium').val(row.medium);
+                            $('#high').val(row.high);
+                        },
+                        'click #reset': function (e, value, row, index) {
+                            // 从 originalData 中找到对应的行
+                            const originalRow = originalData.find(item => item.id === row.id);
+                            if (originalRow) {
+                                // 更新表格行的值为原始值
+                                $('#params-management').bootstrapTable('updateRow', {
+                                    index: index,
+                                    row: {
+                                        low: originalRow.low,
+                                        medium: originalRow.medium,
+                                        high: originalRow.high
+                                    }
+                                });
+                                alert('参数已重置为初始状态！');
+                            } else {
+                                alert('未找到对应的原始数据，无法重置！');
+                            }
+                        }
+                    }
+                }
+
+            ];
+            // 初始化 Bootstrap Table
+            $(tableId).bootstrapTable({
+                columns: tablaTitle,
+                data: results,
+                striped: true,
+                pagination: true,
+                search: true,
+                sidePagination: 'client',
+                pageNumber: 1,
+                pageSize: 20,
+                pageList: [5, 10, 20, 30],
+                queryParamsType: '',
+                formatLoadingMessage: function () {
+                    return '请稍候，加载中....';
+                },
+                formatNoMatches: function () {
+                    return '未找到匹配的数据。';
+                },
+                sortable: true, // 启用排序
+                sortOrder: 'asc', // 默认排序顺序
+                icons: {
+                    columns: 'glyphicon-list',
+                    toggle: 'glyphicon-list-alt',
+                    sort: 'glyphicon-sort',
+                    sortOrder: 'glyphicon-sort-by-order'
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // 获取表格的 tbody 元素
+            // const tableBody = document.querySelector("#params-management tbody");
+
+            // 请求后端 API 获取数据
+            fetch('/paramsManagement/getAllAlgorithmInfoDisplay', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch data from API");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.code !== 200) {
+                        throw new Error(data.message || "Unexpected error");
+                    }
+                    originalData = JSON.parse(JSON.stringify(data.data));
+                    generateTable("#params-management", data.data);
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error.message);
+                });
+        });
+
+        window.onload = function () {
+            const $saveAllParamsBtn = $("#saveAllParams");
+            const $reloadAllAlgosBtn = $("#reloadAllAlgorithms");
+
+            function saveAllParams() {
+                const tableData = $('#params-management').bootstrapTable('getData');
+                const payload = tableData.map(row => ({
+                    id: row.id,
+                    low: row.low,
+                    medium: row.medium,
+                    high: row.high
+                }));
+                fetch("/paramsManagement/updateAlgorithmParams", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert("算法参数已成功保存到数据库")
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error saving all parameters:", error.message);
+                        alert("保存算法参数失败：" + error.message);
+                    });
+            }
+
+            function reloadAllAlgorithms() {
+                fetch("/paramsManagement/reloadAlgorithmFactory", {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            alert("所有算法已重新加载");
+                            location.reload();
+                        } else {
+                            throw new Error(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error reloading all algorithms:", error.message);
+                        alert("重新加载算法失败：" + error.message);
+                    });
+
+            }
+
+            $saveAllParamsBtn.off("click").on("click", saveAllParams);
+            $reloadAllAlgosBtn.off("click").on("click", reloadAllAlgorithms);
+
+        };
+    </script>
+</head>
+<body>
+<div class="wrapper wrapper-content">
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="id">算法ID</label>
+                        <input id="id" type="text" class="form-control" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">算法名称</label>
+                        <input id="name" type="text" class="form-control" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label for="low">低等级</label>
+                        <input id="low" type="text" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="medium">中等级</label>
+                        <input id="medium" type="text" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="high">高等级</label>
+                        <input id="high" type="text" class="form-control"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="editInfo()">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>脱敏算法安全参数管理</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <table id="params-management">
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <button id="saveAllParams" class="btn btn-info">设置所有算法参数</button>
+                            <button id="reloadAllAlgorithms" class="btn btn-info m-l">重新加载所有算法</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>

@@ -1,8 +1,10 @@
 package com.lu.gademo;
 
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
+import com.lu.gademo.mapper.ga.AlgorithmInfoDao;
 import com.lu.gademo.service.AlgorithmInfoDaoService;
 import com.lu.gademo.utils.AlgorithmInfo;
+import com.lu.gademo.utils.AlgorithmType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import java.util.List;
 public class AlgorithmInfoDaoServiceTest {
     @Autowired
     AlgorithmInfoDaoService algorithmInfoDaoService;
+    @Autowired
+    private AlgorithmInfoDao algorithmInfoDao;
 
     @Test
     void getAllAlgorithmsRawInfoTest() {
@@ -59,6 +63,15 @@ public class AlgorithmInfoDaoServiceTest {
         System.out.println(algorithmInfoDaoService.getAlgorithmInfoConvertObjectById(2));
     }
 
+    @Test
+    void getAlgorithmInfoByTypeAndOriginalIdByTypeTest() {
+        System.out.println(algorithmInfoDaoService.getAlgorithmInfoByTypeAndOriginalId(AlgorithmType.fromValue(1), 1));
+    }
+
+    @Test
+    void getAlgorithmInfoConvertObjectByTypeAndOriginalIdByTypeTest() {
+        System.out.println(algorithmInfoDaoService.getAlgorithmInfoConvertObjectByTypeAndOriginalId(AlgorithmType.fromValue(2), 1));
+    }
     @Test
     void getAlgorithmInfoByTypeAndOriginalIdTest() {
         System.out.println(algorithmInfoDaoService.getAlgorithmInfoByTypeAndOriginalId(1, 1));

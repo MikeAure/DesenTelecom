@@ -26,10 +26,10 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456", "asdas123454", "dad123dfd3009sda");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 1,0);
-        DSObject result1 = replace.service(dsObject, 1,1);
-        DSObject result2 = replace.service(dsObject, 1,2);
-        DSObject result3 = replace.service(dsObject, 1,3);
+        DSObject result = replace.service(dsObject, 1,"0");
+        DSObject result1 = replace.service(dsObject, 1,"1");
+        DSObject result2 = replace.service(dsObject, 1,"2");
+        DSObject result3 = replace.service(dsObject, 1,"3");
         result.getList().forEach(System.out::println);
 
         for (Object object : result1.getList()) {
@@ -44,7 +44,7 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<Double> rawData = Arrays.asList(1234567.0, 89102.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 2, 1);
+        DSObject result = replace.service(dsObject, 2, "2.3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -55,10 +55,10 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 3, 0);
-        DSObject result1 = replace.service(dsObject, 3, 1);
-        DSObject result2 = replace.service(dsObject, 3, 2);
-        DSObject result3 = replace.service(dsObject, 3, 3);
+        DSObject result = replace.service(dsObject, 3, "0");
+        DSObject result1 = replace.service(dsObject, 3, "1");
+        DSObject result2 = replace.service(dsObject, 3, "2");
+        DSObject result3 = replace.service(dsObject, 3, "3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -72,7 +72,7 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<Double> rawData = Arrays.asList(123.0, 456.0, 237.0);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 4, 1);
+        DSObject result = replace.service(dsObject, 4, "20");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -83,10 +83,10 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("123", "456");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 5, 0);
-        DSObject result1 = replace.service(dsObject, 5, 1);
-        DSObject result2 = replace.service(dsObject, 5, 2);
-        DSObject result3 = replace.service(dsObject, 5, 3);
+        DSObject result = replace.service(dsObject, 5, "0");
+        DSObject result1 = replace.service(dsObject, 5, "15");
+        DSObject result2 = replace.service(dsObject, 5, "20");
+        DSObject result3 = replace.service(dsObject, 5, "25");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -101,11 +101,11 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("赵一二", "钱三四", "孙五六", "欧阳七八", "赵一二钱三四孙五六欧阳七八");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 6, 0);
+        DSObject result = replace.service(dsObject, 6, "0");
 
-        DSObject result1 = replace.service(dsObject, 6, 1);
-        DSObject result2 = replace.service(dsObject, 6, 2);
-        DSObject result3 = replace.service(dsObject, 6, 3);
+        DSObject result1 = replace.service(dsObject, 6, "1");
+        DSObject result2 = replace.service(dsObject, 6, "2");
+        DSObject result3 = replace.service(dsObject, 6, "3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -120,10 +120,10 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("19929384529", "7654321", "17789012345", "1992938452977654321", "1", "2", "22", "333", "4444");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 7, 0);
-        DSObject result1 = replace.service(dsObject, 7, 1);
-        DSObject result2 = replace.service(dsObject, 7, 2);
-        DSObject result3 = replace.service(dsObject, 7, 3);
+        DSObject result = replace.service(dsObject, 7, "0");
+        DSObject result1 = replace.service(dsObject, 7, "1");
+        DSObject result2 = replace.service(dsObject, 7, "4");
+        DSObject result3 = replace.service(dsObject, 7, "5");
 
         for (Object object : result.getList()) {
             System.out.println(object);
@@ -139,10 +139,10 @@ public class ReplaceTest {
         // Replace replace = new ReplaceImpl();
         List<String> rawData = Arrays.asList("199@163.com", "qwertyuiop@qq.com", "217hdu1d17@gmail.com");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result0 = replace.service(dsObject, 8, 0);
-        DSObject result1 = replace.service(dsObject, 8, 1);
-        DSObject result2 = replace.service(dsObject, 8, 2);
-        DSObject result3 = replace.service(dsObject, 8, 3);
+        DSObject result0 = replace.service(dsObject, 8, "0");
+        DSObject result1 = replace.service(dsObject, 8, "1");
+        DSObject result2 = replace.service(dsObject, 8, "2");
+        DSObject result3 = replace.service(dsObject, 8, "3");
         for (Object object : result0.getList()) {
             System.out.println(object);
         }
@@ -158,10 +158,10 @@ public class ReplaceTest {
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1",
                 "2401:3801:4012:1807:1101:1101:1101:1012", "138d:196c:6401:1412:112b:1101:1101:1101");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 9, 0);
-        DSObject result1 = replace.service(dsObject, 9, 1);
-        DSObject result2 = replace.service(dsObject, 9, 2);
-        DSObject result3 = replace.service(dsObject, 9, 3);
+        DSObject result = replace.service(dsObject, 9, "0");
+        DSObject result1 = replace.service(dsObject, 9, "1");
+        DSObject result2 = replace.service(dsObject, 9, "2");
+        DSObject result3 = replace.service(dsObject, 9, "3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -176,10 +176,10 @@ public class ReplaceTest {
         List<String> rawData = Arrays.asList("192.168.1.1", "10.1.1.1", "127.0.0.1",
                 "2401:3801:4012:1807:1101:1101:1101:1012", "138d:196c:6401:1412:112b:1101:1101:1101");
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 10, 0);
-        DSObject result1 = replace.service(dsObject, 10, 1);
-        DSObject result2 = replace.service(dsObject, 10, 2);
-        DSObject result3 = replace.service(dsObject, 10, 3);
+        DSObject result = replace.service(dsObject, 10, "0");
+        DSObject result1 = replace.service(dsObject, 10, "1");
+        DSObject result2 = replace.service(dsObject, 10, "2");
+        DSObject result3 = replace.service(dsObject, 10, "3");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -212,7 +212,7 @@ public class ReplaceTest {
         String path2 = Paths.get(currentPath, "image", "2.png").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 12, 1);
+        DSObject result = replace.service(dsObject, 12, "20");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -243,7 +243,7 @@ public class ReplaceTest {
         String path2 = Paths.get(currentPath, "raw_files", "3-add-color.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 14, 1);
+        DSObject result = replace.service(dsObject, 14, "20");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -275,7 +275,7 @@ public class ReplaceTest {
         String path3 = Paths.get(currentPath, "image", "FaceReplace", "dataset", "result", "result.mp4").toString();
         List<String> rawData = Arrays.asList(path1, path2, path3);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 16, 1);
+        DSObject result = replace.service(dsObject, 16, "0.4");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -290,7 +290,7 @@ public class ReplaceTest {
         String path2 = Paths.get(currentPath, "audio", "0001_reshuffle.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 17, 1);
+        DSObject result = replace.service(dsObject, 17, "5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }
@@ -305,7 +305,7 @@ public class ReplaceTest {
         String path2 = Paths.get(currentPath, "audio", "0001_apply_effects.wav").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = replace.service(dsObject, 18, 1);
+        DSObject result = replace.service(dsObject, 18, "-3,0.7,-5,5");
         for (Object s : result.getList()) {
             System.out.println(s);
         }

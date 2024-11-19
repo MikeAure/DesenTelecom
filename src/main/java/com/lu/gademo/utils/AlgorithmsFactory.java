@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Data
@@ -25,7 +23,6 @@ public class AlgorithmsFactory {
         this.algorithmInfoMap = new HashMap<>();
         this.algorithmInfoDaoService = algorithmInfoDaoService;
     }
-
 
     @PostConstruct
     public void init() {
@@ -115,6 +112,17 @@ public class AlgorithmsFactory {
 //                return null;
 //        }
 //    }
+
+    /**
+     * 重新加载算法信息
+     * @return 重新加载是否成功
+     */
+    public boolean reload() {
+        int previousSize = algorithmInfoMap.size();
+        algorithmInfoMap = algorithmInfoDaoService.getAllAlgorithmInfoMap();
+        return algorithmInfoMap.size() == previousSize;
+    }
+
     public AlgorithmInfo getAlgorithmInfoFromName(String name) {
         return algorithmInfoMap.get(name);
     }

@@ -4,6 +4,7 @@ import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.model.ModalTypes;
 import lombok.*;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,6 +73,9 @@ public class AlgorithmInfo {
      */
     public DSObject execute(DSObject rawData, Number... params) {
         int idx = params[0].intValue();
+        if (CollectionUtils.isEmpty(this.getParams())) {
+            return executor.service(rawData, originalId);
+        }
         if (this.modalType == ModalTypes.SHEET) {
             if (idx == 0) {
                 return executor.service(rawData, originalId, "0");

@@ -26,7 +26,7 @@ public class AnonymityTest {
         String path2 = Paths.get(currentPath, "raw_files", "adult_k_anonymity.csv").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = anonymity.service(dsObject, 1, 2);
+        DSObject result = anonymity.service(dsObject, 1, "2");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -35,7 +35,7 @@ public class AnonymityTest {
     public void testCirDummy()  {
         // Anonymity anonymity = new AnonymityImpl();
         DSObject dsObject = new DSObject("116.435842,39.941626");
-        DSObject result = anonymity.service(dsObject, 2, 3, 10, 0.5);
+        DSObject result = anonymity.service(dsObject, 2, "3", "10", "0.5");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -45,7 +45,7 @@ public class AnonymityTest {
     public void testGirDummy()  {
         // Anonymity anonymity = new AnonymityImpl();
         DSObject dsObject = new DSObject("116.435842,39.941626");
-        DSObject result = anonymity.service(dsObject, 3, 6, 16);
+        DSObject result = anonymity.service(dsObject, 3, "6", "16");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -57,7 +57,7 @@ public class AnonymityTest {
         List<String> rawData = Arrays.asList("39.921459,116.210864", "39.962555,116.291789");
         DSObject dsObject = new DSObject(rawData);
         dsObject.setString("39.952695,116.231002");
-        DSObject result = anonymity.service(dsObject, 4, 2);
+        DSObject result = anonymity.service(dsObject, 4, "2");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -67,7 +67,7 @@ public class AnonymityTest {
     public void testCaDSA()  {
         // Anonymity anonymity = new AnonymityImpl();
         DSObject dsObject = new DSObject("116.359642,39.659324");
-        DSObject result = anonymity.service(dsObject, 5, 2);
+        DSObject result = anonymity.service(dsObject, 5, "2");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -77,7 +77,7 @@ public class AnonymityTest {
     public void testKAnonymityPosition()  {
         // Anonymity anonymity = new AnonymityImpl();
         DSObject dsObject = new DSObject("116.359642,39.659324");
-        DSObject result = anonymity.service(dsObject, 6, 2);
+        DSObject result = anonymity.service(dsObject, 6, "2");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -92,7 +92,7 @@ public class AnonymityTest {
         String path2 = Paths.get(currentPath, "raw_files", "adult_l_diversity.csv").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = anonymity.service(dsObject, 7, 2);
+        DSObject result = anonymity.service(dsObject, 7, "2");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -107,7 +107,7 @@ public class AnonymityTest {
         String path2 = Paths.get(currentPath, "raw_files", "adult_t_close.csv").toString();
         List<String> rawData = Arrays.asList(path1, path2);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = anonymity.service(dsObject, 10, 2);
+        DSObject result = anonymity.service(dsObject, 10, "2");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -117,7 +117,7 @@ public class AnonymityTest {
     public void testHilbert()  {
         // Anonymity anonymity = new AnonymityImpl();
         DSObject dsObject = new DSObject("3.56230,4.36520");
-        DSObject result = anonymity.service(dsObject, 11, 4);
+        DSObject result = anonymity.service(dsObject, 11, "4");
         for (Object object : result.getList()) {
             System.out.println(object);
         }
@@ -129,7 +129,7 @@ public class AnonymityTest {
         List<String> rawData = Arrays.asList("39.959201,116.319997", "40.139234,115.892943", "40.310622,117.003926", "39.560823,116.790982");
         DSObject dsObject = new DSObject(rawData);
         dsObject.setString("116.359642,39.659324");
-        DSObject result = anonymity.service(dsObject, 12, 2);
+        DSObject result = anonymity.service(dsObject, 12, "2");
         for (Object object : result.getList()) {
             System.out.println(object);
         }

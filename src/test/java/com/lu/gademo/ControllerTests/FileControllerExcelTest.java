@@ -75,7 +75,7 @@ public class FileControllerExcelTest {
             "travel.xlsx", "useCar.xlsx", "usedCar.xlsx", "vr.xlsx", "webcast.xlsx", "woman.xlsx", "petcare.xlsx", "homerepair.xlsx"
     );
     private static final String URL = "/File/desenFile";
-    private static final String EXCEL_FILE_PATH = "src/test/resources/test_data/sheets/Table/";
+    private static final String EXCEL_FILE_PATH = "D:\\52scenes1w\\50\\";
     private static final String EXCEL_FILE_PATH_1000w = "D:\\50scenes1000wdata_old\\";
     private final MockMvc mvc;
     Path excelPath;
@@ -329,7 +329,7 @@ public class FileControllerExcelTest {
     @Test
     public void testExcelFiles52scenes() throws Exception {
         Map<String, List<String>> failedResult = new HashMap<>();
-        Path currentDirectory = Paths.get("D:\\52scenes100");
+        Path currentDirectory = Paths.get("D:\\52scenes1w\\50\\");
         System.out.println("CurrentDirectory: " + currentDirectory.toString());
         List<String> failedFileNameList = new ArrayList<>();
         for (String sceneName : FIFTYTWO_SCENE) {

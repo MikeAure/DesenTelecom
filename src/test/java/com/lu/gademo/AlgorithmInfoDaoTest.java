@@ -14,8 +14,6 @@ public class AlgorithmInfoDaoTest {
     @Autowired
     AlgorithmInfoDao algorithmInfoDao;
 
-
-
     @Test
     void getAllAlgorithmInfoConvertObjectTest() {
         System.out.println(algorithmInfoDao.getAllAlgorithmInfoConvertObject());
@@ -24,6 +22,11 @@ public class AlgorithmInfoDaoTest {
     @Test
     void getAllAlgorithmInfoTest() {
         System.out.println(algorithmInfoDao.getAllAlgorithmInfo());
+    }
+
+    @Test
+    void getAllAlgorithmInfoDisplayTest() {
+        algorithmInfoDao.getAllAlgorithmInfoDisplay().forEach(System.out::println);
     }
 
     @Test

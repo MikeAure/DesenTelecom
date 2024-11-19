@@ -49,7 +49,7 @@ def pixelate_frame(frame, block_size: int = 5):
 
 
 def pixelate_region_frame(frame, region_x, region_y, region_w, region_h, block_size: int = 5):
-    x, y, w, h = region_x, region_y, region_w, region_h
+    x, y, w, h = adjust_region(frame, region_x, region_y, region_w, region_h)
     region = frame[y:y + h, x:x + w]
     pixelated_region = pixelate_frame(region, block_size)
     frame[y:y + h, x:x + w] = pixelated_region
@@ -61,7 +61,7 @@ def gaussian_blur_frame(frame, radius: int = 2):
 
 
 def gaussian_blur_region_frame(frame, region_x, region_y, region_w, region_h, radius: int = 2):
-    x, y, w, h = region_x, region_y, region_w, region_h
+    x, y, w, h = adjust_region(frame, region_x, region_y, region_w, region_h)
     region = frame[y:y + h, x:x + w]
     blurred_region = gaussian_blur_frame(region, radius)
     frame[y:y + h, x:x + w] = blurred_region
@@ -73,7 +73,7 @@ def box_blur_frame(frame, radius: int = 2):
 
 
 def box_blur_region_frame(frame, region_x, region_y, region_w, region_h, radius: int = 2):
-    x, y, w, h = region_x, region_y, region_w, region_h
+    x, y, w, h = adjust_region(frame, region_x, region_y, region_w, region_h)
     region = frame[y:y + h, x:x + w]
     blurred_region = box_blur_frame(region, radius)
     frame[y:y + h, x:x + w] = blurred_region
@@ -85,6 +85,7 @@ def replace_frame(frame):
 
 
 def replace_region_frame(frame, region_x, region_y, region_w, region_h):
+    region_x, region_y, region_w, region_h = adjust_region(frame, region_x, region_y, region_w, region_h)
     frame[region_y:region_y + region_h, region_x:region_x + region_w] = replace_frame(
         frame[region_y:region_y + region_h, region_x:region_x + region_w])
     return frame

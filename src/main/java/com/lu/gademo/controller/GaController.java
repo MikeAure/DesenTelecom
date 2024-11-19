@@ -1,6 +1,11 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.dto.AlgorithmDisplayInfoDto;
+import com.lu.gademo.dto.AlgorithmInfoDto;
+import com.lu.gademo.dto.AlgorithmInfoParamDto;
+import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.entity.ga.SceneInfo;
+import com.lu.gademo.service.AlgorithmInfoDaoService;
 import com.lu.gademo.service.SceneInfoDaoService;
 import com.lu.gademo.service.impl.ExcelAlgorithmsDaoServiceImpl;
 import com.lu.gademo.service.impl.ToolsetServiceImpl;
@@ -21,13 +26,15 @@ public class GaController extends BaseController {
     private final SceneInfoDaoService sceneInfoDaoService;
     private final List<SceneInfo> allSceneInfos;
     private final ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService;
+    private final AlgorithmInfoDaoService algorithmInfoDaoService;
 
     @Autowired
-    public GaController(ToolsetServiceImpl toolsetServiceImpl, SceneInfoDaoService sceneInfoDaoService, List<SceneInfo> allSceneInfos, ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService) {
+    public GaController(ToolsetServiceImpl toolsetServiceImpl, SceneInfoDaoService sceneInfoDaoService, List<SceneInfo> allSceneInfos, ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService, AlgorithmInfoDaoService algorithmInfoDaoService) {
         this.toolsetServiceImpl = toolsetServiceImpl;
         this.sceneInfoDaoService = sceneInfoDaoService;
-        this.allSceneInfos = sceneInfoDaoService.getAllSceneInfos();
+        this.allSceneInfos = allSceneInfos;
         this.excelAlgorithmsDaoService = excelAlgorithmsDaoService;
+        this.algorithmInfoDaoService = algorithmInfoDaoService;
     }
 
     @RequestMapping(value = {"/", "/index"})
@@ -54,20 +61,7 @@ public class GaController extends BaseController {
     // 脱敏算法验证  按照模态分类
     @GetMapping(value = {"/verify/{name}"})
     public String getVerifyViews(@PathVariable String name, Model model) {
-//        List<AlgorithmInfoDto> audioAlgorithmInfoDtoList = new ArrayList<AlgorithmInfoDto>(Arrays.asList(
-//                new AlgorithmInfoDto(70, "dpAudio", "差分-基于差分隐私的声纹特征脱敏算法"),
-//                new AlgorithmInfoDto(71, "voice_replace", "置换-声纹替换算法"),
-//                new AlgorithmInfoDto(72, "apply_audio_effects", "置换-音频变形"),
-//                new AlgorithmInfoDto(73, "audio_reshuffle", "置换-音频重排"),
-//                new AlgorithmInfoDto(74, "audio_floor", "泛化-音频取整"),
-//                new AlgorithmInfoDto(75, "audio_spec", "泛化-频域遮掩"),
-//                new AlgorithmInfoDto(76, "audio_augmentation", "泛化-音频失真"),
-//                new AlgorithmInfoDto(77, "audio_median", "泛化-基于均值的采样点替换")
-//                ));
-//        if (name.equals("audio")) {
-//            model.addAttribute("distortionAudioAlgoList", audioAlgorithmInfoDtoList);
-//            model.addAttribute("defaultOption", "audio_spec");
-//        }
+
         Map<String, List<Map<String, Object>>> algorithmsByType = excelAlgorithmsDaoService.getAlgorithmsByType();
         String defaultAlgName = "";
         if (!name.equals("graph")) {
@@ -99,7 +93,40 @@ public class GaController extends BaseController {
 
     // 脱敏工具设置
     @GetMapping(value = {"/desentools/{toolName}"})
-    public String getDesenToolsView(@PathVariable String toolName) {
+    public String getDesenToolsView(@PathVariable String toolName, Model model) {
+        switch (toolName) {
+            case "differential_privacy_laplace": {
+                DesensitizationAlgorithm laplace = algorithmInfoDaoService.getAlgorithmInfoById(3).get(0);
+                AlgorithmInfoParamDto laplaceDto = new AlgorithmInfoParamDto(laplace.getId(), laplace.getLow(),
+                        laplace.getMedium(), laplace.getHigh());
+                DesensitizationAlgorithm laplaceImage = algorithmInfoDaoService.getAlgorithmInfoById(44).get(0);
+                AlgorithmInfoParamDto laplaceImageDto = new AlgorithmInfoParamDto(laplaceImage.getId(), laplaceImage.getLow(),
+                        laplaceImage.getMedium(), laplaceImage.getHigh());
+                DesensitizationAlgorithm laplaceGraph = algorithmInfoDaoService.getAlgorithmInfoById(60).get(0);
+                AlgorithmInfoParamDto laplaceGraphDto = new AlgorithmInfoParamDto(laplaceGraph.getId(), laplaceGraph.getLow(),
+                        laplaceGraph.getMedium(), laplaceGraph.getHigh());
+                DesensitizationAlgorithm laplaceAudio = algorithmInfoDaoService.getAlgorithmInfoById(70).get(0);
+                AlgorithmInfoParamDto laplaceAudioDto = new AlgorithmInfoParamDto(laplaceAudio.getId(), laplaceAudio.getLow(),
+                        laplaceAudio.getMedium(), laplaceAudio.getHigh());
+                DesensitizationAlgorithm laplaceImage2 = algorithmInfoDaoService.getAlgorithmInfoById(45).get(0);
+                AlgorithmInfoParamDto laplaceImage2Dto = new AlgorithmInfoParamDto(laplaceImage2.getId(), laplaceImage2.getLow(),
+                        laplaceImage2.getMedium(), laplaceImage2.getHigh());
+                DesensitizationAlgorithm laplaceDpDate = algorithmInfoDaoService.getAlgorithmInfoById(1).get(0);
+                AlgorithmInfoParamDto laplaceDpDateDto = new AlgorithmInfoParamDto(laplaceDpDate.getId(), laplaceDpDate.getLow(),
+                        laplaceDpDate.getMedium(), laplaceDpDate.getHigh());
+
+                model.addAttribute("laplace", laplaceDto);
+                model.addAttribute("laplaceImage", laplaceImageDto);
+                model.addAttribute("laplaceGraph", laplaceGraphDto);
+                model.addAttribute("laplaceAudio", laplaceAudioDto);
+                model.addAttribute("laplaceImage2", laplaceImage2Dto);
+                model.addAttribute("laplaceDpDate", laplaceDpDateDto);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
         return "desentools/" + toolName;
     }
 

@@ -197,9 +197,7 @@ def audio_reshuffle(audio, output_path, block_num):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
-        print("Usage: python your_script.py algName input_file out_file param")
-        sys.exit(1)
+
     # 算法名
     algName = sys.argv[1]
     # 音频文件路径及脱敏参数

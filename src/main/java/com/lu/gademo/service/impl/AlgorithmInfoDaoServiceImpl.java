@@ -1,5 +1,6 @@
 package com.lu.gademo.service.impl;
 
+import com.lu.gademo.dto.AlgorithmDisplayInfoDto;
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.mapper.ga.AlgorithmInfoDao;
@@ -32,38 +33,27 @@ public class AlgorithmInfoDaoServiceImpl implements AlgorithmInfoDaoService {
         this.replace = replace;
     }
 
-    /**
-     * 获取所有算法信息，使用DesensitizationAlgorithm存储，对应数据库中每一列的信息
-     * @return 所有算法信息
-     */
     @Override
     public List<DesensitizationAlgorithm> getAllAlgorithmsRawInfo() {
         return algorithmInfoDao.getAllAlgorithmInfo();
     }
 
-    /**
-     * 获取所有算法信息，使用AlgorithmInfo存储，直接使用Mapper转换
-     * @return 所有算法执行体
-     */
     @Override
     public List<AlgorithmInfo> getAllAlgorithmInfoConvertObject() {
         return algorithmInfoDao.getAllAlgorithmInfoConvertObject();
     }
 
-    /**
-     * 获取所有算法信息，使用AlgorithmInfo存储，手动转换
-      * @return 所有算法执行体
-     */
     @Override
     public List<AlgorithmInfo> getAllAlgorithmInfoConvertObjectFromRawInfo() {
         List<DesensitizationAlgorithm> rawInfo = algorithmInfoDao.getAllAlgorithmInfo();
         return rawInfoList2AlgorithmInfoList(rawInfo);
     }
 
-    /**
-     * 获取所有算法信息，使用AlgorithmInfo存储，转换为Map
-     * @return 所有算法执行体Map
-     */
+    @Override
+    public List<AlgorithmDisplayInfoDto> getAllAlgorithmInfoDisplay() {
+        return algorithmInfoDao.getAllAlgorithmInfoDisplay();
+    }
+
     @Override
     public Map<String, AlgorithmInfo> getAllAlgorithmInfoMap() {
         return getAllAlgorithmInfoConvertObjectFromRawInfo().stream().collect(Collectors.toMap(AlgorithmInfo::getName, Function.identity()));
