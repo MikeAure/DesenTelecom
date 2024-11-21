@@ -1,5 +1,6 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.utils.AlgorithmsFactory;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class RandomNoiseController {
-    Dp dp;
+    AlgorithmsFactory algorithmsFactory;
 
     @ResponseBody
     @RequestMapping(value = "/desenValue", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -32,28 +33,9 @@ public class RandomNoiseController {
                              @RequestParam String algName,
                              @RequestParam String params) {
         log.info(algName);
-        int algNum = 0;
-        switch (algName) {
-            //
-            case "report_noisy_max4": {
-                algNum = 10;
-                break;
-            }
-            case "report_noisy_max3": {
-                algNum = 3;
-                break;
-            }
-            case "noisy_hist2": {
-                algNum = 25;
-                break;
-            }
-            default:
-                throw new RuntimeException("Unknown algorithm: " + algName);
-
-        }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        DSObject resultDS = dp.service(rawObject, algNum, samples, params);
+        DSObject resultDS = algorithmsFactory.getAlgorithmInfoFromName(algName).execute(rawObject, samples, params);
         StringBuilder resultString = new StringBuilder();
         resultDS.getList().forEach(s -> resultString.append(s).append("\n"));
         return resultString.toString();
@@ -69,33 +51,10 @@ public class RandomNoiseController {
                               @RequestParam String params) {
 
         log.info(algName);
-        int algNum;
-        switch (algName) {
-            case "sparse_vector_technique3": {
-                algNum = 13;
-                break;
-            }
-            case "sparse_vector_technique4": {
-                algNum = 14;
-                break;
-            }
-            case "sparse_vector_technique5": {
-                algNum = 15;
-                break;
-            }
-            //
-            case "sparse_vector_technique6": {
-                algNum = 16;
-                break;
-            }
-            default:
-                throw new RuntimeException("Unknown algorithm: " + algName);
-
-        }
-
-        List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
+        List<Double> rawDataList = Arrays.stream(rawData.split(","))
+                .filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        DSObject resultDS = dp.service(rawObject, algNum, c, t, params);
+        DSObject resultDS = algorithmsFactory.getAlgorithmInfoFromName(algName).execute(rawObject, c, t, params);
         StringBuilder resultString = new StringBuilder();
         resultDS.getList().forEach(s -> resultString.append(s).append("\n"));
         return resultString.toString();

@@ -71,20 +71,42 @@ public class AlgorithmInfo {
      * @param params 算法对应的参数
      * @return 封装后的脱敏数据
      */
-    public DSObject execute(DSObject rawData, Number... params) {
-        int idx = params[0].intValue();
+    public DSObject execute(DSObject rawData, int params) {
         if (CollectionUtils.isEmpty(this.getParams())) {
             return executor.service(rawData, originalId);
         }
         if (this.modalType == ModalTypes.SHEET) {
-            if (idx == 0) {
+            if (params == 0) {
                 return executor.service(rawData, originalId, "0");
             } else {
-                return executor.service(rawData, originalId, this.params.get(idx - 1).toString());
+                return executor.service(rawData, originalId, this.params.get(params - 1).toString());
             }
+        } else {
+            return executor.service(rawData, originalId, this.params.get(params).toString());
         }
-        else {
-            return executor.service(rawData, originalId, this.params.get(idx).toString());
+    }
+
+    public DSObject execute(DSObject rawData, String... params) {
+        if (CollectionUtils.isEmpty(this.getParams())) {
+            return executor.service(rawData, originalId, params);
+        } else {
+            int size = params.length;
+            int paramIndex = Integer.parseInt(params[size - 1]); // 获取最后一个参数的索引
+
+            // 替换最后一个参数
+            String[] newParams = Arrays.copyOf(params, size); // 复制原参数数组
+            if (this.modalType == ModalTypes.SHEET) {
+                if (paramIndex == 0) {
+                    newParams[size - 1] = "0"; // 替换最后一个参数为 "0"
+                } else {
+                    newParams[size - 1] = this.params.get(paramIndex - 1).toString(); // 替换为指定参数
+                }
+            } else {
+                newParams[size - 1] = this.params.get(paramIndex).toString(); // 替换为指定参数
+            }
+
+            // 调用服务
+            return executor.service(rawData, originalId, newParams);
         }
     }
 

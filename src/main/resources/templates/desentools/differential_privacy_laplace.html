@@ -543,11 +543,11 @@
                             id="report_noisy_max1_privacyLevel"
                             style="font-size: 1.5em;">
                         <option value="1"
-                                th:text="|epsilon=${laplace.low}|"></option>
+                                th:text="|epsilon=${reportNoiseMax1.low}|"></option>
                         <option value="2"
-                                th:text="|epsilon=${laplace.medium}|"></option>
+                                th:text="|epsilon=${reportNoiseMax1.medium}|"></option>
                         <option value="3"
-                                th:text="|epsilon=${laplace.high}|"></option>
+                                th:text="|epsilon=${reportNoiseMax1.high}|"></option>
                     </select>
                 </div>
                 <div class="col-sm-offset-2 col-sm-8 input-group">
@@ -626,11 +626,11 @@
                             id="report_noisy_max3_privacyLevel"
                             style="font-size: 1.5em;">
                         <option value="1"
-                                th:text="|epsilon=${laplace.low}|"></option>
+                                th:text="|epsilon=${reportNoiseMax3.low}|"></option>
                         <option value="2"
-                                th:text="|epsilon=${laplace.medium}|"></option>
+                                th:text="|epsilon=${reportNoiseMax3.medium}|"></option>
                         <option value="3"
-                                th:text="|epsilon=${laplace.high}|"></option>
+                                th:text="|epsilon=${reportNoiseMax3.high}|"></option>
                     </select>
                 </div>
                 <div class="col-sm-offset-2 col-sm-8 input-group">
@@ -707,9 +707,9 @@
                     <select class="text-center"
                             id="snapping_privacyLevel"
                             style="font-size: 1.5em;">
-                        <option value="0">epsilon=10</option>
-                        <option value="1">epsilon=1</option>
-                        <option value="2">epsilon=0.1</option>
+                        <option value="0" th:text="|epsilon=${snapping.low}|"></option>
+                        <option value="1" th:text="|epsilon=${snapping.medium}|"></option>
+                        <option value="2" th:text="|epsilon=${snapping.high}|"></option>
                     </select>
                 </div>
                 <div class="col-sm-offset-2 col-sm-8 input-group">
@@ -1050,7 +1050,7 @@
 
                 <div class="col-sm-offset-2 col-sm-8 input-group">
                     <input type="text" id="dpDate_textInput" class="form-control"
-                           placeholder="请输入日期格式的文本，如2001-01-01，以,分隔" style="font-size: 20px"/>
+                           placeholder="请输入日期格式的文本，如2001-01-01 12:23:23，以,分隔" style="font-size: 20px"/>
                     <span class="input-group-btn">
                     <button class="btn btn-default"
                             id="dpDate_submitBtn"

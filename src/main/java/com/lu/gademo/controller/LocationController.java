@@ -24,9 +24,10 @@ public class LocationController {
     String currentPath;
     String program;
     String path;
+    AlgorithmsFactory algorithmsFactory;
 
 
-    public LocationController(Util util, Generalization generalization, Anonymity anonymity) {
+    public LocationController(Util util, Generalization generalization, Anonymity anonymity, AlgorithmsFactory algorithmsFactory) {
         this.util = util;
         this.generalization = generalization;
         this.anonymity = anonymity;
@@ -34,6 +35,7 @@ public class LocationController {
         this.currentPath = directory.getAbsolutePath();
         this.program = util.isLinux() ? "LocationPrivacy" : "LocationPrivacy.exe";
         this.path = Paths.get(currentPath, program).toString();
+        this.algorithmsFactory = algorithmsFactory;
     }
 
     @ResponseBody
@@ -51,8 +53,9 @@ public class LocationController {
 //        return CommandExecutor.openExe(cmd);
         List<String> rawData = Arrays.asList(points.split(";"));
         DSObject dsObject = new DSObject(position, rawData);
-        DSObject result = this.generalization.service(dsObject, 6, id,
-                time);
+//        DSObject result = this.generalization.service(dsObject, 6, id,
+//                time);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("mixzone_1").execute(dsObject, id, time);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
 
 
@@ -60,7 +63,7 @@ public class LocationController {
 
     @ResponseBody
     @RequestMapping(value = "/mixzone_3", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> mixzone_3(@RequestParam String position, @RequestParam String id, @RequestParam String time, @RequestParam String points){
+    public List<String> mixzone_3(@RequestParam String position, @RequestParam String id, @RequestParam String time, @RequestParam String points) {
 //        String[] s = position.split(",");
 //        String param = "6 " + s[0] + " " + s[1] + " " + id + " " + time;
 //        String[] strings = points.split(";");
@@ -72,53 +75,56 @@ public class LocationController {
 //        return CommandExecutor.openExe(cmd);
         List<String> rawData = Arrays.asList(points.split(";"));
         DSObject dsObject = new DSObject(position, rawData);
-        DSObject result = this.generalization.service(dsObject, 7, id,
-                time);
+//        DSObject result = this.generalization.service(dsObject, 7, id,
+//                time);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("mixzone_3").execute(dsObject, id, time);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
 
     }
 
     @ResponseBody
     @RequestMapping(value = "/Accuracy_reduction", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> Accuracy_reduction(@RequestParam String rawData){
+    public List<String> Accuracy_reduction(@RequestParam String rawData, @RequestParam String param) {
 //        String[] s = rawData.split(",");
 //        String param = "10 " + s[0] + " " + s[1] + " 1000";
 //        String cmd = path + " " + param;
 //        return CommandExecutor.openExe(cmd);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = this.generalization.service(dsObject, 8);
+//        DSObject result = this.generalization.service(dsObject, 8, param);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("Accuracy_reduction").execute(dsObject, param);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @ResponseBody
     @RequestMapping(value = "/CirDummy", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public List<String> CirDummy(@RequestParam String position, @RequestParam String k,
-                                 @RequestParam String s_cd, @RequestParam String rho)
-            {
+                                 @RequestParam String s_cd, @RequestParam String rho) {
 //        String[] s = position.split(",");
 //        String param = "2 " + s[0] + " " + s[1] + " " + k + " " + s_cd + " " + rho;
 //        String cmd = path + " " + param;
 //        return CommandExecutor.openExe(cmd);
         DSObject dsObject = new DSObject(position);
-        DSObject result = this.anonymity.service(dsObject, 2, k, s_cd, rho);
+//        DSObject result = this.anonymity.service(dsObject, 2, k, s_cd, rho);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("CirDummy").execute(dsObject, k, s_cd, rho);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @ResponseBody
     @RequestMapping(value = "/GridDummy", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> GridDummy(@RequestParam String position, @RequestParam String k, @RequestParam String s_cd){
+    public List<String> GridDummy(@RequestParam String position, @RequestParam String k, @RequestParam String s_cd) {
 //        String[] s = position.split(",");
 //        String param = "3 " + s[0] + " " + s[1] + " " + k + " " + s_cd;
 //        String cmd = path + " " + param;
 //        return CommandExecutor.openExe(cmd);
         DSObject dsObject = new DSObject(position);
-        DSObject result = anonymity.service(dsObject, 3, k, s_cd);
+//        DSObject result = anonymity.service(dsObject, 3, k, s_cd);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("GridDummy").execute(dsObject, k, s_cd);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @ResponseBody
     @RequestMapping(value = "/adaptiveIntervalCloakingWrapper", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> adaptiveIntervalCloakingWrapper(@RequestParam String rawData, @RequestParam String k, @RequestParam String min, @RequestParam String max){
+    public List<String> adaptiveIntervalCloakingWrapper(@RequestParam String rawData, @RequestParam String k, @RequestParam String min, @RequestParam String max) {
 //        String[] s = rawData.split(",");
 //        String[] s1 = min.split(",");
 //        String[] s2 = max.split(",");
@@ -128,49 +134,53 @@ public class LocationController {
         List<String> rawList = Arrays.asList(min, max);
         DSObject dsObject = new DSObject(rawList);
         dsObject.setString(rawData);
-        DSObject result = anonymity.service(dsObject, 4, k);
+//        DSObject result = anonymity.service(dsObject, 4, k);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("adaptiveIntervalCloakingWrapper").execute(dsObject, k);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @ResponseBody
     @RequestMapping(value = "/CaDSA", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> CaDSA(@RequestParam String rawData, @RequestParam String op){
+    public List<String> CaDSA(@RequestParam String rawData, @RequestParam String op) {
 //        String[] s = rawData.split(",");
 //        String param = "9 " + s[0] + " " + s[1] + " " + op;
 //        String cmd = path + " " + param;
 //        return CommandExecutor.openExe(cmd);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = anonymity.service(dsObject, 5, op);
+//        DSObject result = anonymity.service(dsObject, 5, op);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("CaDSA").execute(dsObject, op);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @ResponseBody
     @RequestMapping(value = "/K_anonymity_position", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> K_anonymity_position(@RequestParam String rawData, @RequestParam String k){
+    public List<String> K_anonymity_position(@RequestParam String rawData, @RequestParam String k) {
 //        String[] s = rawData.split(",");
 //        String param = "1 " + s[0] + " " + s[1] + " " + k;
 //        String cmd = path + " " + param;
 //        return CommandExecutor.openExe(cmd);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = anonymity.service(dsObject, 6, k);
+//        DSObject result = anonymity.service(dsObject, 6, k);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("K_anonymity_position").execute(dsObject, k);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @ResponseBody
     @RequestMapping(value = "/Hilbert", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> Hilbert(@RequestParam String rawData, @RequestParam String k){
+    public List<String> Hilbert(@RequestParam String rawData, @RequestParam String k) {
 //        String[] s = rawData.split(",");
 //        String param = "8 " + s[0] + " " + s[1] + " " + k;
 //        String cmd = path + " " + param;
 //        return CommandExecutor.openExe(cmd);
         DSObject dsObject = new DSObject(rawData);
-        DSObject result = anonymity.service(dsObject, 11, k);
+//        DSObject result = anonymity.service(dsObject, 11, k);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("Hilbert").execute(dsObject, k);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @ResponseBody
     @RequestMapping(value = "/SpaceTwist", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public List<String> SpaceTwist(@RequestParam String rawData, @RequestParam String k, @RequestParam String poi){
+    public List<String> SpaceTwist(@RequestParam String rawData, @RequestParam String k, @RequestParam String poi) {
 //        String[] s = rawData.split(",");
 //        String param = "7 " + s[0] + " " + s[1] + " " + k;
 //        String[] strings = poi.split(";");
@@ -183,7 +193,8 @@ public class LocationController {
         List<String> poiList = Arrays.asList(poi.split(";"));
         DSObject dsObject = new DSObject(poiList);
         dsObject.setString(rawData);
-        DSObject result = anonymity.service(dsObject, 12, k);
+//        DSObject result = anonymity.service(dsObject, 12, k);
+        DSObject result = this.algorithmsFactory.getAlgorithmInfoFromName("SpaceTwist").execute(dsObject, k);
         return result.getList().stream().map(Object::toString).collect(Collectors.toList());
     }
 }

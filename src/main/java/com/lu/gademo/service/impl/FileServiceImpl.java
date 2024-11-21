@@ -517,6 +517,7 @@ public class FileServiceImpl implements FileService {
      */
     private LogInfo processSingleColumnTextFile(FileStorageDetails fileStorageDetails, String level, String algName,
                                                 boolean ifSkipFirstRow) throws IOException {
+        ThreadLocal<SimpleDateFormat> fmt = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         Boolean desenCom = false;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "text";
@@ -556,7 +557,6 @@ public class FileServiceImpl implements FileService {
 
         for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
             // 取列名
-//            String colName = fieldRow.getCell(columnIndex).toString();
             log.info("Column Index: {}, Column Name: {}", columnIndex, rawFileName);
 
             // 脱敏前信息类型标识
@@ -599,7 +599,12 @@ public class FileServiceImpl implements FileService {
                 writer.newLine();
             }
             for (Object data : datas) {
-                writer.write(data.toString());
+                if (algName.trim().equals("dpDate") || algName.trim().equals("date_group_replace")) {
+                    writer.write(fmt.get().format(data));
+                } else {
+                    writer.write(data.toString());
+                }
+
                 writer.newLine();
             }
         }
@@ -1134,7 +1139,7 @@ public class FileServiceImpl implements FileService {
 
         // 执行脱敏
         DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, rawFacePathString, desenFilePathString));
-        algorithmInfo.execute(dsObject);
+        algorithmInfo.execute(dsObject,1);
         // 结束时间
         endTimePoint = System.currentTimeMillis();
         // 脱敏耗时
@@ -3686,7 +3691,7 @@ public class FileServiceImpl implements FileService {
 
         // 执行脱敏
         DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, rawFacePathString, desenFilePathString));
-        algorithmInfo.execute(dsObject);
+        algorithmInfo.execute(dsObject, 1);
         // 结束时间
         endTimePoint = System.currentTimeMillis();
         // 脱敏耗时
@@ -3784,9 +3789,8 @@ public class FileServiceImpl implements FileService {
                 result = builder.substring(0, builder.length() - 1);
                 break;
             }
-            case "dpDate":
             case "dpCode":
-            case "date_group_replace":
+            case "dpDate":{
                 String[] inputList = textInput.trim().split(",");
                 DSObject codes = new DSObject(Arrays.asList(inputList));
                 StringBuilder sb = new StringBuilder();
@@ -3796,6 +3800,20 @@ public class FileServiceImpl implements FileService {
                 }
                 result = sb.substring(0, sb.length() - 1);
                 break;
+            }
+
+            case "date_group_replace": {
+                ThreadLocal<SimpleDateFormat> fmt = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+                String[] inputList = textInput.trim().split(",");
+                DSObject codes = new DSObject(Arrays.asList(inputList));
+                StringBuilder sb = new StringBuilder();
+                List<?> results = algorithmInfo.execute(codes, param).getList();
+                for (Object a : results) {
+                    sb.append(fmt.get().format(a)).append(",");
+                }
+                result = sb.substring(0, sb.length() - 1);
+                break;
+            }
 
         }
         log.info(result);

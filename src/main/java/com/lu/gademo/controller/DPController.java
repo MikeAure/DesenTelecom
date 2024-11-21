@@ -1,5 +1,6 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.utils.AlgorithmsFactory;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.Dp;
 
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @AllArgsConstructor
 public class DPController {
-    Dp dp;
+    AlgorithmsFactory algorithmsFactory;
 
     /**
      * 用于算法设置部分的接口
@@ -42,52 +43,10 @@ public class DPController {
         String[] types = algName.split(",");
         algName = types[types.length - 1];
         log.info(algName);
-        int algNum = 0;
-        switch (algName) {
-            //
-            case "snapping": {
-                algNum = 4;
-                break;
-            }
-            //
-            case "exponential": {
-                algNum = 8;
-                break;
-            }
-            //
-            case "report_noisy_max1": {
-                algNum = 2;
-                break;
-            }
-            //
-            case "report_noisy_max2": {
-                algNum = 9;
-                break;
-            }
-            //
-            case "noisy_hist1": {
-                algNum = 24;
-                break;
-            }
-            //
-            case "rappor": {
-                algNum = 18;
-                break;
-            }
-            //
-            case "onetimerappor": {
-                algNum = 19;
-                break;
-            }
-            default:
-                throw new RuntimeException("Unknown algorithm: " + algName);
-
-        }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject resultDS = null;
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-            resultDS = dp.service(rawObject, algNum, samples, params);
-
+        resultDS = algorithmsFactory.getAlgorithmInfoFromName(algName).execute(rawObject,samples, params);
         StringBuilder resultString = new StringBuilder();
         if (resultDS.getList() != null && !resultDS.getList().isEmpty()) {
             for (Object s : resultDS.getList()) {
@@ -114,24 +73,9 @@ public class DPController {
         String[] types = algName.split(",");
         algName = types[types.length - 1];
         log.info(algName);
-        int algNum = 0;
-        switch (algName) {
-            case "sparse_vector_technique1": {
-                algNum = 11;
-                break;
-            }
-            case "sparse_vector_technique2": {
-                algNum = 12;
-                break;
-            }
-            case "sparse_vector_technique_numerical": {
-                algNum = 17;
-                break;
-            }
-        }
         List<Double> rawDataList = Arrays.stream(rawData.split(",")).filter(x -> !x.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
         DSObject rawObject = rawDataList.size() == 1 ? new DSObject(rawDataList.get(0)) : new DSObject(rawDataList);
-        DSObject result = dp.service(rawObject, algNum, c, t, params);
+        DSObject result = algorithmsFactory.getAlgorithmInfoFromName(algName).execute(rawObject, c, t, params);
         StringBuilder resultString = new StringBuilder();
         for (Object s : result.getList()) {
             resultString.append(s).append("\n");

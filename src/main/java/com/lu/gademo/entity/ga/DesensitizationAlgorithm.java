@@ -19,10 +19,6 @@ public class DesensitizationAlgorithm {
 
     private String algorithmAbbreviation;
 
-    private String applicableDataModes;
-
-    private Byte reversible;
-
     private String optionalParameters;
 
     private String low;
@@ -41,4 +37,13 @@ public class DesensitizationAlgorithm {
 
     private Boolean ifModify;
 
+    private Boolean ifInteger;
+
+    private Boolean ifMinus;
+
+    private int paramsLength;
+
+    private String min;
+
+    private String max;
 }

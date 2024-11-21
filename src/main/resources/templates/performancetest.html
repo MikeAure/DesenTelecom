@@ -38,194 +38,6 @@
     <script th:src="@{/js/multiple-select.min.js}" defer></script>
     <!-- 自定义js -->
     <script th:src="@{/js/content.js?v=1.0.0}"></script>
-    <style>
-        /*标题*/
-        th {
-            text-align: center;
-        }
-
-        /*.ibox-title {*/
-        /*    height: 200px;*/
-        /*    border-color: #edf1f2;*/
-        /*    background-color: #dbeafe;*/
-        /*    color: black;*/
-        /*    display: flex;*/
-        /*    align-items: center;*/
-        /*    justify-content: center;*/
-        /*}*/
-
-        /*选择框居中*/
-        .midtile {
-            line-height: 50px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        /*#privacyLevel {*/
-        /*    margin-left: 2.5em;*/
-        /*}*/
-
-        .tabs-container ul {
-            height: 70px;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-        }
-
-        /*上传按钮*/
-        .upload-btn {
-            background-color: #347aa9;
-            color: white;
-            cursor: pointer;
-            padding: 5px 20px;
-            text-align: center;
-            font-size: 20px;
-            display: inline-block;
-            margin: 30px;
-        }
-
-        /*#submitBtn {*/
-        /*    background-color: #347aa9;*/
-        /*    padding: 5px 20px;*/
-        /*    cursor: pointer;*/
-        /*    color: black;*/
-        /*    font-size: 20px;*/
-        /*    display: inline-block;*/
-        /*    text-align: center;*/
-        /*    !*margin-right: 50px;*!*/
-        /*}*/
-
-        #submitBtn {
-            background-color: #347aa9;
-            color: white;
-            cursor: pointer;
-            padding: 5px 20px;
-            text-align: center;
-            font-size: 20px;
-            display: inline-block;
-            margin: 30px;
-        }
-
-        .btn2 {
-            line-height: 30px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        .performance-test button,
-        .performance-test label,
-        .map-info button,
-        .server-content button {
-            background-color: #347aa9;
-            color: white;
-            cursor: pointer;
-            padding: 5px 20px;
-            text-align: center;
-            font-size: 15px;
-            display: inline-block;
-            margin: auto;
-        }
-
-        /*#container {*/
-        /*    width: 100%;*/
-        /*    height: 100%;*/
-        /*}*/
-
-        .tab-pane {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #selection-area table {
-            margin: auto;
-            font-size: 20px;
-        }
-
-        .server-container, .map-container {
-            display: flex;
-            flex-direction: column; /* 保持子元素垂直排列 */
-            align-items: center; /* 确保标题居中 */
-            margin-bottom: 20px; /* 为每个地图容器添加底部间距 */
-        }
-
-        .server-title, .map-title {
-            margin-bottom: 10px; /* 为标题和下面的内容添加间距 */
-            font-size: 20px; /* 根据需要调整字体大小 */
-            text-align: center; /* 确保标题文本居中 */
-        }
-
-        .map-content { /* 新增一个包裹map和map-info的容器的样式 */
-            display: flex;
-            width: 100%; /* 确保容器宽度充满父容器 */
-            justify-content: space-between; /* 使map和map-info在水平方向上分布 */
-            /*align-items: start; !* 对齐方式 *!*/
-            flex-direction: row; /* 子元素水平排列 */
-            align-items: stretch; /* 子元素高度拉伸以匹配最高的子元素 */
-        }
-
-        .server-content {
-            display: flex;
-            width: 100%; /* 确保容器宽度充满父容器 */
-            justify-content: center; /* 使map和map-info在水平方向上分布 */
-            /*align-items: start; !* 对齐方式 *!*/
-            flex-direction: column; /* 子元素水平排列 */
-            align-items: center; /* 子元素高度拉伸以匹配最高的子元素 */
-        }
-
-        .map, .map-info {
-            /*width: 500px; !* 原有大小 *!*/
-            /*height: 300px; !* 原有大小 *!*/
-            /*background-color: #EEE; !* 仅为了可视化，实际使用时应去除 *!*/
-            font-size: 20px;
-            flex: 1; /* 使.map和.map-info元素占据相同的空间比例 */
-            display: flex;
-            flex-direction: column; /* 如果需要，确保其内部内容也能垂直排列 */
-            padding: 10px; /* 根据需要调整 */
-            box-sizing: border-box; /* 确保内边距不会影响到定义的宽度和高度 */
-            min-height: 300px;
-        }
-
-        .map {
-            min-width: 500px;
-        }
-
-        /*.map-info {*/
-        /*    margin-left: 20px; !* 信息区域与地图的间距 *!*/
-        /*}*/
-
-        .coordinates {
-            margin-bottom: 10px; /* 经纬度行之间的间距 */
-        }
-
-        /*.log-area {*/
-        /*    width: 300px; !* 日志区域宽度 *!*/
-        /*    height: 150px; !* 日志区域高度 *!*/
-        /*    border: 1px solid #CCC; !* 日志区域边框 *!*/
-        /*    margin-top: 10px; !* 日志区域与上方元素的间距 *!*/
-        /*}*/
-
-        #serverLog {
-            width: 500px; /* 日志区域宽度 */
-            height: 300px; /* 日志区域高度 */
-            border: 1px solid #CCC; /* 日志区域边框 */
-            margin: 10px; /* 日志区域与上方元素的间距 */
-        }
-
-        #serverLog textarea {
-            width: 100%; /* 使textarea填充整个父容器的宽度 */
-            height: 100%; /* 使textarea填充整个父容器的高度 */
-            border: none; /* 可选：移除边框 */
-            margin: 0; /* 移除外边距 */
-            padding: 0; /* 移除内边距 */
-            box-sizing: border-box; /* 确保宽度和高度包含边框和内边距 */
-            font-size: 20px;
-        }
-
-    </style>
     <script type="text/javascript">
         window.onload = function () {
             // debugger
@@ -561,6 +373,194 @@
         }
 
     </script>
+    <style>
+        /*标题*/
+        th {
+            text-align: center;
+        }
+
+        /*.ibox-title {*/
+        /*    height: 200px;*/
+        /*    border-color: #edf1f2;*/
+        /*    background-color: #dbeafe;*/
+        /*    color: black;*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*    justify-content: center;*/
+        /*}*/
+
+        /*选择框居中*/
+        .midtile {
+            line-height: 50px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        /*#privacyLevel {*/
+        /*    margin-left: 2.5em;*/
+        /*}*/
+
+        .tabs-container ul {
+            height: 70px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        /*上传按钮*/
+        .upload-btn {
+            background-color: #347aa9;
+            color: white;
+            cursor: pointer;
+            padding: 5px 20px;
+            text-align: center;
+            font-size: 20px;
+            display: inline-block;
+            margin: 30px;
+        }
+
+        /*#submitBtn {*/
+        /*    background-color: #347aa9;*/
+        /*    padding: 5px 20px;*/
+        /*    cursor: pointer;*/
+        /*    color: black;*/
+        /*    font-size: 20px;*/
+        /*    display: inline-block;*/
+        /*    text-align: center;*/
+        /*    !*margin-right: 50px;*!*/
+        /*}*/
+
+        #submitBtn {
+            background-color: #347aa9;
+            color: white;
+            cursor: pointer;
+            padding: 5px 20px;
+            text-align: center;
+            font-size: 20px;
+            display: inline-block;
+            margin: 30px;
+        }
+
+        .btn2 {
+            line-height: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        .performance-test button,
+        .performance-test label,
+        .map-info button,
+        .server-content button {
+            background-color: #347aa9;
+            color: white;
+            cursor: pointer;
+            padding: 5px 20px;
+            text-align: center;
+            font-size: 15px;
+            display: inline-block;
+            margin: auto;
+        }
+
+        /*#container {*/
+        /*    width: 100%;*/
+        /*    height: 100%;*/
+        /*}*/
+
+        .tab-pane {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #selection-area table {
+            margin: auto;
+            font-size: 20px;
+        }
+
+        .server-container, .map-container {
+            display: flex;
+            flex-direction: column; /* 保持子元素垂直排列 */
+            align-items: center; /* 确保标题居中 */
+            margin-bottom: 20px; /* 为每个地图容器添加底部间距 */
+        }
+
+        .server-title, .map-title {
+            margin-bottom: 10px; /* 为标题和下面的内容添加间距 */
+            font-size: 20px; /* 根据需要调整字体大小 */
+            text-align: center; /* 确保标题文本居中 */
+        }
+
+        .map-content { /* 新增一个包裹map和map-info的容器的样式 */
+            display: flex;
+            width: 100%; /* 确保容器宽度充满父容器 */
+            justify-content: space-between; /* 使map和map-info在水平方向上分布 */
+            /*align-items: start; !* 对齐方式 *!*/
+            flex-direction: row; /* 子元素水平排列 */
+            align-items: stretch; /* 子元素高度拉伸以匹配最高的子元素 */
+        }
+
+        .server-content {
+            display: flex;
+            width: 100%; /* 确保容器宽度充满父容器 */
+            justify-content: center; /* 使map和map-info在水平方向上分布 */
+            /*align-items: start; !* 对齐方式 *!*/
+            flex-direction: column; /* 子元素水平排列 */
+            align-items: center; /* 子元素高度拉伸以匹配最高的子元素 */
+        }
+
+        .map, .map-info {
+            /*width: 500px; !* 原有大小 *!*/
+            /*height: 300px; !* 原有大小 *!*/
+            /*background-color: #EEE; !* 仅为了可视化，实际使用时应去除 *!*/
+            font-size: 20px;
+            flex: 1; /* 使.map和.map-info元素占据相同的空间比例 */
+            display: flex;
+            flex-direction: column; /* 如果需要，确保其内部内容也能垂直排列 */
+            padding: 10px; /* 根据需要调整 */
+            box-sizing: border-box; /* 确保内边距不会影响到定义的宽度和高度 */
+            min-height: 300px;
+        }
+
+        .map {
+            min-width: 500px;
+        }
+
+        /*.map-info {*/
+        /*    margin-left: 20px; !* 信息区域与地图的间距 *!*/
+        /*}*/
+
+        .coordinates {
+            margin-bottom: 10px; /* 经纬度行之间的间距 */
+        }
+
+        /*.log-area {*/
+        /*    width: 300px; !* 日志区域宽度 *!*/
+        /*    height: 150px; !* 日志区域高度 *!*/
+        /*    border: 1px solid #CCC; !* 日志区域边框 *!*/
+        /*    margin-top: 10px; !* 日志区域与上方元素的间距 *!*/
+        /*}*/
+
+        #serverLog {
+            width: 500px; /* 日志区域宽度 */
+            height: 300px; /* 日志区域高度 */
+            border: 1px solid #CCC; /* 日志区域边框 */
+            margin: 10px; /* 日志区域与上方元素的间距 */
+        }
+
+        #serverLog textarea {
+            width: 100%; /* 使textarea填充整个父容器的宽度 */
+            height: 100%; /* 使textarea填充整个父容器的高度 */
+            border: none; /* 可选：移除边框 */
+            margin: 0; /* 移除外边距 */
+            padding: 0; /* 移除内边距 */
+            box-sizing: border-box; /* 确保宽度和高度包含边框和内边距 */
+            font-size: 20px;
+        }
+
+    </style>
 </head>
 
 <body>

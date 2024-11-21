@@ -41,8 +41,80 @@
     <script type="text/javascript">
         let originalData = [];
 
-        function validateParams(id, low, medium, high) {
-            return false;
+        function validateParams(rowData, low, medium, high) {
+            // 获取当前行的校验规则
+            const ifInteger = rowData.ifInteger;
+            const ifMinus = rowData.ifMinus;
+            const paramsLength = rowData.paramsLength;
+            const minValues = rowData.min.split(',').map(Number);
+            const maxValues = rowData.max.split(',').map(Number);
+
+            // 对每个参数进行校验
+            const paramsToValidate = { low, medium, high };
+            let isValid = true;
+            let errorMessage = '';
+
+            const nameMap = {
+                "low": "低等级",
+                "medium": "中等级",
+                "high": "高等级",
+            }
+
+            for (const [key, value] of Object.entries(paramsToValidate)) {
+                // 如果输入为空，跳过校验
+                if (value === '') continue;
+
+                const paramsArray = value.split(',');
+
+                // 校验参数数量
+                if (paramsArray.length !== paramsLength) {
+                    isValid = false;
+                    errorMessage += `${nameMap[key]} 参数数量应为 ${paramsLength} 个。\n`;
+                    continue;
+                }
+
+                for (let i = 0; i < paramsArray.length; i++) {
+                    const param = paramsArray[i].trim();
+
+                    // 校验是否为数字
+                    if (isNaN(param)) {
+                        isValid = false;
+                        errorMessage += `${nameMap[key]} 的第 ${i + 1} 个参数不是有效的数字。\n`;
+                        continue;
+                    }
+
+                    let paramValue = Number(param);
+
+                    // 校验是否为整数
+                    if (ifInteger && !Number.isInteger(paramValue)) {
+                        isValid = false;
+                        errorMessage += `${nameMap[key]} 的第 ${i + 1} 个参数应为整数。\n`;
+                    }
+
+                    // 校验是否包含负数
+                    if (!ifMinus && paramValue < 0) {
+                        isValid = false;
+                        errorMessage += `${nameMap[key]} 的第 ${i + 1} 个参数不应为负数。\n`;
+                    }
+
+                    // 校验参数范围
+                    const minValue = minValues.length === 1 ? minValues[0] : minValues[i];
+                    const maxValue = maxValues.length === 1 ? maxValues[0] : maxValues[i];
+
+                    if (paramValue < minValue || paramValue > maxValue) {
+                        isValid = false;
+                        errorMessage += `${nameMap[key]} 的第 ${i + 1} 个参数应在 ${minValue} 到 ${maxValue} 之间。\n`;
+                    }
+                }
+            }
+
+            if (isValid) {
+                return true;
+            } else {
+                // 显示错误信息
+                alert(errorMessage);
+                return false;
+            }
         }
 
         function editInfo() {
@@ -53,17 +125,19 @@
             const high = $('#high').val();
             console.log(`id: ${id}, low: ${low}, medium: ${medium}, high: ${high}`);
 
-            // 校验输入的参数
-            // if (!validateParams(id, low, medium, high)) {
-            //     alert("参数校验失败，请检查输入！");
-            //     return;
-            // }
 
             // 更新表格对应行的数据
             const $table = $('#params-management'); // 表格 ID
             const rowIndex = $table.bootstrapTable('getData').findIndex(row => row.id === parseInt(id)); // 找到对应行
 
             if (rowIndex !== -1) {
+                const rowData = $table.bootstrapTable('getData')[rowIndex];
+
+                // 校验输入的参数
+                if (!validateParams(rowData, low, medium, high)) {
+                    // 如果校验失败，停止更新操作
+                    return;
+                }
                 // 更新数据
                 $table.bootstrapTable('updateRow', {
                     index: rowIndex,
@@ -99,6 +173,14 @@
             return typeMap[value];
         }
 
+        function formatBoolType(value) {
+            if (value) {
+                return "是";
+            } else {
+                return "否";
+            }
+        }
+
         function generateTable(tableId, results) {
             let tablaTitle = [
                 {field: 'id', title: '算法ID',},  // 编号列，使用格式化函数 formatIndex
@@ -109,6 +191,11 @@
                 {field: 'high', title: '高等级脱敏参数'},  // 拆分后平均值列
                 {field: 'type', title: '算法类型', formatter: formatType},  // 拆分前最大值列
                 {field: 'requirement', title: '脱敏需求'},  // 拆分后最大值列
+                {field: 'ifInteger', title: '参数是否为整数', formatter: formatBoolType},
+                {field: 'ifMinus', title: '参数是否包含负数', formatter: formatBoolType},
+                {field: 'paramsLength', title: '参数数量'},
+                {field: 'min', title: '参数最小值'},
+                {field: 'max', title: '参数最大值'},
                 {
                     field: 'operate', title: '操作', formatter: addButtons,
                     events: {
@@ -118,6 +205,8 @@
                             $('#low').val(row.low);
                             $('#medium').val(row.medium);
                             $('#high').val(row.high);
+                            $('#min-param').val(row.min);
+                            $('#high-param').val(row.max);
                         },
                         'click #reset': function (e, value, row, index) {
                             // 从 originalData 中找到对应的行
@@ -292,6 +381,16 @@
                     <div class="form-group">
                         <label for="high">高等级</label>
                         <input id="high" type="text" class="form-control"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-param">参数最小值</label>
+                        <input id="min-param" type="text" class="form-control" disabled/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="high-param">参数最大值</label>
+                        <input id="high-param" type="text" class="form-control" disabled/>
                     </div>
                 </div>
                 <div class="modal-footer">

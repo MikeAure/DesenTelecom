@@ -84,7 +84,7 @@ public interface DpUtil {
     List<String> valueHide(List<Object> dataList, Integer privacyLevel);
 
     //数值映射为新值  *50
-    List<String> valueMapping(List<Object> dataList, int scale);
+    List<String> valueMapping(List<Object> dataList, double scale);
 
     //SHA512 哈希
     List<String> SHA512(List<Object> dataList, Integer privacyLevel);

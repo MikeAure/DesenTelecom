@@ -137,11 +137,11 @@ public class UtilImpl implements Util {
 
         // 打印私钥的16进制表示
         String privateKeyHex = new String(Hex.encode(privateKey.getEncoded()));
-        System.out.println("Private Key (Hex): " + privateKeyHex);
+//        System.out.println("Private Key (Hex): " + privateKeyHex);
 
         // 打印公钥的16进制表示
         String publicKeyHex = new String(Hex.encode(publicKey.getEncoded()));
-        System.out.println("Public Key (Hex): " + publicKeyHex);
+//        System.out.println("Public Key (Hex): " + publicKeyHex);
 
         // 初始化SM3withSM2签名对象
         Signature signature = Signature.getInstance("SM3withSM2", "BC");

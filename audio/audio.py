@@ -3,7 +3,7 @@ import numpy
 import soundfile as sf
 import sys
 from audiomentations import Compose, Gain, SpecFrequencyMask
-from audiomentations import LowPassFilter, HighPassFilter, PolarityInversion, Reverse, Normalize, TanhDistortion
+from audiomentations import LowPassFilter, HighPassFilter, PolarityInversion, Reverse, Normalize, TanhDistortion, BandPassFilter
 
 
 def apply_audio_effects(input_signal, sample_rate):

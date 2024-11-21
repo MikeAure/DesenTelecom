@@ -194,7 +194,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 0);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -213,7 +213,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 3);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -232,7 +232,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -251,7 +251,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -327,7 +327,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -384,7 +384,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -403,7 +403,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -422,7 +422,7 @@ public class AlgorithmsFactoryTest {
         for (Object object : result.getList()) {
             System.out.println(object);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -537,7 +537,7 @@ public class AlgorithmsFactoryTest {
         for (Object s : result.getList()) {
             System.out.println(s);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject, 0.5);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -583,7 +583,7 @@ public class AlgorithmsFactoryTest {
         for (Object s : result.getList()) {
             System.out.println(s);
         }
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -632,7 +632,7 @@ public class AlgorithmsFactoryTest {
             System.out.println(s);
         }
 
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -826,7 +826,7 @@ public class AlgorithmsFactoryTest {
             System.out.println(s);
         }
 
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }
@@ -874,7 +874,7 @@ public class AlgorithmsFactoryTest {
             System.out.println(s);
         }
 
-        DSObject newResult = algorithmInfo.execute(dsObject);
+        DSObject newResult = algorithmInfo.execute(dsObject, 1);
         for (Object object : newResult.getList()) {
             System.out.println(object);
         }

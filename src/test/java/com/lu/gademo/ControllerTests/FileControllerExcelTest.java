@@ -329,7 +329,7 @@ public class FileControllerExcelTest {
     @Test
     public void testExcelFiles52scenes() throws Exception {
         Map<String, List<String>> failedResult = new HashMap<>();
-        Path currentDirectory = Paths.get("D:\\52scenes1w\\50\\");
+        Path currentDirectory = Paths.get("D:\\52scenes1w\\70\\");
         System.out.println("CurrentDirectory: " + currentDirectory.toString());
         List<String> failedFileNameList = new ArrayList<>();
         for (String sceneName : FIFTYTWO_SCENE) {

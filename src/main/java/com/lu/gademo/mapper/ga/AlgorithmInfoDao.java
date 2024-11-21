@@ -42,8 +42,6 @@ public interface AlgorithmInfoDao {
                     @Result(property = "id", column = "id"),
                     @Result(property = "algorithmName", column = "algorithm_name"),
                     @Result(property = "algorithmAbbreviation", column = "algorithm_abbreviation"),
-                    @Result(property = "applicableDataModes", column = "applicable_dataModes"),
-                    @Result(property = "reversible", column = "reversible"),
                     @Result(property = "optionalParameters", column = "optional_parameters"),
                     @Result(property = "low", column = "low"),
                     @Result(property = "medium", column = "medium"),
@@ -53,10 +51,15 @@ public interface AlgorithmInfoDao {
                     @Result(property = "modal", column = "modal", javaType= ModalTypes.class, typeHandler = ModalTypesHandler.class),
                     @Result(property = "requirement", column = "requirement"),
                     @Result(property = "ifModify", column = "if_modify"),
+                    @Result(property = "ifInteger", column = "if_integer"),
+                    @Result(property = "ifMinus", column = "if_minus"),
+                    @Result(property = "paramsLength", column = "params_length"),
+                    @Result(property = "min", column = "min"),
+                    @Result(property = "max", column = "max")
             })
     List<DesensitizationAlgorithm> getAllAlgorithmInfo();
 
-    @Select("SELECT id, algorithm_name, algorithm_abbreviation, low, medium, high, type, requirement FROM desensitization_algorithms where if_modify=1")
+    @Select("SELECT id, algorithm_name, algorithm_abbreviation, low, medium, high, type, requirement, if_integer, if_minus, params_length, min, max FROM desensitization_algorithms where if_modify=1")
     @Results({
             @Result(property = "id", column = "id"),
             @Result(property = "algorithmName", column = "algorithm_name"),
@@ -66,6 +69,11 @@ public interface AlgorithmInfoDao {
             @Result(property = "high", column = "high"),
             @Result(property = "type", column = "type", javaType=AlgorithmType.class, typeHandler = AlgorithmTypeHandler.class),
             @Result(property = "requirement", column = "requirement"),
+            @Result(property = "ifInteger", column = "if_integer"),
+            @Result(property = "ifMinus", column = "if_minus"),
+            @Result(property = "paramsLength", column = "params_length"),
+            @Result(property = "min", column = "min"),
+            @Result(property = "max", column = "max")
     })
     List<AlgorithmDisplayInfoDto> getAllAlgorithmInfoDisplay();
 

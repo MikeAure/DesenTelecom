@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class AlgorithmDisplayInfoDto {
     private int id;
 
-    @Getter
     private String algorithmName;
 
     private String algorithmAbbreviation;
@@ -26,6 +25,60 @@ public class AlgorithmDisplayInfoDto {
     private AlgorithmType type;
 
     private String requirement;
+
+    private Boolean ifInteger;
+
+    private Boolean ifMinus;
+
+    private int paramsLength;
+
+    private String min;
+
+    private String max;
+
+    public String getAlgorithmName() {
+        return algorithmName;
+    }
+
+    public Boolean getIfInteger() {
+        return ifInteger;
+    }
+
+    public void setIfInteger(Boolean ifInteger) {
+        this.ifInteger = ifInteger;
+    }
+
+    public Boolean getIfMinus() {
+        return ifMinus;
+    }
+
+    public void setIfMinus(Boolean ifMinus) {
+        this.ifMinus = ifMinus;
+    }
+
+    public int getParamsLength() {
+        return paramsLength;
+    }
+
+    public void setParamsLength(int paramsLength) {
+        this.paramsLength = paramsLength;
+    }
+
+    public String getMin() {
+        return min;
+    }
+
+    public void setMin(String min) {
+        this.min = min;
+    }
+
+    public String getMax() {
+        return max;
+    }
+
+    public void setMax(String max) {
+        this.max = max;
+    }
 
     public int getId() {
         return id;
@@ -96,8 +149,13 @@ public class AlgorithmDisplayInfoDto {
                 ", low='" + low + '\'' +
                 ", medium='" + medium + '\'' +
                 ", high='" + high + '\'' +
-                ", type=" + type.getValue() +
+                ", type=" + type +
                 ", requirement='" + requirement + '\'' +
+                ", ifInteger=" + ifInteger +
+                ", ifMinus=" + ifMinus +
+                ", paramsLength=" + paramsLength +
+                ", min='" + min + '\'' +
+                ", max='" + max + '\'' +
                 '}';
     }
 }

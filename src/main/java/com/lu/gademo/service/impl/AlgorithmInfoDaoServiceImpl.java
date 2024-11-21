@@ -56,7 +56,8 @@ public class AlgorithmInfoDaoServiceImpl implements AlgorithmInfoDaoService {
 
     @Override
     public Map<String, AlgorithmInfo> getAllAlgorithmInfoMap() {
-        return getAllAlgorithmInfoConvertObjectFromRawInfo().stream().collect(Collectors.toMap(AlgorithmInfo::getName, Function.identity()));
+        return getAllAlgorithmInfoConvertObjectFromRawInfo().stream()
+                .collect(Collectors.toMap(AlgorithmInfo::getName, Function.identity()));
     }
 
     @Override

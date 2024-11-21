@@ -21,7 +21,7 @@ public class AlgorithmInfoDaoTest {
 
     @Test
     void getAllAlgorithmInfoTest() {
-        System.out.println(algorithmInfoDao.getAllAlgorithmInfo());
+        algorithmInfoDao.getAllAlgorithmInfo().forEach(System.out::println);
     }
 
     @Test

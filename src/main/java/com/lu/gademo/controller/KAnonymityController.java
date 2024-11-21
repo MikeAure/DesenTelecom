@@ -1,5 +1,6 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.utils.AlgorithmsFactory;
 import com.lu.gademo.utils.Anonymity;
 import com.lu.gademo.utils.DSObject;
 import lombok.extern.slf4j.Slf4j;
@@ -29,15 +30,16 @@ public class KAnonymityController {
     private final String dir;
 
     private final Anonymity anonymity;
+    private final AlgorithmsFactory algorithmsFactory;
 
-
-    public KAnonymityController(Anonymity anonymity) throws IOException {
+    public KAnonymityController(Anonymity anonymity, AlgorithmsFactory algorithmsFactory) throws IOException {
         File directory = new File("");
         String currentPath = directory.getAbsolutePath();
         Path dirPath = Paths.get(currentPath, "templates");
         this.dir = Files.exists(dirPath) ? dirPath.toAbsolutePath().toString()
                 : Files.createDirectories(dirPath).toAbsolutePath().toString();
         this.anonymity = anonymity;
+        this.algorithmsFactory = algorithmsFactory;
     }
 
     @PostMapping("/KAnonymity")
@@ -60,7 +62,8 @@ public class KAnonymityController {
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
                 dsObject.setIntVal(templates.size() - 1);
-                String output = anonymity.service(dsObject, 1, params).getStringVal();
+//                String output = anonymity.service(dsObject, 1, params).getStringVal();
+                String output = algorithmsFactory.getAlgorithmInfoFromId(61).execute(dsObject, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();
@@ -96,7 +99,8 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 7, params).getStringVal();
+//                String output = anonymity.service(dsObject, 7, params).getStringVal();
+                String output = algorithmsFactory.getAlgorithmInfoFromId(62).execute(dsObject, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();
@@ -133,7 +137,8 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 8, params).getStringVal();
+//                String output = anonymity.service(dsObject, 8, params).getStringVal();
+                String output = algorithmsFactory.getAlgorithmInfoFromId(63).execute(dsObject, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();
@@ -168,7 +173,8 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 9, params).getStringVal();
+//                String output = anonymity.service(dsObject, 9, params).getStringVal();
+                String output = algorithmsFactory.getAlgorithmInfoFromId(64).execute(dsObject, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + output);
@@ -202,7 +208,8 @@ public class KAnonymityController {
                     }
                 }
                 DSObject dsObject = new DSObject(Arrays.asList(baseName, dir, attribute));
-                String output = anonymity.service(dsObject, 10, params).getStringVal();
+//                String output = anonymity.service(dsObject, 10, params).getStringVal();
+                String output = algorithmsFactory.getAlgorithmInfoFromId(65).execute(dsObject, params).getStringVal();
                 byte[] fileContent = Files.readAllBytes(Paths.get(output));
 
                 HttpHeaders headers = new HttpHeaders();

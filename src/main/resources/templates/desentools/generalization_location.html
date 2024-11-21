@@ -94,6 +94,7 @@
             //Accuracy_reduction
             document.getElementById("Accuracy_reduction").addEventListener("click", function () {
                 let position = $("#Accuracy_reduction_position").val();
+                let level = $("#accuracy_reduction_level").val();
 
                 if (position === "") {
                     alert("请输入文本");
@@ -106,7 +107,8 @@
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     body:
-                        '&rawData=' + encodeURIComponent(position)
+                        '&rawData=' + encodeURIComponent(position) +
+                        '&param=' + encodeURIComponent(level)
                 })
                     .then(response => response.text())
                     .then(data => {
@@ -271,16 +273,33 @@
                     <div class="row justify-content-center" style="display: grid; place-items: center;">
                         <div class="col-lg-5">
                             <!-- 新加的两个文本输入框 -->
-                            <div class="input-group" style="margin-top: 10px;">
-                                <input type="text" id="Accuracy_reduction_position" class="form-control"
-                                       placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
-                                <span class="input-group-btn">
+                            <div style="text-align: center;">
+                                <div style="margin: auto; font-size: 20px">
+                                    <label for="accuracy_reduction_level">请选择隐私保护程度：</label>
+                                    <select id="accuracy_reduction_level">
+                                        <option value="0"> 低程度</option>
+                                        <option value="1" selected> 中程度</option>
+                                        <option value="2"> 高程度</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <form role="form">
+                                <div class="form-group">
+                                    <div class="input-group" style="margin-top: 10px;">
+                                        <input type="text" id="Accuracy_reduction_position" class="form-control"
+                                               placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
+                                        <span class="input-group-btn">
                                         <button class="btn btn-default" id="Accuracy_reduction" type="button"
                                                 style="font-size: 20px;height: 30px;display: flex; justify-content: center; align-items: center; ">
                                             提交脱敏
                                         </button>
-                                </span>
-                            </div>
+                                    </span>
+                                    </div>
+                                </div>
+
+                            </form>
+
+
 
                             <div class="text-center">
                                 <label for="Accuracy_reduction_outputText"

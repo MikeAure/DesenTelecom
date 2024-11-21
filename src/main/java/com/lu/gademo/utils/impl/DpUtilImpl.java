@@ -36,6 +36,7 @@ public class DpUtilImpl implements DpUtil {
     Pattern ipv6Pattern;
     String[] ipv6Parts;
     SecureRandom random;
+    DecimalFormat decimalFormat;
 
 
     public DpUtilImpl() {
@@ -46,6 +47,8 @@ public class DpUtilImpl implements DpUtil {
         this.ipv6Pattern = Pattern.compile(ipv6PatternTemp);
         this.ipv6Parts = new String[]{"$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8"};
         this.random = new SecureRandom();
+        this.decimalFormat = new DecimalFormat("#.###");
+
     }
 
     /**
@@ -1276,7 +1279,7 @@ public class DpUtilImpl implements DpUtil {
     }
 
     @Override
-    public List<String> valueMapping(List<Object> dataList, int scale) {
+    public List<String> valueMapping(List<Object> dataList, double scale) {
         List<String> result = new ArrayList<>();
         List<BigDecimal> reData = new ArrayList<>();
         //读取数据
@@ -1310,7 +1313,7 @@ public class DpUtilImpl implements DpUtil {
             if (data == null) {
                 result.add(null);
             } else {
-                result.add(data.multiply(new BigDecimal(scale)).toString());
+                result.add(decimalFormat.format(data.multiply(new BigDecimal(scale))));
             }
         }
         return result;
@@ -1419,6 +1422,7 @@ public class DpUtilImpl implements DpUtil {
     public List<Double> randomGaussianToValue(List<Object> datas, double stdDev) {
         System.out.println(datas.size());
         List<Double> reData = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("#.###");
         //读取数据
         for (Object data : datas) {
             if (data == null) {
@@ -1463,12 +1467,11 @@ public class DpUtilImpl implements DpUtil {
             } else {
                 double d = noise + reDatum;
                 // 值保留三位小数
-                DecimalFormat df = new DecimalFormat("#.###");
+
                 String roundedValue = df.format(d);
 
                 // 将字符串转换为 double 类型
                 double result = Double.parseDouble(roundedValue);
-
                 newData.add(result);
             }
         }
@@ -1539,6 +1542,7 @@ public class DpUtilImpl implements DpUtil {
     public List<Double> randomUniformToValue(List<Object> datas, double am) {
         List<Double> reData = new ArrayList<>();
         List<Double> newData = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("#.###");
         //读取数据
         for (Object data : datas) {
             if (data == null) {
@@ -1567,21 +1571,17 @@ public class DpUtilImpl implements DpUtil {
         //privacyLevel直接返回
         if (am == 0)
             return reData;
-        //执行均匀加噪
-//        double am = 2.0;
-//        if (privacyLevel == 2) {
-//            am = 10.0;
-//        } else if (privacyLevel == 3) {
-//            am = 20.0;
-//        }
 
         SecureRandom secureRandom = new SecureRandom();
-        for (int i = 0; i < reData.size(); i++) {
+        for (Double reDatum : reData) {
             double noise = (secureRandom.nextDouble() * 2 * am) - am; // 生成均匀分布的噪声
-            if (reData.get(i) == null) {
+            if (reDatum == null) {
                 newData.add(null);
             } else {
-                newData.add(noise + reData.get(i));
+                String roundedValue = df.format(noise + reDatum);
+                // 将字符串转换为 double 类型
+                double result = Double.parseDouble(roundedValue);
+                newData.add(result);
             }
         }
         return newData;
@@ -1625,7 +1625,7 @@ public class DpUtilImpl implements DpUtil {
             if (reDatum == null) {
                 result.add(null);
             } else {
-                result.add(reDatum.add(new BigDecimal(shift)).toString());
+                result.add(decimalFormat.format(reDatum.add(new BigDecimal(shift))));
             }
         }
         return result;

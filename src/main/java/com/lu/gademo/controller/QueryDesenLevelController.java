@@ -20,8 +20,8 @@ import java.util.*;
 @RestController
 @RequestMapping("desenLevel")
 public class QueryDesenLevelController {
-    private SendEvaReqDao sendEvaReqDao;
-    private Map<String, String> sceneNameMapper;
+    private final SendEvaReqDao sendEvaReqDao;
+    private final Map<String, String> sceneNameMapper;
 
     @Autowired
     public QueryDesenLevelController(SendEvaReqDao sendEvaReqDao) {

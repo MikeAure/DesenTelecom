@@ -51,7 +51,7 @@ public class FileControllerVideoTest {
 
     // 基于均值滤波器的视频帧像素替换方法
     @Test
-    public void imageControllerMeanValueVideoTest() throws Exception {
+    public void videoControllerMeanValueVideoTest() throws Exception {
         // 模拟multipart/form-data请求
         for (int i = 0; i < 3; i++) {
             mvc.perform(multipart(URL) // 使用你的实际请求路径
@@ -68,7 +68,7 @@ public class FileControllerVideoTest {
 
     // 基于高斯滤波器的视频帧像素替换方法
     @Test
-    public void imageControllerGaussianBlurVideoTest() throws Exception {
+    public void videoControllerGaussianBlurVideoTest() throws Exception {
 
         // 模拟multipart/form-data请求
         for (int i = 0; i < 3; i++) {
@@ -85,7 +85,7 @@ public class FileControllerVideoTest {
 
     // 基于像素化滤波器的视频帧像素替换方法
     @Test
-    public void imageControllerPixelateVideoTest() throws Exception {
+    public void videoControllerPixelateVideoTest() throws Exception {
         // 模拟multipart/form-data请求
         for (int i = 0; i < 3; i++) {
             mvc.perform(multipart(URL) // 使用你的实际请求路径
@@ -104,7 +104,7 @@ public class FileControllerVideoTest {
 
     // 基于盒式滤波器的视频帧像素替换方法
     @Test
-    public void imageControllerBoxBlurVideoTest() throws Exception {
+    public void videoControllerBoxBlurVideoTest() throws Exception {
         // 模拟multipart/form-data请求
         for (int i = 0; i < 3; i++) {
             mvc.perform(multipart(URL) // 使用你的实际请求路径
@@ -121,7 +121,7 @@ public class FileControllerVideoTest {
 
     // 基于像素块的视频帧像素替换方法
     @Test
-    public void imageControllerReplaceRegionVideoTest() throws Exception {
+    public void videoControllerReplaceRegionVideoTest() throws Exception {
         // 模拟multipart/form-data请求
         for (int i = 0; i < 3; i++) {
             mvc.perform(multipart(URL) // 使用你的实际请求路径
@@ -138,7 +138,7 @@ public class FileControllerVideoTest {
 
     // 基于像素块的视频帧像素颜色偏移方法
     @Test
-    public void imageControllerVideoAddColorOffsetTest() throws Exception {
+    public void videoControllerVideoAddColorOffsetTest() throws Exception {
         // 模拟multipart/form-data请求
         for (int i = 0; i < 3; i++) {
             mvc.perform(multipart(URL) // 使用你的实际请求路径
@@ -156,7 +156,7 @@ public class FileControllerVideoTest {
 
 //     视频背景替换算法
     @Test
-    public void imageControllerVideoRemoveBgTest() throws Exception {
+    public void videoControllerVideoRemoveBgTest() throws Exception {
         // 模拟multipart/form-data请求
             mvc.perform(multipart("/File/removeBackground") // 使用你的实际请求路径
                             .file(videoFile)
@@ -171,7 +171,7 @@ public class FileControllerVideoTest {
 
     // 视频人脸替换算法
     @Test
-    public void imageControllerVideoFaceSubTest() throws Exception {
+    public void videoControllerVideoFaceSubTest() throws Exception {
         // 模拟multipart/form-data请求
             mvc.perform(multipart("/File/replaceFaceVideo") // 使用你的实际请求路径
                             .file(videoFile)

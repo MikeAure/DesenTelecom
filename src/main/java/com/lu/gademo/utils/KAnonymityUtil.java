@@ -47,19 +47,20 @@ public class KAnonymityUtil {
         // data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        int level = 2;
-        switch (params) {
-            case "1": {
-                level = 4;
-                break;
-            }
-            case "2": {
-                level = 8;
-                break;
-            }
-        }
-
-        int k = (level * length / 10) <= 1 ? 2 : level * length / 10;
+//        int level = 2;
+//        switch (params) {
+//            case "1": {
+//                level = 4;
+//                break;
+//            }
+//            case "2": {
+//                level = 8;
+//                break;
+//            }
+//        }
+//
+//        int k = (level * length / 10) <= 1 ? 2 : level * length / 10;
+        int k = Integer.parseInt(params);
         log.info("k = {}", k);
         config.addPrivacyModel(new KAnonymity(k));
         config.setSuppressionLimit(0d);
@@ -75,22 +76,23 @@ public class KAnonymityUtil {
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        int level = 8;
-        switch (params) {
-            case "1": {
-                level = 10;
-                break;
-            }
-            case "2": {
-                level = 16;
-                break;
-            }
-        }
-
-        int l = length * level / 10;
+//        int level = 8;
+//        switch (params) {
+//            case "1": {
+//                level = 10;
+//                break;
+//            }
+//            case "2": {
+//                level = 16;
+//                break;
+//            }
+//        }
+//
+//        int l = length * level / 10;
+        int l = Integer.parseInt(params);
         log.info("l = {}", l);
         config.addPrivacyModel(new DistinctLDiversity(attribute, l));
-        config.setSuppressionLimit(0.04d);
+        config.setSuppressionLimit(0d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
         DataHandle optimal = result.getOutput();
@@ -103,21 +105,22 @@ public class KAnonymityUtil {
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        double level = 8;
-        switch (params) {
-            case "1": {
-                level = 10;
-                break;
-            }
-            case "2": {
-                level = 16;
-                break;
-            }
-        }
-        double l = length * level / 10;
+//        double level = 8;
+//        switch (params) {
+//            case "1": {
+//                level = 10;
+//                break;
+//            }
+//            case "2": {
+//                level = 16;
+//                break;
+//            }
+//        }
+//        double l = length * level / 10;
+        double l = Double.parseDouble(params);
         log.info("l = {}", l);
         config.addPrivacyModel(new EntropyLDiversity(attribute, l));
-        config.setSuppressionLimit(0.04d);
+        config.setSuppressionLimit(0d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
         DataHandle optimal = result.getOutput();
@@ -130,21 +133,25 @@ public class KAnonymityUtil {
         data.getDefinition().setAttributeType(attribute, AttributeType.SENSITIVE_ATTRIBUTE);
         ARXAnonymizer anonymizer = new ARXAnonymizer();
         ARXConfiguration config = ARXConfiguration.create();
-        double level = 8;
-        switch (params) {
-            case "1": {
-                level = 10;
-                break;
-            }
-            case "2": {
-                level = 16;
-                break;
-            }
-        }
-        double c = length * level / 10;
-        log.info("c = {}, l = 2", c);
+        double level = 10;
+        String[] paramsList = params.split(",");
+        double c = Double.parseDouble(paramsList[0]);
+
+        double l = Double.parseDouble(paramsList[1]);
+//        switch (params) {
+//            case "1": {
+//                level = 15;
+//                break;
+//            }
+//            case "2": {
+//                level = 20;
+//                break;
+//            }
+//        }
+//        double c = length * level / 10;
+        log.info("c = {}, l = {}", c, l);
         config.addPrivacyModel(new RecursiveCLDiversity(attribute, c, 2));
-        config.setSuppressionLimit(0.04d);
+        config.setSuppressionLimit(0d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);
         DataHandle optimal = result.getOutput();
@@ -169,7 +176,7 @@ public class KAnonymityUtil {
             }
         }
 //        double t = length * (1 - level / 10.0);
-        double t = level;
+        double t = Double.parseDouble(params);
         log.info("t = {}", t);
         config.addPrivacyModel(new EqualDistanceTCloseness(attribute, t));
         config.setSuppressionLimit(0.04d);

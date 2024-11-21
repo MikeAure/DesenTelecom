@@ -48,6 +48,17 @@ public class UtilsTest {
     }
 
     @Test
+    public void testClone() {
+        String[] a = {"a", "b", "c"};
+        String[] b = a.clone();
+        System.out.println(Arrays.toString(a));
+        System.out.println(Arrays.toString(b));
+        a[0] = "d";
+        System.out.println(Arrays.toString(a));
+        System.out.println(Arrays.toString(b));
+    }
+
+    @Test
     public void testPath() throws IOException {
         // 当前路径
 

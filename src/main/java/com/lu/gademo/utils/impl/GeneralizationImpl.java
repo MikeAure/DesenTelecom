@@ -244,13 +244,15 @@ public class GeneralizationImpl implements Generalization {
 //                return new DSObject(CommandExecutor.openExe(cmd));
 
 //                if (params.length != 1) return null;
-//                List<?> value = object.getList();
+//                List<?> value = object.getList();\
+                if (params.length != 1) return null;
                 String position = object.getStringVal();
                 String[] s = position.split(",");
                 double x = Double.parseDouble(s[0]);
                 double y = Double.parseDouble(s[1]);
+                int accuracy = Integer.parseInt(params[params.length - 1]);
                 List<String> result = new LinkedList<>();
-                LocationUtil.Point point = LocationUtil.accuracyReduction(x, y, 1000);
+                LocationUtil.Point point = LocationUtil.accuracyReduction(x, y, accuracy);
                 result.add(point.getX() + "," + point.getY());
                 return new DSObject(result);
             }

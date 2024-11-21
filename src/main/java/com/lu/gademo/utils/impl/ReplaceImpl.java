@@ -85,7 +85,7 @@ public class ReplaceImpl implements Replace {
                 if (params.length != 1) return null;
                 List<?> list = object.getList();
                 List<Object> value = new ArrayList<>(list);
-                return new DSObject(dpUtil.valueMapping(value, Integer.parseInt(params[0])));
+                return new DSObject(dpUtil.valueMapping(value, Double.parseDouble(params[0])));
             }
 
             /*
