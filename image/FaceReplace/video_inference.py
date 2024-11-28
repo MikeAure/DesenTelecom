@@ -11,8 +11,6 @@ from face_modules.mtcnn import *
 import cv2
 import PIL.Image as Image
 import numpy as np
-import glob
-import configparser
 import os
 import time
 import argparse
@@ -75,6 +73,8 @@ except Exception as e:
     print("video has been prcessed to frames")
 cap.release()
 
+print(f"total video frames: {frame_count}")
+
 print("start load models")
 # load models
 is_cuda = torch.cuda.is_available()
@@ -106,8 +106,10 @@ with torch.no_grad():
     embeds = arcface(F.interpolate(Xs[:, :, 19:237, 19:237], (112, 112), mode='bilinear', align_corners=True))
 
 # load frames
-files = glob.glob(os.path.join(target_frames_path, '*.*g'))
+# files = glob.glob(os.path.join(target_frames_path, '*.*g'))
+files = [os.path.join(target_frames_path, '%08d.jpg' % ps) for ps in range(frame_count)]
 files.sort()
+
 ind = 0
 
 # generate mask
@@ -122,14 +124,19 @@ size = ()
 # inference
 print("start inference")
 for file in files:
+    save_path = os.path.join(result_frames_path, '%08d.jpg' % ind)
     Xt_path = file
     Xt_raw = cv2.imread(Xt_path)
     try:
         Xt, trans_inv = detector.align(Image.fromarray(Xt_raw[:, :, ::-1]), crop_size=(256, 256), return_trans_inv=True)
     except Exception as e:
+        cv2.imwrite(save_path, Xt_raw)
+        ind += 1
         continue
 
     if Xt is None:
+        cv2.imwrite(save_path, Xt_raw)
+        ind += 1
         continue
 
     Xt_raw = Xt_raw.astype(float) / 255.0
@@ -148,21 +155,22 @@ for file in files:
         mask_ = cv2.warpAffine(mask, trans_inv, (np.size(Xt_raw, 1), np.size(Xt_raw, 0)), borderValue=(0, 0, 0))
         mask_ = np.expand_dims(mask_, 2)
         Yt_trans_inv = mask_ * Yt_trans_inv + (1 - mask_) * Xt_raw
-        save_path = os.path.join(result_frames_path, '%08d.jpg' % ind)
         cv2.imwrite(save_path, Yt_trans_inv * 255)
         if (ind % 500 == 0):
             print("%dth frame has been processed" % ind)
-        ind += 1
+    ind += 1
 
+print(f"processed frames number: {ind}")
 print("start generate video")
 # videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, size)
 # videowriter = cv2.VideoWriter(result_video_save_path, cv2.VideoWriter_fourcc('H', '2', '6', '4'), fps, size)
 videowriter = ffmpegcv.VideoWriter(result_video_save_path, fps=fps, resize=size)
 
-files = glob.glob(os.path.join(result_frames_path, '*.*g'))
-files.sort()
+# files = glob.glob(os.path.join(result_frames_path, '*.*g'))
+target_files = [os.path.join(result_frames_path, '%08d.jpg' % ps) for ps in range(ind)]
+target_files.sort()
 count = 0
-for file in files:
+for file in target_files:
     img = cv2.imread(file)
     videowriter.write(img)
     if (count % 500 == 0):

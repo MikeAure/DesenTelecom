@@ -170,7 +170,7 @@ public class DpImpl implements Dp {
                 if (params.length != 1) return null;
                 List<?> value = object.getList();
                 String path5 = Paths.get(currentPath, "graph", "desenGraph.py").toString();
-                System.out.println(path5);
+                System.out.println("path5: " + path5);
                 List<String> result = CommandExecutor.executePython(value.get(0).toString() + " "
                         + value.get(1).toString(), "", path5, params[0]);
                 return new DSObject(result);

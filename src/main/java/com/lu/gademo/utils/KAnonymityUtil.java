@@ -137,7 +137,7 @@ public class KAnonymityUtil {
         String[] paramsList = params.split(",");
         double c = Double.parseDouble(paramsList[0]);
 
-        double l = Double.parseDouble(paramsList[1]);
+        int l = Integer.parseInt(paramsList[1]);
 //        switch (params) {
 //            case "1": {
 //                level = 15;
@@ -150,7 +150,7 @@ public class KAnonymityUtil {
 //        }
 //        double c = length * level / 10;
         log.info("c = {}, l = {}", c, l);
-        config.addPrivacyModel(new RecursiveCLDiversity(attribute, c, 2));
+        config.addPrivacyModel(new RecursiveCLDiversity(attribute, c, l));
         config.setSuppressionLimit(0d);
         config.setQualityModel(Metric.createEntropyMetric());
         ARXResult result = anonymizer.anonymize(data, config);

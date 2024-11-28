@@ -302,6 +302,11 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(localEvidenceJson);
             log.info("本地存证请求Json数据: {}", json);
 
+            if (localEvidenceJson.has("randomidentification") && localEvidenceJson.get("randomidentification").isNull() ||
+                    (localEvidenceJson.has("datasign") && localEvidenceJson.get("datasign").isNull())) {
+                throw new IOException("未进行中心存证请求认证");
+            }
+
             TcpPacket localTcpPacket = new TcpPacket(objectMapper.writeValueAsString(localEvidenceJson), (short) 0x0003, (short) 0x0031, (short) 0x3110);
             byte[] localTcp = localTcpPacket.buildPacket();
             // 发送
@@ -370,7 +375,6 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
             }
 
             localDataInputStream.close();
-            localOutputStream.close();
         } catch (ConnectException connectException) {
             log.error("未与本地存证系统建立连接");
         } catch (IOException e) {

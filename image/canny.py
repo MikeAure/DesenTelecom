@@ -1,14 +1,14 @@
+from concurrent.futures import ProcessPoolExecutor
 import cv2
 import numpy as np
 import os
 import sys
 import math
-import pandas as pd
 import copy
-import tqdm
 from multiprocessing import Pool
 import imageio
-
+from scipy.ndimage import convolve
+import time
 
 class ImageClass:
     """Stores the paths to images for a given class"""
@@ -202,14 +202,42 @@ def image_detect(image_1, k):
     W, H = image_1.shape
     k_half = int((k - 1) / 2)
     img_pad = np.pad(image_1, ((k_half, k_half), (k_half, k_half)), "edge")
-    ave_i = np.zeros([W, H])
-    for i in range(W):
-        for j in range(H):
-            roi = img_pad[i : i + k, j : j + k].copy()
-            ave_i[i, j] = np.sum(roi)
-            ave_i[i, j] = ave_i[i, j] - (k * k - 1) * img_pad[i + k_half, j + k_half]
+    print(img_pad)
+    image_2 = np.copy(image_1).astype(np.float64)
 
-    return ave_i
+    # ave_i = np.zeros([W, H])
+    # print(img_pad.dtype)
+    # for i in range(W):
+    #     for j in range(H):
+    #         roi = img_pad[i : i + k, j : j + k].copy()
+    #         ave_i[i, j] = np.sum(roi)
+    #         ave_i[i, j] = ave_i[i, j] - (k * k - 1) * img_pad[i + k_half, j + k_half]
+    # 定义卷积核
+    kernel = np.ones((k, k))
+    kernel[k // 2, k // 2] = -(k * k - 2)
+    
+    # 使用 scipy.ndimage.convolve 进行卷积，mode='nearest' 类似于边缘填充
+    ave_i2 = convolve(image_2, kernel, mode='nearest')
+    
+    # print(f"ave_i.shape: {ave_i.shape}")
+    # print(f"ave_i2.shape: {ave_i2.shape}")
+    
+    # assert(ave_i.shape == ave_i2.shape)
+    # print(ave_i[1])
+    # print(ave_i2[1])
+    # assert(np.equal(ave_i, ave_i2).all())
+    
+    # 进行卷积，使用 boundary='fill' 和 fillvalue=0
+    # ave_i2 = convolve2d(img_pad, kernel, mode='valid', boundary='fill', fillvalue=0)
+    # assert(ave_i.shape == ave_i2.shape)
+    # print(ave_i[0:3, 0:3])
+    # print(ave_i2[0:3, 0:3])
+    # print(ave_i[0] - ave_i2[0])
+    # print(ave_i[1] - ave_i2[1])
+    # print(ave_i - ave_i2)
+    # assert(np.equal(ave_i, ave_i2).all())
+
+    return ave_i2
 
 
 def add_noise1(dx, dy, image_1):
@@ -239,24 +267,65 @@ def add_noise1(dx, dy, image_1):
     return image_noise
 
 
-def add_noise2(image_1, k=7, epsilon=10):
+def add_noise2(image_1, k=3, epsilon=10):
     print(f"epsilon: {epsilon}")
+    
+    image_detect_start = time.time()
     ave_1 = image_detect(image_1, k)  # 设置k值
+    image_detect_end = time.time()
+    print(f"image_detect time: {image_detect_end - image_detect_start}")
+
     W, H = ave_1.shape
+    
     image_1 = image_1.astype(int)
     noise_x = np.zeros(W * H)
-    eps = 10  # 隐私预算
-    for i in range(W * H):  # 生成噪声
-        noise_x[i] = np.random.laplace(0, (image_1.max() - image_1.min()) / epsilon, 1)
-    ave_1_list = ave_1.flatten()
-    ave_1_index = np.argsort(ave_1_list)
-    noise_x_index = np.argsort(noise_x)
-    for i in range(W * H):
-        x1, y1 = divmod(np.array(ave_1_index)[i], W)
-        image_1[x1, y1] = image_1[x1, y1] + noise_x[np.array(noise_x_index)[i]]
-    image_noise = cv2.normalize(image_1, None, 0, 255, cv2.NORM_MINMAX)
+    # eps = 10  # 隐私预算
+    # generate_noise_start = time.time()
+    # for i in range(W * H):  # 生成噪声
+    #     noise_x[i] = np.random.laplace(0, (image_1.max() - image_1.min()) / epsilon, 1)
+    # generate_noise_end = time.time()
+    
+    
+    # flatten_time_start = time.time()
+    # ave_1_list = ave_1.flatten()
+    # ave_1_index = np.argsort(ave_1_list)
+    # noise_x_index = np.argsort(noise_x)
+    # flatten_time_end = time.time()
+    
+    # add_noise_start = time.time()
+    # for i in range(W * H):
+    #     x1, y1 = divmod(np.array(ave_1_index)[i], H)
+    #     image_1[x1, y1] = image_1[x1, y1] + noise_x[np.array(noise_x_index)[i]]
+    # add_noise_end = time.time()
+    # 优化生成噪声
+    generate_noise_start = time.time()
+    # 使用 numpy 矢量化生成噪声
+    noise_x = np.random.laplace(
+        0, (image_1.max() - image_1.min()) / epsilon, size=W * H
+    )
+    generate_noise_end = time.time()
+
+    # 优化添加噪声
+    add_noise_start = time.time()
+    # 获取排序后的索引
+    ave_1_index = np.argsort(ave_1.flatten())
+    noise_x_sorted = noise_x[np.argsort(noise_x)]
+
+    # 将噪声直接添加到图像中
+    image_1_float = np.copy(image_1).astype(np.float64)
+    image_1_float.flat[ave_1_index] += noise_x_sorted
+    add_noise_end = time.time()
+    
+    image_noise = cv2.normalize(image_1_float, None, 0, 255, cv2.NORM_MINMAX)
     image_noise = image_noise.astype(np.uint8)
     print(f"image_noise: {image_noise}")
+    
+
+    print(f"generate noise time: {generate_noise_end - generate_noise_start}")
+    # print(f"flatten time: {flatten_time_end - flatten_time_start}")
+    print(f"add noise time: {add_noise_end - add_noise_start}")
+
+
     return image_noise
 
 
@@ -368,16 +437,27 @@ if __name__ == "__main__":
     image_color = cv2.imread(img_path,cv2.IMREAD_COLOR)
     image_color_noise = copy.copy(image_color)
     # edges = cv2.Canny(image_1, 138, 200)
-    for i in range(3):
-        image_smooth = smooth(image_color[:,:,i])
-        dx,dy,M,theta = gradients(image_smooth)
-        NMS_1 = NMS(M,dx,dy)
-        edges = double_threshold(NMS_1)
-        #image_noise = add_noise1(dx,dy,image_smooth)
-        image_color_noise[:,:,i] = add_noise2(image_color[:,:,i], epsilon=epsilon)
-        #cv2.imshow('smooth', image_smooth)
-        # cv2.imshow('edges', edges)
-        # cv2.imshow('image_noise', image_color_noise[:,:,i]) #图片矩阵数据格式得是unit8才能show
+    # 未使用多进程前
+    # for i in range(3):
+    #     # image_smooth = smooth(image_color[:,:,i])
+    #     # dx,dy,M,theta = gradients(image_smooth)
+    #     # NMS_1 = NMS(M,dx,dy)
+    #     # edges = double_threshold(NMS_1)
+        
+    #     #image_noise = add_noise1(dx,dy,image_smooth)
+    #     image_color_noise[:,:,i] = add_noise2(image_color[:,:,i], epsilon=epsilon)
+    #     #cv2.imshow('smooth', image_smooth)
+    #     # cv2.imshow('edges', edges)
+    #     # cv2.imshow('image_noise', image_color_noise[:,:,i]) #图片矩阵数据格式得是unit8才能show
+    
+    # 使用多进程加速后
+    with ProcessPoolExecutor(max_workers=3) as executor:
+        futures = [
+            executor.submit(add_noise2, image_color_noise[:,:,i], epsilon=epsilon) for i in range(3)
+        ]
+        
+        for i, future in enumerate(futures):
+            image_color_noise[:,:,i] = future.result()
     # cv2.imshow('origin', image_color)
     # cv2.imshow('noise',image_color_noise)
     # cv2.waitKey()
@@ -388,3 +468,6 @@ if __name__ == "__main__":
     # input_path = "./test_images"
     # output_path = "../facenet/understand_facenet-master/understand_facenet/data/lfw_lap"
     # noise_dataset(input_path)
+    # img = np.random.randint(0, 230, (2, 3))
+    # img = np.array([[20, 30, 40, 20], [20, 30, 706, 20], [20, 30, 40, 20]])
+    # image_detect(img, 3)

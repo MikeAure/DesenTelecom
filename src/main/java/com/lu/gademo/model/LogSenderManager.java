@@ -160,14 +160,18 @@ public class LogSenderManager {
     private Boolean ifSaveToDatabase;
     @Value("${logSenderManager.ifSendFile}")
     private Boolean ifSendFile;
+    @Value("${logSenderManager.ifSendToEvaFirst}")
+    private Boolean ifSendToEvaFirst;
+    @Value("${logSenderManager.ifPlatformTest}")
+    private Boolean ifPlatformTest;
     @Autowired
     private LogCollectUtil logCollectUtil;
 
     @Value("${pythonMock.evaSendFile}")
     private boolean evaMockSendFile;
-
     @Value("${pythonMock.splitSendFile}")
     private boolean splitMockSendFile;
+
 
     @EventListener
     @Async
@@ -178,6 +182,8 @@ public class LogSenderManager {
         SubmitEvidenceLocal submitEvidenceLocal = logManagerEvent.getSubmitEvidenceLocal();
         ReqEvidenceSave reqEvidenceSave = logManagerEvent.getReqEvidenceSave();
         SendSplitDesenData sendSplitDesenData = logManagerEvent.getSendSplitDesenData();
+        String entityName = sendEvaReq.getFileType();
+
         byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
         byte[] desenFileBytes = fileStorageDetails.getDesenFileBytes();
 
@@ -190,6 +196,15 @@ public class LogSenderManager {
         log.info("fileDataType: {}", fileDataType);
         log.info("fileType: {}", fileType);
         log.info("fileSuffix: {}", fileSuffix);
+
+        if (ifPlatformTest && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            ResponseEntity<byte[]> responseEntityResultTemp = new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
+            eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails,
+                    responseEntityCompletableFuture, responseEntityResultTemp));
+            return;
+        }
 
         EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(
                 sendEvaReq, rawFileBytes, desenFileBytes, ifSendFile);
@@ -219,7 +234,6 @@ public class LogSenderManager {
 
                 // 向其他系统发送日志信息
                 eventPublisher.publishEvent(new ThreeSystemsEvent(this, submitEvidenceLocal, reqEvidenceSave, sendRuleReq, sendSplitDesenData, desenFileBytes));
-                String entityName = sendEvaReq.getFileType();
                 // 将脱敏后的表格文件内容保存到数据库表中
                 if (ifSaveToDatabase && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
                     eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails,

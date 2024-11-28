@@ -802,17 +802,6 @@
             text-align: center;
         }
 
-        /*标题*/
-        /*.ibox-title {*/
-        /*    height: 200px;*/
-        /*    border-color: #edf1f2;*/
-        /*    background-color: #dbeafe;*/
-        /*    color: black;*/
-        /*    display: flex;*/
-        /*    align-items: center;*/
-        /*    justify-content: center;*/
-        /*}*/
-
         .ibox-title span {
             font-size: 50px;
         }
@@ -826,21 +815,6 @@
             display: inline-block;
             text-align: center;
             /*margin-right: 50px;*/
-        }
-
-        .btn2 {
-            line-height: 30px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        /*选择框居中*/
-        .midtile {
-            line-height: 30px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
         }
 
         /*上传按钮*/
@@ -858,16 +832,6 @@
             margin: 30px;
         }
 
-        /*#pre {*/
-        /*    text-align: center;*/
-        /*}*/
-
-        /*#pre video {*/
-        /*    display: inline-block;*/
-        /*    max-width: 50%;*/
-        /*    height: auto*/
-        /*}*/
-
         #pre,
         #showRawVideo,
         #showDecryptedVideo,
@@ -876,12 +840,17 @@
         }
 
         #pre video,
-        #showRawVideo video,
-        #showDecryptedVideo video,
         #after video {
             display: block;
             max-width: 100%;
-            height: auto
+            height: auto;
+        }
+
+        #showRawVideo video,
+        #showDecryptedVideo video {
+            text-align: center;
+            max-width: 50%;
+            height: auto;
         }
 
         .showFile {
@@ -1002,17 +971,7 @@
                                     </button>
                                 </div>
                             </form>
-                            <!--文件上传信息-->
 
-                            <!--                            <div class="showFile">-->
-                            <!--                                &lt;!&ndash;前后文件&ndash;&gt;-->
-                            <!--                                <div id=pre>-->
-                            <!--                                </div>-->
-                            <!--                                <div id=mid-image>-->
-                            <!--                                </div>-->
-                            <!--                                <div id=after>-->
-                            <!--                                </div>-->
-                            <!--                            </div>-->
                             <div class="showFile row m-t">
                                 <div class="col-lg-3" id="midImageArea" style="display: none;">
                                     <div class="panel panel-warning">

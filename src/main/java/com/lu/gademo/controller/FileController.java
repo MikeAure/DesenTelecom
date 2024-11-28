@@ -119,6 +119,7 @@ public class FileController extends BaseController {
         log.info("File Type: " + fileType);
         log.info("AlgName: " + algName);
         log.info("Sheet: {}", sheet);
+        log.info("Params: {}", params);
 
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
@@ -151,7 +152,7 @@ public class FileController extends BaseController {
                                                    @RequestParam("params") String params,
                                                    @RequestParam("algName") String algName,
                                                    @RequestPart("sheet") MultipartFile sheet
-    ) throws IOException, InterruptedException, SQLException {
+    ) throws IOException, InterruptedException, SQLException, ExecutionException, TimeoutException {
         log.info("Params: {}", params);
         log.info("Sheet: {}", sheet);
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);

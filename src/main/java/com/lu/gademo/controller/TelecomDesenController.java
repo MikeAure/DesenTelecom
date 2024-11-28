@@ -131,9 +131,9 @@ public class TelecomDesenController {
             log.error("Failed to save raw file: {}", e.getMessage());
             return new Result<>(500, "Failed to save file", "");
         }
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Please press enter to continue:");
-        scanner.nextLine();
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Please press enter to continue:");
+//        scanner.nextLine();
         try {
 //            log.info("正在使用低脱敏策略进行脱敏");
 //            ResponseEntity<byte[]> lowResponseEntity = fileService.dealExcel(fileStorageDetails1, lowStrategyConfigString,

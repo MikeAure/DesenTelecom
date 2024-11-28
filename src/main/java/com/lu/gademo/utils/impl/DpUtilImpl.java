@@ -302,7 +302,7 @@ public class DpUtilImpl implements DpUtil {
 //            bigEpsilon = new BigDecimal(1);
 //        }
 
-        log.info("Epsilon: {}", bigEpsilon);
+        log.info("Epsilon: {}", this.decimalFormat.format(bigEpsilon));
         BigDecimal beta = sensitivity.divide(bigEpsilon, 6, RoundingMode.HALF_UP);
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
         log.info("Beta: {}", beta);

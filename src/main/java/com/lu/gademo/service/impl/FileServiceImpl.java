@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.LogCollectResult;
-import com.lu.gademo.service.FileStorageService;
-import com.lu.gademo.service.SendEvaReqService;
-import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.entity.ga.effectEva.RecEvaResultInv;
 import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import com.lu.gademo.event.LogManagerEvent;
@@ -14,6 +11,8 @@ import com.lu.gademo.event.ReDesensitizeEvent;
 import com.lu.gademo.model.LogSenderManager;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
+import com.lu.gademo.service.FileStorageService;
+import com.lu.gademo.service.SendEvaReqService;
 import com.lu.gademo.utils.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -40,6 +38,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -78,6 +77,8 @@ public class FileServiceImpl implements FileService {
     private final ObjectMapper objectMapper;
     private final Boolean ifSendToEvaFirst;
     private final Boolean ifPerformanceTest;
+    private final Boolean ifSaveToDatabase;
+    private final Boolean ifPlatformTest;
     private final FileStorageService fileStorageService;
 
     private final DateParseUtil dateParseUtil;
@@ -119,7 +120,12 @@ public class FileServiceImpl implements FileService {
                            @Value("${logSenderManager.ifSendToEvaFirst}")
                            Boolean ifSendEvaFirst, FileStorageService fileStorageService,
                            @Value("${logSenderManager.ifPerformenceTest}")
-                           Boolean ifPerformanceTest, DateParseUtil dateParseUtil) throws IOException {
+                           Boolean ifPerformanceTest, DateParseUtil dateParseUtil,
+                            @Value("${logSenderManager.ifSaveToDatabase}")
+                           Boolean ifSaveToDatabase,
+                           @Value("${logSenderManager.ifPlatformTest}")
+        Boolean ifPlatformTest
+    ) throws IOException {
         this.algorithmsFactory = algorithmsFactory;
         this.dp = dp;
         this.replacement = replacement;
@@ -149,6 +155,8 @@ public class FileServiceImpl implements FileService {
         this.fileStorageService = fileStorageService;
         this.ifPerformanceTest = ifPerformanceTest;
         this.dateParseUtil = dateParseUtil;
+        this.ifSaveToDatabase = ifSaveToDatabase;
+        this.ifPlatformTest = ifPlatformTest;
     }
 
     private LogInfo processExcel(FileStorageDetails fileStorageDetails, String params, String sheetName,
@@ -193,7 +201,7 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         Map<Integer, List<?>> desenResult = realDealExcel(
                 preprocessSheet(originalSheet, excelParamList, totalRowNum, fieldNameRow, columnCount)
-                ,infoBuilders, excelParamList, totalRowNum, fieldNameRow, columnCount);
+                , infoBuilders, excelParamList, totalRowNum, fieldNameRow, columnCount);
         String endTime = util.getTime();
         log.info("脱敏结束");
 //        log.info("创建新Excel Workbook");
@@ -508,10 +516,11 @@ public class FileServiceImpl implements FileService {
 
     /**
      * 处理单列文本文件
+     *
      * @param fileStorageDetails 封装的文件信息
-     * @param level 脱敏等级
-     * @param algName 脱敏算法名称
-     * @param ifSkipFirstRow 是否跳过第一行，在非性能测试场景下，需要跳过第一行
+     * @param level              脱敏等级
+     * @param algName            脱敏算法名称
+     * @param ifSkipFirstRow     是否跳过第一行，在非性能测试场景下，需要跳过第一行
      * @return
      * @throws IOException
      */
@@ -897,7 +906,7 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         // 脱敏开始时间
         long startTimePoint = System.currentTimeMillis();
-        algorithmsFactory.getAlgorithmInfoFromId(7).execute(dsObject, Integer.parseInt(desenParam));
+        algorithmsFactory.getAlgorithmInfoFromId(60).execute(dsObject, Integer.parseInt(desenParam));
 
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -1139,7 +1148,7 @@ public class FileServiceImpl implements FileService {
 
         // 执行脱敏
         DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, rawFacePathString, desenFilePathString));
-        algorithmInfo.execute(dsObject,1);
+        algorithmInfo.execute(dsObject, 1);
         // 结束时间
         endTimePoint = System.currentTimeMillis();
         // 脱敏耗时
@@ -1690,6 +1699,7 @@ public class FileServiceImpl implements FileService {
         return ResponseEntity.ok().headers(headers).body(desenFileBytes);
 
     }
+
     private Map<Integer, List<Object>> preprocessSheet(Sheet sheet, List<ExcelParam> excelParamList, int totalRowNum,
                                                        List<String> fieldNameRow, int columnCount) {
         Map<Integer, List<Object>> preprocessedData = new HashMap<>();
@@ -1865,10 +1875,16 @@ public class FileServiceImpl implements FileService {
         byte[] rawFileBytes = logInfo.getRawFileBytes();
         byte[] desenFileBytes = logInfo.getDesenFileBytes();
         String desenFileName = logInfo.getDesenFileName();
+        String entityName = logCollectResult.getSendEvaReq().getFileType();
         // 如果没进行性能测试，则选择不同的日志发送方式
         // 选择首先发给评测系统评测
         if (!ifPerformanceTest) {
             if (ifSendToEvaFirst) {
+                eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
+                        logCollectResult, responseEntityCompletableFuture));
+            }
+            else if (ifPlatformTest && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
+                logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
                 eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
                         logCollectResult, responseEntityCompletableFuture));
             }
@@ -1960,8 +1976,8 @@ public class FileServiceImpl implements FileService {
                 }
             }
             if (excelParam == null) {
-                log.error("Current column name does't match any column in the template");
-                throw new IOException("Current column name does't match any column in the template");
+                log.error("Current column name doesn't match any column in the template");
+                throw new IOException("Current column name doesn't match any column in the template");
             }
 
             int algoNum = excelParam.getK();
@@ -2494,7 +2510,8 @@ public class FileServiceImpl implements FileService {
         else {
             logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            Optional<MediaType> mediaType = MediaTypeFactory.getMediaType(fileStorageDetails.getRawFileName());
+            mediaType.ifPresent(headers::setContentType);
             headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
             responseEntityCompletableFuture.complete(new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK));
         }
@@ -2708,196 +2725,7 @@ public class FileServiceImpl implements FileService {
         return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
     }
 
-    //    @Override
-//    public ResponseEntity<byte[]> dealCsv(FileStorageDetails fileStorageDetails, String params, String algName) throws InterruptedException, IOException {
-//        Boolean desenCom = false;
-//        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
-//        String objectMode = "text";
-//
-//        // 设置原文件保存路径
-//        String rawFileName = fileStorageDetails.getRawFileName();
-//        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
-//        Path rawFilePath = fileStorageDetails.getRawFilePath();
-//        String rawFilePathString = fileStorageDetails.getRawFilePathString();
-//        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
-//        Long rawFileSize = fileStorageDetails.getRawFileSize();
-//
-//        // 设置脱敏后文件路径信息
-//        String desenFileName = fileStorageDetails.getDesenFileName();
-//        Path desenFilePath = fileStorageDetails.getDesenFilePath();
-//        log.info(desenFilePath.toAbsolutePath().toString());
-//        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
-//
-//        // 脱敏参数
-//        String privacyLevel = String.valueOf(params.charAt(params.length() - 1));
-//        int[] k_anonymity_param = new int[]{5, 10, 20};
-//        int[] l_diversity_param = new int[]{2, 4, 6};
-//        double[] t_closeness_param = new double[]{0.6, 0.4, 0.2};
-//        String desenParam;
-//        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
-//        // 脱敏开始时间
-//        String startTime = util.getTime();
-//        // 开始时间
-//        // TODO: 整合该部分进AlgorithmsFactory
-//        long desenStartTime = System.currentTimeMillis();
-//        switch (algName) {
-//            case "k_anonymity":
-//                infoBuilders.desenAlg.append(25);
-//                anonymity.service(dsObject, 1, Integer.parseInt(privacyLevel));
-//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
-//                break;
-//            case "l_diversity":
-//                infoBuilders.desenAlg.append(26);
-//                anonymity.service(dsObject, 7, Integer.parseInt(privacyLevel));
-//                desenParam = String.valueOf(l_diversity_param[Integer.parseInt(privacyLevel)]);
-//                break;
-//            case "t_closeness":
-//                infoBuilders.desenAlg.append(27);
-//                anonymity.service(dsObject, 10, Integer.parseInt(privacyLevel));
-//                desenParam = String.valueOf(t_closeness_param[Integer.parseInt(privacyLevel)]);
-//                break;
-//
-//            default:
-//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
-//        }
-//        infoBuilders.desenAlgParam.append(desenParam);
-//        // 脱敏级别
-//        infoBuilders.desenLevel.append(privacyLevel + 1);
-//        // 脱敏结束时间
-//        String endTime = util.getTime();
-//        // 结束时间
-//        long desenEndTime = System.currentTimeMillis();
-//        long executionTime = desenEndTime - desenStartTime;
-//        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "CSV");
-//
-//        // 标志脱敏完成
-//        desenCom = true;
-//        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
-//
-//        // 脱敏后信息
-//        // 脱敏后文件大小
-//        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
-//        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
-//        // 脱敏前类型
-//        infoBuilders.desenInfoPreIden.append("csv文件");
-//        // 脱敏后类型
-//        infoBuilders.desenInfoAfterIden.append("csv文件");
-//        // 脱敏意图
-//        infoBuilders.desenIntention.append("对csv文件脱敏");
-//        // 脱敏要求
-//        infoBuilders.desenRequirements.append("对csv文件脱敏");
-//        // 脱敏数据类型
-//        infoBuilders.fileDataType.append(rawFileSuffix);
-//
-//        // 存证系统
-//        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-//        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-//        // 返回excel给前端
-//        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
-//                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-//        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
-//
-//        return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
-//    }
-//    @Override
-//    public ResponseEntity<byte[]> dealCsv(FileStorageDetails fileStorageDetails, String params, String algName)
-//            throws IOException, InterruptedException {
-//        Boolean desenCom = false;
-//        DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
-//        String objectMode = "text";
-//
-//        /// 设置原文件保存路径
-//        String rawFileName = fileStorageDetails.getRawFileName();
-//        String rawFileSuffix = fileStorageDetails.getRawFileSuffix();
-//        Path rawFilePath = fileStorageDetails.getRawFilePath();
-//        String rawFilePathString = fileStorageDetails.getRawFilePathString();
-//        byte[] rawFileBytes = fileStorageDetails.getRawFileBytes();
-//        Long rawFileSize = fileStorageDetails.getRawFileSize();
-//
-//        // 设置脱敏后文件路径信息
-//        String desenFileName = fileStorageDetails.getDesenFileName();
-//        Path desenFilePath = fileStorageDetails.getDesenFilePath();
-//        log.info(desenFilePath.toAbsolutePath().toString());
-//        String desenFilePathString = fileStorageDetails.getDesenFilePathString();
-//
-//        // 脱敏参数
-//        String privacyLevel = String.valueOf(params.charAt(params.length() - 1));
-//        int[] k_anonymity_param = new int[]{5, 10, 20};
-//        int[] l_diversity_param = new int[]{2, 4, 6};
-//        double[] t_closeness_param = new double[]{0.6, 0.4, 0.2};
-//        String desenParam;
-//        DSObject dsObject = new DSObject(Arrays.asList(rawFilePathString, desenFilePathString));
-//        // 脱敏开始时间
-//        String startTime = util.getTime();
-//        // 开始时间
-//        // TODO: 整合该部分进AlgorithmsFactory
-//        long desenStartTime = System.currentTimeMillis();
-//        switch (algName) {
-//            case "k_anonymity":
-//                infoBuilders.desenAlg.append(25);
-//                anonymity.service(dsObject, 1, Integer.parseInt(privacyLevel));
-//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
-//                break;
-//            case "l_diversity":
-//                infoBuilders.desenAlg.append(26);
-//                anonymity.service(dsObject, 7, Integer.parseInt(privacyLevel));
-//                desenParam = String.valueOf(l_diversity_param[Integer.parseInt(privacyLevel)]);
-//                break;
-//            case "t_closeness":
-//                infoBuilders.desenAlg.append(27);
-//                anonymity.service(dsObject, 10, Integer.parseInt(privacyLevel));
-//                desenParam = String.valueOf(t_closeness_param[Integer.parseInt(privacyLevel)]);
-//                break;
-//
-//            default:
-//                desenParam = String.valueOf(k_anonymity_param[Integer.parseInt(privacyLevel)]);
-//        }
-//        infoBuilders.desenAlgParam.append(desenParam);
-//        // 脱敏级别
-//        infoBuilders.desenLevel.append(privacyLevel + 1);
-//        // 脱敏结束时间
-//        String endTime = util.getTime();
-//
-//        // 结束时间
-//        long desenEndTime = System.currentTimeMillis();
-//        long executionTime = desenEndTime - desenStartTime;
-//        logCollectUtil.logExecutionTime(String.valueOf(executionTime), "CSV");
-//
-//        // 标志脱敏完成
-//        desenCom = true;
-//        String globalID = System.currentTimeMillis() + randomNum.nextInt() + "脱敏工具集";
-//
-//        // 脱敏后信息
-//        // 脱敏后文件大小
-//        byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
-//        Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
-//        // 脱敏前类型
-//        infoBuilders.desenInfoPreIden.append("csv文件");
-//        // 脱敏后类型
-//        infoBuilders.desenInfoAfterIden.append("csv文件");
-//        // 脱敏意图
-//        infoBuilders.desenIntention.append("对csv文件脱敏");
-//        // 脱敏要求
-//        infoBuilders.desenRequirements.append("对csv文件脱敏");
-//        // 脱敏数据类型
-//        infoBuilders.fileDataType.append(rawFileSuffix);
-//        // 存证系统
-//        //存证请求  消息版本：中心0x1000，0x1010; 本地0x1100，0x1110
-//        String evidenceID = util.getSM3Hash((new String(desenFileBytes, StandardCharsets.UTF_8) + util.getTime()).getBytes());
-//
-//        // 返回excel给前端
-//        logSenderManager.submitToFourSystems(globalID, evidenceID, desenCom, objectMode, infoBuilders, rawFileName,
-//                rawFileBytes, rawFileSize, desenFileName, desenFileBytes, desenFileSize, objectMode, rawFileSuffix, startTime, endTime);
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-//        headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
-//
-//        return new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
-//    }
+
     @Override
     public ResponseEntity<byte[]> dealSingleExcel(FileStorageDetails fileStorageDetails, String params, String algName)
             throws IOException {
@@ -3294,12 +3122,12 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public ResponseEntity<byte[]> replaceVideoBackground(FileStorageDetails fileStorageDetails, String params,
-                                                         String algName, FileStorageDetails sheetStorageDetails) throws IOException {
+                                                         String algName, FileStorageDetails sheetStorageDetails)
+            throws IOException, ExecutionException, InterruptedException, TimeoutException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
 
         LogInfo logInfo = processReplaceVideoBackground(fileStorageDetails, params, algName, sheetStorageDetails);
-
         // 构造日志收集结果
         LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);
         // 构造响应结果
@@ -3324,22 +3152,7 @@ public class FileServiceImpl implements FileService {
                     .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes));
         }
         // 在此处等待响应返回
-        try {
-            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
-        } catch (TimeoutException e) {
-            log.error("等待处理结果超时：{}", e.getMessage());
-            String errorMsg = "等待处理结果超时";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (InterruptedException e) {
-            log.error("等待处理结果时异常中断：{}", e.getMessage());
-            String errorMsg = "等待处理结果时异常中断";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (ExecutionException e) {
-            log.error("等待处理结果时执行异常：{}", e.getMessage());
-            String errorMsg = "等待处理结果时执行异常";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        }
-
+        return responseEntityCompletableFuture.get(20, TimeUnit.MINUTES);
     }
 
     @Override
@@ -3450,7 +3263,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public ResponseEntity<byte[]> replaceFace(FileStorageDetails fileStorageDetails, String params, String algName,
-                                              FileStorageDetails sheetStorageDetails) throws IOException {
+                                              FileStorageDetails sheetStorageDetails) throws IOException,
+            ExecutionException, InterruptedException, TimeoutException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
         // 处理图片
@@ -3482,21 +3296,9 @@ public class FileServiceImpl implements FileService {
         }
         // 在此处等待响应返回
         // TODO: Controller Advice
-        try {
-            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
-        } catch (TimeoutException e) {
-            log.error("等待处理结果超时：{}", e.getMessage());
-            String errorMsg = "等待处理结果超时";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (InterruptedException e) {
-            log.error("等待处理结果时异常中断：{}", e.getMessage());
-            String errorMsg = "等待处理结果时异常中断";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (ExecutionException e) {
-            log.error("等待处理结果时执行异常：{}", e.getMessage());
-            String errorMsg = "等待处理结果时执行异常";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        }
+
+        return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
+
     }
 
     @Override
@@ -3598,7 +3400,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public ResponseEntity<byte[]> replaceFaceVideo(FileStorageDetails fileStorageDetails, String params, String algName,
-                                                   FileStorageDetails sheetStorageDetails) throws IOException {
+                                                   FileStorageDetails sheetStorageDetails) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         HttpHeaders errorHttpHeaders = new HttpHeaders();
         errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
 
@@ -3628,21 +3430,9 @@ public class FileServiceImpl implements FileService {
                     .contentType(MediaType.parseMediaType("video/mp4")).body(desenFileBytes));
         }
         // 在此处等待响应返回
-        try {
-            return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);
-        } catch (TimeoutException e) {
-            log.error("等待处理结果超时：{}", e.getMessage());
-            String errorMsg = "等待处理结果超时";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (InterruptedException e) {
-            log.error("等待处理结果时异常中断：{}", e.getMessage());
-            String errorMsg = "等待处理结果时异常中断";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        } catch (ExecutionException e) {
-            log.error("等待处理结果时执行异常：{}", e.getMessage());
-            String errorMsg = "等待处理结果时执行异常";
-            return ResponseEntity.status(500).headers(errorHttpHeaders).body(errorMsg.getBytes());
-        }
+
+        return responseEntityCompletableFuture.get(30, TimeUnit.MINUTES);
+
     }
 
     @Override
@@ -3790,7 +3580,7 @@ public class FileServiceImpl implements FileService {
                 break;
             }
             case "dpCode":
-            case "dpDate":{
+            case "dpDate": {
                 String[] inputList = textInput.trim().split(",");
                 DSObject codes = new DSObject(Arrays.asList(inputList));
                 StringBuilder sb = new StringBuilder();
@@ -3876,11 +3666,12 @@ public class FileServiceImpl implements FileService {
 
     /**
      * 从Excel脱敏参数中获取脱敏等级
+     *
      * @param algorithmInfo 封装脱敏结果的算法信息类
-     * @param rawData 原始数据
-     * @param excelParam Excel脱敏参数
-     * @return 包含脱敏结果的List
+     * @param rawData       原始数据
+     * @param excelParam    Excel脱敏参数
      * @param <T>
+     * @return 包含脱敏结果的List
      */
     public static <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, ExcelParam excelParam) {
         log.info("当前列脱敏算法名称: " + algorithmInfo.getName());
@@ -3893,11 +3684,12 @@ public class FileServiceImpl implements FileService {
 
     /**
      * 使用对应的脱敏算法执行脱敏并获取结果
+     *
      * @param algorithmInfo
      * @param rawData
      * @param param
-     * @return 包含脱敏结果的List
      * @param <T>
+     * @return 包含脱敏结果的List
      */
     public static <T> List<T> getDsList(AlgorithmInfo algorithmInfo, DSObject rawData, int param) {
         return algorithmInfo.execute(rawData, param).getList()

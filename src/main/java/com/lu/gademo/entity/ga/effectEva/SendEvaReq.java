@@ -24,11 +24,9 @@ public class SendEvaReq extends BaseEntity {
     @Basic
     @Column(name = "systemid")
     private Integer systemID;
-
     @Basic
     @Column(name = "evidenceid")
     private String evidenceID;
-
     @Basic
     @Column(name = "globalid")
     private String globalID;
