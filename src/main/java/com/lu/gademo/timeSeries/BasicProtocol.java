@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 
 
 public class BasicProtocol {
-
+    // 符号计算协议（计算正负性）
     public static int signComputeProtocol(BigInteger c1, SHSParamters Param) {
 
         int k1 = Param.k1;
@@ -35,7 +35,7 @@ public class BasicProtocol {
         }
     }
 
-
+    // 最小值计算协议
     public static BigInteger minimumComputeProtocol(BigInteger c1, BigInteger c2, BigInteger cipherMiunsOne, BigInteger cipherOne, SHSParamters Param) {
         int k1 = Param.k1;
         int k2 = Param.k2;
@@ -67,7 +67,7 @@ public class BasicProtocol {
         return result;
 
     }
-
+    // 绝对值计算协议
     public static BigInteger absoluteComputeProtocol(BigInteger c1, BigInteger c2, BigInteger cipherMiunsOne, BigInteger cipherOne, SHSParamters Param) {
 
         int k1 = Param.k1;

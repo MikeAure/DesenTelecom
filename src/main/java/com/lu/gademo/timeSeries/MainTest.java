@@ -102,58 +102,58 @@ public class MainTest {
         //for (int i = 0; i < cycle; i++) {
 
         // encryption by our scheme
-        HashMap<Integer, ArrayList<Integer>> pivotsList = PreCompute.ChoosePivots(intDataList, k);
-//        HashMap<Integer, ArrayList<Integer>> pivotsList = new HashMap<>();
-//
-//        ArrayList<Integer> list0 = new ArrayList<>();
-//        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
-//        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
-//        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
-//        list0.add(-72); list0.add(-2); list0.add(191); list0.add(-34); list0.add(-72);
-//        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(152); list0.add(178);
-//        list0.add(146); list0.add(146); list0.add(-34); list0.add(-72); list0.add(-72);
-//        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
-//        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
-//        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
-//
-//        ArrayList<Integer> list1 = new ArrayList<>();
-//        list1.add(-61); list1.add(-61); list1.add(237); list1.add(44); list1.add(-61);
-//        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(184); list1.add(79);
-//        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(114);
-//        list1.add(149); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61);
-//        list1.add(-25); list1.add(255); list1.add(-25); list1.add(-61); list1.add(-61);
-//        list1.add(-61); list1.add(-61); list1.add(149); list1.add(114); list1.add(-61);
-//        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(44); list1.add(255);
-//        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(202);
-//        list1.add(61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61);
-//        list1.add(114);
-//
-//        ArrayList<Integer> list2 = new ArrayList<>();
-//        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
-//        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
-//        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
-//        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
-//        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
-//        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(633);
-//        list2.add(-24); list2.add(-24); list2.add(335); list2.add(12); list2.add(-24);
-//        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(277); list2.add(-24);
-//        list2.add(-24); list2.add(-24); list2.add(161); list2.add(-24);
-//
-//        ArrayList<Integer> list3 = new ArrayList<>();
-//        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
-//        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
-//        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
-//        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
-//        list3.add(-18); list3.add(-18); list3.add(584); list3.add(-18); list3.add(-18);
-//        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
-//        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
-//        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(600);
-//        list3.add(-18);
-//
-//        pivotsList.put(0, list0);
-//        pivotsList.put(1, list1);
-//        pivotsList.put(2, list2);
-//        pivotsList.put(3, list3);
+//        HashMap<Integer, ArrayList<Integer>> pivotsList = PreCompute.ChoosePivots(intDataList, k);
+        HashMap<Integer, ArrayList<Integer>> pivotsList = new HashMap<>();
+
+        ArrayList<Integer> list0 = new ArrayList<>();
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-2); list0.add(191); list0.add(-34); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(152); list0.add(178);
+        list0.add(146); list0.add(146); list0.add(-34); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+        list0.add(-72); list0.add(-72); list0.add(-72); list0.add(-72);
+
+        ArrayList<Integer> list1 = new ArrayList<>();
+        list1.add(-61); list1.add(-61); list1.add(237); list1.add(44); list1.add(-61);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(184); list1.add(79);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(114);
+        list1.add(149); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61);
+        list1.add(-25); list1.add(255); list1.add(-25); list1.add(-61); list1.add(-61);
+        list1.add(-61); list1.add(-61); list1.add(149); list1.add(114); list1.add(-61);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(44); list1.add(255);
+        list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(202);
+        list1.add(61); list1.add(-61); list1.add(-61); list1.add(-61); list1.add(-61);
+        list1.add(114);
+
+        ArrayList<Integer> list2 = new ArrayList<>();
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(-24); list2.add(633);
+        list2.add(-24); list2.add(-24); list2.add(335); list2.add(12); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(-24); list2.add(277); list2.add(-24);
+        list2.add(-24); list2.add(-24); list2.add(161); list2.add(-24);
+
+        ArrayList<Integer> list3 = new ArrayList<>();
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(584); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18);
+        list3.add(-18); list3.add(-18); list3.add(-18); list3.add(-18); list3.add(600);
+        list3.add(-18);
+
+        pivotsList.put(0, list0);
+        pivotsList.put(1, list1);
+        pivotsList.put(2, list2);
+        pivotsList.put(3, list3);
 
         System.out.println("pivotsList: " + pivotsList.toString());
         HashMap<Integer, int[]> distanceList = PreCompute.PreComputeDistance(intDataList, pivotsList, lamda);
@@ -180,11 +180,7 @@ public class MainTest {
         // query processing with our scheme
         HashMap<BigInteger, ArrayList<BigInteger>> filterResult = KDTree.SearchTreeFiltration(encryptT, token, filterParam, verifyParam);
         System.out.println("operationTime:" + filterResult.size());
-
-
         operationTime = operationTime + filterResult.size();
-
-        //}
         int index = (int) KDTree.SearchTreeVerification(filterResult, token, verifyParam, VerifycipherMiunsOne, VerifyCipherOne, SecretKeyS1, SecretKeyS2);
         System.out.println(index);
 //        operationTime = operationTime / cycle / 20;
@@ -315,9 +311,11 @@ public class MainTest {
 
         int delta = 350;
         int cycle = 25;*/
-
+        // 查询的记录数量
         int[] n = {2000};
+        // 每条记录的维度
         int d = 48;
+        // 选择参考点的数量
         int[] k = {4};
 //        int delta = 50;
         int delta = 200;

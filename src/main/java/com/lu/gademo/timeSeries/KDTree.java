@@ -225,60 +225,121 @@ public class KDTree {
         /*for(int i = 0; i < 20; i++) {*/
 
         double t1 = System.currentTimeMillis();
-        BigInteger encryptID = (BigInteger) distanceList.keySet().toArray()[0];
-        BigInteger encryptDistance = TWED.TWEDComputeCipher(queryRecord, distanceList.get(encryptID), encryptLamda,
-                cipherMiunsOne, cipherOne, VerificationParam);
-        // 同态操作
-        BigInteger encryptValue = encryptDelta.add(cipherMiunsOne.multiply(encryptDistance).mod(N)).mod(N);
-
-        // server S1
-        r1 = (new BigInteger(k1, rnd));
-        r2 = (new BigInteger(k1, rnd));
-        while (r1.compareTo(r2) == -1 || r1.compareTo(r2) == 0) {
+        int counter = 0;
+        for (Map.Entry<BigInteger, ArrayList<BigInteger>> entry : distanceList.entrySet()) {
+            if (counter >= 10) break;
+            BigInteger encryptID = entry.getKey();
+            BigInteger encryptDistance = TWED.TWEDComputeCipher(queryRecord, entry.getValue(), encryptLamda,
+                    cipherMiunsOne, cipherOne, VerificationParam);
+            // 同态操作
+            BigInteger encryptValue = encryptDelta.add(cipherMiunsOne.multiply(encryptDistance).mod(N)).mod(N);
+            // Sign computation protocol
+            // server S1
+            r1 = (new BigInteger(k1, rnd));
             r2 = (new BigInteger(k1, rnd));
-        }
+            while (r1.compareTo(r2) == -1 || r1.compareTo(r2) == 0) {
+                r2 = (new BigInteger(k1, rnd));
+            }
 
-        BigInteger c = encryptValue.multiply(r1).mod(N).add(r2).mod(N);
-        //server S2
-        BigInteger m = SymHomSch.Dec(c, VerificationParam);
+            BigInteger c = encryptValue.multiply(r1).mod(N).add(r2).mod(N);
+            //server S2
+            BigInteger m = SymHomSch.Dec(c, VerificationParam);
 
-        int sign;
-        BigInteger encryptSign = BigInteger.ONE;
+            int sign;
+            BigInteger encryptSign = BigInteger.ONE;
 
-        if (m.bitLength() != VerificationParam.L.bitLength()) {
-            sign = 1;
-            encryptSign = SymHomSch.EncInt(1, VerificationParam);
-        } else {
-            BigInteger LminusOne = L.subtract(BigInteger.ONE);
-            encryptSign = SymHomSch.EncBiginteger(LminusOne, VerificationParam);
-        }
+            if (m.bitLength() != VerificationParam.L.bitLength()) {
+                sign = 1;
+                encryptSign = SymHomSch.EncInt(1, VerificationParam);
+            } else {
+                BigInteger LminusOne = L.subtract(BigInteger.ONE);
+                encryptSign = SymHomSch.EncBiginteger(LminusOne, VerificationParam);
+            }
 
-        // S1
-        encryptID = encryptID.multiply(encryptSign).mod(N);
+            // return the query result to the query user
+            // S1
+            encryptID = encryptID.multiply(encryptSign).mod(N);
 
-        r1 = (new BigInteger(k1, rnd));
-        r2 = (new BigInteger(k1, rnd));
-        while (r1.compareTo(r2) == -1 || r1.compareTo(r2) == 0) {
+            r1 = (new BigInteger(k1, rnd));
             r2 = (new BigInteger(k1, rnd));
+            while (r1.compareTo(r2) == -1 || r1.compareTo(r2) == 0) {
+                r2 = (new BigInteger(k1, rnd));
+            }
+
+            c = encryptID.multiply(r1).mod(N).add(r2).mod(N);
+
+            String message1 = r1.toString();
+            String message2 = r2.toString();
+
+            String cipher1 = AES.encrypt(message1, SecretKeyS1);
+            String cipher2 = AES.encrypt(message2, SecretKeyS1);
+
+            //server S2
+            m = SymHomSch.Dec(c, VerificationParam);
+
+            if (m.bitLength() != VerificationParam.L.bitLength()) {
+                String cipher3 = AES.encrypt(m.toString(), SecretKeyS2);
+                resultS1.add(cipher1);
+                resultS1.add(cipher2);
+                resultS2.add(cipher3);
+            }
+            counter ++;
         }
 
-        c = encryptID.multiply(r1).mod(N).add(r2).mod(N);
-
-        String message1 = r1.toString();
-        String message2 = r2.toString();
-
-        String cipher1 = AES.encrypt(message1, SecretKeyS1);
-        String cipher2 = AES.encrypt(message2, SecretKeyS1);
-
-        //server S2
-        m = SymHomSch.Dec(c, VerificationParam);
-
-        if (m.bitLength() != VerificationParam.L.bitLength()) {
-            String cipher3 = AES.encrypt(m.toString(), SecretKeyS2);
-            resultS1.add(cipher1);
-            resultS1.add(cipher2);
-            resultS2.add(cipher3);
-        }
+//        BigInteger encryptID = (BigInteger) distanceList.keySet().toArray()[0];
+//        BigInteger encryptDistance = TWED.TWEDComputeCipher(queryRecord, distanceList.get(encryptID), encryptLamda,
+//                cipherMiunsOne, cipherOne, VerificationParam);
+//        // 同态操作
+//        BigInteger encryptValue = encryptDelta.add(cipherMiunsOne.multiply(encryptDistance).mod(N)).mod(N);
+//        // Sign computation protocol
+//        // server S1
+//        r1 = (new BigInteger(k1, rnd));
+//        r2 = (new BigInteger(k1, rnd));
+//        while (r1.compareTo(r2) == -1 || r1.compareTo(r2) == 0) {
+//            r2 = (new BigInteger(k1, rnd));
+//        }
+//
+//        BigInteger c = encryptValue.multiply(r1).mod(N).add(r2).mod(N);
+//        //server S2
+//        BigInteger m = SymHomSch.Dec(c, VerificationParam);
+//
+//        int sign;
+//        BigInteger encryptSign = BigInteger.ONE;
+//
+//        if (m.bitLength() != VerificationParam.L.bitLength()) {
+//            sign = 1;
+//            encryptSign = SymHomSch.EncInt(1, VerificationParam);
+//        } else {
+//            BigInteger LminusOne = L.subtract(BigInteger.ONE);
+//            encryptSign = SymHomSch.EncBiginteger(LminusOne, VerificationParam);
+//        }
+//
+//        // S1
+//        encryptID = encryptID.multiply(encryptSign).mod(N);
+//
+//        r1 = (new BigInteger(k1, rnd));
+//        r2 = (new BigInteger(k1, rnd));
+//        while (r1.compareTo(r2) == -1 || r1.compareTo(r2) == 0) {
+//            r2 = (new BigInteger(k1, rnd));
+//        }
+//
+//        c = encryptID.multiply(r1).mod(N).add(r2).mod(N);
+//
+//        String message1 = r1.toString();
+//        String message2 = r2.toString();
+//
+//        String cipher1 = AES.encrypt(message1, SecretKeyS1);
+//        String cipher2 = AES.encrypt(message2, SecretKeyS1);
+//
+//        //server S2
+//        m = SymHomSch.Dec(c, VerificationParam);
+//
+//        if (m.bitLength() != VerificationParam.L.bitLength()) {
+//            String cipher3 = AES.encrypt(m.toString(), SecretKeyS2);
+//            resultS1.add(cipher1);
+//            resultS1.add(cipher2);
+//            resultS2.add(cipher3);
+//        }
 
 	    	/*double t2 = System.currentTimeMillis();
 			if(i >= 10) {
@@ -301,13 +362,13 @@ public class KDTree {
             BigInteger x = new BigInteger(s3);
             ID.add(x.subtract(r2).divide(r1));
         }
+        System.out.println("distanceList: " + distanceList.size());
         System.out.println("ID大小：" + ID.size());
         System.out.println("ID内容：");
         for (BigInteger element : ID) {
             System.out.println(element);
             t = element.intValue();
         }
-
         return t;
     }
 
