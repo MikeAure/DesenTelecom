@@ -177,7 +177,7 @@ def getCorrMatrix(trjs, budget, poiId, pois, attribute1ToPoi, input_file):
     # print(corrMatrix)
     j = 0
     poi_selected_id = []
-    file = os.path.dirname(os.path.dirname(input_file)) + os.sep + "graph" + os.sep + "not_in_geolife_poi.txt"
+    file = os.path.dirname(os.path.dirname(__file__)) + os.sep + "graph" + os.sep + "not_in_geolife_poi.txt"
     with open(file, 'r') as f:
         pois_not = f.readlines()
     for i in range(len(poiId)):
@@ -258,23 +258,23 @@ def main(input_file, newFilePath, param):
     budget1 = budget * 4 / 10
     budget2 = budget * 4 / 10
     budget3 = budget * 2 / 10
-    print("开始建模与加噪")
+    print("Start modeling and adding noise")
     starttime = datetime.datetime.now()
     start, category1, category2, category3 = getGraph(trjs0, budget1, attribute1, attribute2, attribute3)
     poi_selected, attribute1ToPoi, corrMatrix = getCorrMatrix(trjs0, budget2, poiId, pois, attribute1ToPoi, input_file)
     length = getLenDistribution(trjs0, budget3)
     endtime = datetime.datetime.now()
-    print("建模时间：", (endtime - starttime).seconds, "s")
+    print("Modelling time", (endtime - starttime).seconds, "s")
     multi_parm = [(1147, length, start, category1, category2, category3, corrMatrix, pois, poi_selected,
                    attribute1, attribute2, attribute3, attribute1ToPoi) for j in range(8)]
-    print("开始合成轨迹")
+    print("Start synthetic trajectory")
     starttime = datetime.datetime.now()
     # 进行多进程运算
     with Pool() as pool:
         multi_result_list = pool.starmap(syntheticTrajectory, multi_parm)
     # syntheticTrajectory(9173,length,start,category1,category2,category3,corrMatrix,budget,i+1)
     endtime = datetime.datetime.now()
-    print("轨迹合成时间：", (endtime - starttime).seconds, "s")
+    print("Tracjectory generation time: ", (endtime - starttime).seconds, "s")
 
     if not os.path.exists(os.path.dirname(newFilePath)):
         os.makedirs(os.path.dirname(newFilePath))

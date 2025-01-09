@@ -490,7 +490,7 @@ public class DpTest {
                     switch (cell.getCellType()) {
                         case STRING:
                             // 如果单元格是字符串类型，尝试解析为日期
-                            String dateString = cell.getStringCellValue();
+                            String dateString = cell.getStringCellValue().trim();
                             java.util.Date date = dateParseUtil.parseDate(dateString);
                             if (date != null) {
                                 String formattedDate = sdf.format(date);

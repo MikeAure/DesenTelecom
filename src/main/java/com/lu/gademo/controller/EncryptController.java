@@ -1,6 +1,8 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.entity.ga.LatLong;
 import com.lu.gademo.model.LogSenderManager;
+import com.lu.gademo.service.BasicDataService;
 import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.common.Vertex;
 import com.lu.gademo.trace.client.user.Customer;
@@ -50,6 +52,10 @@ public class EncryptController {
     private Util util;
     @Autowired
     private LogSenderManager logSenderManager;
+    @Autowired
+    private BasicDataService basicDataService;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+
 
     private final double minLat = 34.14;
     private final double maxLat = 34.43;
@@ -333,12 +339,17 @@ public class EncryptController {
 
     @ResponseBody
     @GetMapping(value = "/generateTestData", produces = "application/json;charset=UTF-8")
-    public ServerResponse<String> generateTestData() {
-        generateRandomGeoPoints(minLat, maxLat, minLon, maxLon, numberOfPoints);
+    public ServerResponse<String> generateTestData() throws ExecutionException, InterruptedException {
+//        generateRandomGeoPoints(minLat, maxLat, minLon, maxLon, numberOfPoints);
         StringBuilder sb = new StringBuilder();
-        for (double[] randomPoint : randomPoints) {
-            sb.append(randomPoint[0]).append(" ").append(randomPoint[1]).append("\n");
+        List<LatLong> result = fetchRandomLatitudeAndLongitude(60000000, 500000, 10);
+        log.info("Result size: {}", result.size());
+        for (LatLong latLong : result) {
+            sb.append(latLong.getLatitude()).append(" ").append(latLong.getLongitude()).append("\n");
         }
+//        for (double[] randomPoint : randomPoints) {
+//            sb.append(randomPoint[0]).append(" ").append(randomPoint[1]).append("\n");
+//        }
         return new ServerResponse<>("ok", sb.toString());
     }
 
@@ -352,6 +363,39 @@ public class EncryptController {
             randomPoints[i][1] = longitude;
         }
 //        return randomPoints;
+    }
+
+    private Set<Integer> generateUniqueRandomIndices(int total, int sampleTimes, int batchSize) {
+        Random random = new Random();
+        Set<Integer> indices = new HashSet<>();
+        int bucketSize = total / sampleTimes;
+
+        for (int i = 0; i < sampleTimes; i++) {
+            indices.add(1 + bucketSize * i + random.nextInt(bucketSize - batchSize));
+        }
+        return indices;
+    }
+
+    public List<LatLong> fetchRandomLatitudeAndLongitude(int tableRecords, int totalRecords, int sampleTimes) throws InterruptedException, ExecutionException {
+
+        int batchSize = totalRecords / sampleTimes;
+        Set<Integer> uniqueIndices = generateUniqueRandomIndices(tableRecords, sampleTimes, batchSize);
+//        log.info("Unique Indices: {}", uniqueIndices);
+        // 结果列表
+        List<Future<List<LatLong>>> futures = new ArrayList<>();
+        List<LatLong> finalResults = new ArrayList<>();
+
+        // 提交任务到线程池
+        for (int startIndex : uniqueIndices) {
+            futures.add(executorService.submit(() -> basicDataService.getLatitudeAndLongitudeInRange(startIndex, batchSize)));
+        }
+
+        // 等待所有任务完成并合并结果
+        for (Future<List<LatLong>> future : futures) {
+            finalResults.addAll(future.get());
+        }
+
+        return finalResults;
     }
 
     @ResponseBody

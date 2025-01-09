@@ -862,7 +862,8 @@ public class DpUtilImpl implements DpUtil {
         List<Date> newDate = new ArrayList<>();
         BigDecimal sensitivity = new BigDecimal(1);
         BigDecimal bigDecimalEpsilon = new BigDecimal(epsilon);
-
+        log.info("Epsilon: {}", this.decimalFormat.format(bigDecimalEpsilon));
+        log.info("Sensitivity: {}", sensitivity);
         BigDecimal beta = sensitivity.divide(bigDecimalEpsilon, 6, RoundingMode.HALF_UP);
         double betad = beta.setScale(6, RoundingMode.HALF_UP).doubleValue();
         //添加噪声，依次加day、hour、minute

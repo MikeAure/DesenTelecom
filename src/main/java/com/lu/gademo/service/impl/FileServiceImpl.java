@@ -9,10 +9,7 @@ import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import com.lu.gademo.event.LogManagerEvent;
 import com.lu.gademo.event.ReDesensitizeEvent;
 import com.lu.gademo.model.LogSenderManager;
-import com.lu.gademo.service.ExcelParamService;
-import com.lu.gademo.service.FileService;
-import com.lu.gademo.service.FileStorageService;
-import com.lu.gademo.service.SendEvaReqService;
+import com.lu.gademo.service.*;
 import com.lu.gademo.utils.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +36,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -80,8 +74,10 @@ public class FileServiceImpl implements FileService {
     private final Boolean ifSaveToDatabase;
     private final Boolean ifPlatformTest;
     private final FileStorageService fileStorageService;
+    private final BasicDataService basicDataService;
 
     private final DateParseUtil dateParseUtil;
+    private final ExecutorService executorService;
 
 
     @EventListener
@@ -121,10 +117,11 @@ public class FileServiceImpl implements FileService {
                            Boolean ifSendEvaFirst, FileStorageService fileStorageService,
                            @Value("${logSenderManager.ifPerformenceTest}")
                            Boolean ifPerformanceTest, DateParseUtil dateParseUtil,
-                            @Value("${logSenderManager.ifSaveToDatabase}")
+                           @Value("${logSenderManager.ifSaveToDatabase}")
                            Boolean ifSaveToDatabase,
                            @Value("${logSenderManager.ifPlatformTest}")
-        Boolean ifPlatformTest
+                           Boolean ifPlatformTest,
+                           BasicDataService basicService
     ) throws IOException {
         this.algorithmsFactory = algorithmsFactory;
         this.dp = dp;
@@ -157,6 +154,8 @@ public class FileServiceImpl implements FileService {
         this.dateParseUtil = dateParseUtil;
         this.ifSaveToDatabase = ifSaveToDatabase;
         this.ifPlatformTest = ifPlatformTest;
+        this.basicDataService = basicService;
+        this.executorService = Executors.newFixedThreadPool(10);
     }
 
     private LogInfo processExcel(FileStorageDetails fileStorageDetails, String params, String sheetName,
@@ -1741,7 +1740,7 @@ public class FileServiceImpl implements FileService {
                         switch (cell.getCellType()) {
                             case STRING:
                                 // 如果单元格是字符串类型，尝试解析为日期
-                                String dateString = cell.getStringCellValue();
+                                String dateString = cell.getStringCellValue().trim();
                                 java.util.Date date = dateParseUtil.parseDate(dateString);
                                 if (date != null) {
                                     String formattedDate = sdf.format(date);
@@ -1758,7 +1757,7 @@ public class FileServiceImpl implements FileService {
 //                                    System.out.println("Formatted Date from Numeric: " + formattedDate);
                                     objs.add(formattedDate);
                                 } else {
-                                    String formatCellValue = dataFormatter.formatCellValue(cell);
+                                    String formatCellValue = dataFormatter.formatCellValue(cell).trim();
                                     java.util.Date date2 = dateParseUtil.parseDate(formatCellValue);
                                     if (date2 != null) {
                                         String formattedDate = sdf.format(date2);
@@ -1783,7 +1782,7 @@ public class FileServiceImpl implements FileService {
                                 objs.add((long) cellTemp);
                             }
                         } else {
-                            objs.add(cell.getStringCellValue());
+                            objs.add(cell.getStringCellValue().trim());
                         }
                     }
                     // 编码型数据
@@ -1791,7 +1790,7 @@ public class FileServiceImpl implements FileService {
                         if (cell.getCellType() == CellType.NUMERIC) {
                             objs.add(String.valueOf(cell.getNumericCellValue()));
                         } else {
-                            objs.add(cell.getStringCellValue());
+                            objs.add(cell.getStringCellValue().trim());
                         }
                     }
                     // 数值型数据
@@ -1799,10 +1798,10 @@ public class FileServiceImpl implements FileService {
                         if (cell.getCellType() == CellType.NUMERIC) {
                             objs.add(String.valueOf(cell.getNumericCellValue()));
                         } else {
-                            objs.add(cell.getStringCellValue());
+                            objs.add(cell.getStringCellValue().trim());
                         }
                     } else {
-                        objs.add(cell);
+                        objs.add(cell.getStringCellValue());
                     }
                 }
             }
@@ -1835,10 +1834,12 @@ public class FileServiceImpl implements FileService {
 
             int algoNum = excelParam.getK();
             AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(algoNum);
-//            log.info("Excel Param: {}", excelParam);
+            log.info("Excel Param: {}", excelParam);
             addDataTypeAndInfoIden(infoBuilders, excelParam, columnName, algoNum);
             // 取列数据
             List<Object> objs = preprocessedData.get(columnIndex);
+            int columnDataType = excelParam.getDataType();
+
             // 添加脱敏参数
             infoBuilders.desenAlgParam.append(
                     excelParam.getTmParam() == 0 ? "没有脱敏," :
@@ -1846,7 +1847,108 @@ public class FileServiceImpl implements FileService {
             );
             infoBuilders.desenRequirements.append(columnName).append(algorithmInfo.getRequirement()).append(",");
             // 这里的类型信息是否需要注意下
-            desenResult.put(columnIndex, getDsList(algorithmInfo, new DSObject(objs), excelParam));
+            switch (columnDataType) {
+                case 0:
+                case 1:
+                case 3:
+                case 4: {
+                    desenResult.put(columnIndex, getDsList(algorithmInfo, new DSObject(objs), excelParam));
+                    break;
+                }
+                case 5:
+                case 6:
+                case 7: {
+                    Map<String, String> rawDesenMap = new HashMap<>();
+                    List<String> result = new ArrayList<>();
+                    for (Object obj : objs) {
+                        if (obj == null) {
+                            // 如果 obj 是 null，直接添加空字符串到结果列表中
+                            result.add("");
+                            continue;
+                        }
+
+                        String originalFileName = obj.toString();
+                        String desensitizedFileName = generateDesensitizedFileName(originalFileName);
+
+                        rawDesenMap.putIfAbsent(originalFileName, desensitizedFileName);
+                        log.info("desensitizedFileName: " + desensitizedFileName);
+                        result.add(rawDesenMap.get(originalFileName));
+                    }
+                    desenResult.put(columnIndex, result);
+                    for (Map.Entry<String, String> item : rawDesenMap.entrySet()) {
+                        log.info("当前脱敏文件名: " + item.getKey());
+                        String originalFileName = item.getKey();
+                        String desensitizedFileName = item.getValue();
+                        log.info("Excel Param: {}", excelParam.getTmParam());
+                        if (excelParam.getTmParam() == 0) {
+                            try {
+                                Files.copy(Paths.get(originalFileName), Paths.get(desensitizedFileName));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+//                            System.out.println("不经脱敏：" + desensitizedFileName);
+                        } else {
+                            DSObject dsObject = new DSObject(Arrays.asList(originalFileName, desensitizedFileName));
+                            algorithmInfo.execute(dsObject, excelParam.getTmParam() - 1);
+//                            System.out.println("经脱敏：" + desensitizedFileName);
+                        }
+                    }
+                    break;
+                }
+                case 8: {
+//                    Set<String> rawGraphSet = new HashSet<>();
+//                    Set<String> desenGraphSet = new HashSet<>();
+                    Map<String, String> rawDesenMap = new HashMap<>();
+                    List<String> result = new ArrayList<>();
+                    for (Object obj : objs) {
+                        if (obj == null) {
+                            // 如果 obj 是 null，直接添加空字符串到结果列表中
+                            result.add("");
+                            continue;
+                        }
+                        int lastIndex = obj.toString().lastIndexOf(":");
+                        String originalFileName = obj.toString().substring(0, lastIndex);
+                        String lineNum = obj.toString().substring(lastIndex + 1);
+                        log.info("Original Filename: {}", originalFileName);
+                        log.info("Line Number: {}", lineNum);
+                        String desensitizedFileName = generateDesensitizedFileName(originalFileName);
+//                        rawGraphSet.add(originalFileName);
+                        rawDesenMap.putIfAbsent(originalFileName, desensitizedFileName);
+//                        desenGraphSet.add(desensitizedFileName);
+                        log.info("desensitizedFileName: " + rawDesenMap.get(originalFileName));
+
+                        result.add(rawDesenMap.get(originalFileName) + ":" + lineNum);
+                    }
+                    // 使用单独的线程对图形进行脱敏
+                    Thread desenGraph = new Thread(() -> {
+                        log.info("使用独立线程对表格中图形模态进行脱敏");
+                        for (Map.Entry<String, String> item : rawDesenMap.entrySet()) {
+                            log.info("当前脱敏文件名: " + item.getKey());
+                            String originalFileName = item.getKey();
+                            String desensitizedFileName = item.getValue();
+                            log.info("Excel Param: {}", excelParam.getTmParam());
+
+                            if (excelParam.getTmParam() == 0) {
+                                try {
+                                    Files.copy(Paths.get(originalFileName), Paths.get(desensitizedFileName));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+//                                System.out.println("不经脱敏：" + desensitizedFileName);
+                            } else {
+                                DSObject dsObject = new DSObject(Arrays.asList(originalFileName, desensitizedFileName));
+                                algorithmInfo.execute(dsObject, excelParam.getTmParam() - 1);
+//                                System.out.println("经脱敏：" + desensitizedFileName);
+                            }
+
+                        }
+                        log.info("图形模态脱敏完成");
+                    });
+                    desenGraph.start();
+                    desenResult.put(columnIndex, result);
+                    break;
+                }
+            }
         }
 
         long endTimePoint = System.currentTimeMillis();
@@ -1860,6 +1962,46 @@ public class FileServiceImpl implements FileService {
         log.info("每秒钟可脱敏单元格数量：{}", cellsInOneSecond);
         return desenResult;
 
+    }
+
+    public String generateDesensitizedFileName(String originalPath) {
+        // 检查路径是否为空
+        if (originalPath == null || originalPath.trim().isEmpty()) {
+            throw new IllegalArgumentException("原始路径不能为空");
+        }
+
+//        // 获取当前工作目录并构建目标目录路径
+        String uploadDir = desenFileDirectory.toAbsolutePath().toString();
+        File originalFile = new File(originalPath);
+        String fileName = originalFile.getName(); // 获取文件名
+
+        // 检查文件名是否为空
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("路径中未找到有效的文件名");
+        }
+
+        // 找到最后一个 '.' 的位置，以分离文件名和扩展名
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex == -1 || dotIndex == 0 || dotIndex == fileName.length() - 1) {
+            throw new IllegalArgumentException("文件名格式无效，未找到扩展名");
+        }
+
+        String namePart = fileName.substring(0, dotIndex); // 文件名部分
+        String extension = fileName.substring(dotIndex);   // 扩展名部分
+
+        // 拼接脱敏后的文件名
+        String desensitizedName = "desen_" + namePart + "_" + System.currentTimeMillis() + extension;
+
+        // 复制源文件到目标目录
+//        File targetFile = Paths.get(uploadDir, fileName).toFile();
+//        try {
+//            Files.copy(originalFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//        } catch (IOException e) {
+//            throw new RuntimeException("文件复制失败: " + e.getMessage(), e);
+//        }
+
+        // 返回完整路径，将文件保存到指定目录
+        return Paths.get(uploadDir, desensitizedName).toAbsolutePath().toString();
     }
 
     @Override
@@ -1882,8 +2024,7 @@ public class FileServiceImpl implements FileService {
             if (ifSendToEvaFirst) {
                 eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
                         logCollectResult, responseEntityCompletableFuture));
-            }
-            else if (ifPlatformTest && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
+            } else if (ifPlatformTest && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
                 logSenderManager.submitToFourSystems(logCollectResult, rawFileBytes, desenFileBytes);
                 eventPublisher.publishEvent(new LogManagerEvent(this, fileStorageDetails,
                         logCollectResult, responseEntityCompletableFuture));
@@ -2014,7 +2155,7 @@ public class FileServiceImpl implements FileService {
                         switch (cell.getCellType()) {
                             case STRING:
                                 // 如果单元格是字符串类型，尝试解析为日期
-                                String dateString = cell.getStringCellValue();
+                                String dateString = cell.getStringCellValue().trim();
                                 java.util.Date date = dateParseUtil.parseDate(dateString);
                                 if (date != null) {
                                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -3611,7 +3752,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileStorageDetails generateTextTestFile(int totalNumber) throws IOException {
+    public FileStorageDetails generateTextTestFile(int totalNumber) throws IOException, ExecutionException, InterruptedException {
         String fileName = "textTestFile.txt"; // 定义输出文件的路径
 
         // 使用随机数生成器生成数值数据
@@ -3621,17 +3762,55 @@ public class FileServiceImpl implements FileService {
         OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(rawFileStorageDetails.getRawFilePath()),
                 StandardCharsets.UTF_8);
 
-        for (int i = 0; i < totalNumber; i++) {
-            double randomNumber = 10000 * random.nextDouble(); // 生成随机浮点数
-            writer.write(String.valueOf(randomNumber));
-            writer.write("\n"); // 每个数字后写入一个新行
-        }
+//        for (int i = 0; i < totalNumber; i++) {
+//            double randomNumber = 10000 * random.nextDouble(); // 生成随机浮点数
+//            writer.write(String.valueOf(randomNumber));
+//            writer.write("\n"); // 每个数字后写入一个新行
+//        }
 
+        List<Double> finalResult = fetchRandomPayAmounts(60000000, totalNumber, 10);
+        for (Double payAmount : finalResult) {
+            writer.write(String.valueOf(payAmount));
+            writer.write("\n");
+        }
         writer.flush();  // 确保所有数据都写入到ByteArrayOutputStream中
         writer.close();
 
         return rawFileStorageDetails; // 保存文件到文件系统
 
+    }
+
+    private Set<Integer> generateUniqueRandomIndices(int total, int sampleTimes, int batchSize) {
+        Random random = new Random();
+        Set<Integer> indices = new HashSet<>();
+        int bucketSize = total / sampleTimes;
+
+        for (int i = 0; i < sampleTimes; i++) {
+            indices.add(1 + bucketSize * i + random.nextInt(bucketSize - batchSize));
+        }
+        return indices;
+    }
+
+    public List<Double> fetchRandomPayAmounts(int tableRecords, int totalRecords, int sampleTimes) throws InterruptedException, ExecutionException {
+
+        int batchSize = totalRecords / sampleTimes;
+        Set<Integer> uniqueIndices = generateUniqueRandomIndices(tableRecords, sampleTimes, batchSize);
+//        log.info("Unique Indices: {}", uniqueIndices);
+        // 结果列表
+        List<Future<List<Double>>> futures = new ArrayList<>();
+        List<Double> finalResults = new ArrayList<>();
+
+        // 提交任务到线程池
+        for (int startIndex : uniqueIndices) {
+            futures.add(executorService.submit(() -> basicDataService.getPayAmountInRange(startIndex, batchSize)));
+        }
+
+        // 等待所有任务完成并合并结果
+        for (Future<List<Double>> future : futures) {
+            finalResults.addAll(future.get());
+        }
+
+        return finalResults;
     }
 
     private void saveExcelParamsToDatabase(String sheetName, Boolean ifSaveExcelParam, List<ExcelParam> excelParamList) {

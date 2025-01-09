@@ -1,6 +1,7 @@
 package com.lu.gademo.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.lu.gademo.entity.BasicData;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.ga.Meeting;
@@ -8,6 +9,7 @@ import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.FileStorageService;
+import com.lu.gademo.service.impl.BasicDataAnalysisEventListener;
 import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;
@@ -29,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.Basic;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
@@ -143,7 +146,7 @@ public class FileController extends BaseController {
         log.info("Params: {}", params);
         log.info("AlgName: {}", algName);
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
-        return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, true);
+        return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, false);
     }
 
 
@@ -187,7 +190,7 @@ public class FileController extends BaseController {
 
     @GetMapping(value = "generateTextTestData")
     public ResponseEntity<Resource> generateTextTestData(@RequestParam("totalNumber") Integer totalNumber)
-            throws IOException {
+            throws IOException, ExecutionException, InterruptedException {
         log.info("开始生成失真文本算法测试文件");
         HttpHeaders headers = new HttpHeaders();
         FileStorageDetails fileStorageDetails = fileService.generateTextTestFile(totalNumber);
@@ -279,6 +282,45 @@ public class FileController extends BaseController {
         log.info("Raw File Path String: {}", fileStorageDetails.getRawFilePathString());
         EasyExcel.read(fileStorageDetails.getRawFilePathString(), Meeting.class,
                 new MeetingAnalysisEventListener(algorithmsFactory, config, fileStorageDetails.getDesenFilePathString()))
+                .sheet().doRead();
+        excelParamList.clear();
+        config.clear();
+
+        Resource resource = new FileSystemResource(fileStorageDetails.getDesenFilePath());
+//        fileStorageDetails.setRawFileBytes(new byte[0]);
+        HttpHeaders httpheaders = new HttpHeaders();
+        httpheaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        httpheaders.setContentDispositionFormData("attachment", fileStorageDetails.getDesenFileName());
+        excelParamList = null;
+        config = null;
+        fileStorageDetails = null;
+        System.gc();
+        return ResponseEntity.ok().headers(httpheaders).body(resource);
+
+    }
+
+    @ResponseBody
+    @PostMapping(value = "bigExcelDesen2")
+    public ResponseEntity<Resource> bigExcelDesen2(@RequestPart("file") MultipartFile file,
+                                                  @RequestParam("params") String params,
+                                                  @RequestParam("algName") String algName,
+                                                  @RequestParam("sheet") String sheet
+    ) throws IOException {
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+        log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
+        log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
+        // 调用脱敏函数
+        String fileName = file.getOriginalFilename();
+        String fileType = getFileSuffix(fileName);
+        log.info("File Type: " + fileType);
+        log.info("AlgName: " + algName);
+        log.info("Sheet: {}", sheet);
+        List<ExcelParam> excelParamList = logCollectUtil.jsonStringToParams(params);
+        Map<String, ExcelParam> config = excelParamList.parallelStream()
+                .collect(Collectors.toMap(param -> param.getFieldName().trim(), Function.identity()));
+        log.info("Raw File Path String: {}", fileStorageDetails.getRawFilePathString());
+        EasyExcel.read(fileStorageDetails.getRawFilePathString(), BasicData.class,
+                        new BasicDataAnalysisEventListener(algorithmsFactory, config, fileStorageDetails.getDesenFilePathString()))
                 .sheet().doRead();
         excelParamList.clear();
         config.clear();

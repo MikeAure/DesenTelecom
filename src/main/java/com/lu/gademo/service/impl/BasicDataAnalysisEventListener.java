@@ -6,36 +6,36 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.lu.gademo.entity.ExcelParam;
-import com.lu.gademo.entity.ga.Meeting;
+import com.lu.gademo.entity.BasicData;
 import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.utils.AlgorithmsFactory;
 import com.lu.gademo.utils.DSObject;
+
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 import static com.lu.gademo.service.impl.FileServiceImpl.getDsList;
 
-
-public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>  {
-
+public class BasicDataAnalysisEventListener extends AnalysisEventListener<BasicData> {
     private static final int BATCH_SIZE = 50000;
-    private final List<Meeting> patch;
+    private final List<BasicData> patch;
     private final ExcelWriter excelWriter;
     private final WriteSheet writeSheet;
     private final AlgorithmsFactory algorithmsFactory;
     private final Map<String, ExcelParam> config;
     private static final ThreadLocal<SimpleDateFormat> sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));;
 
-    public MeetingAnalysisEventListener(AlgorithmsFactory algorithmsFactory, Map<String, ExcelParam> config, String desenFilePath) {
+    public BasicDataAnalysisEventListener(AlgorithmsFactory algorithmsFactory, Map<String, ExcelParam> config, String desenFilePath) {
         this.patch = new ArrayList<>(BATCH_SIZE);
-        this.excelWriter = EasyExcel.write(desenFilePath, Meeting.class).build();
+        this.excelWriter = EasyExcel.write(desenFilePath, BasicData.class).build();
         this.writeSheet = EasyExcel.writerSheet("Sheet1").build();
         this.algorithmsFactory = algorithmsFactory;
         this.config = config;
     }
 
     @Override
-    public void invoke(Meeting data, AnalysisContext context) {
+    public void invoke(BasicData data, AnalysisContext context) {
         this.patch.add(data);
 
         if (this.patch.size() >= BATCH_SIZE) {
@@ -76,14 +76,14 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
             return;
         }
         Map<String, List<Object>> map = new HashMap<>();
-        Field[] fields = Meeting.class.getDeclaredFields();
+        Field[] fields = BasicData.class.getDeclaredFields();
 
         for (Field item : fields) {
 //            System.out.println(item.getName());
             map.put(item.getName(), new ArrayList<>());
         }
         // 清洗数据
-        for (Meeting obj : this.patch) {
+        for (BasicData obj : this.patch) {
             for (Field field : fields) {
                 field.setAccessible(true);
                 if (field.getType() == Date.class) {
@@ -97,8 +97,8 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
         }
 
         Map<String, List<Object>> maskedData = desen(map, this.config);
-        List<Meeting> desenResult = getDesenResult(maskedData, fields);
-        System.out.println(desenResult.get(0).getHysj());
+        List<BasicData> desenResult = getDesenResult(maskedData, fields);
+        System.out.println(desenResult.get(0).getIdcardNum());
         this.excelWriter.write(desenResult, this.writeSheet);
         maskedData.clear();
         desenResult.clear();
@@ -128,22 +128,26 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
         return desenResult;
     }
 
-    private List<Meeting> getDesenResult(Map<String, List<Object>> desenData, Field[] fields) throws IllegalAccessException {
-        List<Meeting> result = new ArrayList<>();
-        System.out.println("yhm size: " + desenData.get("yhm").size());
-        for (int i = 0; i < desenData.get("yhm").size(); i++) {
-            Meeting meeting = new Meeting();
+    private List<BasicData> getDesenResult(Map<String, List<Object>> desenData, Field[] fields) throws IllegalAccessException {
+        List<BasicData> result = new ArrayList<>();
+        System.out.println("idcardNum size: " + desenData.get("idcardNum").size());
+        for (int i = 0; i < desenData.get("idcardNum").size(); i++) {
+            BasicData basicData = new BasicData();
             for (Field field : fields) {
                 field.setAccessible(true);
                 if (field.getType() == Date.class) {
                     Date value = (Date) desenData.get(field.getName()).get(i);
-                    field.set(meeting, value);
+                    field.set(basicData, value);
+
+                } else if (field.getType() == double.class) {
+                    double value = (double) desenData.get(field.getName()).get(i);
+                    field.set(basicData, value);
                 } else {
                     String value = (String) desenData.get(field.getName()).get(i);
-                    field.set(meeting, value);
+                    field.set(basicData, value);
                 }
             }
-            result.add(meeting);
+            result.add(basicData);
         }
         return result;
     }
@@ -155,8 +159,8 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
      * @return
      * @throws IllegalAccessException
      */
-    private Meeting desenMeeting(Meeting obj, Field[] fields) throws IllegalAccessException {
-        Meeting meeting = new Meeting();
+    private BasicData desenBasicData(BasicData obj, Field[] fields) throws IllegalAccessException {
+        BasicData BasicData = new BasicData();
         for (int k = 0; k < fields.length; k++) {
             Field field = fields[k];
             field.setAccessible(true);
@@ -164,12 +168,12 @@ public class MeetingAnalysisEventListener extends AnalysisEventListener<Meeting>
             if (field.getType() == Date.class) {
                 Date value = (Date) field.get(obj);
                 value.setTime(value.getTime() + 86400000);
-                field.set(meeting, value);
+                field.set(BasicData, value);
             } else {
                 String value = (String) field.get(obj);
-                field.set(meeting, value.substring(0, 1));
+                field.set(BasicData, value.substring(0, 1));
             }
         }
-        return meeting;
+        return BasicData;
     }
 }

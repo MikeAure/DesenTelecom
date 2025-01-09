@@ -620,7 +620,7 @@
                                            placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
                                 </div>
                                 <div class="form-group" style="margin-top: 10px;">
-                                    <input type="text" id="CirDummy_k" class="form-control" placeholder="请输入匿名度k"
+                                    <input type="text" id="CirDummy_k" class="form-control" placeholder="请输入整数匿名度k（2≤k≤6）"
                                            style="font-size: 20px">
                                 </div>
                                 <div class="form-group" style="margin-top: 10px;">
@@ -667,7 +667,7 @@
                         说明：基于包含用户真实位置的虚拟方格产生虚拟位置。基于覆盖用户位置的虚拟网格生成k个虚拟位置，并返回k个虚拟位置的集合。同时，生成的虚拟方格还需要满足用户预先定义的匿名区域的面积的要求。
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：经度、纬度 匿名度k、匿名区域的面积s_cd
+                        输入：经度，纬度、匿名度k、匿名区域的面积s_cd
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：坐标数组
@@ -685,12 +685,12 @@
                                            placeholder="请输入经纬度，以,分隔" style="font-size: 20px">
                                 </div>
                                 <div class="form-group" style="margin-top: 10px;">
-                                    <input type="text" id="GridDummy_k" class="form-control" placeholder="请输入匿名度k"
+                                    <input type="text" id="GridDummy_k" class="form-control" placeholder="请输入整数匿名度k（2≤k≤6）"
                                            style="font-size: 20px">
                                 </div>
                                 <div class="form-group" style="margin-top: 10px;">
                                     <input type="text" id="GridDummy_s_cd" class="form-control"
-                                           placeholder="匿名区域的面积"
+                                           placeholder="匿名区域的面积s_cd（0＜s_cd≤100）"
                                            style="font-size: 20px">
                                 </div>
                                 <div class="form-group text-center">
@@ -731,7 +731,7 @@
                         分结果作为最终的矩形区域，输出该区域中所包含的缓存位置信息以及真实的用户位置信息。最终为用户形成一个包含用户数量刚好大于最小匿名度、且不可再分的隐藏区域。
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输入：维度，经度、 匿名度k、矩形区域左下角和右上角坐标
+                        输入：维度，经度、匿名度k、矩形区域左下角和右上角坐标
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输出：坐标数组
@@ -750,7 +750,7 @@
                                 </div>
                                 <div class="form-group" style="margin-top: 10px;">
                                     <input type="text" id="adaptiveIntervalCloakingWrapper_k" class="form-control"
-                                           placeholder="请输入匿名度k" style="font-size: 20px">
+                                           placeholder="请输入整数匿名度k（2≤k≤6）" style="font-size: 20px">
                                 </div>
                                 <div class="form-group" style="margin-top: 10px;">
                                     <input type="text" id="adaptiveIntervalCloakingWrapper_min" class="form-control"
@@ -850,7 +850,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：从预先生成的虚拟位置库中随机选择K-1个匿名位置，与真实位置一起形成K-匿名位置集合。（经度范围：[116.251772, 116.51892], 维度范围：[39.854504, 39.991843]
+                        说明：从预先生成的虚拟位置库中随机选择K-1个匿名位置，与真实位置一起形成K-匿名位置集合。（经度范围：[116.251772, 116.51892], 维度范围：[39.854504, 39.991843]）
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：经度，纬度、匿名度k
@@ -878,7 +878,7 @@
                                 </div>
                                 <div class="form-group" style="margin-top: 10px;">
                                     <input type="text" id="K_anonymity_position_k" class="form-control"
-                                           placeholder="请输入匿名度k" style="font-size: 20px">
+                                           placeholder="请输入整数匿名度k（2≤k≤6）" style="font-size: 20px">
 
                                 </div>
                                 <div class="form-group text-center">

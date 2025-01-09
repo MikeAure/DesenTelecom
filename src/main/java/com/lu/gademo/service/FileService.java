@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -25,7 +26,9 @@ public interface FileService {
     void redesenVideo(ReDesensitizeEvent event) throws Exception;
     void redesenAudio(ReDesensitizeEvent event) throws Exception;
 
-    FileStorageDetails generateTextTestFile(int totalNumber) throws IOException;
+    List<Double> fetchRandomPayAmounts(int tableRecords, int totalRecords, int sampleTimes) throws InterruptedException, ExecutionException;
+
+    FileStorageDetails generateTextTestFile(int totalNumber) throws IOException, ExecutionException, InterruptedException;
 
     ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ExecutionException, InterruptedException, TimeoutException;
 

@@ -82,14 +82,22 @@
                 0: "数值型数据",
                 1: "编码型数据",
                 3: "文本型数据",
-                4: "时间数据"
+                4: "时间数据",
+                5: "图像模态数据",
+                6: "视频模态数据",
+                7: "音频模态数据",
+                8: "图形模态数据"
             };
 
             const typeFieldOptions = {
                 "数值型数据": 0,
                 "编码型数据": 1,
                 "文本型数据": 3,
-                "时间数据": 4
+                "时间数据": 4,
+                "图像模态数据": 5,
+                "视频模态数据": 6,
+                "音频模态数据": 7,
+                "图形模态数据": 8
             };
 
             const privacyProtectionLevels = {
@@ -1293,6 +1301,7 @@
                                             <option th:value="${scene.sceneName}"
                                                     th:each="scene : ${scenes}"
                                                     th:text="${scene.sceneChineseName}"></option>
+                                            <option value="basicdata">基础数据</option>
 <!--                                            <option value="map">地图导航类场景</option>-->
 <!--                                            <option value="onlinetaxi">网络约车类场景</option>-->
 <!--                                            <option value="communication">即时通信场景</option>-->

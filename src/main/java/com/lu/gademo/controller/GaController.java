@@ -118,8 +118,8 @@ public class GaController extends BaseController {
                 AlgorithmInfoParamDto reportNoiseMax3Dto = new AlgorithmInfoParamDto(reportNoiseMax3.getId(), reportNoiseMax3.getLow(),
                         reportNoiseMax3.getMedium(), reportNoiseMax3.getHigh());
                 DesensitizationAlgorithm snapping = algorithmInfoDaoService.getAlgorithmInfoById(23).get(0);
-                AlgorithmInfoParamDto snappingDto = new AlgorithmInfoParamDto(snapping.getId(), snapping.getLow(),
-                        snapping.getMedium(), snapping.getHigh());
+                AlgorithmInfoParamDto snappingDto = new AlgorithmInfoParamDto(snapping.getId(), snapping.getLow().split(",")[0],
+                        snapping.getMedium().split(",")[0], snapping.getHigh().split(",")[0]);
 
                 model.addAttribute("laplace", laplaceDto);
                 model.addAttribute("laplaceImage", laplaceImageDto);

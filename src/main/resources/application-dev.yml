@@ -4,7 +4,7 @@ spring:
             indent_output: false
     datasource:
         ga:
-            jdbc-url: jdbc:mysql://localhost:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            jdbc-url: jdbc:mysql://192.168.1.39:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
