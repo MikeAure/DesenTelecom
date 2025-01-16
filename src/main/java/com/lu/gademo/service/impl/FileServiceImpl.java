@@ -543,15 +543,21 @@ public class FileServiceImpl implements FileService {
         Path desenFilePath = fileStorageDetails.getDesenFilePath();
         log.info(desenFilePath.toAbsolutePath().toString());
         String desenFilePathString = fileStorageDetails.getDesenFilePathString();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
         Stream<String> lines = Files.lines(rawFilePath);
         List<String> dataList = lines.collect(Collectors.toList());
+        if (algName.equals("dpDate")) {
+            dataList = dataList.stream().map(dateParseUtil::parseDate).map(sdf::format).collect(Collectors.toList());
+        }
         // 保存脱敏后文件
         // 脱敏文件路径
         BufferedWriter writer = new BufferedWriter(new FileWriter(desenFilePathString));      // 保存参数文件
         int desenParam = Integer.parseInt(String.valueOf(level.charAt(level.length() - 1)));
         // 数据行数
         int totalRowNum = dataList.size();
+        System.out.println("totalRowNum: " + totalRowNum);
 
         // 列数
         int columnCount = 1; // 获取列数
@@ -592,7 +598,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏结束时间
         String endTime = util.getTime();
         log.info("脱敏共耗时：" + (endTimePoint - startTimePoint) / 1e6 + "ms");
-        long oneTime = (endTimePoint - startTimePoint) / columnCount / (totalRowNum - 1);
+        long oneTime = (endTimePoint - startTimePoint) / columnCount / totalRowNum;
         // 打印单条运行时间
         log.info("脱敏单条数据时长：" + oneTime / 1e6 + " ms");
         // 一秒数据量
@@ -3229,6 +3235,7 @@ public class FileServiceImpl implements FileService {
         byte[] rawFileBytes = logInfo.getRawFileBytes();
         byte[] desenFileBytes = logInfo.getDesenFileBytes();
         String desenFileName = logInfo.getDesenFileName();
+
         // 选择不同的日志发送方式
         // 选择首先发给评测系统评测
         if (ifSendToEvaFirst) {

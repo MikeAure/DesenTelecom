@@ -150,7 +150,7 @@ public class AnonymityImpl implements Anonymity {
                     double[] retArrY = new double[len];
 
                     // 调用 gridDummy 方法生成虚假位置
-                    kAnonymityUtil.gridDummy(x, y, k, sCd, retArrX, retArrY);
+                    KAnonymityUtil.gridDummy(x, y, k, sCd, retArrX, retArrY);
 
                     List<String> result = new ArrayList<>();
                     for (int i = 0; i < len; ++i) {

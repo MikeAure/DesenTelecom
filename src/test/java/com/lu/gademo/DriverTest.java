@@ -77,7 +77,6 @@ public class DriverTest {
         StringBuilder DSb = new StringBuilder();
         String D = null;
         String D_i = null;
-
         for (int i = 0; i < C_iStr.length; i++) {
             // EN_ij1-EN_ij6
             C_inStr = C_iStr[i].trim().split(symbol1);

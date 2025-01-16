@@ -664,7 +664,7 @@
             <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 50%; margin: 0 auto;">
                 <div>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        说明：基于包含用户真实位置的虚拟方格产生虚拟位置。基于覆盖用户位置的虚拟网格生成k个虚拟位置，并返回k个虚拟位置的集合。同时，生成的虚拟方格还需要满足用户预先定义的匿名区域的面积的要求。
+                        说明：基于包含用户真实位置的虚拟方格产生虚拟位置。基于覆盖用户位置的虚拟网格生成k个虚拟位置，并返回大于等于k个虚拟位置的集合。同时，生成的虚拟方格还需要满足用户预先定义的匿名区域的面积的要求。
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
                         输入：经度，纬度、匿名度k、匿名区域的面积s_cd
@@ -800,7 +800,7 @@
                         输入：经度，纬度、算法类型（1表示CaDSA、2表示enhanced CaDSA）
                     </p>
                     <p style="font-size: 1.5em;text-align: justify;">
-                        输出：坐标数组
+                        输出：坐标数组（大小为2，k=3）
                     </p>
                     <p style="font-size: 1.5em;text-align: center;">算法测试</p>
 

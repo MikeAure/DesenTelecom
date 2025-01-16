@@ -133,39 +133,6 @@
             let textType = defaultOptionParts[defaultOptionParts.length - 1];
 
             setDefaultOption(textType, textAlgo);
-            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'text')
-            //     .then(response => {
-            //         if (response.ok) {
-            //             return response.json();
-            //         } else {
-            //             throw new Error('Failed to fetch');
-            //         }
-            //     })
-            //     .then(data => {
-            //         if (data.code === 200 && data.message) {
-            //             defaultOption = data.data;
-            //             console.log("defaultOption: " + defaultOption);
-            //             let defaultOptionParts = defaultOption.split("_");
-            //             let textAlgo = defaultOptionParts[0];
-            //             let textType = defaultOptionParts[defaultOptionParts.length - 1];
-            //
-            //             setDefaultOption(textType, textAlgo);
-            //
-            //         } else {
-            //             let defaultOptionParts = defaultOption.split("_");
-            //             let textAlgo = defaultOptionParts[0];
-            //             let textType = defaultOptionParts[defaultOptionParts.length - 1];
-            //             setDefaultOption(textType, textAlgo);
-            //         }
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //         alert("获取默认算法失败");
-            //         let defaultOptionParts = defaultOption.split("_");
-            //         let textAlgo = defaultOptionParts[0];
-            //         let textType = defaultOptionParts[defaultOptionParts.length - 1];
-            //         setDefaultOption(textType, textAlgo);
-            //     });
 
             function setDefaultOption(type, algo) {
                 // const defaultOptionTextType = getKeyByValue(value);
@@ -210,25 +177,6 @@
                     default_module.style.visibility = "visible";
                 }
             });
-
-            // document.getElementById("textType").addEventListener("change", function () {
-            //     // 获取文本类型和算法列表
-            //     let text_type = document.getElementById("textType").value;
-            //     let distortion_alg_list = document.getElementById("distortionAlg");
-            //     // 清空算法列表
-            //     distortion_alg_list.innerHTML = "";
-            //
-            //     // Check if the selected text type is in the allAlgorithms mapping
-            //     if (allAlgorithms[text_type]) {
-            //         // Add each algorithm option corresponding to the text type
-            //         allAlgorithms[text_type].forEach(alg => {
-            //             distortion_alg_list.options.add(new Option(alg.label, alg.value));
-            //         });
-            //     } else {
-            //         // If no mapping exists, add a default prompt
-            //         distortion_alg_list.options.add(new Option("请选择文本类型", "default"));
-            //     }
-            // });
 
             // 事件监听器，当文本类型改变时更新算法列表
             document.getElementById("textType").addEventListener("change", function () {
@@ -338,15 +286,15 @@
                                     let currentPage = 1;
 
                                     function displayTable(page) {
-                                        let startIndex = (page - 1) * pageSize + 1; // 跳过表头
+                                        let startIndex = (page - 1) * pageSize; // 跳过表头
                                         let endIndex = Math.min(startIndex + pageSize, lines.length);
 
-                                        let tableContent = '<thead><tr>';
+                                        // let tableContent = '<thead><tr>';
                                         let headers = lines[0];
-                                        headers.forEach(function (header) {
-                                            tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
-                                        });
-                                        tableContent += '</tr></thead><tbody>';
+                                        // headers.forEach(function (header) {
+                                        //     tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
+                                        // });
+                                        let tableContent = '<tbody>';
 
                                         for (let i = startIndex; i < endIndex; i++) {
                                             tableContent += '<tr>';
@@ -422,15 +370,15 @@
                                     let currentPage1 = 1;
 
                                     function displayTable1(page1) {
-                                        let startIndex1 = (page1 - 1) * pageSize + 1; // 跳过表头
+                                        let startIndex1 = (page1 - 1) * pageSize; // 跳过表头
                                         let endIndex = Math.min(startIndex1 + pageSize, lines.length);
 
-                                        let tableContent1 = '<thead><tr>';
+                                        // let tableContent1 = '<thead><tr>';
                                         let headers1 = lines[0];
-                                        headers1.forEach(function (header1) {
-                                            tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
-                                        });
-                                        tableContent1 += '</tr></thead><tbody>';
+                                        // headers1.forEach(function (header1) {
+                                        //     tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
+                                        // });
+                                        let tableContent1 = '<tbody>';
 
                                         for (let i = startIndex1; i < endIndex; i++) {
                                             tableContent1 += '<tr>';

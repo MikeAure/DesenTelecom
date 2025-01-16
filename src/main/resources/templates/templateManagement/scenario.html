@@ -45,7 +45,11 @@
         {value: '0', label: "数值型数据"},
         {value: '1', label: "编码型数据"},
         {value: '3', label: "文本型数据"},
-        {value: '4', label: "时间数据"}
+        {value: '4', label: "时间数据"},
+        {value: '5', label: "图像数据"},
+        {value: '6', label: "视频数据"},
+        {value: '7', label: "音频数据"},
+        {value: '8', label: "图形数据"}
     ];
 
     const maskAlgorithmOptions = {
@@ -141,36 +145,40 @@
 
         // 添加一行到表格
         document.getElementById("add_row").onclick = function () {
-            var tableBody = document.getElementById("table_body");
+            let tableBody = document.getElementById("table_body");
 
             // 全局变量用于追踪id的值
-            var nextId = tableBody.rows.length + 1;
+            let nextId = tableBody.rows.length + 1;
 
             // 插入新行
-            var newRow = tableBody.insertRow(tableBody.rows.length);
+            let newRow = tableBody.insertRow(tableBody.rows.length);
 
             // 插入id列
-            var idCell = newRow.insertCell(0);
+            let idCell = newRow.insertCell(0);
             idCell.textContent = nextId;
 
             // 根据你的数据结构进行相应的定制
-            for (var i = 1; i < 3; i++) {
-                var cell = newRow.insertCell(i);
+            for (let i = 1; i < 3; i++) {
+                let cell = newRow.insertCell(i);
                 cell.innerHTML = "<span contenteditable='true'>请填入数据</span>";
             }
 
             // 添加下拉框作为 "dataType" 单元格
-            var dataTypeCell = newRow.insertCell(3);
-            var dataTypeDropdown = document.createElement("select");
+            let dataTypeCell = newRow.insertCell(3);
+            let dataTypeDropdown = document.createElement("select");
             dataTypeDropdown.innerHTML = "<option value='0'>数值型数据</option>" +
                 "<option value='1'>编码型数据</option>" +
                 "<option value='3'>文本型数据</option>" +
-                "<option value='4'>时间数据</option>";
+                "<option value='4'>时间数据</option>" + 
+                "<option value='5'>图像数据</option>" +
+                "<option value='6'>视频数据</option>" +
+                "<option value='7'>音频数据</option>" +
+                "<option value='8'>图形数据</option>";
 
             dataTypeCell.appendChild(dataTypeDropdown);
 
             // 添加删除按钮
-            var deleteCell = newRow.insertCell(4);
+            let deleteCell = newRow.insertCell(4);
             deleteCell.innerHTML = "<button type='button' onclick='deleteRow(this)'>删除</button>";
             newRow.classList.add("new-row");
             // 更新全局id变量
@@ -182,7 +190,7 @@
 
     // 通过 fieldName 查找 existingData 中的数据
     function findExistingDataByFieldName(fieldName) {
-        for (var i = 0; i < existingData.length; i++) {
+        for (let i = 0; i < existingData.length; i++) {
             if (existingData[i].fieldName === fieldName) {
                 return existingData[i];
             }
@@ -193,12 +201,12 @@
 
     // 保存按钮点击事件
     function saveData() {
-        var tableBody = document.getElementById("table_body");
-        var dataToSend = [];
+        let tableBody = document.getElementById("table_body");
+        let dataToSend = [];
 
-        for (var i = 0; i < tableBody.rows.length; i++) {
-            var rowData = {};
-            var tr = tableBody.rows[i];
+        for (let i = 0; i < tableBody.rows.length; i++) {
+            let rowData = {};
+            let tr = tableBody.rows[i];
 
             // 获取每一行的数据
             rowData.id = tr.cells[0].textContent; // 设置 'id' 值
@@ -206,8 +214,8 @@
             rowData.columnName = tr.cells[2].innerText;
 
             // 获取dataType的值
-            var dataTypeCell = tr.cells[3];
-            var dataTypeDropdown = dataTypeCell.querySelector('select');
+            let dataTypeCell = tr.cells[3];
+            let dataTypeDropdown = dataTypeCell.querySelector('select');
             // 调试输出
             if (dataTypeDropdown) {
                 rowData.dataType = dataTypeDropdown.value;
@@ -232,6 +240,18 @@
                     case '4':
                         rowData.k = 1;
                         break;
+                    case '5':
+                        rowData.k = 40;
+                        break
+                    case '6':
+                        rowData.k = 50;
+                        break;
+                    case '7':
+                        rowData.k = 72;
+                        break;
+                    case '8':
+                        rowData.k = 60;
+                        break;
 
                 }
                 // rowData.k = 0;
@@ -253,7 +273,7 @@
         }
 
         // 发送数据到后端
-        // var selectedSheet = document.getElementById("choose_sheet").value;
+        // let selectedSheet = document.getElementById("choose_sheet").value;
         fetch('/Param/saveData?tableName=' + sceneName + '_param', {
             method: 'POST',
             headers: {
@@ -289,27 +309,27 @@
 
     // 删除行的函数
     function deleteRow(button) {
-        var rowToDelete = button.parentNode.parentNode; // 获取要删除的行
-        var tableBody = document.getElementById("table_body");
+        let rowToDelete = button.parentNode.parentNode; // 获取要删除的行
+        let tableBody = document.getElementById("table_body");
 
         // 发送数据到后端
-        var selectedSheet = document.getElementById("choose_sheet").value;
+        let selectedSheet = document.getElementById("choose_sheet").value;
 
         // 获取被删除行的id值
-        var deletedId = parseInt(rowToDelete.cells[0].textContent, 10);
+        let deletedId = parseInt(rowToDelete.cells[0].textContent, 10);
 
         // 如果是新添加的行，直接删除
         if (rowToDelete.classList.contains("new-row")) {
             rowToDelete.parentNode.removeChild(rowToDelete);
             // 更新剩余行的id列的值
-            for (var i = deletedId - 1; i < tableBody.rows.length; i++) {
+            for (let i = deletedId - 1; i < tableBody.rows.length; i++) {
                 tableBody.rows[i].cells[0].textContent = i + 1;
             }
 
 
         } else {
             // 否则，弹出确认框
-            var confirmDelete = confirm("是否确定要删除此行数据？");
+            let confirmDelete = confirm("是否确定要删除此行数据？");
 
             if (confirmDelete) {
 
@@ -447,6 +467,18 @@
                             break;
                         case 4:
                             html += "时间数据";
+                            break;
+                        case 5:
+                            html += "图像数据";
+                            break;
+                        case 6:
+                            html += "视频数据";
+                            break;
+                        case 7:
+                            html += "音频数据";
+                            break;
+                        case 8:
+                            html += "图形数据";
                             break;
                         default:
                             html += "未知数据类型";

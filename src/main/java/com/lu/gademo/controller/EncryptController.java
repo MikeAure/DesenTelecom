@@ -408,7 +408,7 @@ public class EncryptController {
         List<String> result = new ArrayList<>();
         CoordinateConversion coor = new CoordinateConversion();
         String[] mapDatum = MapUtils.mapData;
-        int numThreads = Runtime.getRuntime().availableProcessors();
+        int numThreads = Runtime.getRuntime().availableProcessors() / 3;
         // Create a thread pool with the number of available processors
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         List<Future<String>> futures = new ArrayList<>();

@@ -4,7 +4,7 @@ spring:
             indent_output: false
     datasource:
         ga:
-            jdbc-url: jdbc:mysql://192.168.1.39:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+            jdbc-url: jdbc:mysql://localhost:3306/ga?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
@@ -78,7 +78,7 @@ logging:
 effectEva:
 #    address: 192.168.37.192
     address: 127.0.0.1
-    port: 10005
+    port: 10006
 evidence:
 #    localAddress: 172.28.72.214
     localAddress: 127.0.0.1

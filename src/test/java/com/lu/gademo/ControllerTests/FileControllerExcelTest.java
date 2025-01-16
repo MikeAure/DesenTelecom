@@ -74,6 +74,64 @@ public class FileControllerExcelTest {
             "sports.xlsx", "takeaway.xlsx", "telecommunication.xlsx", "telemedicine.xlsx", "tools.xlsx", "transportationTicket.xlsx",
             "travel.xlsx", "useCar.xlsx", "usedCar.xlsx", "vr.xlsx", "webcast.xlsx", "woman.xlsx", "petcare.xlsx", "homerepair.xlsx"
     );
+
+    private static final Map<String, String> FIFTY_SCENE_MAP = new LinkedHashMap<String, String> () {
+        {
+            put("map", "map.xlsx");
+            put("onlinetaxi", "online_taxi.xlsx");
+            put("communication", "communication.xlsx");
+            put("community", "community.xlsx");
+            put("onlinepayment", "online_payment.xlsx");
+            put("onlineshopping", "online_shopping.xlsx");
+            put("takeaway", "take_away.xlsx");
+            put("express", "express.xlsx");
+            put("transportationticket", "transportation_ticket.xlsx");
+            put("marry", "marry.xlsx");
+            put("employment", "employment.xlsx");
+            put("onlinelending", "online_lending.xlsx");
+            put("house", "house.xlsx");
+            put("usedcar", "used_car.xlsx");
+            put("consultation", "consultation.xlsx");
+            put("travel", "travel.xlsx");
+            put("hotel", "hotel.xlsx");
+            put("game", "game.xlsx");
+            put("education", "education.xlsx");
+            put("locallife", "local_life.xlsx");
+            put("woman", "woman.xlsx");
+            put("usecar", "use_car.xlsx");
+            put("investment", "investment.xlsx");
+            put("bank", "bank.xlsx");
+            put("mailbox", "mail_box.xlsx");
+            put("meeting", "meeting.xlsx");
+            put("webcast", "webcast.xlsx");
+            put("onlinemovie", "onlineMovie.xlsx");
+            put("shortvideo", "shortVideo.xlsx");
+            put("news", "news.xlsx");
+            put("sports", "sports.xlsx");
+            put("browser", "browser.xlsx");
+            put("input", "input.xlsx");
+            put("security", "security.xlsx");
+            put("ebook", "ebook.xlsx");
+            put("capture", "capture.xlsx");
+            put("appstore", "appStore.xlsx");
+            put("tools", "tools.xlsx");
+            put("performanceticket", "performanceTicket.xlsx");
+            put("networkaccess", "networkaccess.xlsx");
+            put("telecommunication", "telecommunication.xlsx");
+            put("monitor", "monitor.xlsx");
+            put("pay", "pay.xlsx");
+            put("customerservice", "customerservice.xlsx");
+            put("schoolservice", "schoolservice.xlsx");
+            put("smarthome", "smarthome.xlsx");
+            put("autonomousdriving", "autonomousdriving.xlsx");
+            put("telemedicine", "telemedicine.xlsx");
+            put("vr", "vr.xlsx");
+            put("onlinevoting", "onlinevoting.xlsx");
+            put("homerepair", "homerepair.xlsx");
+            put("petcare", "petcare.xlsx");
+
+        }
+    };
     private static final String URL = "/File/desenFile";
     private static final String EXCEL_FILE_PATH = "D:\\52scenes1w\\50\\";
     private static final String EXCEL_FILE_PATH_1000w = "D:\\50scenes1000wdata_old\\";
@@ -329,10 +387,11 @@ public class FileControllerExcelTest {
     @Test
     public void testExcelFiles52scenes() throws Exception {
         Map<String, List<String>> failedResult = new HashMap<>();
-        Path currentDirectory = Paths.get("D:\\52scenes1w\\70\\");
+        Path currentDirectory = Paths.get("D:\\Programming\\DesenTelecom\\src\\test\\resources\\test_data\\new_sheets\\125");
         System.out.println("CurrentDirectory: " + currentDirectory.toString());
         List<String> failedFileNameList = new ArrayList<>();
-        for (String sceneName : FIFTYTWO_SCENE) {
+        for (Map.Entry<String, String> entry : FIFTY_SCENE_MAP.entrySet()) {
+            String sceneName = entry.getKey();
             String[] strategy = new String[]{"_low", "_medium", "_high"};
             for (String elem : strategy) {
                 System.out.println("正在获取：" + sceneName + elem + "参数");
@@ -347,10 +406,7 @@ public class FileControllerExcelTest {
                 String params = excelParam.getResponse().getContentAsString(StandardCharsets.UTF_8);
                 System.out.println("Params: " + params);
                 System.out.println("获取" + sceneName + elem + "成功");
-                String fileName = EXCEL_FILE_NAMES_52.stream()
-                        .filter(name -> name.substring(0, name.lastIndexOf("."))
-                                .equalsIgnoreCase(sceneName))
-                        .findFirst().get();
+                String fileName = entry.getValue();
                 System.out.println(fileName);
                 Path testFilePath = currentDirectory.resolve(fileName);
                 System.out.println("正在测试文件：" + testFilePath.toAbsolutePath());
