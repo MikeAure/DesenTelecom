@@ -15,6 +15,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTMarkupRange;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,10 +27,9 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +46,9 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     private final Anonymity anonymity;
     private final Generalization generalization;
     private final AlgorithmsFactory algorithmsFactory;
+    private final DateParseUtil dateParseUtil;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final SimpleDateFormat outputFormat = new SimpleDateFormat("yyyyMMdd");
 
     private static Map<Integer, XWPFRun> getPosToRuns(XWPFParagraph paragraph) {
         int pos = 0;
@@ -177,7 +180,6 @@ public class RecvFileDesenImpl implements RecvFileDesen {
 
             for (XWPFParagraph paragraph : document.getParagraphs()) {
                 XWPFComment comment;
-                StringBuilder commentText = new StringBuilder();
                 for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartList()) {
                     BigInteger id = anchor.getId();
 
@@ -185,15 +187,29 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                             (comment = paragraph.getDocument().getCommentByID(id.toString())) != null) {
                         System.out.println("Comment ID: " + id);
 
-                        // TODO: 根据comment内容判断脱敏等级
+                        String commentText = comment.getText();
                         System.out.println("Comment: " + comment.getText());
+                        String[] commentTextList = commentText.split("-");
+                        System.out.println(Arrays.toString(commentTextList));
+                        int dataType = Integer.parseInt(commentTextList[1]);
+                        int algoNum = Integer.parseInt(commentTextList[2]);
+                        int privacyLevel = Integer.parseInt(commentTextList[3]);
+                        System.out.println(algoNum);
+                        System.out.println(privacyLevel);
                         String target = commentMap.get(id.toString());
+                        String desenResult = "";
                         if (target == null) {
                             System.out.println("id: " + id + " target is null");
                             continue;
                         }
                         System.out.println("Target: " + target);
-                        String desenResult = desenData(target, replacement, 3, 1).getList().get(0).toString();
+                        if (dataType == 4) {
+                            String targetTemp = sdf.format(dateParseUtil.parseDate(target));
+                            desenResult = desenData(targetTemp, algoNum, privacyLevel).getList().get(0).toString();
+                            desenResult = outputFormat.format(dateParseUtil.parseDate(desenResult));
+                        } else {
+                            desenResult = desenData(target, algoNum, privacyLevel).getList().get(0).toString();
+                        }
                         System.out.println("desenResult: " + desenResult);
                         if (desenResult.equals(target)) {
                             continue;
@@ -252,7 +268,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                             if (shapeText.contains(rawContent)) {
                                 String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
                                 String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
-                                String desenResult = desenData(rawContent, generalization, 1, privacyLevel).getList().get(0).toString();
+                                String desenResult = desenData(rawContent, 1, privacyLevel).getList().get(0).toString();
                                 String stringBuilder = preString +
                                         desenResult +
                                         afterString;
@@ -338,12 +354,11 @@ public class RecvFileDesenImpl implements RecvFileDesen {
 
     /**
      * @param content
-     * @param algorithm
      * @param algoNum
      * @param privacyLevel
      * @return
      */
-    private DSObject desenData(String content, BaseDesenAlgorithm algorithm, int algoNum, int privacyLevel) {
+    private DSObject desenData(String content, int algoNum, int privacyLevel) {
         // 构建脱敏算法输入数据
         DSObject rawData = new DSObject(Collections.singletonList(content));
         // 使用编号脱敏算法

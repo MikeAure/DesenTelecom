@@ -178,6 +178,22 @@
                 }
             });
 
+            let uploadOfficeCheckbox = document.getElementById("uploadOffice");
+
+            uploadOfficeCheckbox.addEventListener("click", () => {
+                if (uploadOfficeCheckbox.checked) {
+                    document.getElementById("textType").disabled = true;
+                    document.getElementById("distortionAlg").disabled = true;
+                    document.getElementById("distortionPrivacyLevel").disabled = true;
+                    document.getElementById("fileUpload").accept = ".docx";
+                } else {
+                    document.getElementById("textType").disabled = false;
+                    document.getElementById("distortionAlg").disabled = false;
+                    document.getElementById("distortionPrivacyLevel").disabled = false;
+                    document.getElementById("fileUpload").accept = ".txt";
+                }
+            });
+
             // 事件监听器，当文本类型改变时更新算法列表
             document.getElementById("textType").addEventListener("change", function () {
                 const textType = this.value;
@@ -222,6 +238,8 @@
             };
         };
 
+
+
         let choose_file = function (event) {
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
@@ -231,223 +249,281 @@
             // 文件名，扩展名
             const fileName = file.name;
             const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            let ifUploadOffice = document.getElementById("uploadOffice").checked;
+
             if (file) {
-                if ("txt" === fileExtension) {
-                    document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
-                        "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
-                    //构建formData,发送给后端
-                    let formData = new FormData();
-                    formData.set("file", file);
+                if (ifUploadOffice) {
+                    if ("docx" === fileExtension){
+                        const url = "/File/recvFileDesen"
 
-                    //提交脱敏参数，请求脱敏
-                    document.getElementById("submitBtn").onclick = function () {
-                        // 选择脱敏程度
-                        let privacyLevel = document.getElementById("distortionPrivacyLevel").value;
-                        // 保证params字段唯一值唯一
-                        formData.set("params", privacyLevel)
-                        // 算法名
-                        let alg_name;
-                        let idx = $("ul .active").index();
-                        if (idx === 0) {
-                            alg_name = document.getElementById("distortionAlg").value;
-                        }
+                        document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                            "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
+                        //构建formData,发送给后端
+                        let formData = new FormData();
+                        formData.set("file", file);
 
-                        // 发送算法名、隐私保护等级、脱敏文件
-                        formData.set("algName", alg_name)
-                        fetch('/File/desenSingleColumn', {
-                            method: 'POST',
-                            body: formData
-                        })
-                            .then(response => {
-                                if (response.status === 500) {
-                                    // Handle server error
-                                    return response.text().then(failedMsg => {
-                                        alert(failedMsg);
-                                        throw new Error(failedMsg); // Throw an error to stop further processing
-                                    });
-                                }
-                                return response.blob();
+                        document.getElementById("submitBtn").onclick = function () {
+                            fetch(url, {
+                                method: 'POST',
+                                body: formData
                             })
-                            .then(blob => {
-                                // 脱敏前
-                                /*  document.getElementById("preData").innerHTML="脱敏前数据"*/
-                                let reader = new FileReader();
-                                reader.onload = function (e) {
-                                    let data = e.target.result;
-                                    if (typeof data !== 'string') {
-                                        data = new TextDecoder('utf-8').decode(new Uint8Array(data));
-                                    }
-                                    let lines = data.split("\n").map(line => line.split("\t")); // 假设以制表符分隔列
-                                    for (let i = 0; i < 10; i++) {
-                                        console.log(lines[i]);
-                                    }
-                                    let pageSize = 10;
-                                    let pageCount = Math.ceil((lines.length - 1) / pageSize);
-                                    let currentPage = 1;
+                                .then(resp => resp.json())
+                                .then(data => {
+                                    // 从 JSON 中提取 base64 编码的数据
+                                    const base64Data = data.data;
 
-                                    function displayTable(page) {
-                                        let startIndex = (page - 1) * pageSize; // 跳过表头
-                                        let endIndex = Math.min(startIndex + pageSize, lines.length);
+                                    // 解码 Base64 数据为二进制
+                                    const binaryString = atob(base64Data);
 
-                                        // let tableContent = '<thead><tr>';
-                                        let headers = lines[0];
-                                        // headers.forEach(function (header) {
-                                        //     tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
-                                        // });
-                                        let tableContent = '<tbody>';
-
-                                        for (let i = startIndex; i < endIndex; i++) {
-                                            tableContent += '<tr>';
-                                            for (let j = 0; j < headers.length; j++) {
-                                                let cellValue = (lines[i][j] !== undefined) ? lines[i][j] : '';
-                                                tableContent += '<td>' + cellValue + '</td>';
-                                            }
-                                            tableContent += '</tr>';
-                                        }
-
-                                        tableContent += '</tbody>';
-
-                                        $('#dataTable').html(tableContent);
+                                    // 创建一个数组来存储二进制数据
+                                    const binaryArray = [];
+                                    for (let i = 0; i < binaryString.length; i++) {
+                                        binaryArray.push(binaryString.charCodeAt(i));
                                     }
 
-                                    displayTable(currentPage);
+                                    // 创建 Blob 对象，指定类型为 Word 文件
+                                    const blob = new Blob([new Uint8Array(binaryArray)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
-                                    function renderPagination() {
-                                        let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
-                                        pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
+                                    // 创建临时下载链接
+                                    const link = document.createElement('a');
+                                    const timestamp = new Date().getTime(); // 使用当前时间戳作为文件名
+                                    link.href = URL.createObjectURL(blob);
+                                    link.download = `${timestamp}.docx`; // 设置文件名为时间戳 + .docx
 
-                                        $('#pagination').html(pagination);
+                                    // 触发下载
+                                    link.click();
 
-                                        $('#pagination a').off("click").on("click", function (e) {
-                                            e.preventDefault();
-                                            let page = $(this).data('page');
-                                            console.log(page)
-                                            if (page === 'prev') {
-                                                currentPage = Math.max(1, currentPage - 1);
-                                            } else if (page === 'next') {
-                                                currentPage = Math.min(pageCount, currentPage + 1);
-                                            }
-                                            displayTable(currentPage);
-                                            $("#totalPages").text(currentPage + "/" + pageCount);
-                                        });
-
-                                        let info = "共" + pageCount + "页"
-                                        console.log(info)
-                                        $("#totalPages").text(currentPage + "/" + pageCount);
-                                    }
-
-                                    $('#paginationContainer').show();
-                                    renderPagination();
-
-                                    $('#goToPage').off("click").on("click", function () {
-                                        let pageNumber = parseInt($('#pageInput').val());
-                                        if (pageNumber >= 1 && pageNumber <= pageCount) {
-                                            currentPage = pageNumber;
-                                            displayTable(currentPage);
-                                            renderPagination();
-                                        } else {
-                                            alert('请输入有效页数！');
-                                        }
-                                    });
-                                };
-                                reader.readAsArrayBuffer(file);
-
-                                // 脱敏后
-                                /* document.getElementById("afterData").innerHTML="脱敏后数据"*/
-                                const reader1 = new FileReader();
-                                reader1.onload = function (event) {
-                                    let data = event.target.result;
-                                    // const workbook = XLSX.read(data, {type: 'binary'});
-                                    // const sheetName = workbook.SheetNames[0];
-                                    // const sheet = workbook.Sheets[sheetName];
-                                    if (typeof data !== 'string') {
-                                        data = new TextDecoder('utf-8').decode(new Uint8Array(data));
-                                    }
-                                    // const lines = XLSX.utils.sheet_to_json(sheet, {header: 1});
-                                    let lines = data.split("\n").map(line => line.split("\t"));
-                                    let pageSize = 10;
-                                    let pageCount = Math.ceil((lines.length - 1) / pageSize);
-                                    let currentPage1 = 1;
-
-                                    function displayTable1(page1) {
-                                        let startIndex1 = (page1 - 1) * pageSize; // 跳过表头
-                                        let endIndex = Math.min(startIndex1 + pageSize, lines.length);
-
-                                        // let tableContent1 = '<thead><tr>';
-                                        let headers1 = lines[0];
-                                        // headers1.forEach(function (header1) {
-                                        //     tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
-                                        // });
-                                        let tableContent1 = '<tbody>';
-
-                                        for (let i = startIndex1; i < endIndex; i++) {
-                                            tableContent1 += '<tr>';
-                                            for (let j = 0; j < headers1.length; j++) {
-                                                let cellValue = (lines[i][j] !== undefined) ? lines[i][j] : '';
-                                                tableContent1 += '<td>' + cellValue + '</td>';
-                                            }
-                                            tableContent1 += '</tr>';
-                                        }
-
-                                        tableContent1 += '</tbody>';
-
-                                        $('#dataTable1').html(tableContent1);
-                                    }
-
-                                    displayTable1(currentPage1);
-
-                                    function renderPagination1() {
-                                        let pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
-                                        pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
-
-                                        $('#pagination1').html(pagination1);
-
-                                        $('#pagination1 a').off("click").on("click", function (e) {
-                                            e.preventDefault();
-                                            let page = $(this).data('page');
-                                            console.log(page)
-                                            if (page === 'prev1') {
-                                                currentPage1 = Math.max(1, currentPage1 - 1);
-                                            } else if (page === 'next1') {
-                                                currentPage1 = Math.min(pageCount, currentPage1 + 1);
-                                            }
-                                            displayTable1(currentPage1);
-                                            $("#totalPages1").text(currentPage1 + "/" + pageCount);
-                                        });
-
-                                        let info = "共" + pageCount + "页"
-                                        console.log(info)
-                                        $("#totalPages1").text(currentPage1 + "/" + pageCount);
-                                    }
-
-                                    $('#paginationContainer1').show();
-                                    renderPagination1();
-
-                                    $('#goToPage1').off("click").on("click", function () {
-                                        let pageNumber1 = parseInt($('#pageInput1').val());
-                                        if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
-                                            currentPage1 = pageNumber1;
-                                            displayTable1(currentPage1);
-                                            renderPagination1();
-                                        } else {
-                                            alert('请输入有效页数！');
-                                        }
-                                    });
-                                };
-                                reader1.readAsText(blob);
-
-                                // 创建一个下载链接
-                                const downloadLink = document.createElement('a');
-                                downloadLink.href = URL.createObjectURL(blob);
-                                downloadLink.download = Date.now().toString() + ".txt"; // 下载的文件名
-                                downloadLink.click();
-                                // after.appendChild(downloadLink);
-                            })
-                            .catch(error => console.error('Error:', error));
+                                    // 释放 Blob 对象
+                                    URL.revokeObjectURL(link.href);
+                                })
+                                .catch(error => {
+                                    console.error('下载失败:', error);
+                                });
+                        };
+                    }
+                    else {
+                        alert("请提交docx类型文件")
                     }
                 } else {
-                    alert("请提交txt类型文件")
+                    if ("txt" === fileExtension) {
+                        document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
+                            "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
+                        //构建formData,发送给后端
+                        let formData = new FormData();
+                        formData.set("file", file);
+
+                        //提交脱敏参数，请求脱敏
+                        document.getElementById("submitBtn").onclick = function () {
+                            // 选择脱敏程度
+                            let privacyLevel = document.getElementById("distortionPrivacyLevel").value;
+                            // 保证params字段唯一值唯一
+                            formData.set("params", privacyLevel)
+                            // 算法名
+                            let alg_name;
+                            let idx = $("ul .active").index();
+                            if (idx === 0) {
+                                alg_name = document.getElementById("distortionAlg").value;
+                            }
+
+                            // 发送算法名、隐私保护等级、脱敏文件
+                            formData.set("algName", alg_name)
+                            fetch('/File/desenSingleColumn', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => {
+                                    if (response.status === 500) {
+                                        // Handle server error
+                                        return response.text().then(failedMsg => {
+                                            alert(failedMsg);
+                                            throw new Error(failedMsg); // Throw an error to stop further processing
+                                        });
+                                    }
+                                    return response.blob();
+                                })
+                                .then(blob => {
+                                    // 脱敏前
+                                    /*  document.getElementById("preData").innerHTML="脱敏前数据"*/
+                                    let reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        let data = e.target.result;
+                                        if (typeof data !== 'string') {
+                                            data = new TextDecoder('utf-8').decode(new Uint8Array(data));
+                                        }
+                                        let lines = data.split("\n").map(line => line.split("\t")); // 假设以制表符分隔列
+                                        for (let i = 0; i < 10; i++) {
+                                            console.log(lines[i]);
+                                        }
+                                        let pageSize = 10;
+                                        let pageCount = Math.ceil((lines.length - 1) / pageSize);
+                                        let currentPage = 1;
+
+                                        function displayTable(page) {
+                                            let startIndex = (page - 1) * pageSize; // 跳过表头
+                                            let endIndex = Math.min(startIndex + pageSize, lines.length);
+
+                                            // let tableContent = '<thead><tr>';
+                                            let headers = lines[0];
+                                            // headers.forEach(function (header) {
+                                            //     tableContent += '<th style=\"white-space: nowrap;\">' + header + '</th>';
+                                            // });
+                                            let tableContent = '<tbody>';
+
+                                            for (let i = startIndex; i < endIndex; i++) {
+                                                tableContent += '<tr>';
+                                                for (let j = 0; j < headers.length; j++) {
+                                                    let cellValue = (lines[i][j] !== undefined) ? lines[i][j] : '';
+                                                    tableContent += '<td>' + cellValue + '</td>';
+                                                }
+                                                tableContent += '</tr>';
+                                            }
+
+                                            tableContent += '</tbody>';
+
+                                            $('#dataTable').html(tableContent);
+                                        }
+
+                                        displayTable(currentPage);
+
+                                        function renderPagination() {
+                                            let pagination = '<li class="page-item"><a class="page-link" href="#" data-page="prev">Prev</a></li>';
+                                            pagination += '<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>';
+
+                                            $('#pagination').html(pagination);
+
+                                            $('#pagination a').off("click").on("click", function (e) {
+                                                e.preventDefault();
+                                                let page = $(this).data('page');
+                                                console.log(page)
+                                                if (page === 'prev') {
+                                                    currentPage = Math.max(1, currentPage - 1);
+                                                } else if (page === 'next') {
+                                                    currentPage = Math.min(pageCount, currentPage + 1);
+                                                }
+                                                displayTable(currentPage);
+                                                $("#totalPages").text(currentPage + "/" + pageCount);
+                                            });
+
+                                            let info = "共" + pageCount + "页"
+                                            console.log(info)
+                                            $("#totalPages").text(currentPage + "/" + pageCount);
+                                        }
+
+                                        $('#paginationContainer').show();
+                                        renderPagination();
+
+                                        $('#goToPage').off("click").on("click", function () {
+                                            let pageNumber = parseInt($('#pageInput').val());
+                                            if (pageNumber >= 1 && pageNumber <= pageCount) {
+                                                currentPage = pageNumber;
+                                                displayTable(currentPage);
+                                                renderPagination();
+                                            } else {
+                                                alert('请输入有效页数！');
+                                            }
+                                        });
+                                    };
+                                    reader.readAsArrayBuffer(file);
+
+                                    // 脱敏后
+                                    /* document.getElementById("afterData").innerHTML="脱敏后数据"*/
+                                    const reader1 = new FileReader();
+                                    reader1.onload = function (event) {
+                                        let data = event.target.result;
+                                        // const workbook = XLSX.read(data, {type: 'binary'});
+                                        // const sheetName = workbook.SheetNames[0];
+                                        // const sheet = workbook.Sheets[sheetName];
+                                        if (typeof data !== 'string') {
+                                            data = new TextDecoder('utf-8').decode(new Uint8Array(data));
+                                        }
+                                        // const lines = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                                        let lines = data.split("\n").map(line => line.split("\t"));
+                                        let pageSize = 10;
+                                        let pageCount = Math.ceil((lines.length - 1) / pageSize);
+                                        let currentPage1 = 1;
+
+                                        function displayTable1(page1) {
+                                            let startIndex1 = (page1 - 1) * pageSize; // 跳过表头
+                                            let endIndex = Math.min(startIndex1 + pageSize, lines.length);
+
+                                            // let tableContent1 = '<thead><tr>';
+                                            let headers1 = lines[0];
+                                            // headers1.forEach(function (header1) {
+                                            //     tableContent1 += '<th style=\"white-space: nowrap;\">' + header1 + '</th>';
+                                            // });
+                                            let tableContent1 = '<tbody>';
+
+                                            for (let i = startIndex1; i < endIndex; i++) {
+                                                tableContent1 += '<tr>';
+                                                for (let j = 0; j < headers1.length; j++) {
+                                                    let cellValue = (lines[i][j] !== undefined) ? lines[i][j] : '';
+                                                    tableContent1 += '<td>' + cellValue + '</td>';
+                                                }
+                                                tableContent1 += '</tr>';
+                                            }
+
+                                            tableContent1 += '</tbody>';
+
+                                            $('#dataTable1').html(tableContent1);
+                                        }
+
+                                        displayTable1(currentPage1);
+
+                                        function renderPagination1() {
+                                            let pagination1 = '<li class="page-item"><a class="page-link" href="#" data-page="prev1">Prev</a></li>';
+                                            pagination1 += '<li class="page-item"><a class="page-link" href="#" data-page="next1">Next</a></li>';
+
+                                            $('#pagination1').html(pagination1);
+
+                                            $('#pagination1 a').off("click").on("click", function (e) {
+                                                e.preventDefault();
+                                                let page = $(this).data('page');
+                                                console.log(page)
+                                                if (page === 'prev1') {
+                                                    currentPage1 = Math.max(1, currentPage1 - 1);
+                                                } else if (page === 'next1') {
+                                                    currentPage1 = Math.min(pageCount, currentPage1 + 1);
+                                                }
+                                                displayTable1(currentPage1);
+                                                $("#totalPages1").text(currentPage1 + "/" + pageCount);
+                                            });
+
+                                            let info = "共" + pageCount + "页"
+                                            console.log(info)
+                                            $("#totalPages1").text(currentPage1 + "/" + pageCount);
+                                        }
+
+                                        $('#paginationContainer1').show();
+                                        renderPagination1();
+
+                                        $('#goToPage1').off("click").on("click", function () {
+                                            let pageNumber1 = parseInt($('#pageInput1').val());
+                                            if (pageNumber1 >= 1 && pageNumber1 <= pageCount) {
+                                                currentPage1 = pageNumber1;
+                                                displayTable1(currentPage1);
+                                                renderPagination1();
+                                            } else {
+                                                alert('请输入有效页数！');
+                                            }
+                                        });
+                                    };
+                                    reader1.readAsText(blob);
+
+                                    // 创建一个下载链接
+                                    const downloadLink = document.createElement('a');
+                                    downloadLink.href = URL.createObjectURL(blob);
+                                    downloadLink.download = Date.now().toString() + ".txt"; // 下载的文件名
+                                    downloadLink.click();
+                                    // after.appendChild(downloadLink);
+                                })
+                                .catch(error => console.error('Error:', error));
+                        }
+                    } else {
+                        alert("请提交txt类型文件")
+                    }
                 }
+
             } else {
                 alert("请提交脱敏文件");
             }
@@ -704,6 +780,8 @@
                                 </div>
                                 <div id="fileInfo"></div>
                                 <div class="form-group text-center">
+                                    <input type="checkbox" id="uploadOffice"/>
+                                    <label for="uploadOffice">上传Word文件</label>
                                     <input type="file" accept=".txt" id="fileUpload" style="display: none;">
                                     <label for="fileUpload" class="btn btn-white">
                                         选择文件
@@ -718,7 +796,6 @@
                                     </button>
                                 </div>
                             </form>
-
 
                             <!--                            <div style="display: flex; flex-wrap: wrap; justify-content: center;">-->
                             <div class="row">
