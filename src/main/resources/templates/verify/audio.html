@@ -190,31 +190,6 @@
             } else {
                 document.getElementById("privacyLevel").style.display = "block";
             }
-            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'audio')
-            //     .then(response => {
-            //         if (response.ok) {
-            //             return response.json();
-            //         } else {
-            //             throw new Error('Failed to fetch');
-            //         }
-            //     })
-            //     .then(data => {
-            //         if (data.code === 200 && data.data) {
-            //             setDefaultOption(data.data);
-            //             defaultOption = data.data;
-            //             if (defaultOption === "voice_replace") {
-            //                 document.getElementById("privacyLevel").style.display = "none";
-            //             } else {
-            //                 document.getElementById("privacyLevel").style.display = "block";
-            //             }
-            //         } else {
-            //             setDefaultOption(defaultOption);
-            //         }
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //         setDefaultOption(defaultOption);
-            //     });
 
             function setDefaultOption(value) {
                 selectElement.value = value;
@@ -316,7 +291,6 @@
 
             let choose_audio_file = function (e, fileElementId, nameElementId, backendInterface) {
                 // e.preventDefault(); // 阻止表单的默认提交行为
-
                 const fileInput = document.getElementById(fileElementId);
                 console.log("file name: " + fileInput.files[0].name);
                 const name = document.getElementById(nameElementId);
@@ -540,9 +514,10 @@
                                     <div class="col-lg-3">
                                         <select class="form-control" name="distortionaudio_privacyLevel"
                                                 id="distortionaudio_privacyLevel">
-                                            <option value="0"> 低程度</option>
-                                            <option value="1" selected> 中程度</option>
-                                            <option value="2"> 高程度</option>
+                                            <option value="0">无隐私保护处理</option>
+                                            <option value="1">低程度</option>
+                                            <option value="2" selected>中程度</option>
+                                            <option value="3">高程度</option>
                                         </select>
                                     </div>
                                 </div>

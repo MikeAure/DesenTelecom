@@ -336,7 +336,6 @@
                                     if (response.status === 500) {
                                         // Handle server error
                                         return response.text().then(failedMsg => {
-                                            alert(failedMsg);
                                             throw new Error(failedMsg); // Throw an error to stop further processing
                                         });
                                     }
@@ -517,7 +516,10 @@
                                     downloadLink.click();
                                     // after.appendChild(downloadLink);
                                 })
-                                .catch(error => console.error('Error:', error));
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert(error)
+                                });
                         }
                     } else {
                         alert("请提交txt类型文件")
@@ -772,9 +774,10 @@
                                     <div class="col-lg-3">
                                         <select class="form-control" name="distortionPrivacyLevel"
                                                 id="distortionPrivacyLevel">
-                                            <option value="1"> 低程度</option>
-                                            <option value="2" selected> 中程度</option>
-                                            <option value="3"> 高程度</option>
+                                            <option value="0">无隐私保护处理</option>
+                                            <option value="1">低程度</option>
+                                            <option value="2" selected>中程度</option>
+                                            <option value="3">高程度</option>
                                         </select>
                                     </div>
                                 </div>

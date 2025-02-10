@@ -191,9 +191,10 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                         System.out.println("Comment: " + comment.getText());
                         String[] commentTextList = commentText.split("-");
                         System.out.println(Arrays.toString(commentTextList));
-                        int dataType = Integer.parseInt(commentTextList[1]);
-                        int algoNum = Integer.parseInt(commentTextList[2]);
-                        int privacyLevel = Integer.parseInt(commentTextList[3]);
+                        int arrayLength = commentTextList.length;
+                        int dataType = Integer.parseInt(commentTextList[arrayLength - 3]);
+                        int algoNum = Integer.parseInt(commentTextList[arrayLength - 2]);
+                        int privacyLevel = Integer.parseInt(commentTextList[arrayLength - 1]);
                         System.out.println(algoNum);
                         System.out.println(privacyLevel);
                         String target = commentMap.get(id.toString());

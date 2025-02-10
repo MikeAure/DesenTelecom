@@ -70,15 +70,15 @@ public class Driver {
 //        user.setPassword(psd);
 //        user.setRoleId(roleId);
         user.setMsgType(MessageType.LOGIN);
-        logger.info("account: " + user.getUserName());
-        logger.info("psd: " + user.getPassword());
-        logger.info("role id: " + user.getRoleId());
+        System.out.println("account: " + user.getUserName());
+        System.out.println("psd: " + user.getPassword());
+        System.out.println("role id: " + user.getRoleId());
         boolean isLoginSuc = sendLoginInfo(user);
 //        Log.e("isLoginSuc",isLoginSuc+"");
         if (isLoginSuc) {
-            logger.info(user.getUserName() + "注册成功");
+            System.out.println(user.getUserName() + "注册成功");
         } else {
-            logger.error(user.getUserName() + "注册失败");
+            System.out.println(user.getUserName() + "注册失败");
             throw new IOException("Login Failed");
         }
     }
@@ -86,7 +86,7 @@ public class Driver {
 
     public boolean sendLoginInfo(TraceUser user) {
         connSocket = new Socket();
-        logger.info("ip address: " + ADDRESS);
+        System.out.println("ip address: " + ADDRESS);
 
         try {
             connSocket.connect(new InetSocketAddress(ADDRESS, PORT), 60000 * 3);
@@ -119,7 +119,7 @@ public class Driver {
 
                 mapUtils = new MapUtils();//初始化地图数据
 
-                logger.info("sendLoginInfo_id: " + user.getID());
+                System.out.println("sendLoginInfo_id: " + user.getID());
 
             } else if (message.getMsgType() == MessageType.LOGIN_FAIL) {
                 loginFlag = false;
@@ -147,9 +147,9 @@ public class Driver {
             mapData.setDataType(MapData.ECPM);
             tMessage.setMapData(mapData);
             oos.writeObject(tMessage);
-            logger.info("sendEncryptedMapData: 写入数据完成！");
+            System.out.println("sendEncryptedMapData: 写入数据完成！");
         } catch (IOException e) {
-            logger.error("ccst init: 读取输出流失败！");
+            System.out.println("ccst init: 读取输出流失败！");
             throw new IOException(e);
         }
 
@@ -170,7 +170,7 @@ public class Driver {
 
             tMessage.setMapData(mapData);
             oos.writeObject(tMessage);
-            logger.info("sendED: 写入数据完成！msgType: " + type);
+            System.out.println("sendED: 写入数据完成！msgType: " + type);
         } catch (IOException e) {
             logger.error("ED: 读取输出流失败！");
         }
@@ -211,18 +211,18 @@ public class Driver {
         try {
             queryMessage = new StringBuffer(qu_agrq_c.UF_AGRQ_C_RDC(stringBuffer.toString(), vertex));
         } catch (Exception e) {
-            logger.info("OnReceivedCircleData: DriverActivity中数据处理出错！");
+            System.out.println("OnReceivedCircleData: DriverActivity中数据处理出错！");
             logger.error(e.getMessage());
         }
         sendEncryptedData(queryMessage, 4);
-        logger.info("与圆进行计算:计算数据发送完毕！");
+        System.out.println("与圆进行计算:计算数据发送完毕！");
     }
 
     // 这里还有一个判断是当车主位于圆内的时候，客户端通过服务器返回True让车主选择是否同意
     public void OnReceivedRespCircleData(int fromUserId, String fromUserName, String destData) {
         final TraceUser fromUser = new TraceUser();
         fromUser.setID(fromUserId);
-        logger.info("用户“" + fromUserName + "”正在打车，目的地：" + destData);
+        System.out.println("用户“" + fromUserName + "”正在打车，目的地：" + destData);
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(connSocket.getOutputStream());
@@ -231,9 +231,9 @@ public class Driver {
             ntMessage.setFromUser(user);
             ntMessage.setToUser(fromUser);//寄回给打车用户
             oos.writeObject(ntMessage);
-            logger.info("dialog: 写入数据完成！");
+            System.out.println("dialog: 写入数据完成！");
         } catch (IOException e) {
-            logger.info("dialog: 读取输出流失败！");
+            System.out.println("dialog: 读取输出流失败！");
         }
         //弹窗用来表达是否愿意接单
 //        AlertDialog.Builder dialog = new AlertDialog.Builder(DriverActivity.this);
@@ -262,7 +262,7 @@ public class Driver {
     }
 
     public void OnReceivedRealUserPos(int userIdReal, String userNameReal, double realPosLat, double realPosLng) {//******************
-        logger.info("OnReceivedRealUserPos:  收到用户真实位置:" + realPosLat + "," + realPosLng);
+        System.out.println("OnReceivedRealUserPos:  收到用户真实位置:" + realPosLat + "," + realPosLng);
 
         TraceUser user1Real = new TraceUser();
         user1Real.setUserName(userNameReal);
@@ -276,16 +276,16 @@ public class Driver {
             ntMessage.setToUser(user1Real);//寄回给打车用户
             ntMessage.setDestData(startLatitude + "," + startLongitude);
             oos.writeObject(ntMessage);
-            logger.info("dialog: 写入数据完成！");
+            System.out.println("dialog: 写入数据完成！");
         } catch (IOException e) {
-            logger.info("dialog: 读取输出流失败！");
+            System.out.println("dialog: 读取输出流失败！");
         }
         double distance = Math.sqrt(Math.pow((realPosLat - startLatitude), 2) + Math.pow((realPosLng - startLongitude), 2));
-        logger.info("两人距离： " + distance);
+        System.out.println("两人距离： " + distance);
     }
 
     public void OnReceivedUserDenial(String userNameDenial) {
-        logger.info("用户：" + userNameDenial + " 拒绝了您的接单。");
+        System.out.println("用户：" + userNameDenial + " 拒绝了您的接单。");
     }
 
     public void close() {

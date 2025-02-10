@@ -190,7 +190,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import com.lu.gademo.model.TcpPacket;
 
 import java.io.DataInputStream;
@@ -296,34 +295,40 @@ public class MockEva {
         dataInputStream.readFully(dataBytes);
         byteArrayBuilder.write(dataBytes);
         JsonNode jsonNodes = new ObjectMapper().readTree(dataBytes);
+        String fileSuffix = jsonNodes.get("data").get("content").get("fileSuffix").asText();
         System.out.println(jsonNodes.toPrettyString());
 //        SendEvaReq sendEvaReq = new ObjectMapper().treeToValue(jsonNodes.get("data").get("content"), SendEvaReq.class);
 //        System.out.println(sendEvaReq.toString());
         List<String> desenInfoPreIden = Arrays.asList(jsonNodes.get("data").get("content").get("desenInfoPreIden").asText().split(","));
-
-        Collections.shuffle(desenInfoPreIden, new Random());
-        int chooseNum = new Random().nextInt(desenInfoPreIden.size());
-        if (chooseNum <= 1) {
-            chooseNum = 2;
-        }
-        List<String> selectedList = new ArrayList<>(desenInfoPreIden.subList(0, chooseNum));
-        selectedList.remove("CUST_ID");
-        selectedList.remove("sid");
-        selectedList.remove("id");
-        // 对于大数据平台的测试
-        if (jsonNodes.get("data").get("content").get("fileType").asText().contains("sada")) {
-            selectedList = Arrays.asList("f_srcip", "f_dstip");
+        if (fileSuffix.equals("xlsx")) {
+            Collections.shuffle(desenInfoPreIden, new Random());
+            int chooseNum = new Random().nextInt(desenInfoPreIden.size());
+            if (chooseNum <= 1) {
+                chooseNum = 2;
+            }
+            List<String> selectedList = new ArrayList<>(desenInfoPreIden.subList(0, chooseNum));
+            selectedList.remove("CUST_ID");
+            selectedList.remove("sid");
+            selectedList.remove("id");
+            // 对于大数据平台的测试
+            if (jsonNodes.get("data").get("content").get("fileType").asText().contains("sada")) {
+                selectedList = Arrays.asList("f_srcip", "f_dstip");
+            }
+            result.put("desenFailedColName", String.join(",", selectedList));
+        } else {
+            result.put("desenFailedColName", "");
         }
 //        if (selectedList.contains("手机号码")) {
 //            selectedList.remove("手机号码");
 //        }
-        result.put("desenFailedColName", String.join(",", selectedList));
+
         result.put("desenIntention", jsonNodes.get("data").get("content").get("desenIntention").asText());
         result.put("desenRequirements", jsonNodes.get("data").get("content").get("desenRequirements").asText());
         result.put("fileType", jsonNodes.get("data").get("content").get("fileType").asText());
         result.put("evaRequestId", jsonNodes.get("data").get("content").get("evaRequestId").asText());
         result.put("desenInfoPreId", jsonNodes.get("data").get("content").get("desenInfoPreId").asText());
         result.put("desenInfoAfterId", jsonNodes.get("data").get("content").get("desenInfoAfterId").asText());
+        result.put("desenLevel", jsonNodes.get("data").get("content").get("desenLevel").asText());
         System.out.println("fileType" + jsonNodes.get("data").get("content").get("fileType").asText());
         System.out.println("desenFailedColName" + result.get("desenFailedColName"));
         byte[] auth = new byte[16];
@@ -375,7 +380,7 @@ public class MockEva {
                         "\"desenAlgParam\" : \"5\"," +
                         "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
                         "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
-                        "\"desenLevel\" : \"1\"," +
+                        "\"desenLevel\" : \"3\"," +
                         "\"desenPerformer\":\"脱敏工具集\"," +
                         "\"desenCom\":true," +
                         "\"desenDeviation\":1,\"desenExtendedcontrol\":5,\"desenInformationloss\":1,\"desenUsability\":0," +
@@ -511,6 +516,7 @@ public class MockEva {
         String evaResultID = info.get("evaRequestId");
         String desenInfoPreID = info.get("desenInfoPreId");
         String desenInfoAfterID = info.get("desenInfoAfterId");
+        String privacyLevel = info.get("desenLevel");
         String evaResultInv = "";
 
         switch (fileType) {
@@ -532,7 +538,7 @@ public class MockEva {
                         "\"desenAlgParam\" : \"5\"," +
                         "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
                         "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
-                        "\"desenLevel\" : \"1\"," +
+                        "\"desenLevel\" :" + privacyLevel + "," +
                         "\"desenPerformer\":\"脱敏工具集\"," +
                         "\"desenCom\":true," +
                         "\"desenFailedColName\" :\"\" ," +
@@ -558,7 +564,7 @@ public class MockEva {
                         "\"desenAlgParam\" : \"1.0\"," +
                         "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
                         "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
-                        "\"desenLevel\" : \"2\"," +
+                        "\"desenLevel\" :" + privacyLevel + "," +
                         "\"desenPerformer\":\"脱敏工具集\"," +
                         "\"desenCom\":true," +
                         "\"desenFailedColName\" :\"\" ," +
@@ -584,7 +590,7 @@ public class MockEva {
                         "\"desenAlgParam\" : \"5\"," +
                         "\"desenPerformStartTime\" : \"2024-08-16 15:36:11\"," +
                         "\"desenPerformEndTime\" : \"2024-08-16 15:36:15\"," +
-                        "\"desenLevel\" : \"1\"," +
+                        "\"desenLevel\" :" + privacyLevel + "," +
                         "\"desenPerformer\":\"脱敏工具集\"," +
                         "\"desenCom\":true," +
                         "\"desenFailedColName\" :\"\" ," +
@@ -610,7 +616,7 @@ public class MockEva {
                         "\"desenAlgParam\" : \"10\"," +
                         "\"desenPerformStartTime\" : \"2024-08-16 14:37:24\"," +
                         "\"desenPerformEndTime\" : \"2024-08-16 14:37:24\"," +
-                        "\"desenLevel\" : \"1\"," +
+                        "\"desenLevel\" :" + privacyLevel + "," +
                         "\"desenPerformer\":\"脱敏工具集\"," +
                         "\"desenCom\":true," +
                         "\"desenFailedColName\" :\"\" ," +
@@ -636,7 +642,7 @@ public class MockEva {
                         "\"desenAlgParam\" : \"3,3,3.6,3.6,15,3.6,3.6,3,3,3,3,3,3,3,0.001,3,0.1,0.1,3,3,\"," +
                         "\"desenPerformStartTime\" : \"2024-08-08 20:43:33\"," +
                         "\"desenPerformEndTime\" : \"2024-08-08 20:43:46\"," +
-                        "\"desenLevel\" : \"0,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,\"," +
+                        "\"desenLevel\" :" + privacyLevel + "," +
                         "\"desenPerformer\":\"脱敏工具集\"," +
                         "\"desenCom\":true," +
                         "\"desenFailedColName\" :\"CUST_CONTROL_LEVEL,CUST_AREA_GRADE,\" ," +

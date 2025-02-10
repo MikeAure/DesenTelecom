@@ -2,7 +2,7 @@
 <html lang="ch" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Insert title here</title>
+    <title>Video Tool</title>
     <link th:href="@{favicon.ico}" rel="shortcut icon"/>
     <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet"/>
     <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet"/>
@@ -75,61 +75,6 @@
                     submitBtn.off('click').on("click", originalSubmit);
                     break;
             }
-            // fetch('/toolset/getDefaultSelection?toolsetName=' + 'video')
-            //     .then(response => {
-            //         if (response.ok) {
-            //             return response.json();
-            //         } else {
-            //             throw new Error('Failed to fetch');
-            //         }
-            //     })
-            //     .then(data => {
-            //         if (data.code === 200 && data.data) {
-            //             setDefaultOption(data.data);
-            //             defaultOption = data.data;
-            //
-            //             switch (defaultOption) {
-            //                 case "video_remove_bg":
-            //                     defaultBtns.style.display = "none";
-            //                     videoBgBtns.style.display = "block";
-            //                     videoFaceSubBtns.style.display = "none"
-            //                     privacyLevel.style.display = "block";
-            //                     midImageArea.style.display = "block";
-            //                     // submitBtn.removeEventListener("click", originalSubmit);
-            //                     // submitBtn.removeEventListener("click", faceSubSubmit);
-            //                     submitBtn.off('click').on("click", removeBgSubmit);
-            //                     break;
-            //
-            //                 case "video_face_sub":
-            //                     defaultBtns.style.display = "none";
-            //                     videoBgBtns.style.display = "none";
-            //                     videoFaceSubBtns.style.display = "block"
-            //                     privacyLevel.style.display = "none";
-            //                     midImageArea.style.display = "block";
-            //                     // submitBtn.removeEventListener("click", originalSubmit);
-            //                     // submitBtn.removeEventListener("click", removeBgSubmit);
-            //                     submitBtn.off('click').on("click", faceSubSubmit);
-            //                     break;
-            //
-            //                 default:
-            //                     defaultBtns.style.display = "block";
-            //                     videoBgBtns.style.display = "none";
-            //                     videoFaceSubBtns.style.display = "none"
-            //                     privacyLevel.style.display = "block";
-            //                     midImageArea.style.display = "none";
-            //                     // submitBtn.addEventListener("click", originalSubmit);
-            //                     // submitBtn.removeEventListener("click", removeBgSubmit);
-            //                     submitBtn.off('click').on("click", originalSubmit);
-            //                     break;
-            //             }
-            //         } else {
-            //             setDefaultOption(defaultOption);
-            //         }
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //         setDefaultOption(defaultOption);
-            //     });
 
             function setDefaultOption(value) {
                 selectElement.value = value;
@@ -546,7 +491,6 @@
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert(error)
                         });
                 } else {
                     alert("视频文件或图片文件格式不符合要求");
@@ -921,9 +865,10 @@
                                     </label>
                                     <div class="col-lg-3">
                                         <select class="form-control" id="privacy-levels">
-                                            <option value="0"> 低程度</option>
-                                            <option value="1" selected> 中程度</option>
-                                            <option value="2"> 高程度</option>
+                                            <option value="0">无隐私保护处理</option>
+                                            <option value="1">低程度</option>
+                                            <option value="2" selected>中程度</option>
+                                            <option value="3">高程度</option>
                                         </select>
                                     </div>
                                 </div>

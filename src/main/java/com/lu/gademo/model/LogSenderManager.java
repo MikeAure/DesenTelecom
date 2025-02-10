@@ -39,9 +39,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 
 @Slf4j
 @Service
@@ -70,7 +71,8 @@ public class LogSenderManager {
     String effectEvaAddress;
     @Value("${effectEva.port}")
     int effectEvaPort;
-
+    @Value("${effectEva.waitingTime}")
+    int effectEvaWaitingTime;
     // 拆分重构系统ip和端口
     @Value("${splitReconstruct.address}")
     String splitReconstructAddress;
@@ -108,6 +110,8 @@ public class LogSenderManager {
     ObjectMapper objectMapper = new ObjectMapper();
 
     // 效果评测Dao
+    @Autowired
+    private final SendEvaReqService sendEvaReqService;
     @Autowired
     private SendEvaReqDao sendEvaReqDao;
     @Autowired
@@ -196,7 +200,7 @@ public class LogSenderManager {
         log.info("fileDataType: {}", fileDataType);
         log.info("fileType: {}", fileType);
         log.info("fileSuffix: {}", fileSuffix);
-
+        // 不经过评测系统评测仅发送日志并保存到数据库
         if (ifPlatformTest && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -206,13 +210,20 @@ public class LogSenderManager {
             return;
         }
 
-        EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(
-                sendEvaReq, rawFileBytes, desenFileBytes, ifSendFile);
-        if (evaluationSystemReturnResult != null) {
-            RecEvaResult recEvaResult = evaluationSystemReturnResult.getRecEvaResult();
-            RecEvaResultInv recEvaResultInv = evaluationSystemReturnResult.getRecEvaResultInv();
+        // 超时自动结束
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<EvaluationSystemReturnResult> future = executorService.submit(() ->
+                evaluationSystemLogSender.send2EffectEva(sendEvaReq, rawFileBytes, desenFileBytes, ifSendFile));
 
-            if (recEvaResult != null && recEvaResultInv == null) {
+//        EvaluationSystemReturnResult evaluationSystemReturnResult = evaluationSystemLogSender.send2EffectEva(
+//                sendEvaReq, rawFileBytes, desenFileBytes, ifSendFile);
+        try {
+            EvaluationSystemReturnResult evaluationSystemReturnResult = future.get(this.effectEvaWaitingTime, TimeUnit.MINUTES);
+
+            if (evaluationSystemReturnResult != null) {
+                RecEvaResult recEvaResult = evaluationSystemReturnResult.getRecEvaResult();
+                RecEvaResultInv recEvaResultInv = evaluationSystemReturnResult.getRecEvaResultInv();
+
                 HttpHeaders headers = new HttpHeaders();
                 switch (fileSuffix) {
                     case "jpg":
@@ -232,23 +243,81 @@ public class LogSenderManager {
                 headers.setContentDispositionFormData("attachment", fileStorageDetails.getDesenFileName()); // 示例文件名，可根据实际情况调整
                 ResponseEntity<byte[]> responseEntityResult = new ResponseEntity<>(desenFileBytes, headers, HttpStatus.OK);
 
-                // 向其他系统发送日志信息
-                eventPublisher.publishEvent(new ThreeSystemsEvent(this, submitEvidenceLocal, reqEvidenceSave, sendRuleReq, sendSplitDesenData, desenFileBytes));
-                // 将脱敏后的表格文件内容保存到数据库表中
-                if (ifSaveToDatabase && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
-                    eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails,
-                            responseEntityCompletableFuture, responseEntityResult));
-                } else {
-                    responseEntityCompletableFuture.complete(responseEntityResult);
+                if (recEvaResult != null && recEvaResultInv == null) {
+
+                    // 向其他系统发送日志信息
+                    eventPublisher.publishEvent(new ThreeSystemsEvent(this, submitEvidenceLocal, reqEvidenceSave, sendRuleReq, sendSplitDesenData, desenFileBytes));
+                    // 将脱敏后的表格文件内容保存到数据库表中
+                    if (ifSaveToDatabase && (entityName.contains("customer_desen_msg") || entityName.contains("sada_gdpi_click_dtl"))) {
+                        eventPublisher.publishEvent(new SaveExcelToDatabaseEvent(this, entityName, fileStorageDetails,
+                                responseEntityCompletableFuture, responseEntityResult));
+                    } else {
+                        responseEntityCompletableFuture.complete(responseEntityResult);
+                    }
                 }
+                if (recEvaResult == null && recEvaResultInv != null) {
+                    switch (fileType) {
+                        case "image":
+                        case "audio":
+                        case "video":
+                        case "text":
+                        case "graph":
+                            int desenLevel = Integer.parseInt(recEvaResultInv.getDesenLevel());
+                            if (desenLevel == 3) {
+                                responseEntityCompletableFuture.complete(ResponseEntity.status(500).
+                                        contentType(MediaType.TEXT_PLAIN).body("已将脱敏等级调整至最高仍无法通过评测，请更换脱敏算法".getBytes()));
+                            } else {
+                                eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv, logManagerEvent));
+                            }
+                            break;
+                        default:
+                            String desenInfoAfterID = recEvaResultInv.getDesenInfoAfterID();
+                            String[] updateFieldList = recEvaResultInv.getDesenFailedColName().split(",");
+                            log.info("DesenFailedColName {}", recEvaResultInv.getDesenFailedColName());
+                            log.info("updateFieldList: {}", Arrays.toString(updateFieldList));
+                            SendEvaReq evaReq = sendEvaReqService.findByDesenInfoAfterId(desenInfoAfterID);
+                            // 字段名列表
+                            String[] attributeNameList = evaReq.getDesenInfoPreIden().split(",");
+                            String[] desenLevelList = evaReq.getDesenLevel().split(",");
+
+                            Map<String, Integer> attributeDesenMap = new HashMap<>();
+                            for (int i = 0; i < attributeNameList.length; i++) {
+                                attributeDesenMap.put(attributeNameList[i], Integer.parseInt(desenLevelList[i]));
+                            }
+                            int flag = 1;
+                            if (ArrayUtils.isEmpty(updateFieldList)) {
+                                responseEntityCompletableFuture.complete(ResponseEntity.status(500).
+                                        contentType(MediaType.TEXT_PLAIN).body("评测系统返回的脱敏失败列为空".getBytes()));
+                            }
+                            for (String updateField : updateFieldList) {
+                                flag = flag & (attributeDesenMap.get(updateField) == 3 ? 1 : 0);
+                            }
+                            // 如果所有需要脱敏的字段脱敏等级都已经达到了最高，就直接返回当前的脱敏结果
+                            if (flag == 1) {
+                                responseEntityCompletableFuture.complete(ResponseEntity.status(500).
+                                        contentType(MediaType.TEXT_PLAIN).body("所有失败列已将脱敏等级调整至最高仍无法通过评测，请更换脱敏算法".getBytes()));
+                            } else {
+                                eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv, logManagerEvent));
+                            }
+                            break;
+                    }
+
+                    // 保存脱敏效果评测结果无效异常消息
+                }
+            } else {
+                responseEntityCompletableFuture.complete(ResponseEntity.status(500).
+                        contentType(MediaType.TEXT_PLAIN).body("与评测系统建立连接失败".getBytes()));
             }
-            if (recEvaResult == null && recEvaResultInv != null) {
-                // 保存脱敏效果评测结果无效异常消息
-                eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv, logManagerEvent));
-            }
-        } else {
+        } catch (TimeoutException e) {
+            log.error("评测系统超时，未能在规定时间内返回结果", e);
             responseEntityCompletableFuture.complete(ResponseEntity.status(500).
-                    contentType(MediaType.TEXT_PLAIN).body("与评测系统建立连接失败".getBytes()));
+                    contentType(MediaType.TEXT_PLAIN).body("评测系统超时".getBytes()));
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("调用评测系统时发生错误", e);
+            responseEntityCompletableFuture.complete(ResponseEntity.status(500).
+                    contentType(MediaType.TEXT_PLAIN).body("调用评测系统时发生错误".getBytes()));
+        } finally {
+            executorService.shutdown();
         }
     }
 

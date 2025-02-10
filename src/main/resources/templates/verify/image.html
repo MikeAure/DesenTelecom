@@ -438,7 +438,6 @@
                     if (response.status === 500) {
                         // Handle server error
                         return response.text().then(failedMsg => {
-                            alert(failedMsg);
                             throw new Error(failedMsg); // Throw an error to stop further processing
                         });
                     }
@@ -656,9 +655,10 @@
                                     <div class="col-lg-3">
                                         <select class="form-control" name="level-selection"
                                                 id="level-selection">
-                                            <option value="0"> 低程度</option>
-                                            <option value="1" selected> 中程度</option>
-                                            <option value="2"> 高程度</option>
+                                            <option value="0">无隐私保护处理</option>
+                                            <option value="1">低程度</option>
+                                            <option value="2" selected>中程度</option>
+                                            <option value="3">高程度</option>
                                         </select>
                                     </div>
                                 </div>

@@ -49,7 +49,7 @@ public class DriverConnThread extends Thread {
                 ois = new ObjectInputStream(socket.getInputStream());
                 TMessage tmsg = (TMessage) ois.readObject();
                 int msgType = tmsg.getMsgType();
-                logger.info("消息类型" + msgType);
+                System.out.println("消息类型" + msgType);
                 switch (msgType) {
                     case 10: {//如果车主收到加密的圆形数据，则应该在这里处理自身与该圆形数据进行计算并返回的过程，但是不一定能提供服务（在圆内）
                         String emMapData = tmsg.getMapData().getEncryptedMap().toString();
@@ -66,7 +66,7 @@ public class DriverConnThread extends Thread {
 //                        int fromUserId = Integer.parseInt(tmsg.getFromUser().getID() + "");
 //                        customer.OnReceivedCalculatedCircleData(EMData, fromUserName, fromUserId);
 //
-//                        logger.info("司机id" + tmsg.getFromUser().getID());
+//                        System.out.println("司机id" + tmsg.getFromUser().getID());
 //                        break;
 //                    }
                     case 20: {//这里用来处理司机收到圆形加密结果的方法
@@ -86,7 +86,7 @@ public class DriverConnThread extends Thread {
 //                        int userID = tmsg.getFromUser().getID();
 //                        customer.driverAccept(userName, userID);
 ////                        intentStart(context, "notify-to-refresh", names, values);
-//                        logger.info("意愿司机id" + tmsg.getFromUser().getID());
+//                        System.out.println("意愿司机id" + tmsg.getFromUser().getID());
 //                        break;
 //                    }
                     case 30: {

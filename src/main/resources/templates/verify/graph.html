@@ -212,107 +212,6 @@
             });
             return map;
         }
-
-        // function displayTrack(e, map, outlineColor = '#f50b0b', strokeColor = 'red', markerImage = default_marker_image, windowContent = "原始轨迹") {
-        //     const content = e.target.result;
-        //
-        //     // 使用PlaceSearch类来获取POI信息
-        //     const placeSearch = new AMap.PlaceSearch({
-        //         /* city: 'beijing', // 兴趣点城市*/
-        //         pageSize: 1,
-        //         pageIndex: 1,
-        //         children: 0, //不展示子节点数据
-        //         extensions: 'base' //返回基本地址信息
-        //         //map: map
-        //     });
-        //     // 将文件内容分割成行
-        //     const lines = content.split('\n');
-        //     console.log("Total line number:" + lines.length);
-        //     let index = Math.floor(Math.random() * lines.length);
-        //     console.log("Line index: " + index);
-        //     // 随机获取一行数据
-        //     let raw_line = lines[index];
-        //     console.log("Line:", raw_line);
-        //     // 分割原始轨迹每个点
-        //     let raw_points = raw_line.split(';');
-        //     // 去除数组中的空字符串元素
-        //     raw_points = raw_points.filter(item => item.trim() !== '');
-        //     console.log("raw_points length: " + raw_points.length);
-        //     // 保存原路径节点经纬度
-        //     let raw_path = []
-        //
-        //     let promises = raw_points.map(point => {
-        //         return new Promise((resolve, reject) => {
-        //             let [poiId, attributes] = point.split(',');
-        //             placeSearch.getDetails(poiId, function (status, result) {
-        //                 if (status === 'complete' && result.info === 'OK') {
-        //                     // if (result.poiList.pois && result.poiList.pois.length > 0) {
-        //                     //     let location = result.poiList.pois[0].location;
-        //                     //     console.log(result.poiList.pois[0])
-        //                     //     console.log(location.lng + " " + location.lat)
-        //                     //     resolve([location.lng, location.lat]);
-        //                     // } else {
-        //                     //     console.log("选取的该行POI没有位置数据");
-        //                     //     reject("选取的该行POI没有位置数据");
-        //                     // }
-        //                     let location = result.poiList.pois[0].location;
-        //                     console.log(result.poiList.pois[0])
-        //                     console.log(location.lng + " " + location.lat)
-        //                     resolve([location.lng, location.lat]);
-        //
-        //                 } else {
-        //                     console.log("获取POI信息失败，POI ID:" + poiId);
-        //                 }
-        //             });
-        //         });
-        //     });
-        //
-        //     // 使用Promise.all等待所有的Promise都完成
-        //     Promise.all(promises).then(raw_path => {
-        //         for (let [lng, lat] of raw_path) {
-        //             let marker = new AMap.Marker({
-        //                 icon: markerImage,
-        //                 position: [lng, lat],
-        //                 offset: new AMap.Pixel(-13, -30)
-        //             });
-        //             marker.setMap(map)
-        //         }
-        //
-        //         // 创建折线实例
-        //         let polyline = new AMap.Polyline({
-        //             path: raw_path,         // 折线的路径，`desen_path` 应该是包含经纬度坐标的数组
-        //             isOutline: true,         // 是否显示折线的轮廓线
-        //             outlineColor: outlineColor, // 轮廓线颜色
-        //             borderWeight: 1,         // 轮廓线宽度
-        //             strokeColor: strokeColor,     // 折线颜色
-        //             strokeOpacity: 1,        // 折线透明度，范围 [0, 1]
-        //             strokeWeight: 6,         // 折线宽度
-        //             strokeStyle: "solid",    // 折线样式，可选值："solid"（实线）、"dashed"（虚线）、"dotted"（点线）
-        //             strokeDasharray: [10, 5], // 虚线样式，数组中的数字表示虚线和空白段的长度
-        //             lineJoin: 'round',       // 折线交汇处的连接方式，可选值："round"、"bevel"、"miter"
-        //             lineCap: 'round',        // 折线两端的线帽样式，可选值："butt"、"round"、"square"
-        //             zIndex: 50,              // 折线的层级
-        //         });
-        //
-        //         // 将折线添加至地图实例
-        //         polyline.setMap(map);
-        //         // 选择折线的第一个点作为信息窗体的位置
-        //         let infoWindowPosition = raw_path[0];
-        //         // 创建信息窗体
-        //         let infoWindow = new AMap.InfoWindow({
-        //             content: windowContent,
-        //             position: infoWindowPosition,
-        //             isCustom: true,
-        //             autoMove: true,
-        //         });
-        //
-        //         // 打开信息窗体
-        //         infoWindow.open(map, infoWindowPosition);
-        //
-        //         // ...其他代码
-        //     }).catch(error => console.error('Error:', error));
-        // }
-
         function displayTrack(e, map, outlineColor = '#f50b0b', strokeColor = 'red', markerImage = default_marker_image, windowContent = "原始轨迹") {
             const content = e.target.result;
             const maxAttempts = 50; // 设置最大查询次数
@@ -572,9 +471,10 @@
                                     <div class="col-lg-2">
                                         <select class=" form-control" name="privacyLevel-selections"
                                                 id="privacyLevel-selections">
-                                            <option value="0"> 低程度</option>
-                                            <option value="1" selected> 中程度</option>
-                                            <option value="2"> 高程度</option>
+                                            <option value="0">无隐私保护处理</option>
+                                            <option value="1">低程度</option>
+                                            <option value="2" selected>中程度</option>
+                                            <option value="3">高程度</option>
                                         </select>
                                     </div>
                                 </div>
@@ -590,7 +490,6 @@
                                     <button type="button" class="btn btn-primary" id="submit"> 提交脱敏</button>
                                 </div>
                             </form>
-
 
                             <div class="row">
                                 <div class="col-lg-12">

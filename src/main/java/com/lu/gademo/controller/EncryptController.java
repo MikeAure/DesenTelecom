@@ -178,7 +178,7 @@ public class EncryptController {
             byte[] rawFileBytes = rawData.getBytes();
             Long rawFileSize = (long) rawFileBytes.length;
 
-            // 调用视频加密方法
+
             String startTime = util.getTime();
 //            String result = MainTest.encryptGraph(rawData);
             String endTime = util.getTime();

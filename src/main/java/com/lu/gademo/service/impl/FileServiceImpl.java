@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -679,7 +680,13 @@ public class FileServiceImpl implements FileService {
         // 脱敏开始时间
         String startTime = util.getTime();
         long startTimePoint = System.currentTimeMillis();
-        algorithmInfo.execute(dsObject, reqDesenParam);
+
+        if (reqDesenParam == 0) {
+            desenCom = true;
+            Files.copy(rawFilePath, desenFilePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            algorithmInfo.execute(dsObject, reqDesenParam - 1);
+        }
         // 脱敏后收集信息
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -697,12 +704,19 @@ public class FileServiceImpl implements FileService {
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
 
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        infoBuilders.desenLevel.append(reqDesenParam + 1);
-        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
-            infoBuilders.desenAlgParam.append("无参");
+        infoBuilders.desenLevel.append(reqDesenParam);
+
+        if (reqDesenParam == 0) {
+            infoBuilders.desenAlgParam.append("没有脱敏");
         } else {
-            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(reqDesenParam).toString());
+            if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
+                infoBuilders.desenAlgParam.append("无参");
+            } else {
+                infoBuilders.desenAlgParam.append(algorithmInfo.getParams()
+                        .get(reqDesenParam - 1).toString());
+            }
         }
+
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("image");
         // 脱敏后类型
@@ -756,7 +770,13 @@ public class FileServiceImpl implements FileService {
         // 脱敏开始时间
         String startTime = util.getTime();
         long startTimePoint = System.currentTimeMillis();
-        algorithmInfo.execute(dsObject, desenParam);
+        // 不进行脱敏时的选项
+        if (desenParam == 0) {
+            desenCom = true;
+            Files.copy(rawFilePath, desenFilePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            algorithmInfo.execute(dsObject, desenParam - 1);
+        }
 
         // 脱敏后收集信息
         // 结束时间
@@ -775,12 +795,16 @@ public class FileServiceImpl implements FileService {
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         // 脱敏算法
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
-            infoBuilders.desenAlgParam.append("无参");
+        if (desenParam == 0) {
+            infoBuilders.desenAlgParam.append("没有脱敏");
         } else {
-            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
+            if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
+                infoBuilders.desenAlgParam.append("无参");
+            } else {
+                infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam - 1).toString());
+            }
         }
-        infoBuilders.desenLevel.append(desenParam + 1);
+        infoBuilders.desenLevel.append(desenParam);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("video");
         // 脱敏后类型
@@ -837,7 +861,12 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         // 脱敏开始时间
         long startTimePoint = System.currentTimeMillis();
-        algorithmInfo.execute(desenObj, desenParam);
+        if (desenParam == 0) {
+            desenCom = true;
+            Files.copy(rawFilePath, desenFilePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            algorithmInfo.execute(desenObj, desenParam - 1);
+        }
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
         // 脱敏耗时
@@ -853,13 +882,17 @@ public class FileServiceImpl implements FileService {
         byte[] desenFileBytes = Files.readAllBytes(desenFilePath.toAbsolutePath());
         Long desenFileSize = Files.size(desenFilePath.toAbsolutePath());
         infoBuilders.desenAlg.append(algorithmInfo.getId());
-        if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
-            infoBuilders.desenAlgParam.append("无参");
+        if (desenParam == 0) {
+            infoBuilders.desenAlgParam.append("没有脱敏");
         } else {
-            infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam).toString());
+            if (CollectionUtils.isEmpty(algorithmInfo.getParams())) {
+                infoBuilders.desenAlgParam.append("无参");
+            } else {
+                infoBuilders.desenAlgParam.append(algorithmInfo.getParams().get(desenParam - 1).toString());
+            }
         }
         // 脱敏级别
-        infoBuilders.desenLevel.append(desenParam + 1);
+        infoBuilders.desenLevel.append(desenParam);
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("audio");
         // 脱敏后类型
@@ -911,7 +944,13 @@ public class FileServiceImpl implements FileService {
         String startTime = util.getTime();
         // 脱敏开始时间
         long startTimePoint = System.currentTimeMillis();
-        algorithmsFactory.getAlgorithmInfoFromId(60).execute(dsObject, Integer.parseInt(desenParam));
+        AlgorithmInfo algorithmInfo = algorithmsFactory.getAlgorithmInfoFromId(60);
+        if (Integer.parseInt(desenParam) == 0) {
+            desenCom = true;
+            Files.copy(rawFilePath, desenFilePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            algorithmInfo.execute(dsObject, Integer.parseInt(desenParam) - 1);
+        }
 
         // 结束时间
         long endTimePoint = System.currentTimeMillis();
@@ -930,9 +969,12 @@ public class FileServiceImpl implements FileService {
         double[] param = new double[]{5.0, 1.0, 0.2};
         // 脱敏算法
         infoBuilders.desenAlg.append(60);
-        infoBuilders.desenAlgParam.append(param[Integer.parseInt(desenParam)]);
+        infoBuilders.desenAlgParam.append(
+                Integer.parseInt(desenParam) == 0 ? "没有脱敏" :
+                        algorithmInfo.getParams().get(Integer.parseInt(desenParam) - 1)
+        );
         // 脱敏级别
-        infoBuilders.desenLevel.append(Integer.parseInt(params) + 1);
+        infoBuilders.desenLevel.append(Integer.parseInt(params));
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append(objectMode);
         // 脱敏后类型
@@ -991,8 +1033,13 @@ public class FileServiceImpl implements FileService {
         List<String> rawData = Arrays.asList(rawFilePathString, rawBgPathString, desenFilePathString);
         DSObject dsObject = new DSObject(rawData);
         // 调用脱敏程序处理
-        String resultString = algorithmInfo.execute(dsObject, Integer.valueOf(params)).getList().toString();
-        log.info(resultString);
+        if (Integer.parseInt(params) == 0) {
+            desenCom = true;
+            Files.copy(rawFilePath, desenFilePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            algorithmInfo.execute(dsObject, Integer.parseInt(params) - 1);
+        }
+//        log.info(resultString);
         // 结束时间
         endTimePoint = System.currentTimeMillis();
         executionTime = endTimePoint - startTimePoint;
@@ -1010,7 +1057,7 @@ public class FileServiceImpl implements FileService {
         // 脱敏参数
         infoBuilders.desenAlgParam.append(rawBgPathString);
         // 脱敏级别
-        infoBuilders.desenLevel.append(Integer.parseInt(desenParam) + 1);
+        infoBuilders.desenLevel.append(Integer.parseInt(desenParam));
         // 脱敏前类型
         infoBuilders.desenInfoPreIden.append("video");
         // 脱敏后类型
@@ -1360,17 +1407,16 @@ public class FileServiceImpl implements FileService {
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();
 
         // 提升脱敏等级，除表格外其他模态的数据的脱敏等级为0，1，2
-        desenLevel -= 1;
-        if (desenLevel < 2) {
+        if (desenLevel < 3) {
             desenLevel++;
         } else {
-            desenLevel = 2;
+            desenLevel = 3;
         }
 
         if (!algIdList.contains(desenAlg)) {
             desenAlg = 41;
             algName = algorithmsFactory.getAlgorithmInfoFromId(desenAlg).getName();
-            desenLevel = 0;
+            desenLevel = 1;
         }
 
         FileStorageDetails fileStorageDetails = FileStorageDetails.builder()
@@ -1424,17 +1470,16 @@ public class FileServiceImpl implements FileService {
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();
 
         // 提升脱敏等级，除表格外其他模态的数据的脱敏等级为0，1，2
-        desenLevel -= 1;
-        if (desenLevel < 2) {
+        if (desenLevel < 3) {
             desenLevel++;
         } else {
-            desenLevel = 2;
+            desenLevel = 3;
         }
 
         if (!algIdList.contains(desenAlg)) {
             desenAlg = 51;
             algName = algorithmsFactory.getAlgorithmInfoFromId(desenAlg).getName();
-            desenLevel = 0;
+            desenLevel = 1;
         }
 
         FileStorageDetails fileStorageDetails = FileStorageDetails.builder()
@@ -1489,17 +1534,17 @@ public class FileServiceImpl implements FileService {
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();
 
         // 提升脱敏等级，除表格外其他模态的数据的脱敏等级为0，1，2
-        desenLevel -= 1;
-        if (desenLevel < 2) {
+//        desenLevel -= 1;
+        if (desenLevel < 3) {
             desenLevel++;
         } else {
-            desenLevel = 2;
+            desenLevel = 3;
         }
 
         if (!algIdList.contains(desenAlg)) {
             desenAlg = 74;
             algName = algorithmsFactory.getAlgorithmInfoFromId(desenAlg).getName();
-            desenLevel = 0;
+            desenLevel = 1;
         }
 
         FileStorageDetails fileStorageDetails = FileStorageDetails.builder()
@@ -1553,11 +1598,10 @@ public class FileServiceImpl implements FileService {
         String desenFilePathString = desenFilePath.toAbsolutePath().toString();
 
         // 提升脱敏等级，除表格外其他模态的数据的脱敏等级为0，1，2
-        desenLevel -= 1;
-        if (desenLevel < 2) {
+        if (desenLevel < 3) {
             desenLevel++;
         } else {
-            desenLevel = 2;
+            desenLevel = 3;
         }
 
         FileStorageDetails fileStorageDetails = FileStorageDetails.builder()

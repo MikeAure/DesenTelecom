@@ -216,7 +216,7 @@ public class QU_AGRQ_P {
             String H = SMUtils.encryptBySm3(H_pre);
             String H_UF = SMUtils.encryptBySm4(H, key_QU);
             String sendMessage = D + symbol2 + QUID + symbol2 + nowTime + symbol2 + H_UF;//同字符类型之间以symbol2隔开
-            log.info("UF_AGRQ_P_RDC发送数据生成成功：" + sendMessage);
+            System.out.println("UF_AGRQ_P_RDC发送数据生成成功：" + sendMessage);
             return sendMessage;
         }
         return null;

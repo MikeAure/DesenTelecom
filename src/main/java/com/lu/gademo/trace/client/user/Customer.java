@@ -117,7 +117,7 @@ public class Customer {
     }
 
     public void driverAccept(String driverName, int userId) {
-        logger.info("司机: " + driverName + " " + userId + " " + "接单了");
+        System.out.println("司机: " + driverName + " " + userId + " " + "接单了");
         TraceUser driver = new TraceUser(driverName, "", 2, userId);
         driverList.add(driver);
         IS_ORDER_ACCEPTED = true;
@@ -133,13 +133,13 @@ public class Customer {
 //        user.setPassword(psd);
 //        user.setRoleId(roleId);
         user.setMsgType(MessageType.LOGIN);
-        logger.info("account: " + user.getUserName());
-        logger.info("psd: " + user.getPassword());
-        logger.info("role id: " + user.getRoleId());
+        System.out.println("account: " + user.getUserName());
+        System.out.println("psd: " + user.getPassword());
+        System.out.println("role id: " + user.getRoleId());
         boolean isLoginSuc = sendLoginInfo(user);
 //        Log.e("isLoginSuc",isLoginSuc+"");
         if (isLoginSuc) {
-            logger.info(user.getUserName() + "注册成功");
+            System.out.println(user.getUserName() + "注册成功");
         } else {
             logger.error(user.getUserName() + "注册失败");
             throw new IOException("Login Failed");
@@ -149,7 +149,7 @@ public class Customer {
     public boolean sendLoginInfo(TraceUser user) {
 
         connSocket = new Socket();
-        logger.info("ip address: " + ADDRESS);
+        System.out.println("ip address: " + ADDRESS);
 
         try {
             connSocket.connect(new InetSocketAddress(ADDRESS, PORT), 60000 * 3);
@@ -182,7 +182,7 @@ public class Customer {
 
                 mapUtils = new MapUtils();//初始化地图数据
 
-                logger.info("sendLoginInfo_id: " + user.getID());
+                System.out.println("sendLoginInfo_id: " + user.getID());
 
             } else if (message.getMsgType() == MessageType.LOGIN_FAIL) {
                 loginFlag = false;
@@ -209,12 +209,12 @@ public class Customer {
             mapData.setEncryptedMap(encryptedCalculatedData(latitude, longitude));
             mapData.setDataType(MapData.ECPM);
             tMessage.setMapData(mapData);
-            log.info("用户发送的tMessage: {}", tMessage.getMapData().toString());
+            System.out.println("用户发送的tMessage: " + tMessage.getMapData().toString());
             oos.writeObject(tMessage);
-            logger.info("sendEncryptedMapData: 写入数据完成！");
+            System.out.println("sendEncryptedMapData: 写入数据完成！");
 
         } catch (IOException e) {
-            logger.info("ccst init: 读取输出流失败！");
+            System.out.println("ccst init: 读取输出流失败！");
         }
         return tMessage.getMapData().toString();
 
@@ -235,7 +235,7 @@ public class Customer {
 
             tMessage.setMapData(mapData);
             oos.writeObject(tMessage);
-            logger.info("sendED: 写入数据完成！msgType: " + type);
+            System.out.println("sendED: 写入数据完成！msgType: " + type);
         } catch (IOException e) {
             logger.error("ED: 读取输出流失败！");
         }
@@ -282,9 +282,9 @@ public class Customer {
 
         sendEncryptedData(stringBuffer, 3);
 
-        logger.info("模糊位置数据发送完毕");
+        System.out.println("模糊位置数据发送完毕");
 
-        logger.info("onClick: " +
+        System.out.println("onClick: " +
                 distance + "m:" + startLatitude + "," + startLongitude + ";" + latLngTopCenter.latitude + "," + latLngLeftCenter.longitude + ";" +
                 +latLngTopCenter.latitude + "," + latLngRightCenter.longitude + ";"
                 + latLngBottomCenter.latitude + "," + latLngRightCenter.longitude + ";"
@@ -319,7 +319,7 @@ public class Customer {
             try {
                 stringBuffer.append(qu_agrq_p.UF_AGRQ_P_RDC(str, vertex) + ";");
             } catch (Exception e) {
-                logger.info("EncryptedCaledData: ", "数据处理出错！");
+                System.out.println("EncryptedCaledData: " + "数据处理出错！");
                 logger.error(e.getMessage());
             }
         }
@@ -336,8 +336,8 @@ public class Customer {
         boolean result = false;
         try {
             result = qu_agrq_c.QU_AGRQ_P_QRR(stringBuffer.toString(), queryCircle);
-            logger.info("收到与圆计算的结果:" + stringBuffer);
-            logger.info("解密圆计算的结果: " + result);
+            System.out.println("收到与圆计算的结果:" + stringBuffer);
+            System.out.println("解密圆计算的结果: " + result);
         } catch (Exception e) {
             logger.error("用户圆形范围车辆判断: 数据处理出错！");
             logger.error(e.getMessage());
@@ -366,7 +366,7 @@ public class Customer {
 
     public void OnReceivedRealDriverPos(String driverNameReal, double realPosLat, double realPosLng) {
         double distance = Math.sqrt(Math.pow((realPosLat - startLatitude), 2) + Math.pow((realPosLng - startLongitude), 2));
-        logger.info("司机名称" + driverNameReal + "两人距离： " + distance);
+        System.out.println("司机名称" + driverNameReal + "两人距离： " + distance);
     }
 
     public void close() {

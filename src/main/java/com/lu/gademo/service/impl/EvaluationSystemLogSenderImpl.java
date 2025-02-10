@@ -67,7 +67,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
      */
     @Override
     public EvaluationSystemReturnResult send2EffectEva(SendEvaReq sendEvaReq, byte[] rawFileData,
-                                                       byte[] desenFileData, Boolean ifSendFile ) {
+                                                       byte[] desenFileData, Boolean ifSendFile) {
         EvaluationSystemReturnResult evaluationSystemReturnResult = null;
         try {
             // 本地保存请求
@@ -116,140 +116,144 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             byte[] evaRequestTcpPacket = tcpPacket.buildPacket();
             // 发送
             // 连接服务器
-            Socket socket = new Socket(effectEvaAddress, effectEvaPort);
-            OutputStream outputStream = socket.getOutputStream();
-            // 接收效果评测系统返回信息
-            InputStream inputStream = socket.getInputStream();
-            DataInputStream dataInputStream = new DataInputStream(inputStream);
-            outputStream.write(evaRequestTcpPacket);
-            outputStream.flush();
-
-            log.info("已发送脱敏效果评测系统请求");
-
-            // TODO: 增加发送文件的开关
-            if (ifSendFile) {
-                // 发送原始文件
-
-                outputStream.write(rawFileData);
-                // 发送脱敏后的文件
-                outputStream.write(desenFileData);
+            try (
+                    Socket socket = new Socket(effectEvaAddress, effectEvaPort);
+                    OutputStream outputStream = socket.getOutputStream();
+                    // 接收效果评测系统返回信息
+                    InputStream inputStream = socket.getInputStream();
+                    DataInputStream dataInputStream = new DataInputStream(inputStream))
+            {
+                outputStream.write(evaRequestTcpPacket);
                 outputStream.flush();
-            }
-            log.info("Chosen algorithm：" + sendEvaReq.getDesenAlg());
 
-            // 各个实体对象
-            RecEvaResultInv recEvaResultInv = new RecEvaResultInv();
-            RecEvaResult recEvaResult = new RecEvaResult();
-            RecEvaReqReceipt recEvaReqReceipt = new RecEvaReqReceipt();
-            SendEvaReceipt sendEvaReceipt = new SendEvaReceipt();
+                log.info("已发送脱敏效果评测系统请求");
 
-            ObjectMapper mapper = new ObjectMapper();
-            String evaResultId = null;
-
-            int recvNum = 2;
-            // 依次读取
-            for (int i = 0; i < recvNum; i++) {
-                // tcp头
-                // 读取头部
-                byte[] header = new byte[14];
-                dataInputStream.read(header);
-                // 响应数据域长度
-                int dataLength = dataInputStream.readInt();
-                log.info("DataLength: " + dataLength);
-                // 读取数据域内容
-                byte[] dataBytes = new byte[dataLength - 34];
-                dataInputStream.read(dataBytes);
-                String jsonData = new String(dataBytes, StandardCharsets.UTF_8);
-                log.info(jsonData);
-                // 认证与校验
-                byte[] auth = new byte[16];
-                dataInputStream.read(auth);
-                //String 转 json
-                JsonNode jsonNode = mapper.readTree(jsonData);
-                JsonNode recvContent = jsonNode.get("content");
-
-                int dataTypeNum = jsonNode.get("dataType").asInt();
-                log.info("脱敏评估系统DataType: " + dataTypeNum);
-                // 接收收据
-                if (dataTypeNum == 0x3131) {
-                    // 获取实体
-                    recEvaReqReceipt = mapper.treeToValue(recvContent, RecEvaReqReceipt.class);
-                    String certificateID = recEvaReqReceipt.getCertificateID();
-                    log.info("CertificateID: " + certificateID);
-                    // 检测重复
-                    if (recEvaReqReceiptDao.existsById(certificateID)) {
-                        recEvaReqReceiptDao.deleteById(certificateID);
-                    }
-                    // 插入数据库
-                    recEvaReqReceiptDao.save(recEvaReqReceipt);
-                    log.info("已接收脱敏效果评测请求收据");
+                // TODO: 增加发送文件的开关
+                if (ifSendFile) {
+                    // 发送原始文件
+                    outputStream.write(rawFileData);
+                    // 发送脱敏后的文件
+                    outputStream.write(desenFileData);
+                    outputStream.flush();
                 }
-                // 接收脱敏效果评测结果
-                else if (dataTypeNum == 0x3132) {
-                    // 获取实体
-                    recEvaResult = mapper.treeToValue(recvContent, RecEvaResult.class);
-                    evaResultId = recvContent.get("evaResultID").asText();
+                log.info("Chosen algorithm：" + sendEvaReq.getDesenAlg());
+
+                // 各个实体对象
+                RecEvaResultInv recEvaResultInv = new RecEvaResultInv();
+                RecEvaResult recEvaResult = new RecEvaResult();
+                RecEvaReqReceipt recEvaReqReceipt = new RecEvaReqReceipt();
+                SendEvaReceipt sendEvaReceipt = new SendEvaReceipt();
+
+                ObjectMapper mapper = new ObjectMapper();
+                String evaResultId = null;
+
+                int recvNum = 2;
+                // 依次读取
+                for (int i = 0; i < recvNum; i++) {
+                    // tcp头
+                    // 读取头部
+                    byte[] header = new byte[14];
+                    dataInputStream.read(header);
+                    // 响应数据域长度
+                    int dataLength = dataInputStream.readInt();
+                    log.info("DataLength: " + dataLength);
+                    // 读取数据域内容
+                    byte[] dataBytes = new byte[dataLength - 34];
+                    dataInputStream.read(dataBytes);
+                    String jsonData = new String(dataBytes, StandardCharsets.UTF_8);
+                    log.info(jsonData);
+                    // 认证与校验
+                    byte[] auth = new byte[16];
+                    dataInputStream.read(auth);
+                    //String 转 json
+                    JsonNode jsonNode = mapper.readTree(jsonData);
+                    JsonNode recvContent = jsonNode.get("content");
+
+                    int dataTypeNum = jsonNode.get("dataType").asInt();
+                    log.info("脱敏评估系统DataType: " + dataTypeNum);
+                    // 接收收据
+                    if (dataTypeNum == 0x3131) {
+                        // 获取实体
+                        recEvaReqReceipt = mapper.treeToValue(recvContent, RecEvaReqReceipt.class);
+                        String certificateID = recEvaReqReceipt.getCertificateID();
+                        log.info("CertificateID: " + certificateID);
+                        // 检测重复
+                        if (recEvaReqReceiptDao.existsById(certificateID)) {
+                            recEvaReqReceiptDao.deleteById(certificateID);
+                        }
+                        // 插入数据库
+                        recEvaReqReceiptDao.save(recEvaReqReceipt);
+                        log.info("已接收脱敏效果评测请求收据");
+                    }
+                    // 接收脱敏效果评测结果
+                    else if (dataTypeNum == 0x3132) {
+                        // 获取实体
+                        recEvaResult = mapper.treeToValue(recvContent, RecEvaResult.class);
+                        evaResultId = recvContent.get("evaResultID").asText();
 //                     检测重复
-                    if (recEvaResultDao.existsById(recEvaResult.getEvaResultID())) {
-                        recEvaResultDao.deleteById(recEvaResult.getEvaResultID());
+                        if (recEvaResultDao.existsById(recEvaResult.getEvaResultID())) {
+                            recEvaResultDao.deleteById(recEvaResult.getEvaResultID());
+                        }
+                        // 插入数据库
+                        recEvaResultDao.save(recEvaResult);
+                        log.info("脱敏效果评测结果：{}", recvContent.toPrettyString());
+                        log.info("已接收脱敏效果评测结果");
+                        evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, recEvaResult, null);
                     }
-                    // 插入数据库
-                    recEvaResultDao.save(recEvaResult);
-                    log.info("脱敏效果评测结果：{}", recvContent.toPrettyString());
-                    log.info("已接收脱敏效果评测结果");
-                    evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, recEvaResult, null);
-                }
-                // 接收脱敏效果测评结果无效异常消息
-                else if (dataTypeNum == 0x3401) {
-                    // 获取实体
-                    recEvaResultInv = mapper.treeToValue(recvContent, RecEvaResultInv.class);
+                    // 接收脱敏效果测评结果无效异常消息
+                    else if (dataTypeNum == 0x3401) {
+                        // 获取实体
+                        recEvaResultInv = mapper.treeToValue(recvContent, RecEvaResultInv.class);
+                        evaResultId = recvContent.get("evaResultID").asText();
 //                     检测重复
-                    if (recEvaResultInvDao.existsById(recEvaResultInv.getEvaResultID())) {
-                        recEvaResultInvDao.deleteById(recEvaResultInv.getEvaResultID());
+                        if (recEvaResultInvDao.existsById(recEvaResultInv.getEvaResultID())) {
+                            recEvaResultInvDao.deleteById(recEvaResultInv.getEvaResultID());
+                        }
+                        // 插入数据库
+                        recEvaResultInvDao.save(recEvaResultInv);
+                        log.info("已接收脱敏效果测评结果无效异常消息");
+                        evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, null, recEvaResultInv);
                     }
-                    // 插入数据库
-                    recEvaResultInvDao.save(recEvaResultInv);
-                    log.info("已接收脱敏效果测评结果无效异常消息");
-                    evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, null, recEvaResultInv);
                 }
-            }
 
-            // 发送收据
-            log.info("发送脱敏效果收据");
-            sendEvaReceipt.setEvaResultID(evaResultId);
-            sendEvaReceipt.setCertificateID(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + util.getTime()).getBytes()));
-            sendEvaReceipt.setHash(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + sendEvaReceipt.getCertificateID()).getBytes()));
-            ObjectNode evaReceiptContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReceipt));
-            ObjectNode data1 = objectMapper.createObjectNode();
-            data1.put("DataType", 0x3130);
-            data1.set("content", evaReceiptContent);
-            ObjectNode dataJson1 = objectMapper.createObjectNode();
-            dataJson1.set("data", data1);
-            TcpPacket tcpPacket1 = new TcpPacket(objectMapper.writeValueAsString(dataJson1));
-            byte[] tcp1 = tcpPacket1.buildPacket();
-            // 发送
-            outputStream.write(tcp1);
-            outputStream.flush();
-            outputStream.flush();
-            outputStream.close();
-            inputStream.close();
-            dataInputStream.close();
-            socket.close();
-            // 本地保存收据
-            sendEvaReceiptDao.save(sendEvaReceipt);
-            return evaluationSystemReturnResult;
-        } catch (ConnectException connectException) {
-            log.error("未与脱敏效果评测系统建立连接");
-        } catch (IOException e) {
+                // 发送收据
+                log.info("发送脱敏效果收据");
+                sendEvaReceipt.setEvaResultID(evaResultId);
+                sendEvaReceipt.setCertificateID(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + util.getTime()).getBytes()));
+                sendEvaReceipt.setHash(util.getSM3Hash((sendEvaReceipt.getEvaResultID() + sendEvaReceipt.getCertificateID()).getBytes()));
+                ObjectNode evaReceiptContent = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendEvaReceipt));
+                ObjectNode data1 = objectMapper.createObjectNode();
+                data1.put("DataType", 0x3130);
+                data1.set("content", evaReceiptContent);
+                ObjectNode dataJson1 = objectMapper.createObjectNode();
+                dataJson1.set("data", data1);
+                TcpPacket tcpPacket1 = new TcpPacket(objectMapper.writeValueAsString(dataJson1));
+                byte[] tcp1 = tcpPacket1.buildPacket();
+                // 发送
+                outputStream.write(tcp1);
+                outputStream.flush();
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+                dataInputStream.close();
+                socket.close();
+                // 本地保存收据
+                sendEvaReceiptDao.save(sendEvaReceipt);
+                return evaluationSystemReturnResult;
+            } catch (ConnectException connectException) {
+                log.error("未与脱敏效果评测系统建立连接");
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        } catch (Exception e) {
             log.error(e.getMessage());
-
         }
         return null;
     }
 
     @Override
     public EvaluationSystemReturnResult send2EffectEva(SendEvaReq sendEvaReq, Path rawFilePath,
-                                                       Path desenFilePath, Boolean ifSendFile ) {
+                                                       Path desenFilePath, Boolean ifSendFile) {
         EvaluationSystemReturnResult evaluationSystemReturnResult = null;
         try {
             // 本地保存请求
@@ -262,8 +266,8 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             ArrayNode evaRequestDesenIntentionArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenIntention, objectMapper);
             ArrayNode evaRequestDesenRequirementsArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenRequirements, objectMapper);
 
-            content.remove("desenIntention");
-            content.remove("desenRequirements");
+//            content.remove("desenIntention");
+//            content.remove("desenRequirements");
 
             content.set("desenIntention", evaRequestDesenIntentionArrayNode);
             content.set("desenRequirements", evaRequestDesenRequirementsArrayNode);
@@ -311,11 +315,11 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             // TODO: 增加发送文件的开关
             if (ifSendFile) {
                 // 发送原始文件
-                try(InputStream rawInputStream = Files.newInputStream(rawFilePath)) {
+                try (InputStream rawInputStream = Files.newInputStream(rawFilePath)) {
                     IOUtils.copy(rawInputStream, outputStream);
                 }
                 // 发送脱敏后的文件
-                try(InputStream desenInputStream = Files.newInputStream(desenFilePath)) {
+                try (InputStream desenInputStream = Files.newInputStream(desenFilePath)) {
                     IOUtils.copy(desenInputStream, outputStream);
                 }
             }
