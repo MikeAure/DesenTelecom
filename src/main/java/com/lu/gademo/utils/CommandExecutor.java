@@ -90,14 +90,14 @@ public class CommandExecutor {
         python = getPythonCommand();
         try {
             // 指定Python脚本路径
-            log.info("Python execution path: " + path);
+//            log.info("Python execution path: " + path);
 
             // 创建参数列表
             StringBuilder command = new StringBuilder(python + " " + path + " " + algName + " " + rawData);
             for (String param : params) {
                 command.append(" ").append(param);
             }
-            log.info("Python command info: " + command);
+//            log.info("Python command info: " + command);
 
             Path fileParent = Paths.get(path).getParent();
             // System.out.println(fileParent.toString());

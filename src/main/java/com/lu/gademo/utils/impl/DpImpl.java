@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.expression.Numbers;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -171,6 +173,11 @@ public class DpImpl implements Dp {
                 List<?> value = object.getList();
                 String path5 = Paths.get(currentPath, "graph", "desenGraph.py").toString();
                 System.out.println("path5: " + path5);
+//                try{
+//                    Files.copy(Paths.get(value.get(0).toString()), Paths.get(value.get(1).toString()), StandardCopyOption.REPLACE_EXISTING);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
                 List<String> result = CommandExecutor.executePython(value.get(0).toString() + " "
                         + value.get(1).toString(), "", path5, params[0]);
                 return new DSObject(result);

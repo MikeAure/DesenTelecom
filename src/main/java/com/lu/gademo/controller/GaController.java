@@ -51,6 +51,9 @@ public class GaController extends BaseController {
     // 五十场景模板
     @GetMapping(value = {"/fifty_scene/{name}"})
     public String getFiftyScenesView(@PathVariable String name, Model model) {
+        Map<String, List<Map<String, Object>>> algorithmsByType = excelAlgorithmsDaoService.getAlgorithmsByType();
+        model.addAttribute("scenes", allSceneInfos);
+        model.addAttribute("algorithmsByType", algorithmsByType);
         model.addAttribute("sheet", name);
         return "fifty_scene/fifty_scene";
     }

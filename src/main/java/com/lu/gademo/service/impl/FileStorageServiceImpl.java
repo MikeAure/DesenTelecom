@@ -3,11 +3,13 @@ package com.lu.gademo.service.impl;
 import com.lu.gademo.entity.FileStorageDetails;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 
 @Slf4j
 @Data
@@ -211,6 +213,44 @@ public class FileStorageServiceImpl implements com.lu.gademo.service.FileStorage
                 .rawFileBytes(rawFileBytes)
                 .rawFileSize(rawFileSize)
                 .build();
+    }
+
+    @Override
+    public FileStorageDetails saveRawFile(List<MultipartFile> files) throws IOException {
+
+        if (CollectionUtils.isEmpty(files)) {
+            throw new IOException("Input files is null");
+        }
+
+        FileStorageDetails fileStorageDetails = new FileStorageDetails();
+
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        for (MultipartFile file : files) {
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName != null) {
+                String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+                String rawFileName = fileTimeStamp + "_" + originalFileName;
+                Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+                String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+                byte[] rawFileBytes = file.getBytes();
+                Long rawFileSize = file.getSize();
+                file.transferTo(rawFilePath);
+
+                if (originalFileName.endsWith(".shp")) {
+                    fileStorageDetails = FileStorageDetails.builder()
+                            .rawFileName(rawFileName)
+                            .rawFileSuffix(rawFileSuffix)
+                            .rawFilePath(rawFilePath)
+                            .rawFilePathString(rawFilePathString)
+                            .rawFileBytes(rawFileBytes)
+                            .rawFileSize(rawFileSize)
+                            .build();
+                }
+            }
+        }
+
+        return fileStorageDetails;
     }
 
     /**

@@ -550,7 +550,16 @@ public class FileServiceImpl implements FileService {
         Stream<String> lines = Files.lines(rawFilePath);
         List<String> dataList = lines.collect(Collectors.toList());
         if (algName.equals("dpDate")) {
-            dataList = dataList.stream().map(dateParseUtil::parseDate).map(sdf::format).collect(Collectors.toList());
+            if (ifSkipFirstRow) {
+                String dataListFirst = dataList.get(0);
+                List<String> temp = new ArrayList<>();
+                temp.add(dataListFirst);
+                List<String> temp2 = dataList.subList(1, dataList.size()).stream().map(dateParseUtil::parseDate).map(sdf::format).collect(Collectors.toList());
+                temp.addAll(temp2);
+                dataList = temp;
+            } else {
+                dataList = dataList.stream().map(dateParseUtil::parseDate).map(sdf::format).collect(Collectors.toList());
+            }
         }
         // 保存脱敏后文件
         // 脱敏文件路径
@@ -931,7 +940,7 @@ public class FileServiceImpl implements FileService {
         // 设置脱敏后文件路径信息
         String desenFileName = fileStorageDetails.getDesenFileName();
         Path desenFilePath = fileStorageDetails.getDesenFilePath();
-        log.info(desenFilePath.toAbsolutePath().toString());
+//        log.info(desenFilePath.toAbsolutePath().toString());
         String desenFilePathString = fileStorageDetails.getDesenFilePathString();
 
         // 调用脱敏程序处理

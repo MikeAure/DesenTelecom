@@ -10,6 +10,7 @@ import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.FileStorageService;
 import com.lu.gademo.service.impl.BasicDataAnalysisEventListener;
+import com.lu.gademo.service.impl.FileStorageServiceImpl;
 import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;
@@ -20,14 +21,19 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.locationtech.jts.geom.Geometry;
+import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -110,16 +116,27 @@ public class FileController extends BaseController {
                                             @RequestParam("sheet") String sheet
     ) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
-        log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
-        log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
+        if (algName.equals("dpGraph")) {
+            log.info("RawFileName: {}", fileStorageDetails.getRawFileName().replace(".txt", ".shp"));
+            log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName().replace(".txt", ".shp"));
+        } else {
+            log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
+            log.info("DesenFileName: {}", fileStorageDetails.getDesenFileName());
+        }
         // 调用脱敏函数
         String fileName = file.getOriginalFilename();
         if (fileName == null) {
             return ResponseEntity.badRequest().body("Request file name is null".getBytes());
         }
-
         String fileType = getFileSuffix(fileName);
-        log.info("File Type: " + fileType);
+        if (algName.equals("dpGraph")) {
+            log.info("File Type: " + "shp");
+        } else {
+
+            log.info("File Type: " + fileType);
+        }
+
+
         log.info("AlgName: " + algName);
         log.info("Sheet: {}", sheet);
         log.info("Params: {}", params);
@@ -137,6 +154,65 @@ public class FileController extends BaseController {
             return fileService.dealGraph(fileStorageDetails, params);
         }
 
+    }
+    @PostMapping("desenShapeFile")
+    public ResponseEntity<byte[]> desenShapeFile(@RequestPart("file") MultipartFile file,
+                                                 @RequestParam("params") String params,
+                                                 @RequestParam("algName") String algName) throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException {
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+        return fileService.dealGraph(fileStorageDetails, params);
+    }
+
+    @PostMapping("/parseToShp")
+    public ResponseEntity<Map<String, String>> parseToShp(@RequestParam("file") MultipartFile file) {
+        try {
+            // 上传目录
+            String userDir = System.getProperty("user.dir");
+            System.out.println("user.dir" + userDir);
+            String uploadDir = userDir + File.separator + "graphtxt" + File.separator;
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            // 保存上传的 TXT 文件
+            File txtFile = new File(uploadDir + file.getOriginalFilename());
+            String originalFileName = file.getOriginalFilename();
+            file.transferTo(txtFile);
+
+            // 调用 Python 进行转换
+            String txtFilePath = txtFile.getAbsolutePath();
+            String shpFilePath = txtFilePath.replace(".txt", ".shp");
+            convertShpToTxt(shpFilePath);
+
+            // 读取转换后的文件并返回 Base64 编码
+            Map<String, String> fileDataMap = new HashMap<>();
+            String[] extensions = {".cpg", ".dbf", ".prj", ".shp", ".shx", ".txt"};
+
+            for (String ext : extensions) {
+                File convertedFile = new File(uploadDir + originalFileName.replace(".txt", ext));
+                if (convertedFile.exists()) {
+                    byte[] fileBytes = Files.readAllBytes(convertedFile.toPath());
+                    String base64Content = Base64Utils.encodeToString(fileBytes);
+                    fileDataMap.put(convertedFile.getName(), base64Content);
+                }
+            }
+
+            return ResponseEntity.ok(fileDataMap);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "文件转换失败: " + e.getMessage()));
+        }
+    }
+
+    public String convertShpToTxt(String shapefilePath) throws IOException {
+        String python = CommandExecutor.getPythonCommand();
+        String filePath = "D:\\Programming\\DesenTelecom\\graph\\poi.py";
+
+        String txtFilePath = shapefilePath.replace(".shp", ".txt");
+        String cmd = String.format("%s %s %s %s", python, filePath, shapefilePath, txtFilePath);
+        CommandExecutor.openExe(cmd);
+
+        return txtFilePath;
     }
 
     @PostMapping("desenSingleColumn")
@@ -250,6 +326,55 @@ public class FileController extends BaseController {
             log.error(e.getMessage());
             return new Result<>(400, "error", e.getMessage());
         }
+    }
+
+    @ResponseBody
+    @PostMapping(value="parseGraphShp")
+    public Result<List<String>> parseGraphShp(@RequestPart("file") List<MultipartFile> files) throws IOException {
+        FileStorageService fileStorageService = new FileStorageServiceImpl();
+        FileStorageDetails fileStorageDetails =  fileStorageService.saveRawFile(files);
+
+        if (fileStorageDetails.getRawFileName().isEmpty()) {
+            return new Result<>(500, "error", null);
+        }
+
+        File file = new File(String.valueOf(fileStorageDetails.getRawFilePath()));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("url", file.toURI().toURL());
+
+        DataStore dataStore = DataStoreFinder.getDataStore(params);
+        String typeName = dataStore.getTypeNames()[0]; // 获取第一个图层
+        SimpleFeatureCollection features = dataStore.getFeatureSource(typeName).getFeatures();
+
+        List<String> elements = new ArrayList<>();
+        List<String> result = new ArrayList<>();
+        // 遍历特征集合
+        try (SimpleFeatureIterator featureIterator = features.features()) {
+            while (featureIterator.hasNext()) {
+                SimpleFeature feature = featureIterator.next();
+                String poiString = (String) feature.getAttribute("id");
+                long lineNum = (Long) feature.getAttribute("line");
+                String typeCode = (String) feature.getAttribute("type_code");
+//                System.out.println(lineNum  + " " + poiString + " " + typeCode);
+                result.add(lineNum  + " " + poiString + " " + typeCode);
+                Geometry geometry = (Geometry) feature.getDefaultGeometry();
+                if (geometry != null) {
+
+                    for (int i = 0; i < geometry.getNumPoints(); i++) {
+                        double latitude = geometry.getCoordinates()[i].y;
+                        int intLatitude = (int) latitude;
+                        elements.add(String.valueOf(intLatitude));
+                    }
+                }
+            }
+        }
+
+        dataStore.dispose();
+
+        String rawData = String.join(",", elements);
+        System.out.println(result);
+        return new Result<List<String>>(200, "ok", result);
     }
 
     /**

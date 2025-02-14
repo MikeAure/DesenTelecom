@@ -303,3 +303,4 @@ src/test/resources/test_data
 *.bak2
 jd_communication.puml
 Test Results - AutoFetchDataTest_testAutoFetchData.html
+graphtxt

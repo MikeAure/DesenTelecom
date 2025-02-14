@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 public interface FileStorageService {
     FileStorageDetails saveRawFileWithDesenInfo(MultipartFile file) throws IOException;
@@ -14,6 +15,8 @@ public interface FileStorageService {
     FileStorageDetails saveRawFileWithDesenInfo(Path file) throws IOException;
 
     FileStorageDetails saveRawFile(MultipartFile file) throws IOException;
+
+    FileStorageDetails saveRawFile(List<MultipartFile> file) throws IOException;
 
     FileStorageDetails saveRawFile(String fileName, byte[] rawFileBytes) throws IOException;
 

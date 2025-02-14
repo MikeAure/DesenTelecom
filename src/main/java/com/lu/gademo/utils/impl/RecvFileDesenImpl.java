@@ -158,7 +158,8 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                                 if (cursor.isStart()) { // 再次检查是否为开始标记
                                     QName innerNodeName = cursor.getName();
                                     String commentEndId = cursor.getAttributeText(idQname);
-                                    if ("commentRangeEnd".equals(innerNodeName.getLocalPart()) && commentEndId.equals(commentStartId)) { // 检查是否为结束标记，可能需要调整逻辑以识别commentRangeEnd
+                                    if ("commentRangeEnd".equals(innerNodeName.getLocalPart())
+                                            && commentEndId.equals(commentStartId)) { // 检查是否为结束标记，可能需要调整逻辑以识别commentRangeEnd
                                         break;
                                     }
                                     if ("t".equals(innerNodeName.getLocalPart())) {
@@ -295,6 +296,19 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                 Map<Integer, XWPFRun> posToRuns = getPosToRuns(paragraph);
                 XWPFRun run = posToRuns.get(pos);
                 XWPFRun lastRun = posToRuns.get(pos + searchText.length() - 1);
+
+                List<Map.Entry<Integer, XWPFRun>> entries = new ArrayList<>(posToRuns.entrySet());
+                if (!run.getText(0).equals(searchText)) {
+                    for (Map.Entry<Integer, XWPFRun> entry : entries) {
+                        if (entry.getValue().getText(0).equals(searchText)) {
+                            run = entry.getValue();
+                            pos = entry.getKey();
+                            lastRun = posToRuns.get(pos + searchText.length() - 1);
+                            break;
+                        }
+                    }
+                }
+
                 int runNum = paragraph.getRuns().indexOf(run);
                 int lastRunNum = paragraph.getRuns().indexOf(lastRun);
                 String[] texts = replacement.toString().split("\n");
@@ -329,6 +343,10 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                 for (int i = lastRunNum + texts.length - 1; i > runNum + texts.length - 1; i--) {
                     paragraph.removeRun(i);
                 }
+            }
+            // 如果 replacement 中包含了 searchText, 终止替换循环，保证仅替换一次
+            if (replacement.toString().contains(searchText)) {
+                break;
             }
         }
     }

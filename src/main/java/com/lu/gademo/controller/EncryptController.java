@@ -1,8 +1,12 @@
 package com.lu.gademo.controller;
 
+import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.ga.LatLong;
 import com.lu.gademo.model.LogSenderManager;
 import com.lu.gademo.service.BasicDataService;
+import com.lu.gademo.service.FileService;
+import com.lu.gademo.service.FileStorageService;
+import com.lu.gademo.service.impl.FileStorageServiceImpl;
 import com.lu.gademo.timeSeries.MainTest;
 import com.lu.gademo.trace.client.common.Vertex;
 import com.lu.gademo.trace.client.user.Customer;
@@ -13,6 +17,7 @@ import com.lu.gademo.trace.server.gui.ServerMain;
 import com.lu.gademo.utils.DesenInfoStringBuilders;
 import com.lu.gademo.utils.Util;
 import lombok.extern.slf4j.Slf4j;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -22,6 +27,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
+import org.locationtech.jts.geom.Geometry;
 
 import javax.crypto.Cipher;
 import java.io.*;
@@ -74,7 +85,7 @@ public class EncryptController {
     // graph的非失真算法
     @ResponseBody
     @RequestMapping(value = "/desenGraph", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public ServerResponse<Map<String, String>> desenGraph(@RequestParam String rawData) throws Exception {
+    public ServerResponse<Map<String, String>> desenGraph(@RequestParam("files[]") List<MultipartFile> files) throws Exception {
         Boolean desenCom = true;
         DesenInfoStringBuilders infoBuilders = new DesenInfoStringBuilders();
         String objectMode = "graph";
@@ -82,11 +93,51 @@ public class EncryptController {
         String fileTimeStamp = String.valueOf(System.currentTimeMillis());
         // 设置原文件信息
 
+        FileStorageService fileStorageService = new FileStorageServiceImpl();
+        FileStorageDetails fileStorageDetails =  fileStorageService.saveRawFile(files);
+
+        if (fileStorageDetails.getRawFileName().isEmpty()) {
+            return new ServerResponse<>("error", null);
+        }
+
+        File file = new File(String.valueOf(fileStorageDetails.getRawFilePath()));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("url", file.toURI().toURL());
+
+        DataStore dataStore = DataStoreFinder.getDataStore(params);
+        String typeName = dataStore.getTypeNames()[0]; // 获取第一个图层
+        SimpleFeatureCollection features = dataStore.getFeatureSource(typeName).getFeatures();
+
+        List<String> elements = new ArrayList<>();
+
+        // 遍历特征集合
+        try (SimpleFeatureIterator featureIterator = features.features()) {
+            while (featureIterator.hasNext()) {
+                SimpleFeature feature = featureIterator.next();
+
+                Geometry geometry = (Geometry) feature.getDefaultGeometry();
+                if (geometry != null) {
+
+                    for (int i = 0; i < geometry.getNumPoints(); i++) {
+                        double latitude = geometry.getCoordinates()[i].y;
+                        int intLatitude = (int) latitude;
+                        elements.add(String.valueOf(intLatitude));
+                    }
+                }
+            }
+        }
+
+        dataStore.dispose();
+
+        String rawData = String.join(",", elements);
+
         // 设置原文件保存路径
         String rawFileName = fileTimeStamp + "UserInput";
         String rawFileSuffix = "plaintext";
         byte[] rawFileBytes = rawData.getBytes();
-        Long rawFileSize = (long) rawFileBytes.length;
+
+        long rawFileSize = (long) rawFileBytes.length;
         String result = "";
 
         String startTime = util.getTime();
@@ -120,7 +171,8 @@ public class EncryptController {
                 startTime, endTime);
         Map<String, String> sendResult = new HashMap<>();
         sendResult.put("result", result);
-        sendResult.put("kdTree", MainTest.encryptedKDTreeString.toString());
+        sendResult.put("kdTree", MainTest.encryptedKDTreeString);
+        sendResult.put("series", rawData);
         return new ServerResponse<>("ok", sendResult);
     }
 
