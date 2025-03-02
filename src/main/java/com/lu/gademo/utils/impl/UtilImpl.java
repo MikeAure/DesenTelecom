@@ -2,6 +2,7 @@ package com.lu.gademo.utils.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -9,12 +10,19 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.locationtech.jts.geom.Geometry;
+import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -663,4 +671,91 @@ public class UtilImpl implements Util {
 //        System.out.println(Arrays.toString(desenIntentionList));
         return getArrayNode(desenIntentionList, objectMapper);
     }
+
+    @Override
+    public String convertTxtToShp(String shapefilePath) {
+        String python = CommandExecutor.getPythonCommand();
+        String userDir = System.getProperty("user.dir");
+        String filePath = userDir + File.separator + "graph" + File.separator + "poi.py";
+        System.out.println("poi.py file path: " + filePath);
+
+        String txtFilePath = shapefilePath.replace(".shp", ".txt");
+        String cmd = String.format("%s %s %s %s", python, filePath, shapefilePath, txtFilePath);
+        CommandExecutor.openExe(cmd);
+
+        return txtFilePath;
+    }
+
+    public List<String> converShpToTxt(String shapefilePath) throws IOException {
+        File file = Paths.get(shapefilePath).toFile();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("url", file.toURI().toURL());
+
+        DataStore dataStore = DataStoreFinder.getDataStore(params);
+        String typeName = dataStore.getTypeNames()[0]; // 获取第一个图层
+        SimpleFeatureCollection features = dataStore.getFeatureSource(typeName).getFeatures();
+
+        List<String> elements = new ArrayList<>();
+        List<String> result = new ArrayList<>();
+        // 遍历特征集合
+        try (SimpleFeatureIterator featureIterator = features.features()) {
+            while (featureIterator.hasNext()) {
+                SimpleFeature feature = featureIterator.next();
+                String poiString = (String) feature.getAttribute("id");
+                long lineNum = (Long) feature.getAttribute("line");
+                String typeCode = (String) feature.getAttribute("type_code");
+//                System.out.println(lineNum  + " " + poiString + " " + typeCode);
+                result.add(lineNum  + " " + poiString + " " + typeCode);
+                Geometry geometry = (Geometry) feature.getDefaultGeometry();
+                if (geometry != null) {
+
+                    for (int i = 0; i < geometry.getNumPoints(); i++) {
+                        double latitude = geometry.getCoordinates()[i].y;
+                        double longitude = geometry.getCoordinates()[i].x;
+                        elements.add(String.valueOf(longitude) + " " + String.valueOf(latitude));
+                    }
+                }
+            }
+        }
+
+        dataStore.dispose();
+
+//        String rawData = String.join(",", elements);
+//        System.out.println(result);
+        return result;
+    }
+
+    public Map<String, List<String>> groupByLineNumber(List<String> data) {
+        Map<String, List<String>> groupedData = new HashMap<>();
+        for (String item : data) {
+            String[] parts = item.split(" ");
+            String lineNum = parts[0]; // Line number
+            String poiAndAttribute = parts[1] + "," + parts[2]; // POI and attribute
+
+            // Group by line number
+            groupedData.putIfAbsent(lineNum, new ArrayList<>());
+            groupedData.get(lineNum).add(poiAndAttribute);
+        }
+        return groupedData;
+    }
+
+    public String formatData(Map<String, List<String>> groupedData) {
+        StringBuilder formattedData = new StringBuilder();
+        for (String lineNum : groupedData.keySet()) {
+            List<String> items = groupedData.get(lineNum);
+            formattedData.append(String.join(";", items)) // Join items with semicolon
+                    .append(";\n"); // Add semicolon and newline
+        }
+        return formattedData.toString();
+    }
+
+    public void saveToFile(String data, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write(data);
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
 }

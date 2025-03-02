@@ -142,7 +142,7 @@ def save_to_shapefile(poi_map, output_file):
             
             lon, lat = detail.lon, detail.lat
             point = Point(lon, lat)
-            print(f"Point: {point}")
+            # print(f"Point: {point}")
             gdf_list.append({
                 'name': detail.name,
                 'id': detail.id,
@@ -226,7 +226,7 @@ def output_shp_by_row(line_num, line_details, output_file_name):
     for detail in line_details:
         lon, lat = detail.lon, detail.lat
         point = Point(lon, lat)
-        print(f"Point: {point}")
+        # print(f"Point: {point}")
         gdf_list.append({
             'name': detail.name,
             'id': detail.id,
@@ -263,6 +263,8 @@ def output_shp_by_row(line_num, line_details, output_file_name):
 if __name__ == "__main__":
     txt_path = sys.argv[2]
     shp_path = sys.argv[1]
+    print(f"Current: {txt_path}")
+    print(f"Output: {shp_path}")
     
     all_poi_dict = fetch_poi_data()
 

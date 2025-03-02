@@ -63,7 +63,7 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
         allSplitJsonData.set("content", splitJsonData);
         ObjectNode dataJson = objectMapper.createObjectNode();
         dataJson.set("data", allSplitJsonData);
-        log.info("拆分重构请求数据: {}", dataJson.toPrettyString());
+//        log.info("拆分重构请求数据: {}", dataJson.toPrettyString());
         TcpPacketSplit tcpPacketSplit = new TcpPacketSplit(dataJson.toPrettyString());
         byte[] tcpBytePacket = new byte[0];
         if (ifSendFile) {
@@ -81,11 +81,13 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
             outputStream.flush();
             log.info("已发送拆分重构请求");
         } catch (ConnectException e) {
-            log.error("未与拆分重构系统建立连接");
+            e.getMessage();
         } catch (UnknownHostException e) {
-            log.error(e.getMessage());
+//            log.error(e.getMessage());
+            e.getMessage();
         } catch (IOException e) {
-            log.error(e.getMessage());
+//            log.error(e.getMessage());
+            e.getMessage();
         }
 
     }

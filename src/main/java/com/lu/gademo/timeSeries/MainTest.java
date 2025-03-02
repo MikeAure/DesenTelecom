@@ -3,7 +3,10 @@ package com.lu.gademo.timeSeries;
 import Jama.Matrix;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -370,7 +373,7 @@ public class MainTest {
         int cycle = 25;
 
 //		double[][] time = new double[d.length][2];
-//		
+//
 //		for(int i = 0; i < d.length; i++) {
 //			Matrix A = Matrix.identity(2*k[0] + 1, 2*k[0] + 1);
 //			for(int j = 0; j < 2; j++) {
@@ -379,7 +382,7 @@ public class MainTest {
 //				time[i][1] = t[1];
 //			}
 //		}
-//		
+//
 //		System.out.println("basic operation time \t our scheme \t naive solution\n");
 //		for(int i = 0; i < d.length; i++) {
 //			for(int j = 0; j < 2; j++) {
@@ -606,5 +609,29 @@ public class MainTest {
 
     }
 
+    public static String readSeries(int targetLineNumber) throws Exception {
 
+        File directory = new File("");
+        String currentPath = directory.getAbsolutePath();
+        String filename = Paths.get(currentPath, "ElectricDevices_TEST.tsv").toString();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            int currentLineNumber = 0;
+
+            while ((line = br.readLine()) != null) {
+                currentLineNumber++;
+                if (currentLineNumber == targetLineNumber) {
+                    return line;
+                }
+            }
+
+            if (currentLineNumber < targetLineNumber) {
+                System.out.println("The file does not have " + targetLineNumber + " lines.");
+            }
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
+        return null;
+    }
 }

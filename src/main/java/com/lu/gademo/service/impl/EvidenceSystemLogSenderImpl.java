@@ -116,7 +116,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         reqEvidence.set("data", reqData);
         // dataSign: 对data字段的签名
         reqEvidence.put("datasign", reqEvidenceSave.getDatasign());
-        log.info("发送给中心存证系统的请求: {}", reqEvidence.toPrettyString());
+//        log.info("发送给中心存证系统的请求: {}", reqEvidence.toPrettyString());
 
         // 相关请求信息存储到数据库
         reqEvidenceSaveDao.save(reqEvidenceSave);
@@ -154,7 +154,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
             //String转json 存储响应信息
             log.info("读取校验");
             JsonNode responseJson = objectMapper.readTree(new String(responseDataBytes, StandardCharsets.UTF_8));
-            log.info("存证系统响应：{}", responseJson.toPrettyString());
+//            log.info("存证系统响应：{}", responseJson.toPrettyString());
             // systemID: 系统ID
             evidenceResponse.setSystemID(responseJson.get("systemID").asInt());
             // mainCMD: 消息类型编码（主命令码）
@@ -177,12 +177,13 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
             evidenceResponse.setRandomIdentification(responseJson.get("randomidentification").asText());
             // 保存到数据库
             evidenceResponseDao.save(evidenceResponse);
-            log.info("中心存证响应Random Identification {}", evidenceResponse.getRandomIdentification());
+//            log.info("中心存证响应Random Identification {}", evidenceResponse.getRandomIdentification());
             log.info("中心存证结束");
         } catch (ConnectException connectException) {
-            log.error("未与中心存证系统建立连接");
+            log.info("未与中心存证系统建立连接");
         } catch (IOException e) {
-            log.error(e.getMessage());
+            e.getMessage();
+//            log.error(e.getMessage());
         }
 
         // 构造本地存证信息
@@ -261,7 +262,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
 
         localEvidenceData.put("fileDataType", submitEvidenceLocal.getFileDataType());
 
-        log.info("发送给本地存证系统的请求: {}", localEvidenceData.toPrettyString());
+//        log.info("发送给本地存证系统的请求: {}", localEvidenceData.toPrettyString());
         // 整个json
         ObjectNode localEvidenceJson = objectMapper.createObjectNode();
         localEvidenceJson.put("systemID", submitEvidenceLocal.getSystemID());
@@ -300,11 +301,11 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         ) {
             // 打印发送json
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(localEvidenceJson);
-            log.info("本地存证请求Json数据: {}", json);
+//            log.info("本地存证请求Json数据", json);
 
             if (localEvidenceJson.has("randomidentification") && localEvidenceJson.get("randomidentification").isNull() ||
                     (localEvidenceJson.has("datasign") && localEvidenceJson.get("datasign").isNull())) {
-                throw new IOException("未进行中心存证请求认证");
+                throw new IOException("中心存证");
             }
 
             TcpPacket localTcpPacket = new TcpPacket(objectMapper.writeValueAsString(localEvidenceJson), (short) 0x0003, (short) 0x0031, (short) 0x3110);
@@ -333,7 +334,9 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
             JsonNode recJson = objectMapper.readTree(receipt);
             //打印
             String recjson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(recJson);
-            log.info("接收隐私数据流转状态管理与存证系统收据: {}", recjson);
+//            log.info("接收隐私数据流转状态管理与存证系统收据: {}", recjson);
+            log.info("接收隐私数据流转状态管理与存证系统收据");
+
             //  发生异常
             if (recJson.has("errCode")) {
                 // 系统ID
@@ -347,11 +350,11 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
                 evidenceReceiptErr.setErrCode(recJson.get("errCode").asInt());
                 //存储
                 evidenceReceiptErrDao.save(evidenceReceiptErr);
-                if (recJson.get("errCode").asInt() == 0x01) {
-                    log.error("未进行请求认证");
-                } else {
-                    log.error("上报数据格式不正确");
-                }
+//                if (recJson.get("errCode").asInt() == 0x01) {
+//                    log.info("未进行请求认证");
+//                } else {
+//                    log.info("上报数据格式不正确");
+//                }
             }
             // 正常接收
             else {
@@ -376,9 +379,9 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
 
             localDataInputStream.close();
         } catch (ConnectException connectException) {
-            log.error("未与本地存证系统建立连接");
+            log.info("未与本地存证系统建立连接");
         } catch (IOException e) {
-            log.error(e.getMessage());
+            e.getMessage();
         }
 
     }

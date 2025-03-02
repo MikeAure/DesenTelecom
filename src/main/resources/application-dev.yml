@@ -40,7 +40,7 @@ spring:
             jadira:
                 usertype:
                     autoRegisterUserTypes: true
-        show-sql: true
+        show-sql: false
 
     servlet:
         multipart:
@@ -77,7 +77,7 @@ logging:
 
 effectEva:
 #    address: 192.168.37.192
-    address: 127.0.0.1
+    address: 192.168.112.192
     port: 10005
     waitingTime: 10
 evidence:
@@ -89,7 +89,7 @@ evidence:
     remotePort: 50005
 ruleCheck:
 #    address: 172.28.72.224
-    address: 127.0.0.1
+    address:  192.168.112.192
     port: 30002
 splitReconstruct:
 #    address: 172.28.72.225

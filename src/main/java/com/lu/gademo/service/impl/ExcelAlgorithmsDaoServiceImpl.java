@@ -2,6 +2,7 @@ package com.lu.gademo.service.impl;
 
 import com.lu.gademo.entity.ga.ExcelAlgorithm;
 import com.lu.gademo.mapper.ga.ExcelAlgorithmsDao;
+import com.lu.gademo.service.ExcelAlgorithmsDaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class ExcelAlgorithmsDaoServiceImpl {
+public class ExcelAlgorithmsDaoServiceImpl implements ExcelAlgorithmsDaoService {
     ExcelAlgorithmsDao excelAlgorithmsDao;
 
     @Autowired

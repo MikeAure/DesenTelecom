@@ -25,6 +25,7 @@ public interface FileService {
     void redesenImage(ReDesensitizeEvent event) throws Exception;
     void redesenVideo(ReDesensitizeEvent event) throws Exception;
     void redesenAudio(ReDesensitizeEvent event) throws Exception;
+    void redesenDocument(ReDesensitizeEvent event) throws Exception;
 
     List<Double> fetchRandomPayAmounts(int tableRecords, int totalRecords, int sampleTimes) throws InterruptedException, ExecutionException;
 
@@ -54,7 +55,9 @@ public interface FileService {
 //
 //    ResponseEntity<byte[]> dealCsv(MultipartFile file, String params, String algName) throws IOException, SQLException, InterruptedException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException;
 
-    ResponseEntity<byte[]> dealSingleColumnTextFile(FileStorageDetails fileStorageDetails, String params, String algName, boolean ifSkipFirstRow) throws IOException, ParseException;
+    ResponseEntity<byte[]> dealSingleColumnTextFile(FileStorageDetails fileStorageDetails, String params, String algName, boolean ifSkipFirstRow) throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException;
+
+    ResponseEntity<byte[]> dealDocument(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException;
 
     ResponseEntity<byte[]> dealSingleExcel(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ParseException;
 

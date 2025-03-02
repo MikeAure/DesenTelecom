@@ -255,52 +255,41 @@
             if (file) {
                 if (ifUploadOffice) {
                     if ("docx" === fileExtension){
-                        const url = "/File/recvFileDesen"
+                        const url = "/File/desenFile"
 
                         document.getElementById("fileInfo").innerHTML = "<div  style=\"font-size: 20px; text-align: center\"> <span>" +
                             "<strong>" + fileName + "文件</strong>上传成功" + "</span>" + "</div>";
                         //构建formData,发送给后端
                         let formData = new FormData();
                         formData.set("file", file);
+                        formData.set("params", "1");
+                        formData.set("algName", "desenDocx");
+                        formData.set("sheet", "desenDocx");
 
                         document.getElementById("submitBtn").onclick = function () {
                             fetch(url, {
                                 method: 'POST',
                                 body: formData
                             })
-                                .then(resp => resp.json())
-                                .then(data => {
-                                    // 从 JSON 中提取 base64 编码的数据
-                                    const base64Data = data.data;
-
-                                    // 解码 Base64 数据为二进制
-                                    const binaryString = atob(base64Data);
-
-                                    // 创建一个数组来存储二进制数据
-                                    const binaryArray = [];
-                                    for (let i = 0; i < binaryString.length; i++) {
-                                        binaryArray.push(binaryString.charCodeAt(i));
+                                .then(response => {
+                                    if (response.status === 500) {
+                                        // Handle server error
+                                        return response.text().then(failedMsg => {
+                                            throw new Error(failedMsg); // Throw an error to stop further processing
+                                        });
                                     }
-
-                                    // 创建 Blob 对象，指定类型为 Word 文件
-                                    const blob = new Blob([new Uint8Array(binaryArray)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-
-                                    // 创建临时下载链接
-                                    const link = document.createElement('a');
-                                    const timestamp = new Date().getTime(); // 使用当前时间戳作为文件名
-                                    link.href = URL.createObjectURL(blob);
-                                    link.download = `${timestamp}.docx`; // 设置文件名为时间戳 + .docx
-
-                                    // 触发下载
-                                    link.click();
-
-                                    // 释放 Blob 对象
-                                    URL.revokeObjectURL(link.href);
+                                    return response.blob();
                                 })
-                                .catch(error => {
-                                    console.error('下载失败:', error);
-                                });
+                                .then(blob => {
+                                    // 创建一个下载链接
+                                    const downloadLink = document.createElement('a');
+                                    downloadLink.href = URL.createObjectURL(blob);
+                                    downloadLink.download = Date.now().toString() + ".docx"; // 下载的文件名
+                                    downloadLink.click();
+                                    URL.revokeObjectURL(downloadLink.href)
+                                })
                         };
+
                     }
                     else {
                         alert("请提交docx类型文件")
@@ -514,6 +503,7 @@
                                     downloadLink.href = URL.createObjectURL(blob);
                                     downloadLink.download = Date.now().toString() + ".txt"; // 下载的文件名
                                     downloadLink.click();
+                                    URL.revokeObjectURL(downloadLink.href)
                                     // after.appendChild(downloadLink);
                                 })
                                 .catch(error => {
@@ -577,17 +567,6 @@
             display: inline-block;
             margin: 30px;
         }
-
-        /*#submitBtn {*/
-        /*    background-color: #347aa9;*/
-        /*    padding: 5px 20px;*/
-        /*    cursor: pointer;*/
-        /*    color: black;*/
-        /*    font-size: 20px;*/
-        /*    display: inline-block;*/
-        /*    text-align: center;*/
-        /*    !*margin-right: 50px;*!*/
-        /*}*/
 
         .btn2 > button {
             background-color: #347aa9;

@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="ch" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>Graph Tool</title>
-    <link th:href="@{favicon.ico}" rel="shortcut icon">
-    <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet">
-    <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet">
-    <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet">
-    <link th:href="@{/css/animate.css}" rel="stylesheet">
-    <link th:href="@{/css/multiple-select.min.css}" rel="stylesheet" type="text/css">
-    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css">
-    <link th:href="@{/css/style.css?v=4.1.0}" rel="stylesheet">
-    <link th:href="@{https://cache.amap.com/lbs/static/main1119.css}" rel="stylesheet"/>
+    <link th:href="@{favicon.ico}" rel="shortcut icon"/>
+    <link th:href="@{/css/bootstrap.min.css?v=3.3.6}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.css?v=4.4.0}" rel="stylesheet"/>
+    <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet"/>
+    <link th:href="@{/css/animate.css}" rel="stylesheet"/>
+    <link
+            th:href="@{/css/multiple-select.min.css}"
+            rel="stylesheet"
+            type="text/css"
+    />
+    <link th:href="@{/css/GA.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/css/style.css?v=4.1.0}" rel="stylesheet"/>
+    <link
+            th:href="@{https://cache.amap.com/lbs/static/main1119.css}"
+            rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .amap-icon img,
         .amap-marker-content img {
@@ -25,11 +33,10 @@
             right: -118px;
             color: #fff;
             padding: 4px 10px;
-            box-shadow: 1px 1px 1px rgba(10, 10, 10, .2);
+            box-shadow: 1px 1px 1px rgba(10, 10, 10, 0.2);
             white-space: nowrap;
             font-size: 12px;
-            font-family: "";
-            background-color: #25A5F7;
+            background-color: #25a5f7;
             border-radius: 3px;
         }
 
@@ -114,31 +121,43 @@
             justify-content: center;
         }
     </style>
-    <!--    <script type="text/javascript">-->
-    <!--        window._AMapSecurityConfig = {-->
-    <!--            securityJsCode: "919c4ab28e79692cb9fac5abcb3ae1b0",-->
-    <!--        };-->
-    <!--    </script>-->
+        <script type="text/javascript">
+            window._AMapSecurityConfig = {
+                securityJsCode: "919c4ab28e79692cb9fac5abcb3ae1b0",
+            };
+        </script>
 
-    <script type="text/javascript">
-        window._AMapSecurityConfig = {
-            securityJsCode: "120a27c95fe9d758fa109e700d2bfb97",
-        };
+<!--    <script type="text/javascript">-->
+<!--        window._AMapSecurityConfig = {-->
+<!--            securityJsCode: "120a27c95fe9d758fa109e700d2bfb97",-->
+<!--        };-->
     </script>
     <!-- 全局js -->
     <script th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
     <script th:src="@{/js/bootstrap.min.js?v=3.3.6}"></script>
     <script th:src="@{/js/xlsx.full.min.js}"></script>
 
-    <!--    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=9017e2042639d8873323dcd7d7539611&plugin=AMap.PlaceSearch"></script>-->
     <script type="text/javascript"
-            th:src="@{https://webapi.amap.com/maps?v=1.4.15&key=3ec301cfc0baed14e8a4c2d1b61b1706&plugin=AMap.PlaceSearch}"></script>
-    <script th:src="@{https://cache.amap.com/lbs/static/addToolbar.js}" type="text/javascript"></script>
+            th:src="@{https://webapi.amap.com/maps?v=1.4.15&key=9017e2042639d8873323dcd7d7539611&plugin=AMap.PlaceSearch}"></script>
+<!--    <script-->
+<!--            type="text/javascript"-->
+<!--            th:src="@{https://webapi.amap.com/maps?v=1.4.15&key=3ec301cfc0baed14e8a4c2d1b61b1706&plugin=AMap.PlaceSearch}"-->
+<!--    ></script>-->
+    <script
+            th:src="@{https://cache.amap.com/lbs/static/addToolbar.js}"
+            type="text/javascript"
+    ></script>
 
     <!-- Bootstrap table -->
-    <script th:src="@{/js/plugins/bootstrap-table/bootstrap-table.min.js}"></script>
-    <script th:src="@{/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js}"></script>
-    <script th:src="@{/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+    <script
+            th:src="@{/js/plugins/bootstrap-table/bootstrap-table.min.js}"
+    ></script>
+    <script
+            th:src="@{/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js}"
+    ></script>
+    <script
+            th:src="@{/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"
+    ></script>
 
     <!-- Peity -->
     <script th:src="@{/js/plugins/peity/jquery.peity.min.js}"></script>
@@ -147,73 +166,146 @@
     <!-- 自定义js -->
     <script th:src="@{/js/content.js?v=1.0.0}"></script>
     <script type="text/javascript">
-        const default_marker_image = "https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png";
-        let globalParsedFile = null
-        let globalMap = null
+        const default_marker_image =
+            "https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png";
+        let globalParsedFile = null;
+        let globalMap = null;
         window.onload = function () {
-            document.getElementById("fileUpload").addEventListener("change", chooseFile)
-            document.getElementById("encryptGraph").addEventListener("click", function () {
+            document
+                .getElementById("fileUpload")
+                .addEventListener("change", chooseFile);
+            document
+                .getElementById("encryptGraph")
+                .addEventListener("click", function () {
+                    const files = document.getElementById("shpFileInput").files;
 
-                const files = document.getElementById('shpFileInput').files;
+                    if (files.length === 0) {
+                        alert("请上传一个或多个 SHP 文件相关的文件！");
+                        return;
+                    }
 
-                if (files.length === 0) {
-                    alert("请上传一个或多个 SHP 文件相关的文件！");
-                    return;
-                }
+                    const formData = new FormData();
 
-                const formData = new FormData();
+                    Array.from(files).forEach((file) => {
+                        formData.append("files[]", file);
+                    });
 
-                Array.from(files).forEach(file => {
-                    formData.append('files[]', file);
+                    fetch("/Encrypt/desenGraph", {
+                        method: "POST",
+                        body: formData,
+                    })
+                        .then((response) => {
+                            if (response.status === 500) {
+                                // Handle server error
+                                return response.text().then((failedMsg) => {
+                                    alert(failedMsg);
+                                    throw new Error(failedMsg); // Throw an error to stop further processing
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then((data) => {
+                            const rawDataPoints = data.message.series
+                                .split(",")
+                                .map(Number);
+
+                            const rawCtx = document
+                                .getElementById("shpFileSeries")
+                                .getContext("2d");
+
+                            const rawDataChart = new Chart(rawCtx, {
+                                type: "line",
+                                data: {
+                                    labels: rawDataPoints.map((_, index) => index + 1),
+                                    datasets: [
+                                        {
+                                            label: "波形",
+                                            data: rawDataPoints,
+                                            borderColor: "rgba(75, 192, 192, 1)",
+                                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                                            borderWidth: 1,
+                                            fill: true,
+                                        },
+                                    ],
+                                },
+                                options: {
+                                    responsive: false,
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true,
+                                        },
+                                        y: {
+                                            beginAtZero: true,
+                                        },
+                                    },
+                                },
+                            });
+
+                            const dataPoints = data.message.result.split("\t").map(Number);
+
+                            const ctx = document
+                                .getElementById("outputText")
+                                .getContext("2d");
+
+                            const returnChart = new Chart(ctx, {
+                                type: "line",
+                                data: {
+                                    labels: dataPoints.map((_, index) => index + 1),
+                                    datasets: [
+                                        {
+                                            label: "波形",
+                                            data: dataPoints,
+                                            borderColor: "rgba(75, 192, 192, 1)",
+                                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                                            borderWidth: 1,
+                                            fill: true,
+                                        },
+                                    ],
+                                },
+                                options: {
+                                    responsive: false,
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true,
+                                        },
+                                        y: {
+                                            beginAtZero: true,
+                                        },
+                                    },
+                                },
+                            });
+
+                            // 获取data.message中的值
+                            let encryptedMessage = data.message.kdTree;
+                            // 创建一个blob对象，将数据存入blob
+                            let blob = new Blob([encryptedMessage], {type: "text/plain"});
+                            // 创建一个链接对象
+                            let link = document.createElement("a");
+                            link.href = window.URL.createObjectURL(blob);
+                            // 设置下载文件的名字
+                            link.download = Date.now() + "KDTree.txt";
+                            // 触发点击事件下载文件
+                            link.click();
+                            // 释放URL对象
+                            window.URL.revokeObjectURL(link.href);
+                        })
+                        .catch((error) => console.error("Error:", error));
                 });
 
-                fetch("/Encrypt/desenGraph", {
-                    method: 'POST',
-                    body: formData
-
-                })
-                    .then(response => {
-                        if (response.status === 500) {
-                            // Handle server error
-                            return response.text().then(failedMsg => {
-                                alert(failedMsg);
-                                throw new Error(failedMsg); // Throw an error to stop further processing
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        document.getElementById("outputText").value = data.message.result;
-                        document.getElementById("shpFileSeries").textContent = "输入序列：" + data.message.series;
-
-                        // 获取data.message中的值
-                        let encryptedMessage = data.message.kdTree;
-                        // 创建一个blob对象，将数据存入blob
-                        let blob = new Blob([encryptedMessage], {type: 'text/plain'});
-                        // 创建一个链接对象
-                        let link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        // 设置下载文件的名字
-                        link.download = Date.now() + 'KDTree.txt';
-                        // 触发点击事件下载文件
-                        link.click();
-                        // 释放URL对象
-                        window.URL.revokeObjectURL(link.href);
-                    })
-                    .catch(error => console.error('Error:', error));
-
-            })
-
-            document.getElementById('shpFileInput').addEventListener('change', function (event) {
-                const files = event.target.files;
-                const fileInfoDiv = document.getElementById('shpFileInfo');
-                fileInfoDiv.innerHTML = '';
-                fileInfoDiv.textContent = '已上传文件：';
-                if (files.length > 0) {
-                    const fileNames = Array.from(files).filter(file => file.name.endsWith('.shp')).map(file => file.name);
-                    fileInfoDiv.textContent += (fileNames + " 及附件");
-                }
-            });
+            document
+                .getElementById("shpFileInput")
+                .addEventListener("change", function (event) {
+                    const files = event.target.files;
+                    const fileInfoDiv = document.getElementById("shpFileInfo");
+                    fileInfoDiv.innerHTML = "";
+                    fileInfoDiv.textContent = "已上传文件：";
+                    if (files.length > 0) {
+                        const fileNames = Array.from(files)
+                            .filter((file) => file.name.endsWith(".shp"))
+                            .map((file) => file.name);
+                        fileInfoDiv.textContent += fileNames + " 及附件";
+                    }
+                });
 
             document.getElementById("submit").onclick = function () {
                 if (globalParsedFile === null || globalParsedFile.size === 0) {
@@ -225,77 +317,90 @@
 
                     // 获取文件上传输入框
                     let fileInput = document.getElementById("fileUpload");
-                    let files = fileInput.files;  // 获取文件列表
+                    let files = fileInput.files; // 获取文件列表
 
                     // 获取保护级别
 
                     let formData1 = new FormData();
                     formData1.set("file", globalParsedFile);
                     formData1.set("params", param);
-                    formData1.set("algName", "dpGraph")
+                    formData1.set("algName", "dpGraph");
 
                     let idx = $("ul .active").index();
                     if (idx === 0) {
                         // formData1.set("distortion", "distortion");
-                        let distortionAlgs = document.getElementById("distortion-algs")
+                        let distortionAlgs = document.getElementById("distortion-algs");
                         let type1 = distortionAlgs.value;
                         formData1.set("sheet", type1);
                     }
-                    fetch('/File/desenFile', {
-                        method: 'POST',
-                        body: formData1
+                    fetch("/File/desenFile", {
+                        method: "POST",
+                        body: formData1,
                     })
-                        .then(response => {
+                        .then((response) => {
                             if (response.status === 500) {
                                 // Handle server error
-                                return response.text().then(failedMsg => {
+                                return response.text().then((failedMsg) => {
                                     alert(failedMsg);
                                     throw new Error(failedMsg); // Throw an error to stop further processing
                                 });
                             }
-                            console.log(response.headers.get('Content-Disposition'));
-                            let fileName = response.headers.get('Content-Disposition').split('filename=')[1].split(';')[0];
-                            fileName = fileName.replaceAll('"', '')
+                            console.log(response.headers.get("Content-Disposition"));
+                            let fileName = response.headers
+                                .get("Content-Disposition")
+                                .split("filename=")[1]
+                                .split(";")[0];
+                            fileName = fileName.replaceAll('"', "");
                             console.log(fileName);
-                            return response.blob().then(blob => ({ blob, fileName }));  // If the status is not 500, proceed to handle the file blob
+                            return response.blob().then((blob) => ({blob, fileName})); // If the status is not 500, proceed to handle the file blob
                             // return response.blob();
                         })
 
                         .then(({blob, fileName}) => {
-                            console.log("Received: " + fileName)
+                            console.log("Received: " + fileName);
                             // 检查 blob 是否存在且是有效的 Blob 对象
                             if (!blob || !(blob instanceof Blob)) {
-                                throw new Error('Received an invalid blob');
+                                throw new Error("Received an invalid blob");
                             }
 
                             // 读取文本并显示轨迹
-                            blob.text().then(text => {
-                                if (globalMap !== null) {
-                                    displayTrack({ target: { result: text } }, globalMap, '#49ff00', 'green', default_marker_image, "脱敏后轨迹");
-                                }
-                            }).catch(error => {
-                                console.error('Error reading blob text:', error);
-                                alert('读取文件内容时发生错误');
-                            });
+                            blob
+                                .text()
+                                .then((text) => {
+                                    if (globalMap !== null) {
+                                        displayTrack(
+                                            {target: {result: text}},
+                                            globalMap,
+                                            "#49ff00",
+                                            "green",
+                                            default_marker_image,
+                                            "脱敏后轨迹"
+                                        );
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error("Error reading blob text:", error);
+                                    alert("读取文件内容时发生错误");
+                                });
 
                             // 创建 FormData 并封装 Blob 文件
                             const formData = new FormData();
-                            const file = new File([blob], fileName, { type: "text/plain" });
+                            const file = new File([blob], fileName, {type: "text/plain"});
                             formData.append("file", file);
 
-                            return fetch('/File/parseToShp', {
-                                method: 'POST',
-                                body: formData
+                            return fetch("/File/parseToShp", {
+                                method: "POST",
+                                body: formData,
                             });
                         })
-                        .then(response => {
+                        .then((response) => {
                             if (!response.ok) {
                                 throw new Error("文件转换失败");
                             }
                             return response.json(); // 期待返回 Base64 编码的文件数据
                         })
-                        .then(fileDataMap => {
-                            Object.keys(fileDataMap).forEach(fileName => {
+                        .then((fileDataMap) => {
+                            Object.keys(fileDataMap).forEach((fileName) => {
                                 const base64Content = fileDataMap[fileName];
                                 const byteCharacters = atob(base64Content); // 解码 Base64
                                 const byteNumbers = new Array(byteCharacters.length);
@@ -306,7 +411,7 @@
                                 const blob = new Blob([byteArray]);
 
                                 // 创建下载链接
-                                const downloadLink = document.createElement('a');
+                                const downloadLink = document.createElement("a");
                                 downloadLink.href = URL.createObjectURL(blob);
                                 downloadLink.download = fileName;
                                 document.body.appendChild(downloadLink);
@@ -314,147 +419,130 @@
                                 document.body.removeChild(downloadLink);
                             });
                         })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('文件处理过程中发生错误');
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            alert("文件处理过程中发生错误");
                         });
                 }
             };
-
-        }
+        };
 
         function initMap() {
             let lnglat = new AMap.LngLat(116.326936, 40.003213);
-            let map = new AMap.Map("mapid", {
-                resizeEnable: true,  // 自适应地图容器变化
-                center: lnglat,      // 地图中心点坐标
+            return new AMap.Map("mapid", {
+                resizeEnable: true, // 自适应地图容器变化
+                center: lnglat, // 地图中心点坐标
                 key: "3ec301cfc0baed14e8a4c2d1b61b1706",
                 /* key:"a356710cf98fab9a753bceb3f2dc3c96",*/
-                viewMode: '3D',   // 地图显示模式，'3D' 表示三维地图
+                viewMode: "3D", // 地图显示模式，'3D' 表示三维地图
                 /*  showBuildingBlock: true, // 是否显示楼块
-                  showIndoorMap: true,  // 是否显示室内地图
-                  pitch: 45,              // 地图俯仰角度，单位为度，范围 [0, 60]
-                  rotation: 10,           // 地图旋转角度，单位为度，范围 [0, 360]*/
+                        showIndoorMap: true,  // 是否显示室内地图
+                        pitch: 45,              // 地图俯仰角度，单位为度，范围 [0, 60]
+                        rotation: 10,           // 地图旋转角度，单位为度，范围 [0, 360]*/
                 willReadFrequently: true, //
-                zoom: 10
+                zoom: 10,
             });
-            return map;
         }
 
-        function displayTrack(e, map, outlineColor = '#f50b0b', strokeColor = 'red', markerImage = default_marker_image, windowContent = "原始轨迹") {
+        function displayTrack(
+            e,
+            map,
+            outlineColor = "#f50b0b",
+            strokeColor = "red",
+            markerImage = default_marker_image,
+            windowContent = "原始轨迹"
+        ) {
             const content = e.target.result;
-            const maxAttempts = 50; // 设置最大查询次数
-            let attemptCount = 0; // 记录当前查询次数
 
-            // 使用PlaceSearch类来获取POI信息
-            const placeSearch = new AMap.PlaceSearch({
-                pageSize: 1,
-                pageIndex: 1,
-                children: 0, // 不展示子节点数据
-                extensions: 'base' // 返回基本地址信息
-            });
+            // 后端接口的URL
+            const apiUrl = "/getPoiInfos"; // 请根据实际路径修改
 
-            // 将文件内容分割成行
-            const lines = content.split('\n');
+            // 将文件内容分割成行，获取第一行
+            const lines = content.split("\n");
             console.log("Total line number:" + lines.length);
 
-            function processRandomLine() {
-                attemptCount++; // 每次调用时增加一次计数
+            // 获取第一行数据
+            const raw_line = lines[0];
+            console.log("First line:", raw_line);
 
-                if (attemptCount > maxAttempts) {
-                    // 达到最大尝试次数时，弹窗提示用户
-                    alert("已超过最大尝试次数，无法找到合适的POI数据。");
-                    return; // 超过最大尝试次数时停止递归
-                }
+            // 分割原始轨迹每个点
+            let raw_points = raw_line
+                .split(";")
+                .filter((item) => item.trim() !== "");
+            console.log("raw_points length: " + raw_points.length);
 
-                let index = Math.floor(Math.random() * lines.length);
-                console.log("Line index: " + index);
+            // 清洗数据：提取 POI ID
+            let poiIds = raw_points.map((point) => {
+                let [poiId, attributes] = point.split(",");
+                return poiId;  // 提取 POI ID
+            });
 
-                // 随机获取一行数据
-                let raw_line = lines[index];
-                console.log("Line:", raw_line);
+            console.log("Extracted POI IDs:", poiIds);
 
-                // 分割原始轨迹每个点
-                let raw_points = raw_line.split(';').filter(item => item.trim() !== '');
-                console.log("raw_points length: " + raw_points.length);
+            // 使用 Fetch API 发送 POI ID 到后端
+            fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(poiIds) // 将 POI IDs 作为请求体发送
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200 && data.data) {
+                        let raw_path = data.data.map(poi => [poi.lon, poi.lat]);
+                        console.log("Received POI Data:", data.data);
 
-                // 保存原路径节点经纬度
-                let raw_path = [];
-
-                // 使用 Promise.all 来检查所有 POI 点是否都能解析
-                let promises = raw_points.map(point => {
-                    return new Promise((resolve, reject) => {
-                        let [poiId, attributes] = point.split(',');
-                        placeSearch.getDetails(poiId, function (status, result) {
-                            if (status === 'complete' && result.info === 'OK') {
-                                if (result.poiList.pois && result.poiList.pois.length > 0) {
-                                    let location = result.poiList.pois[0].location;
-                                    console.log(result.poiList.pois[0])
-                                    console.log(location.lng + " " + location.lat)
-                                    resolve([location.lng, location.lat]);
-                                } else {
-                                    console.log("选取的该行POI没有位置数据");
-                                    reject("选取的该行POI没有位置数据");
-                                }
-                            } else {
-                                console.log("获取POI信息失败，POI ID:" + poiId);
-                                reject("选取的POI没有位置数据"); // 如果失败，reject
-                            }
+                        // 在地图上绘制标记和折线
+                        // 绘制 POI 点
+                        data.data.forEach(poi => {
+                            let marker = new AMap.Marker({
+                                icon: markerImage,
+                                position: [poi.lon, poi.lat],
+                                offset: new AMap.Pixel(-13, -30),
+                            });
+                            marker.setMap(map);
                         });
-                    });
-                });
 
-                // 处理所有的 Promise
-                Promise.all(promises).then(raw_path => {
-                    // 所有 POI 点都解析成功，开始在地图上绘制
-                    for (let [lng, lat] of raw_path) {
-                        let marker = new AMap.Marker({
-                            icon: markerImage,
-                            position: [lng, lat],
-                            offset: new AMap.Pixel(-13, -30)
+                        // 创建折线实例
+                        let polyline = new AMap.Polyline({
+                            path: raw_path, // 折线的路径
+                            isOutline: true, // 是否显示折线的轮廓线
+                            outlineColor: outlineColor, // 轮廓线颜色
+                            borderWeight: 1, // 轮廓线宽度
+                            strokeColor: strokeColor, // 折线颜色
+                            strokeOpacity: 1, // 折线透明度
+                            strokeWeight: 6, // 折线宽度
+                            strokeStyle: "solid", // 折线样式
+                            strokeDasharray: [10, 5], // 虚线样式
+                            lineJoin: "round", // 折线交汇处的连接方式
+                            lineCap: "round", // 折线两端的线帽样式
+                            zIndex: 50, // 折线的层级
                         });
-                        marker.setMap(map);
+
+                        // 将折线添加至地图实例
+                        polyline.setMap(map);
+
+                        // 选择折线的第一个点作为信息窗体的位置
+                        let infoWindowPosition = raw_path[0];
+                        let infoWindow = new AMap.InfoWindow({
+                            content: windowContent,
+                            position: infoWindowPosition,
+                            isCustom: true,
+                            autoMove: true,
+                        });
+
+                        // 打开信息窗体
+                        infoWindow.open(map, infoWindowPosition);
+                    } else {
+                        console.error("POI 数据获取失败:", data.message);
                     }
-
-                    // 创建折线实例
-                    let polyline = new AMap.Polyline({
-                        path: raw_path,         // 折线的路径
-                        isOutline: true,        // 是否显示折线的轮廓线
-                        outlineColor: outlineColor, // 轮廓线颜色
-                        borderWeight: 1,        // 轮廓线宽度
-                        strokeColor: strokeColor,   // 折线颜色
-                        strokeOpacity: 1,       // 折线透明度
-                        strokeWeight: 6,        // 折线宽度
-                        strokeStyle: "solid",   // 折线样式
-                        strokeDasharray: [10, 5], // 虚线样式
-                        lineJoin: 'round',      // 折线交汇处的连接方式
-                        lineCap: 'round',       // 折线两端的线帽样式
-                        zIndex: 50,             // 折线的层级
-                    });
-
-                    // 将折线添加至地图实例
-                    polyline.setMap(map);
-
-                    // 选择折线的第一个点作为信息窗体的位置
-                    let infoWindowPosition = raw_path[0];
-                    let infoWindow = new AMap.InfoWindow({
-                        content: windowContent,
-                        position: infoWindowPosition,
-                        isCustom: true,
-                        autoMove: true,
-                    });
-
-                    // 打开信息窗体
-                    infoWindow.open(map, infoWindowPosition);
-                }).catch(error => {
-                    // 如果解析失败，递归重新选择一行数据
-                    console.error('Error:', error);
-                    processRandomLine(); // 重新选择一行数据
+                })
+                .catch(error => {
+                    console.error("请求失败:", error);
                 });
-            }
-            // 初始调用
-            processRandomLine();
         }
+
 
         // function downloadFile(blob, filename) {
         //     const url = URL.createObjectURL(blob);  // 创建 Blob 的临时 URL
@@ -481,7 +569,7 @@
                 const fileName = file.name;
 
                 // 提取最后一个扩展名
-                const fileExtension = '.' + fileName.split('.').pop().toLowerCase();
+                const fileExtension = "." + fileName.split(".").pop().toLowerCase();
 
                 // 如果文件扩展名不在允许的列表中，则返回false
                 if (!fileSuffixes.includes(fileExtension)) {
@@ -494,23 +582,23 @@
         // 按行号分组数据
         function groupByLineNumber(data) {
             let groupedData = {};
-            data.forEach(item => {
+            data.forEach((item) => {
                 let parts = item.split(" ");
-                let lineNum = parts[0];  // 获取行号
+                let lineNum = parts[0]; // 获取行号
 
                 if (!groupedData[lineNum]) {
                     groupedData[lineNum] = [];
                 }
-                groupedData[lineNum].push(`${parts[1]},${parts[2]}`);  // 将POI和属性放在一起
+                groupedData[lineNum].push(`${parts[1]},${parts[2]}`); // 将POI和属性放在一起
             });
             return groupedData;
         }
 
         // 格式化数据为每行一个POI，行号相同的放在同一行，并在每行末尾加上分号和换行符
         function formatData(groupedData) {
-            let formattedData = '';
+            let formattedData = "";
             for (let lineNum in groupedData) {
-                formattedData += groupedData[lineNum].join(";") + ";\n";  // 每行末尾添加分号 + 换行符
+                formattedData += groupedData[lineNum].join(";") + ";\n"; // 每行末尾添加分号 + 换行符
             }
             return formattedData;
         }
@@ -523,8 +611,8 @@
             // 创建一个隐藏的 <a> 标签
             const a = document.createElement("a");
             a.href = url;
-            a.download = filename;  // 设置下载的文件名
-            document.body.appendChild(a);  // 将 <a> 标签添加到文档中
+            a.download = filename; // 设置下载的文件名
+            document.body.appendChild(a); // 将 <a> 标签添加到文档中
 
             // 模拟点击事件，自动下载文件
             a.click();
@@ -538,27 +626,27 @@
             // 清空
             document.getElementById("fileInfo").innerHTML = "";
             //读取文件
-            const files = event.target.files;  // 获取文件列表
+            const files = event.target.files; // 获取文件列表
 
             if (files.length === 5 && checkEffectiveFileSuffix(files)) {
-                let shpFiles = [];  // 用于存储.shp文件的文件名
+                let shpFiles = []; // 用于存储.shp文件的文件名
 
                 // 遍历文件列表，筛选.shp文件
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     const fileName = file.name;
-                    const fileExtension = fileName.split('.').pop().toLowerCase();  // 获取文件扩展名
+                    const fileExtension = fileName.split(".").pop().toLowerCase(); // 获取文件扩展名
 
                     // 如果文件扩展名是.shp，加入列表
-                    if (fileExtension === 'shp') {
+                    if (fileExtension === "shp") {
                         shpFiles.push(fileName);
                     }
                 }
 
                 // 更新前端显示
                 if (shpFiles.length > 0) {
-                    let fileLoad = "<div style=\"font-size: 15px; text-align: center\">";
-                    shpFiles.forEach(name => {
+                    let fileLoad = '<div style="font-size: 15px; text-align: center">';
+                    shpFiles.forEach((name) => {
                         fileLoad += `<span><strong>${name}</strong> 文件已选择</span><br>`;
                     });
                     fileLoad += "</div>";
@@ -566,7 +654,7 @@
                 } else {
                     // 如果没有.shp文件，显示提示信息
                     document.getElementById("fileInfo").innerHTML =
-                        "<div style=\"font-size: 15px; text-align: center; color: red;\">未选择任何 .shp 文件</div>";
+                        '<div style="font-size: 15px; text-align: center; color: red;">未选择任何 .shp 文件</div>';
                 }
                 // 读取文件内容绘制原轨迹
                 // 初始化map
@@ -575,15 +663,15 @@
                 let formData = new FormData();
                 // 将每个文件添加到 FormData 中
                 for (let i = 0; i < files.length; i++) {
-                    formData.append("file", files[i]);  // 将文件添加到 FormData，键是 "file"
+                    formData.append("file", files[i]); // 将文件添加到 FormData，键是 "file"
                 }
                 // 发送请求
-                fetch('/File/parseGraphShp', {
-                    method: 'POST',
-                    body: formData
+                fetch("/File/parseGraphShp", {
+                    method: "POST",
+                    body: formData,
                 })
-                    .then(response => response.json())
-                    .then(data => {
+                    .then((response) => response.json())
+                    .then((data) => {
                         console.log("Success:", data);
                         // 按行号分组
                         let groupedData = groupByLineNumber(data.data);
@@ -591,34 +679,33 @@
                         let formattedData = formatData(groupedData);
 
                         // 创建一个 Blob 对象
-                        let blob = new Blob([formattedData], {type: 'text/plain'});
+                        let blob = new Blob([formattedData], {type: "text/plain"});
                         // 触发 FileReader 读取文件内容并显示在控制台
                         const reader = new FileReader();
                         reader.onload = function (e) {
-                            let fileContent = e.target.result;  // 读取的文本内容
-                            console.log("文件内容：", fileContent);  // 控制台显示文件内容
-                            displayTrack(e, globalMap);  // 假设 displayTrack 是你的显示函数
+                            let fileContent = e.target.result; // 读取的文本内容
+                            console.log("文件内容：", fileContent); // 控制台显示文件内容
+                            displayTrack(e, globalMap); // 假设 displayTrack 是你的显示函数
                             // setTimeout(function() {
                             //     console.log("延迟 3 秒后执行的代码");
                             //     displayTrack(e, map, '#49ff00', 'green', default_marker_image, "脱敏后轨迹")
                             // }, 3000);
                         };
-                        reader.readAsText(blob);  // 读取文件内容为文本
+                        reader.readAsText(blob); // 读取文件内容为文本
                         // const formData = new FormData();
-                        globalParsedFile = new File([blob], "graph.txt", {type: "text/plain"});
+                        globalParsedFile = new File([blob], "graph.txt", {
+                            type: "text/plain",
+                        });
                     })
-                    .catch(error => {
-                        console.log(error)
-                        alert("处理文件时发生错误")
-                    })
+                    .catch((error) => {
+                        console.log(error);
+                        alert("处理文件时发生错误");
+                    });
                 //提交脱敏参数，请求脱敏
-            }
-            else {
+            } else {
                 alert("应上传.shp, .shx, .dbf .prj, .cpg文件");
             }
-
         }
-
     </script>
 </head>
 <body>
@@ -626,34 +713,61 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="tabs-container">
-                <ul id="tab-type" class="nav nav-tabs" style="left: 50%;font-size: 20px;">
-                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 失真 </a>
+                <ul
+                        id="tab-type"
+                        class="nav nav-tabs"
+                        style="left: 50%; font-size: 20px"
+                >
+                    <li class="active">
+                        <a data-toggle="tab" href="#tab-1" aria-expanded="true">
+                            失真
+                        </a>
                     </li>
-                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false"> 非失真 </a>
+                    <li class="">
+                        <a data-toggle="tab" href="#tab-2" aria-expanded="false">
+                            非失真
+                        </a>
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div id="tab-1" class="tab-pane active" style="text-align: center;">
+                    <div
+                            id="tab-1"
+                            class="tab-pane active"
+                            style="text-align: center"
+                    >
                         <div class="panel-body">
                             <form role="form" class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="distortion-algs">
+                                    <label
+                                            class="col-lg-3 col-lg-offset-3 control-label"
+                                            for="distortion-algs"
+                                    >
                                         请选择图形失真脱敏算法
                                     </label>
                                     <div class="col-lg-2">
-                                        <select class=" form-control" name="distortion-algs" id="distortion-algs">
-                                            <option value="dp" selected> 差分算法</option>
+                                        <select
+                                                class="form-control"
+                                                name="distortion-algs"
+                                                id="distortion-algs"
+                                        >
+                                            <option value="dp" selected>差分算法</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="col-lg-3 col-lg-offset-3 control-label" for="privacyLevel-selections">
+                                    <label
+                                            class="col-lg-3 col-lg-offset-3 control-label"
+                                            for="privacyLevel-selections"
+                                    >
                                         请选择隐私保护等级
                                     </label>
                                     <div class="col-lg-2">
-                                        <select class=" form-control" name="privacyLevel-selections"
-                                                id="privacyLevel-selections">
+                                        <select
+                                                class="form-control"
+                                                name="privacyLevel-selections"
+                                                id="privacyLevel-selections"
+                                        >
                                             <option value="0">无隐私保护处理</option>
                                             <option value="1">低程度</option>
                                             <option value="2" selected>中程度</option>
@@ -662,40 +776,64 @@
                                     </div>
                                 </div>
                                 <div class="form-group text-center">
-                                    <input type="file" id="fileUpload" accept=".shp,.shx,.dbf,.prj,.cpg,.sbx,.sbn" style="display: none;" multiple>
+                                    <input
+                                            type="file"
+                                            id="fileUpload"
+                                            accept=".shp,.shx,.dbf,.prj,.cpg,.sbx,.sbn"
+                                            style="display: none"
+                                            multiple
+                                    />
                                     <label for="fileUpload" class="btn btn-white">
                                         选择文件
                                     </label>
                                 </div>
-                                <div id="fileInfo">
-                                </div>
+                                <div id="fileInfo"></div>
                                 <div class="form-group text-center">
-                                    <button type="button" class="btn btn-primary" id="submit"> 提交脱敏</button>
+                                    <button type="button" class="btn btn-primary" id="submit">
+                                        提交脱敏
+                                    </button>
                                 </div>
                             </form>
 
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <div id="mapid" style="height: 1000px;"></div>
+                                    <div id="mapid" style="height: 1000px"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div id="tab-2" class="tab-pane">
-                        <div style="text-align: center; font-size: 20px; margin-top: 20px;">
+                        <div
+                                style="text-align: center; font-size: 20px; margin-top: 20px"
+                        >
                             <div class="form-group text-center">
-                                <input type="file" id="shpFileInput" multiple
-                                       accept=".shp,.shx,.dbf,.prj,.cpg,.sbx,.sbn" style="display: none;">
+                                <input
+                                        type="file"
+                                        id="shpFileInput"
+                                        multiple
+                                        accept=".shp,.shx,.dbf,.prj,.cpg,.sbx,.sbn"
+                                        style="display: none"
+                                />
                                 <label for="shpFileInput" class="btn btn-white">
                                     选择文件
                                 </label>
-                                <div id="shpFileInfo" style="margin-bottom: 10px;"></div>
-                                <div id="shpFileSeries"></div>
+                                <div id="shpFileInfo" style="margin-bottom: 10px"></div>
+                                <canvas
+                                        id="shpFileSeries"
+                                        width="400"
+                                        height="200"
+                                        style="display: block; margin: auto"
+                                ></canvas>
                             </div>
                             <button id="encryptGraph">提交</button>
-                            <br>
-                            <p>返回相似的序列ID</p>
-                            <textarea id="outputText" rows="4" cols="50" readonly></textarea>
+                            <br/>
+                            <p>返回相似的序列波形</p>
+                            <canvas
+                                    id="outputText"
+                                    width="400"
+                                    height="200"
+                                    style="display: block; margin: auto"
+                            ></canvas>
                         </div>
                     </div>
                 </div>

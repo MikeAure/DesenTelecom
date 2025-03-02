@@ -236,6 +236,8 @@ public class LogSenderManager {
                     case "mp4":
                         headers.setContentType(MediaType.parseMediaType("video/mp4"));
                         break;
+                    case "docx":
+                        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
                     default:
                         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
                         break;
@@ -261,6 +263,18 @@ public class LogSenderManager {
                         case "audio":
                         case "video":
                         case "text":
+                            if (fileSuffix.equals("docx")) {
+                                eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv, logManagerEvent));
+                            } else {
+                                int desenLevel = Integer.parseInt(recEvaResultInv.getDesenLevel());
+                                if (desenLevel == 3) {
+                                    responseEntityCompletableFuture.complete(ResponseEntity.status(500).
+                                            contentType(MediaType.TEXT_PLAIN).body("已将脱敏等级调整至最高仍无法通过评测，请更换脱敏算法".getBytes()));
+                                } else {
+                                    eventPublisher.publishEvent(new ReDesensitizeEvent(this, recEvaResultInv, logManagerEvent));
+                                }
+                            }
+                            break;
                         case "graph":
                             int desenLevel = Integer.parseInt(recEvaResultInv.getDesenLevel());
                             if (desenLevel == 3) {

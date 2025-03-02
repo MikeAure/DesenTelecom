@@ -86,7 +86,8 @@
                 5: "图像模态数据",
                 6: "视频模态数据",
                 7: "音频模态数据",
-                8: "图形模态数据"
+                8: "图形模态数据",
+                9: "文本模态数据"
             };
 
             const typeFieldOptions = {
@@ -97,7 +98,8 @@
                 "图像模态数据": 5,
                 "视频模态数据": 6,
                 "音频模态数据": 7,
-                "图形模态数据": 8
+                "图形模态数据": 8,
+                "文本模态数据": 9
             };
 
             const privacyProtectionLevels = {
@@ -134,28 +136,52 @@
 
                     if (ifAll) {
                         let $algorithmSelect = $("<select></select>");
-                        if (desensitizationAlgorithms[item.dataType]) {
-                            desensitizationAlgorithms[item.dataType].forEach(algorithm => {
-                                let $option = $("<option></option>")
-                                    .val(algorithm.value)
-                                    .text(algorithm.label);
-                                if (algorithm.value === item.k) $option.attr("selected", "selected");
-                                $algorithmSelect.append($option);
-                            });
-                        }
+                        if (item.dataType === 9) {
+                            let $option1 = $("<option></option>")
+                                .val(99)
+                                .text("文档脱敏");
+                            $option1.attr("selected", "selected");
+                            $algorithmSelect.append($option1);
+                        } else {
+                            if (desensitizationAlgorithms[item.dataType]) {
+                                desensitizationAlgorithms[item.dataType].forEach(algorithm => {
+                                    let $option = $("<option></option>")
+                                        .val(algorithm.value)
+                                        .text(algorithm.label);
+                                    if (algorithm.value === item.k) $option.attr("selected", "selected");
+                                    $algorithmSelect.append($option);
+                                });
+                            }}
+
                         $row.append($("<td></td>").append($algorithmSelect));
 
                         // 创建“隐私保护等级”列的 <select> 下拉框
                         let $privacySelect = $("<select></select>");
-                        Object.keys(privacyProtectionLevels).forEach(level => {
-                            let $option = $("<option></option>")
-                                .val(level)
-                                .text(privacyProtectionLevels[level]);
-                            if (parseInt(level) === item.tmParam) {
-                                $option.attr("selected", "selected");
+                        if (item.dataType === 9) {
+                            let $option1 = $("<option></option>")
+                                .val(0)
+                                .text("无隐私保护处理");
+                            let $option2 = $("<option></option>")
+                                .val(1)
+                                .text("进行隐私保护");
+                            if (parseInt(item.tmParam) === 1) {
+                                $option2.attr("selected", "selected");
+                            } else {
+                                $option1.attr("selected", "selected");
                             }
-                            $privacySelect.append($option);
-                        })
+                            $privacySelect.append($option1).append($option2);
+                        } else {
+                            Object.keys(privacyProtectionLevels).forEach(level => {
+                                let $option = $("<option></option>")
+                                    .val(level)
+                                    .text(privacyProtectionLevels[level]);
+                                if (parseInt(level) === item.tmParam) {
+                                    $option.attr("selected", "selected");
+                                }
+                                $privacySelect.append($option);
+                            });
+                        }
+
                         $row.append($("<td></td>").append($privacySelect));
                     }
 

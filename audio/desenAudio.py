@@ -116,7 +116,7 @@ def replace_voice_print_fixed(file_path, newFilePath):
     # 扰动音频声纹路径
     # template_vector = os.path.join(pythonPath, (file_name_parts + "_template_vector.txt"))
     # 处理过的模板声纹
-    fixed_template_vector = os.path.join(pythonPath, "template_vector.txt")
+    fixed_template_vector = os.path.join(os.path.dirname(__file__), "template_vector.txt")
 
     # 音频内容保存路径
     contentPath = os.path.join(pythonPath, file_name_parts + '_content.txt')

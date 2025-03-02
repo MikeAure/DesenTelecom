@@ -153,6 +153,7 @@ public class FileStorageServiceImpl implements com.lu.gademo.service.FileStorage
 //        log.info("RawFileName: {}", rawFileName);
         Path rawFilePath = rawFileDirectory.resolve(rawFileName);
         String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        log.info("Raw file path string: {}", rawFilePathString);
         byte[] rawFileBytes = Files.readAllBytes(file);
         Long rawFileSize = Files.size(file);
 
@@ -177,6 +178,58 @@ public class FileStorageServiceImpl implements com.lu.gademo.service.FileStorage
                 .desenFilePath(desenFilePath)
                 .desenFilePathString(desenFilePathString)
                 .build();
+    }
+
+    @Override
+    public FileStorageDetails saveRawFileWithDesenInfo(List<Path> files) throws IOException {
+        if (CollectionUtils.isEmpty(files)) {
+            throw new IOException("Input files is null");
+        }
+
+        FileStorageDetails fileStorageDetails = new FileStorageDetails();
+
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        for (Path file : files) {
+            String originalFileName = file.getFileName().toString();
+            String fileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+            String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+            String rawFileNameTemp = fileTimeStamp + "_" + fileName;
+            String rawFileName = fileTimeStamp + "_" + originalFileName;
+//        log.info("RawFileName: {}", rawFileName);
+            Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+            String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+            log.info("Raw file path string: {}", rawFilePathString);
+            byte[] rawFileBytes = Files.readAllBytes(file);
+            Long rawFileSize = Files.size(file);
+
+            // Path for the desensitized file
+            String desenFileTimeStamp = String.valueOf(System.currentTimeMillis());
+            String desenFileName = rawFileNameTemp + "_" + desenFileTimeStamp + "." + rawFileSuffix;
+            Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+            String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+
+            // Save the original file
+            Files.copy(file, rawFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+            if (originalFileName.endsWith(".shp")) {
+                fileStorageDetails = FileStorageDetails.builder()
+                        .rawFileName(rawFileName)
+                        .rawFileSuffix(rawFileSuffix)
+                        .rawFilePath(rawFilePath)
+                        .rawFilePathString(rawFilePathString)
+                        .rawFileBytes(rawFileBytes)
+                        .rawFileSize(rawFileSize)
+                        .desenFileName(desenFileName)
+                        .desenFileSuffix(rawFileSuffix)
+                        .desenFilePath(desenFilePath)
+                        .desenFilePathString(desenFilePathString)
+                        .build();
+            }
+        }
+
+
+        return fileStorageDetails;
     }
 
     /**
@@ -215,6 +268,13 @@ public class FileStorageServiceImpl implements com.lu.gademo.service.FileStorage
                 .build();
     }
 
+    /**
+     * 保存SHP文件及其相关文件
+     *
+     * @param files SHP及其相关文件
+     * @return SHP文件路径
+     * @throws IOException
+     */
     @Override
     public FileStorageDetails saveRawFile(List<MultipartFile> files) throws IOException {
 

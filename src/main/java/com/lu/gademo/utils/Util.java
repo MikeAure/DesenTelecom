@@ -14,6 +14,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public interface Util {
 
@@ -77,4 +78,12 @@ public interface Util {
     Boolean isCondaInstalled(boolean isLinux);
 
     ArrayNode trimCommaAndReturnArrayNode(String rawString, ObjectMapper objectMapper);
+
+    String convertTxtToShp(String shapefilePath);
+
+    List<String> converShpToTxt(String shapefilePath) throws IOException;
+
+    Map<String, List<String>> groupByLineNumber(List<String> data);
+    String formatData(Map<String, List<String>> groupedData);
+    void saveToFile(String data, String filePath);
 }

@@ -3,8 +3,7 @@ package com.lu.gademo.controller;
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.entity.ga.SceneInfo;
-import com.lu.gademo.service.AlgorithmInfoDaoService;
-import com.lu.gademo.service.SceneInfoDaoService;
+import com.lu.gademo.service.*;
 import com.lu.gademo.service.impl.ExcelAlgorithmsDaoServiceImpl;
 import com.lu.gademo.service.impl.ToolsetServiceImpl;
 import com.lu.gademo.utils.Result;
@@ -21,19 +20,21 @@ import java.util.Map;
 @Controller
 public class GaController extends BaseController {
 
-    private final ToolsetServiceImpl toolsetServiceImpl;
+    private final ToolsetService toolsetService;
     private final SceneInfoDaoService sceneInfoDaoService;
     private final List<SceneInfo> allSceneInfos;
-    private final ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService;
+    private final ExcelAlgorithmsDaoService excelAlgorithmsDaoService;
     private final AlgorithmInfoDaoService algorithmInfoDaoService;
+    private final GraphPoiService graphPoiService;
 
     @Autowired
-    public GaController(ToolsetServiceImpl toolsetServiceImpl, SceneInfoDaoService sceneInfoDaoService, List<SceneInfo> allSceneInfos, ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService, AlgorithmInfoDaoService algorithmInfoDaoService) {
-        this.toolsetServiceImpl = toolsetServiceImpl;
+    public GaController(ToolsetServiceImpl toolsetService, SceneInfoDaoService sceneInfoDaoService, List<SceneInfo> allSceneInfos, ExcelAlgorithmsDaoServiceImpl excelAlgorithmsDaoService, AlgorithmInfoDaoService algorithmInfoDaoService, GraphPoiService graphPoiService) {
+        this.toolsetService = toolsetService;
         this.sceneInfoDaoService = sceneInfoDaoService;
         this.allSceneInfos = sceneInfoDaoService.getAllSceneInfos();
         this.excelAlgorithmsDaoService = excelAlgorithmsDaoService;
         this.algorithmInfoDaoService = algorithmInfoDaoService;
+        this.graphPoiService = graphPoiService;
     }
 
     @RequestMapping(value = {"/", "/index"})
@@ -65,7 +66,7 @@ public class GaController extends BaseController {
         Map<String, List<Map<String, Object>>> algorithmsByType = excelAlgorithmsDaoService.getAlgorithmsByType();
         String defaultAlgName = "";
         if (!name.equals("graph")) {
-            defaultAlgName = toolsetServiceImpl.getDefaultTool(name);
+            defaultAlgName = toolsetService.getDefaultTool(name);
         }
         switch (name) {
             case "text":
@@ -214,7 +215,7 @@ public class GaController extends BaseController {
     @ResponseBody
     @GetMapping(value = "/toolset/getDefaultSelection")
     public Result<?> getDefaultSelectionView(String toolsetName) {
-        String defaultAlgName = toolsetServiceImpl.getDefaultTool(toolsetName);
+        String defaultAlgName = toolsetService.getDefaultTool(toolsetName);
         if (defaultAlgName != null) {
             return Result.success(defaultAlgName);
         }
@@ -224,10 +225,22 @@ public class GaController extends BaseController {
     @ResponseBody
     @PostMapping(value = {"/toolset/setDefaultToolset"})
     public Result<?> setDefaultToolset(String toolsetName, String defaultAlgName) {
-        if (toolsetServiceImpl.setDefaultTool(toolsetName, defaultAlgName)) {
+        if (toolsetService.setDefaultTool(toolsetName, defaultAlgName)) {
             return new Result<>(200, "success", null);
         }
         return new Result<>(500, "failed", null);
+    }
+
+    @ResponseBody
+    @PostMapping(value = "getPoiInfo")
+    public Result<?> getPoiInfo(String id) {
+        return Result.success(graphPoiService.getPoiById(id));
+    }
+
+    @ResponseBody
+    @PostMapping(value = "getPoiInfos")
+    public Result<?> getPoiInfos(@RequestBody List<String> ids) {
+        return Result.success(graphPoiService.selectPoisByIds(ids));
     }
 
 }

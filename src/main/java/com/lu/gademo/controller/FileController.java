@@ -37,7 +37,6 @@ import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Basic;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
@@ -83,16 +82,19 @@ public class FileController extends BaseController {
 
     private final LogCollectUtil logCollectUtil;
 
+    private final Util util;
+
 //    private MeetingAnalysisEventListener meetingAnalysisEventListener;
 
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
-                          ExcelParamService excelParamService, FileStorageService fileStorageService, LogCollectUtil logCollectUtil) {
+                          ExcelParamService excelParamService, FileStorageService fileStorageService, LogCollectUtil logCollectUtil, Util util) {
         this.algorithmsFactory = algorithmsFactory;
         this.officeFileDesen = officeFileDesen;
         this.fileService = fileService;
         this.excelParamService = excelParamService;
         this.fileStorageService = fileStorageService;
+        this.util = util;
         this.readyState = true;
         this.sendBackFileName = "";
         this.sendBackFlag = false;
@@ -114,7 +116,7 @@ public class FileController extends BaseController {
                                             @RequestParam("params") String params,
                                             @RequestParam("algName") String algName,
                                             @RequestParam("sheet") String sheet
-    ) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+    ) throws IOException, ExecutionException, InterruptedException, TimeoutException, ParseException {
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
         if (algName.equals("dpGraph")) {
             log.info("RawFileName: {}", fileStorageDetails.getRawFileName().replace(".txt", ".shp"));
@@ -144,6 +146,8 @@ public class FileController extends BaseController {
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
             return fileService.dealExcel(fileStorageDetails, params, sheet, true);
+        }else if ("docx".equals(fileType)) {
+            return fileService.dealDocument(fileStorageDetails, params, algName);
         } else if (imageType.contains(fileType)) {
             return fileService.dealImage(fileStorageDetails, params, algName);
         } else if (videoType.contains(fileType)) {
@@ -163,13 +167,18 @@ public class FileController extends BaseController {
         return fileService.dealGraph(fileStorageDetails, params);
     }
 
+    /**
+     * TXT转回SHP
+     * @param file TXT文件
+     * @return SHP文件
+     */
     @PostMapping("/parseToShp")
     public ResponseEntity<Map<String, String>> parseToShp(@RequestParam("file") MultipartFile file) {
         try {
             // 上传目录
             String userDir = System.getProperty("user.dir");
             System.out.println("user.dir" + userDir);
-            String uploadDir = userDir + File.separator + "graphtxt" + File.separator;
+            String uploadDir = userDir + File.separator + "desen_files" + File.separator;
             File dir = new File(uploadDir);
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -183,7 +192,7 @@ public class FileController extends BaseController {
             // 调用 Python 进行转换
             String txtFilePath = txtFile.getAbsolutePath();
             String shpFilePath = txtFilePath.replace(".txt", ".shp");
-            convertShpToTxt(shpFilePath);
+            util.convertTxtToShp(shpFilePath);
 
             // 读取转换后的文件并返回 Base64 编码
             Map<String, String> fileDataMap = new HashMap<>();
@@ -204,17 +213,6 @@ public class FileController extends BaseController {
         }
     }
 
-    public String convertShpToTxt(String shapefilePath) throws IOException {
-        String python = CommandExecutor.getPythonCommand();
-        String filePath = "D:\\Programming\\DesenTelecom\\graph\\poi.py";
-
-        String txtFilePath = shapefilePath.replace(".shp", ".txt");
-        String cmd = String.format("%s %s %s %s", python, filePath, shapefilePath, txtFilePath);
-        CommandExecutor.openExe(cmd);
-
-        return txtFilePath;
-    }
-
     @PostMapping("desenSingleColumn")
     public ResponseEntity<byte[]> desenSingleColumn(@RequestPart("file") MultipartFile file,
                                                     @RequestParam("params") String params,
@@ -222,7 +220,13 @@ public class FileController extends BaseController {
         log.info("Params: {}", params);
         log.info("AlgName: {}", algName);
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
-        return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, false);
+        try {
+            return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, false);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(500).body("Failed to process file.".getBytes());
+        }
+
     }
 
 
@@ -303,12 +307,9 @@ public class FileController extends BaseController {
         try {
             FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
             return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, false);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(500).body("Failed to read file.".getBytes());
-        } catch (ParseException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(500).body("Failed to parse file.".getBytes());
         }
     }
 
@@ -331,14 +332,15 @@ public class FileController extends BaseController {
     @ResponseBody
     @PostMapping(value="parseGraphShp")
     public Result<List<String>> parseGraphShp(@RequestPart("file") List<MultipartFile> files) throws IOException {
-        FileStorageService fileStorageService = new FileStorageServiceImpl();
+
         FileStorageDetails fileStorageDetails =  fileStorageService.saveRawFile(files);
 
         if (fileStorageDetails.getRawFileName().isEmpty()) {
             return new Result<>(500, "error", null);
         }
 
-        File file = new File(String.valueOf(fileStorageDetails.getRawFilePath()));
+//        File file = new File(String.valueOf(fileStorageDetails.getRawFilePath()));
+        File file = fileStorageDetails.getRawFilePath().toFile();
 
         Map<String, Object> params = new HashMap<>();
         params.put("url", file.toURI().toURL());
@@ -363,8 +365,8 @@ public class FileController extends BaseController {
 
                     for (int i = 0; i < geometry.getNumPoints(); i++) {
                         double latitude = geometry.getCoordinates()[i].y;
-                        int intLatitude = (int) latitude;
-                        elements.add(String.valueOf(intLatitude));
+                        double longitude = geometry.getCoordinates()[i].x;
+                        elements.add(String.valueOf(longitude) + " " + String.valueOf(latitude));
                     }
                 }
             }
@@ -689,67 +691,6 @@ public class FileController extends BaseController {
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
-
-//    @PostMapping(value = "fileDesen")
-//    @ResponseBody
-//    ResponseEntity<Map<String, Object>> fileDesen(@RequestPart("config") Config config,
-//                                                  @NotNull @RequestPart("file") MultipartFile file) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        String params = config.getParams();
-//        String algName = config.getAlgName();
-//        String sheet = config.getSheet();
-//
-//        System.out.println(file.getSize());
-//        System.out.println(file.getOriginalFilename());
-//
-//        // 调用脱敏函数
-//        String fileName = file.getOriginalFilename();
-//        System.out.println(file.getOriginalFilename());
-//        // 获取文件后缀
-//        String[] names = new String[0];
-//        if (fileName != null) {
-//            names = fileName.split("\\.");
-//        }
-//        //System.out.println(Arrays.toString(names));
-//        String fileType = names[names.length - 1];
-//        System.out.println(fileType);
-//        System.out.println(sheet);
-//
-//        byte[] responseData;
-//        // 判断数据模态
-//        try {
-//            if ("xlsx".equals(fileType)) {
-//                System.out.println("excel");
-//                responseData =  fileService.dealExcel(file, params, sheet).getBody();
-//            } else if (imageType.contains(fileType)) {
-//                System.out.println("image");
-//                responseData = fileService.dealImage(file, params, algName).getBody();
-//            } else if (videoType.contains(fileType)) {
-//                System.out.println("video");
-//                responseData =  fileService.dealVideo(file, params, algName).getBody();
-//            } else if (audioType.contains(fileType)) {
-//                System.out.println("audio");
-//                responseData =  fileService.dealAudio(file, params, algName, sheet).getBody();
-//            } else if ("csv".equals(fileType)) {
-//                System.out.println("csv");
-//                responseData =  fileService.dealCsv(file, params, algName).getBody();
-//            } else {
-//                System.out.println("graph");
-//                responseData =  fileService.dealGraph(file, params).getBody();
-//            }
-//        } catch(Exception e) {
-//            response.put("message", "error");
-//            response.put("data", e.getMessage());
-//            return ResponseEntity.ok().body(response);
-//        }
-//
-//        response.put("message", "ok");
-//        response.put("data", responseData);
-//        return ResponseEntity.ok().body(response);
-//
-//
-//    }
 
 }
 

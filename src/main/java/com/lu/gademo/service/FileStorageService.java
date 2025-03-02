@@ -13,6 +13,7 @@ public interface FileStorageService {
     FileStorageDetails saveRawFileWithDesenInfoForBigFile(MultipartFile file) throws IOException;
 
     FileStorageDetails saveRawFileWithDesenInfo(Path file) throws IOException;
+    FileStorageDetails saveRawFileWithDesenInfo(List<Path> file) throws IOException;
 
     FileStorageDetails saveRawFile(MultipartFile file) throws IOException;
 

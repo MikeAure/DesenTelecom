@@ -48,4 +48,14 @@ public class AlgorithmsFactory {
                 .filter(algorithmInfo -> algorithmInfo.getId() == id)
                 .findFirst().orElse(null);
     }
+
+    public String getAlgorithmInfoNameById(int id) {
+        AlgorithmInfo target =  algorithmInfoMap.values().stream()
+                .filter(algorithmInfo -> algorithmInfo.getId() == id)
+                .findFirst().orElse(null);
+        if (target != null) {
+            return target.getName();
+        }
+        return "";
+    }
 }

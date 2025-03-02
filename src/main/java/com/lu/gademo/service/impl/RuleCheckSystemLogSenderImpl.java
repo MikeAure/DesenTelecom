@@ -92,7 +92,7 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
             data.set("content", content);
             ObjectNode dataJson = objectMapper.createObjectNode();
             dataJson.set("data", data);
-            log.info("合规检测请求：{}", dataJson.toPrettyString());
+//            log.info("合规检测请求：{}", dataJson.toPrettyString());
             // 构造数据域
             TcpPacket tcpPacket = new TcpPacket(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataJson));
             byte[] tcp = tcpPacket.buildPacket();
@@ -126,18 +126,20 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
             dataInputStream.read(auth);
             //String 转 json
             JsonNode jsonNode = objectMapper.readTree(jsonData);
-            log.info("接收到的合规检查收据：{}", jsonNode.toPrettyString());
+//            log.info("接收到的合规检查收据：{}", jsonNode.toPrettyString());
+            log.info("接收到合规检查收据");
+
             JsonNode recData = jsonNode.get("data");
             JsonNode recContent = recData.get("content");
-            log.info("recContent: {}", recContent.toPrettyString());
+//            log.info("recContent: {}", recContent.toPrettyString());
             int dataType = recData.get("DataType").asInt();
-            log.info("合规检查收据DataType: {}", dataType);
+//            log.info("合规检查收据DataType: {}", dataType);
             // 接收收据
 
             // 获取实体
             if (dataType == 0x3141) {
                 ruleReqReceipt = objectMapper.treeToValue(recContent, RecRuleReqReceipt.class);
-                log.info("ruleReqReceipt: {}", ruleReqReceipt.toString());
+//                log.info("ruleReqReceipt: {}", ruleReqReceipt.toString());
                 // 检测重复
                 if (recRuleReqReceiptDao.existsByCertificateID(ruleReqReceipt.getCertificateID())) {
                     recRuleReqReceiptDao.deleteByCertificateID(ruleReqReceipt.getCertificateID());
@@ -270,7 +272,7 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
             inputStream.close();
             dataInputStream.close();
         } catch (ConnectException connectException) {
-            log.error("未与合规检查请求服务器建立连接");
+            log.info("未与合规检查请求服务器建立连接");
         } catch (IOException e) {
             log.error(e.getMessage());
         }

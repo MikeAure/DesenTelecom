@@ -1,5 +1,6 @@
 package com.lu.gademo.utils.impl;
 
+import com.lu.gademo.entity.DocxDesenRequirement;
 import com.lu.gademo.utils.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +16,12 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTMarkupRange;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.namespace.QName;
 import java.awt.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -28,8 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,7 +49,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
     private final AlgorithmsFactory algorithmsFactory;
     private final DateParseUtil dateParseUtil;
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private final SimpleDateFormat outputFormat = new SimpleDateFormat("yyyyMMdd");
+    private final SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static Map<Integer, XWPFRun> getPosToRuns(XWPFParagraph paragraph) {
         int pos = 0;
@@ -76,15 +77,15 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         switch (suffix) {
             case "xlsx": {
-                extractExcel(rawFilePath, desenFilePath);
+                processXlsx(rawFilePath, desenFilePath);
                 break;
             }
             case "docx": {
-                extractWord(rawFilePath, desenFilePath);
+                processWord(rawFilePath, desenFilePath);
                 break;
             }
             case "pptx": {
-                extractPowerPoint(rawFilePath, desenFilePath);
+                processPowerPoint(rawFilePath, desenFilePath);
                 break;
             }
             default: {
@@ -96,7 +97,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         return Files.readAllBytes(desenFilePath);
     }
 
-    private void extractExcel(Path rawFilePath, Path desenFilePath) throws Exception {
+    private void processXlsx(Path rawFilePath, Path desenFilePath) throws Exception {
         try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
                 XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
@@ -130,13 +131,17 @@ public class RecvFileDesenImpl implements RecvFileDesen {
 
     }
 
-    private void extractWord(Path rawFilePath, Path desenFilePath) throws Exception {
+    /**
+     * 获取commentID和被批注的内容
+     * @param rawFilePath
+     * @return
+     */
+    public Map<String, String> extractCommentMapFromWord(Path rawFilePath) {
         Map<String, String> commentMap = new HashMap<>();
 
         try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
-                XWPFDocument document = new XWPFDocument(rawFileInputStream);
-                OutputStream outputStream = Files.newOutputStream(desenFilePath)) {
+                XWPFDocument document = new XWPFDocument(rawFileInputStream);) {
             XmlCursor cursor = document.getDocument().getBody().newCursor();
             QName idQname = new javax.xml.namespace.QName(
                     "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
@@ -178,7 +183,26 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                 cursor.pop();
             }
             cursor.dispose();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return commentMap;
+    }
 
+    @Override
+    public void processWord(Path rawFilePath, Path desenFilePath) {
+        Map<String, String> commentMap = extractCommentMapFromWord(rawFilePath);
+        System.out.println("Comment Map :" + commentMap);
+        Map<BigInteger, DocxDesenRequirement> docxDesenRequirementMap = getDocxDesenRequirement(rawFilePath, commentMap);
+        System.out.println("DocxDesenRequirementMap: " + docxDesenRequirementMap);
+        desenWord(rawFilePath, desenFilePath, docxDesenRequirementMap);
+    }
+
+    public Map<BigInteger, DocxDesenRequirement> getDocxDesenRequirement(Path rawFilePath, Map<String, String> commentMap) {
+        Map<BigInteger, DocxDesenRequirement> resultList = new HashMap<>();
+        try (
+                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
+                XWPFDocument document = new XWPFDocument(rawFileInputStream);){
             for (XWPFParagraph paragraph : document.getParagraphs()) {
                 XWPFComment comment;
                 for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartList()) {
@@ -193,12 +217,62 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                         String[] commentTextList = commentText.split("-");
                         System.out.println(Arrays.toString(commentTextList));
                         int arrayLength = commentTextList.length;
-                        int dataType = Integer.parseInt(commentTextList[arrayLength - 3]);
-                        int algoNum = Integer.parseInt(commentTextList[arrayLength - 2]);
-                        int privacyLevel = Integer.parseInt(commentTextList[arrayLength - 1]);
+                        DocxDesenRequirement docxDesenRequirementTemp = new DocxDesenRequirement(id.toString(),
+                                commentTextList[arrayLength - 4],
+                                Integer.parseInt(commentTextList[arrayLength - 3]),
+                                Integer.parseInt(commentTextList[arrayLength - 2]),
+                                Integer.parseInt(commentTextList[arrayLength - 1]),
+                                commentMap.get(id.toString()));
+                        resultList.put(id, docxDesenRequirementTemp);
+                        System.out.println(docxDesenRequirementTemp.getAlgoNum());
+                        System.out.println(docxDesenRequirementTemp.getPrivacyLevel());
+
+                    }
+                }
+            }
+            return resultList;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 脱敏Word文档
+     * @param rawFilePath 原始文件路径
+     * @param desenFilePath 脱敏文件路径
+     * @param commentMap 批注映射
+     */
+    @Override
+    public void desenWord(Path rawFilePath, Path desenFilePath, Map<BigInteger, DocxDesenRequirement> commentMap) {
+        try (
+                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
+                XWPFDocument document = new XWPFDocument(rawFileInputStream);
+                OutputStream outputStream = Files.newOutputStream(desenFilePath)) {
+            for (XWPFParagraph paragraph : document.getParagraphs()) {
+                XWPFComment comment;
+                for (CTMarkupRange anchor : paragraph.getCTP().getCommentRangeStartList()) {
+                    BigInteger id = anchor.getId();
+
+                    if (id != null &&
+                            (comment = paragraph.getDocument().getCommentByID(id.toString())) != null) {
+                        System.out.println("Comment ID: " + id);
+
+                        String commentText = comment.getText();
+                        System.out.println("Comment: " + comment.getText());
+                        String[] commentTextList = commentText.split("-");
+                        System.out.println(Arrays.toString(commentTextList));
+
+                        DocxDesenRequirement desenRequirement = commentMap.get(id);
+                        String commentId = desenRequirement.getCommentId();
+                        String target = desenRequirement.getTarget();
+                        String desenRquirementItemName = desenRequirement.getDesenRequirementItemName();
+                        int dataType = desenRequirement.getDataType();
+                        int algoNum = desenRequirement.getAlgoNum();
+                        int privacyLevel = desenRequirement.getPrivacyLevel();
                         System.out.println(algoNum);
                         System.out.println(privacyLevel);
-                        String target = commentMap.get(id.toString());
+                        // 获取待脱敏内容
                         String desenResult = "";
                         if (target == null) {
                             System.out.println("id: " + id + " target is null");
@@ -221,12 +295,12 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                 }
             }
             document.write(outputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-
     }
 
-    private void extractPowerPoint(Path rawFilePath, Path desenFilePath) throws Exception {
+    private void processPowerPoint(Path rawFilePath, Path desenFilePath) throws Exception {
         try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
                 XMLSlideShow ppt = new XMLSlideShow(rawFileInputStream);

@@ -170,7 +170,7 @@ public class EncryptController {
                 rawFileBytes, rawFileSize, rawFileName, rawFileBytes, rawFileSize, objectMode, rawFileSuffix,
                 startTime, endTime);
         Map<String, String> sendResult = new HashMap<>();
-        sendResult.put("result", result);
+        sendResult.put("result", MainTest.readSeries(Integer.parseInt(result)));
         sendResult.put("kdTree", MainTest.encryptedKDTreeString);
         sendResult.put("series", rawData);
         return new ServerResponse<>("ok", sendResult);

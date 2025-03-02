@@ -418,4 +418,10 @@ public class OfficeComentExtractTest {
         }
     }
 
+    @Test
+    public void testSplit() {
+        String[] result = "0-姓名1-3-15-3-".split("-");
+        System.out.println(Arrays.toString(result));
+    }
+
 }
