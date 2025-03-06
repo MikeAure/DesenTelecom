@@ -357,14 +357,7 @@ if __name__ == '__main__':
         edges = double_threshold(NMS_1)
         #image_noise = add_noise1(dx,dy,image_smooth)
         image_color_noise[:,:,i] = add_noise2(image_color[:,:,i], epsilon=epsilon)
-    #     #cv2.imshow('smooth', image_smooth)
-    #     cv2.imshow('edges', edges)
-    #     cv2.imshow('image_noise', image_color_noise[:,:,i]) #图片矩阵数据格式得是unit8才能show
-    # cv2.imshow('origin', image_color)
-    # cv2.imshow('noise',image_color_noise)
-    # cv2.waitKey()
-    # #np.savetxt("matrix.txt", image_color_noise,fmt ='%f')
-    # cv2.imwrite("cat2.png", image_color_noise)
+
     cv2.imwrite(output_path, image_color_noise)
 
     # #file1.writelines(noise)
