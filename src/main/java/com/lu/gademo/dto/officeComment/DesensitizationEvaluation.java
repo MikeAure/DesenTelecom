@@ -6,13 +6,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class DesensitizationEvaluation {
-    public static class EvaluationResult {
+    public static class EvaluationResult extends BaseDateFormatter {
         private String evaluationMethod = "";
         private String evaluationConclusion = "";
         private LocalDateTime  desensitizationEvaluationTime = LocalDateTime.now();
-
-        @JsonIgnore
-        final private DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         @JsonCreator
         public EvaluationResult(

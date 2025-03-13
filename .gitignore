@@ -238,3 +238,4 @@ graphtxt
 /xgs.yml
 /audio/saved_models
 !/audio/template_vector.txt
+*.docx

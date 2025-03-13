@@ -65,12 +65,10 @@ public class CategoryAndGrade {
                 '}';
     }
 
-    public static class AttributeCategory {
+    public static class AttributeCategory extends BaseDateFormatter {
         private String firstCategory = "";
         private String secondCategory = "";
         private LocalDateTime informationCategoryTime = LocalDateTime.now();
-
-        final private DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         @JsonCreator
         public AttributeCategory(
@@ -138,12 +136,10 @@ public class CategoryAndGrade {
         }
     }
 
-    public static class AttributeGrade {
+    public static class AttributeGrade extends BaseDateFormatter {
         private int totalGrade;
         private int currentGrade;
         private LocalDateTime informationGradeTime;
-
-        private final DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         @JsonCreator
         public AttributeGrade(

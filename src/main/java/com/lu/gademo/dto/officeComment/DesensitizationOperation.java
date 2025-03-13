@@ -49,13 +49,11 @@ public class DesensitizationOperation {
                 '}';
     }
 
-    public static class AlgorithmChosen {
+    public static class AlgorithmChosen extends BaseDateFormatter {
         private String algorithmCategory = "";
         private String algorithmName = "";
         private String parameterMagnitude = "";
         private LocalDateTime desensitizationOperationTime = LocalDateTime.now();
-
-        final private DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         @JsonCreator
         public AlgorithmChosen(
