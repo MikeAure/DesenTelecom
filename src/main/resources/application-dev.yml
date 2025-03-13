@@ -77,7 +77,7 @@ logging:
 
 effectEva:
 #    address: 192.168.37.192
-    address: 192.168.112.192
+    address: 127.0.0.1
     port: 10005
     waitingTime: 10
 evidence:

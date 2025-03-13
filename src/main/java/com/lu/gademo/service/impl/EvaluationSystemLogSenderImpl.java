@@ -241,12 +241,12 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
                 sendEvaReceiptDao.save(sendEvaReceipt);
                 return evaluationSystemReturnResult;
             } catch (ConnectException connectException) {
-                log.info("未与脱敏效果评测系统建立连接");
+                log.error("未与脱敏效果评测系统建立连接");
             } catch (IOException e) {
-                log.info(e.getMessage());
+                log.error(e.getMessage());
             }
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.error(e.getMessage());
         }
         return null;
     }
@@ -383,7 +383,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
                     }
                     // 插入数据库
                     recEvaResultDao.save(recEvaResult);
-//                    log.info("脱敏效果评测结果：{}", recvContent.toPrettyString());
+                    log.info("脱敏效果评测结果：{}", recvContent.toPrettyString());
                     log.info("已接收脱敏效果评测结果");
                     evaluationSystemReturnResult = new EvaluationSystemReturnResult(recEvaReqReceipt, recEvaResult, null);
                 }
@@ -427,9 +427,9 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             sendEvaReceiptDao.save(sendEvaReceipt);
             return evaluationSystemReturnResult;
         } catch (ConnectException connectException) {
-            log.info("未与脱敏效果评测系统建立连接");
+            log.error("未与脱敏效果评测系统建立连接");
         } catch (IOException e) {
-            log.info(e.getMessage());
+            log.error(e.getMessage());
 
         }
         return null;
