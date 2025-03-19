@@ -25,6 +25,16 @@ public class WordComment {
         this.desensitizationEvaluation = desensitizationEvaluation;
     }
 
+    @JsonCreator
+    public WordComment(
+            @JsonProperty("信息识别")InformationRecognition informationRecognition,
+            @JsonProperty("分类分级") CategoryAndGrade categoryAndGrade) {
+        this.informationRecognition = informationRecognition;
+        this.categoryAndGrade = categoryAndGrade;
+        this.desensitizationOperation = null;
+        this.desensitizationEvaluation = null;
+    }
+
     @JsonGetter("信息识别")
     public InformationRecognition getInformationRecognition() {
         return informationRecognition;

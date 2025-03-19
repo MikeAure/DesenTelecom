@@ -32,7 +32,7 @@ public class DocxCommentUpdater {
     private static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public static void modifyCommentsClass(String inputDocx, String outputDocx, Map<InformationRecognition>) throws Exception {
+    public static void modifyCommentsClass(String inputDocx, String outputDocx) throws Exception {
         try (ZipInputStream zin = new ZipInputStream(Files.newInputStream(Paths.get(inputDocx)));
              ZipOutputStream zout = new ZipOutputStream(Files.newOutputStream(Paths.get(outputDocx)))) {
 

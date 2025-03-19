@@ -344,11 +344,10 @@ public class RecvFileDesenImpl implements RecvFileDesen {
                             if (shapeText.contains(rawContent)) {
                                 String preString = shapeText.substring(0, shapeText.indexOf(rawContent));
                                 String afterString = shapeText.substring(shapeText.indexOf(rawContent) + rawContent.length());
+                                // TODO: 解析脱敏需求，使用对应的脱敏算法
                                 String desenResult = desenData(rawContent, 1, privacyLevel).getList().get(0).toString();
-                                String stringBuilder = preString +
-                                        desenResult +
-                                        afterString;
-                                ((XSLFTextShape) shape).setText(stringBuilder);
+                                String concatString = preString + desenResult + afterString;
+                                ((XSLFTextShape) shape).setText(concatString);
                             }
                         }
                     }

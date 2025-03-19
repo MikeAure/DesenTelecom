@@ -39,8 +39,6 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
     @Value("${ruleCheck.port}")
     int ruleCheckPort;
 
-    @Autowired
-    Util util;
     ObjectMapper objectMapper = new ObjectMapper();
     // 合规检查Dao
     @Autowired

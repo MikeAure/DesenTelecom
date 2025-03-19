@@ -45,6 +45,13 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+
+        <repository>
+            <id>com.e-iceblue</id>
+            <name>e-iceblue</name>
+            <url>https://repo.e-iceblue.cn/repository/maven-public/</url>
+        </repository>
+
     </repositories>
 
     <pluginRepositories>
@@ -154,17 +161,17 @@
             <version>25.2</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.opengis</groupId>-->
-<!--            <artifactId>geoapi</artifactId>-->
-<!--            <version>3.0.1</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.opengis</groupId>-->
+        <!--            <artifactId>geoapi</artifactId>-->
+        <!--            <version>3.0.1</version>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.locationtech.jts</groupId>-->
-<!--            <artifactId>jts-core</artifactId>-->
-<!--            <version>1.16.1</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.locationtech.jts</groupId>-->
+        <!--            <artifactId>jts-core</artifactId>-->
+        <!--            <version>1.16.1</version>-->
+        <!--        </dependency>-->
 
         <!-- mybatis -->
         <dependency>
@@ -238,16 +245,35 @@
             <version>1.5</version>
         </dependency>
 
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.poi</groupId>-->
+        <!--            <artifactId>poi</artifactId>-->
+        <!--            <version>4.1.2</version>-->
+        <!--        </dependency>-->
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.poi</groupId>-->
+        <!--            <artifactId>poi-ooxml</artifactId>-->
+        <!--            <version>4.1.2</version>-->
+        <!--        </dependency>-->
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>4.1.2</version>
+            <version>5.2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml-full</artifactId>
+            <version>5.2.3</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>4.1.2</version>
+            <version>5.2.3</version>
+
         </dependency>
 
         <dependency>
@@ -279,6 +305,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
             <version>3.3.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>poi-ooxml-schemas</artifactId>
+                    <groupId>org.apache.poi</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -295,6 +327,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>e-iceblue</groupId>
+            <artifactId>spire.doc.free</artifactId>
+            <version>5.3.2</version>
         </dependency>
 
     </dependencies>
