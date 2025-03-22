@@ -1,4 +1,4 @@
-package com.lu.gademo.ControllerTests;
+package com.lu.gademo.controllerTests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

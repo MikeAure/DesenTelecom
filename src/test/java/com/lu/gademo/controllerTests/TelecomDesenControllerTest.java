@@ -1,4 +1,4 @@
-package com.lu.gademo.ControllerTests;
+package com.lu.gademo.controllerTests;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.web.multipart.MultipartFile;
 
 
 import java.nio.charset.StandardCharsets;

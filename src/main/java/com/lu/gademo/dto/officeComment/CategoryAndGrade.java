@@ -1,13 +1,12 @@
 package com.lu.gademo.dto.officeComment;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CategoryAndGrade {
     private AttributeCategory attributeCategory;
     private AttributeGrade attributeGrade;
@@ -80,35 +79,35 @@ public class CategoryAndGrade {
             this.informationCategoryTime = LocalDateTime.parse(informationCategoryTime, sdf);
         }
 
-        public AttributeCategory() {
-        }
+//        public AttributeCategory() {
+//        }
 
-        @JsonGetter("一级类别")
+        @JsonProperty("一级类别")
         public String getFirstCategory() {
             return firstCategory;
         }
 
-        @JsonSetter("一级类别")
+        @JsonProperty("一级类别")
         public void setFirstCategory(String firstCategory) {
             this.firstCategory = firstCategory;
         }
 
-        @JsonGetter("二级类别")
+        @JsonProperty("二级类别")
         public String getSecondCategory() {
             return secondCategory;
         }
 
-        @JsonSetter("二级类别")
+        @JsonProperty("二级类别")
         public void setSecondCategory(String secondCategory) {
             this.secondCategory = secondCategory;
         }
 
-        @JsonGetter("信息分类时间")
+        @JsonProperty("信息分类时间")
         public String getInformationCategoryTime() {
             return sdf.format(informationCategoryTime);
         }
 
-        @JsonSetter("信息分类时间")
+        @JsonProperty("信息分类时间")
         public void setInformationCategoryTime(String informationCategoryTime) {
             this.informationCategoryTime = LocalDateTime.parse(informationCategoryTime);
         }
@@ -143,41 +142,74 @@ public class CategoryAndGrade {
 
         @JsonCreator
         public AttributeGrade(
-                @JsonProperty("总级数") int totalGrade,
-                @JsonProperty("当前级数") int currentGrade,
+                @JsonProperty("总级数") String totalGrade,
+                @JsonProperty("当前等级") String currentGrade,
                 @JsonProperty("信息分级时间") String informationGradeTime) {
+            this.totalGrade = Integer.parseInt(totalGrade);
+            this.currentGrade = Integer.parseInt(currentGrade);
+            this.informationGradeTime = LocalDateTime.parse(informationGradeTime, sdf);
+
+        }
+
+//        public AttributeGrade() {
+//
+//        }
+
+        public AttributeGrade(
+                int totalGrade,
+                int currentGrade,
+                String informationGradeTime) {
             this.totalGrade = totalGrade;
             this.currentGrade = currentGrade;
             this.informationGradeTime = LocalDateTime.parse(informationGradeTime, sdf);
 
         }
 
-        @JsonGetter("总级数")
         public int getTotalGrade() {
             return totalGrade;
         }
 
-        @JsonSetter("总级数")
-        public void setTotalGrade(int totalGrade) {
-            this.totalGrade = totalGrade;
+        @JsonProperty("总级数")
+        public String getTotalGradeString() {
+            return String.valueOf(totalGrade);
         }
 
-        @JsonGetter("当前级数")
+//        @JsonSetter("总级数")
+//        public void setTotalGrade(int totalGrade) {
+//            this.totalGrade = totalGrade;
+//        }
+
+        @JsonProperty("总级数")
+        public void setTotalGrade(String totalGrade) {
+            this.totalGrade = Integer.valueOf(totalGrade);
+        }
+
+
         public int getCurrentGrade() {
             return currentGrade;
         }
 
-        @JsonSetter("当前级数")
-        public void setCurrentGrade(int currentGrade) {
-            this.currentGrade = currentGrade;
+        @JsonProperty("当前等级")
+        public String getCurrentGradeString() {
+            return String.valueOf(currentGrade);
         }
 
-        @JsonGetter("信息分级时间")
+//        @JsonSetter("当前等级")
+//        public void setCurrentGrade(int currentGrade) {
+//            this.currentGrade = currentGrade;
+//        }
+
+        @JsonProperty("当前等级")
+        public void setCurrentGrade(String currentGrade) {
+            this.currentGrade = Integer.valueOf(currentGrade);
+        }
+
+        @JsonProperty("信息分级时间")
         public String getInformationGradeTime() {
             return sdf.format(informationGradeTime);
         }
 
-        @JsonSetter("信息分级时间")
+        @JsonProperty("信息分级时间")
         public void setInformationGradeTime(String informationGradeTime) {
             this.informationGradeTime = LocalDateTime.parse(informationGradeTime, sdf);
         }
@@ -201,7 +233,6 @@ public class CategoryAndGrade {
                     "totalGrade=" + totalGrade +
                     ", currentGrade=" + currentGrade +
                     ", informationGradeTime=" + informationGradeTime +
-                    ", sdf=" + sdf +
                     '}';
         }
     }

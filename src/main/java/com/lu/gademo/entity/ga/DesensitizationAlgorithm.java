@@ -1,13 +1,8 @@
 package com.lu.gademo.entity.ga;
 
 import com.lu.gademo.model.ModalTypes;
-import com.lu.gademo.utils.AlgorithmType;
+import com.lu.gademo.model.AlgorithmType;
 import lombok.*;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Data
 @AllArgsConstructor

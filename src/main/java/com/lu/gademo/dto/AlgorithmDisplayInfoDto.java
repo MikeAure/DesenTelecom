@@ -1,10 +1,7 @@
 package com.lu.gademo.dto;
 
-import com.lu.gademo.utils.AlgorithmType;
-import com.lu.gademo.utils.AlgorithmsFactory;
+import com.lu.gademo.model.AlgorithmType;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor

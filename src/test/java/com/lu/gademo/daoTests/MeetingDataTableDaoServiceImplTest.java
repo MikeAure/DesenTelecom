@@ -1,4 +1,4 @@
-package com.lu.gademo;
+package com.lu.gademo.daoTests;
 
 import com.github.pagehelper.PageInfo;
 import com.lu.gademo.entity.ga.MeetingDataTable;

@@ -1,12 +1,10 @@
 package com.lu.gademo.dto.officeComment;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.Objects;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WordComment {
     private InformationRecognition informationRecognition;
     private CategoryAndGrade categoryAndGrade;
@@ -25,7 +23,6 @@ public class WordComment {
         this.desensitizationEvaluation = desensitizationEvaluation;
     }
 
-    @JsonCreator
     public WordComment(
             @JsonProperty("信息识别")InformationRecognition informationRecognition,
             @JsonProperty("分类分级") CategoryAndGrade categoryAndGrade) {

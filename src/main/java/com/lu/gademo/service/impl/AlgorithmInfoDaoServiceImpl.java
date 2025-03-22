@@ -4,6 +4,7 @@ import com.lu.gademo.dto.AlgorithmDisplayInfoDto;
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.mapper.ga.AlgorithmInfoDao;
+import com.lu.gademo.model.AlgorithmType;
 import com.lu.gademo.service.AlgorithmInfoDaoService;
 import com.lu.gademo.utils.*;
 import lombok.extern.slf4j.Slf4j;

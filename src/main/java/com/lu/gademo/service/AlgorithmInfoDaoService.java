@@ -4,7 +4,7 @@ import com.lu.gademo.dto.AlgorithmDisplayInfoDto;
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
 import com.lu.gademo.utils.AlgorithmInfo;
-import com.lu.gademo.utils.AlgorithmType;
+import com.lu.gademo.model.AlgorithmType;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

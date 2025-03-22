@@ -1,4 +1,4 @@
-package com.lu.gademo;
+package com.lu.gademo.daoTests;
 
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.mapper.ga.AlgorithmInfoDao;

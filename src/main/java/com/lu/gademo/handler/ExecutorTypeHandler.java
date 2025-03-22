@@ -1,15 +1,11 @@
 package com.lu.gademo.handler;
 
+import com.lu.gademo.model.AlgorithmType;
 import com.lu.gademo.utils.*;
-import com.lu.gademo.utils.impl.AnonymityImpl;
-import com.lu.gademo.utils.impl.DpImpl;
-import com.lu.gademo.utils.impl.GeneralizationImpl;
-import com.lu.gademo.utils.impl.ReplaceImpl;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.sql.CallableStatement;

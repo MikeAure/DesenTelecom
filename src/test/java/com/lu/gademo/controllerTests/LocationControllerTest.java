@@ -1,4 +1,4 @@
-package com.lu.gademo;
+package com.lu.gademo.controllerTests;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

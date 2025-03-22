@@ -1,4 +1,4 @@
-package com.lu.gademo;
+package com.lu.gademo.daoTests;
 
 import com.lu.gademo.dao.ga.effectEva.SendEvaReqDao;
 import org.junit.jupiter.api.Test;
@@ -7,8 +7,6 @@ import com.lu.gademo.dao.ga.effectEva.RecEvaReqReceiptDao;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @SpringBootTest
 public class JpaTest {

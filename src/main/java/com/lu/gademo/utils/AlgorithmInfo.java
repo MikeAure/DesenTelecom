@@ -1,15 +1,12 @@
 package com.lu.gademo.utils;
 
-import com.lu.gademo.dto.AlgorithmInfoParamDto;
-import com.lu.gademo.entity.ga.DesensitizationAlgorithm;
+import com.lu.gademo.model.AlgorithmType;
 import com.lu.gademo.model.ModalTypes;
 import lombok.*;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 算法信息类，用于存储算法名称、id、算法类型、统一接口中的id、算法参数列表、脱敏需求

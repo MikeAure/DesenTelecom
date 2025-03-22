@@ -1,4 +1,4 @@
-package com.lu.gademo;
+package com.lu.gademo.daoTests;
 
 import com.lu.gademo.mapper.ga.ExcelParamDao;
 import org.junit.jupiter.api.Test;

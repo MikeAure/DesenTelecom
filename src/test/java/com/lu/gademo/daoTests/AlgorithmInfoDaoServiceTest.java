@@ -1,10 +1,10 @@
-package com.lu.gademo;
+package com.lu.gademo.daoTests;
 
 import com.lu.gademo.dto.AlgorithmInfoParamDto;
 import com.lu.gademo.mapper.ga.AlgorithmInfoDao;
 import com.lu.gademo.service.AlgorithmInfoDaoService;
 import com.lu.gademo.utils.AlgorithmInfo;
-import com.lu.gademo.utils.AlgorithmType;
+import com.lu.gademo.model.AlgorithmType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

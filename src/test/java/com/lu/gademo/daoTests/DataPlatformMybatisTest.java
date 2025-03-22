@@ -1,13 +1,9 @@
-package com.lu.gademo;
+package com.lu.gademo.daoTests;
 
-import com.lu.gademo.entity.dataplatform.SadaGdpiClickDtl;
-import com.lu.gademo.mapper.crm.CrmParamDao;
 import com.lu.gademo.mapper.dataplatform.SadaGdpiClickDtlParamDao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest
 public class DataPlatformMybatisTest {

@@ -1,4 +1,4 @@
-package com.lu.gademo.service.impl;
+package com.lu.gademo.utils;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.xwpf.usermodel.XWPFComment;
@@ -11,7 +11,6 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTText;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

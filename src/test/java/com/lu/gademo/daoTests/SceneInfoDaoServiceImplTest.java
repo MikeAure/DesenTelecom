@@ -1,4 +1,4 @@
-package com.lu.gademo;
+package com.lu.gademo.daoTests;
 
 import com.lu.gademo.entity.ga.SceneInfo;
 import com.lu.gademo.service.SceneInfoDaoService;

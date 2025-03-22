@@ -10,7 +10,6 @@ import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.FileStorageService;
 import com.lu.gademo.service.impl.BasicDataAnalysisEventListener;
-import com.lu.gademo.service.impl.FileStorageServiceImpl;
 import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;
@@ -28,18 +27,24 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -84,17 +89,21 @@ public class FileController extends BaseController {
 
     private final Util util;
 
+    private final DocxProcessorIceBlue docxProcessorIceBlue;
+
 //    private MeetingAnalysisEventListener meetingAnalysisEventListener;
 
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
-                          ExcelParamService excelParamService, FileStorageService fileStorageService, LogCollectUtil logCollectUtil, Util util) {
+                          ExcelParamService excelParamService, FileStorageService fileStorageService,
+                          LogCollectUtil logCollectUtil, Util util, DocxProcessorIceBlue docxProcessorIceBlue) {
         this.algorithmsFactory = algorithmsFactory;
         this.officeFileDesen = officeFileDesen;
         this.fileService = fileService;
         this.excelParamService = excelParamService;
         this.fileStorageService = fileStorageService;
         this.util = util;
+        this.docxProcessorIceBlue = docxProcessorIceBlue;
         this.readyState = true;
         this.sendBackFileName = "";
         this.sendBackFlag = false;
@@ -146,7 +155,7 @@ public class FileController extends BaseController {
         // 判断数据模态
         if ("xlsx".equals(fileType)) {
             return fileService.dealExcel(fileStorageDetails, params, sheet, true);
-        }else if ("docx".equals(fileType)) {
+        } else if ("docx".equals(fileType)) {
             return fileService.dealDocument(fileStorageDetails, params, algName);
         } else if (imageType.contains(fileType)) {
             return fileService.dealImage(fileStorageDetails, params, algName);
@@ -159,6 +168,7 @@ public class FileController extends BaseController {
         }
 
     }
+
     @PostMapping("desenShapeFile")
     public ResponseEntity<byte[]> desenShapeFile(@RequestPart("file") MultipartFile file,
                                                  @RequestParam("params") String params,
@@ -169,6 +179,7 @@ public class FileController extends BaseController {
 
     /**
      * TXT转回SHP
+     *
      * @param file TXT文件
      * @return SHP文件
      */
@@ -303,7 +314,6 @@ public class FileController extends BaseController {
     public ResponseEntity<byte[]> textFilePerformenceTest(@RequestPart("file") MultipartFile file,
                                                           @RequestParam("params") String params,
                                                           @RequestParam("algName") String algName) {
-
         try {
             FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
             return fileService.dealSingleColumnTextFile(fileStorageDetails, params, algName, false);
@@ -330,10 +340,10 @@ public class FileController extends BaseController {
     }
 
     @ResponseBody
-    @PostMapping(value="parseGraphShp")
+    @PostMapping(value = "parseGraphShp")
     public Result<List<String>> parseGraphShp(@RequestPart("file") List<MultipartFile> files) throws IOException {
 
-        FileStorageDetails fileStorageDetails =  fileStorageService.saveRawFile(files);
+        FileStorageDetails fileStorageDetails = fileStorageService.saveRawFile(files);
 
         if (fileStorageDetails.getRawFileName().isEmpty()) {
             return new Result<>(500, "error", null);
@@ -359,7 +369,7 @@ public class FileController extends BaseController {
                 long lineNum = (Long) feature.getAttribute("line");
                 String typeCode = (String) feature.getAttribute("type_code");
 //                System.out.println(lineNum  + " " + poiString + " " + typeCode);
-                result.add(lineNum  + " " + poiString + " " + typeCode);
+                result.add(lineNum + " " + poiString + " " + typeCode);
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
                 if (geometry != null) {
 
@@ -379,8 +389,46 @@ public class FileController extends BaseController {
         return new Result<List<String>>(200, "ok", result);
     }
 
+    @ResponseBody
+    @PostMapping(value = "multiDocument", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<Result<?>> dealOfdAndOthers(@RequestParam("file") MultipartFile file,
+                                                      @RequestParam("fileType") String fileType) {
+        try {
+            FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+            if (fileType.equals("docx")) {
+                docxProcessorIceBlue.processDocx(fileStorageDetails.getRawFilePathString(), fileStorageDetails.getDesenFilePathString());
+            }
+            if (Files.exists(fileStorageDetails.getDesenFilePath()) && Files.exists(fileStorageDetails.getRawFilePath())) {
+// 配置 RestTemplate 支持 multipart
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+                // 构建 multipart 请求体
+                MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+                parts.add("ofile", new FileSystemResource(fileStorageDetails.getRawFilePath().toFile()));
+                parts.add("pfile", new FileSystemResource(fileStorageDetails.getDesenFilePath().toFile()));
+                parts.add("fileType", fileType);
+                HttpEntity<MultiValueMap<String, Object>> files = new HttpEntity<>(parts, headers);
+
+                // 发送请求到 /ofd 端点
+                String url = "http://192.168.1.47:8470/Evaluation/ofd"; // 根据实际部署调整 URL
+                try {
+                    ResponseEntity<Resource> response = restTemplate.postForEntity(url, files, Resource.class);
+                } catch (RestClientException e) {
+                    log.error(e.getMessage());
+                }
+            }
+            return ResponseEntity.ok(new Result<>(200, "ok", null));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(500).body(new Result<>(500, e.getMessage(), null));
+        }
+    }
+
     /**
      * 用于处理100w行规模的文件
+     *
      * @param file
      * @param params
      * @param algName
@@ -390,9 +438,9 @@ public class FileController extends BaseController {
     @ResponseBody
     @PostMapping(value = "bigExcelDesen")
     public ResponseEntity<Resource> bigExcelDesen(@RequestPart("file") MultipartFile file,
-                                            @RequestParam("params") String params,
-                                            @RequestParam("algName") String algName,
-                                            @RequestParam("sheet") String sheet
+                                                  @RequestParam("params") String params,
+                                                  @RequestParam("algName") String algName,
+                                                  @RequestParam("sheet") String sheet
     ) throws IOException {
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
         log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
@@ -408,7 +456,7 @@ public class FileController extends BaseController {
                 .collect(Collectors.toMap(param -> param.getFieldName().trim(), Function.identity()));
         log.info("Raw File Path String: {}", fileStorageDetails.getRawFilePathString());
         EasyExcel.read(fileStorageDetails.getRawFilePathString(), Meeting.class,
-                new MeetingAnalysisEventListener(algorithmsFactory, config, fileStorageDetails.getDesenFilePathString()))
+                        new MeetingAnalysisEventListener(algorithmsFactory, config, fileStorageDetails.getDesenFilePathString()))
                 .sheet().doRead();
         excelParamList.clear();
         config.clear();
@@ -429,9 +477,9 @@ public class FileController extends BaseController {
     @ResponseBody
     @PostMapping(value = "bigExcelDesen2")
     public ResponseEntity<Resource> bigExcelDesen2(@RequestPart("file") MultipartFile file,
-                                                  @RequestParam("params") String params,
-                                                  @RequestParam("algName") String algName,
-                                                  @RequestParam("sheet") String sheet
+                                                   @RequestParam("params") String params,
+                                                   @RequestParam("algName") String algName,
+                                                   @RequestParam("sheet") String sheet
     ) throws IOException {
         FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
         log.info("RawFileName: {}", fileStorageDetails.getRawFileName());
@@ -490,7 +538,6 @@ public class FileController extends BaseController {
         }
 
     }
-
 
 
     //    @GetMapping(value = "recvOnLineTaxiFile")
@@ -653,21 +700,6 @@ public class FileController extends BaseController {
 
     }
 
-//    @GetMapping(value = "fileDesenRequest")
-//    @ResponseBody
-    ResponseEntity<Map<String, Object>> fileDesenRequest() {
-        Map<String, Object> response = new HashMap<>();
-
-        if (readyState) {
-            response.put("message", "ok");
-            response.put("data", "");
-        } else {
-            response.put("message", "error");
-            response.put("data", "system is not ready");
-        }
-
-        return ResponseEntity.ok().body(response);
-    }
 
     @ExceptionHandler({InterruptedException.class, ExecutionException.class, TimeoutException.class, IOException.class})
     public ResponseEntity<String> handleFileProcessingExceptions(Exception ex) {
@@ -678,7 +710,7 @@ public class FileController extends BaseController {
             errorMsg += "处理中断\n";
         } else if (ex instanceof ExecutionException) {
             errorMsg += "执行异常\n";
-        } else if (ex instanceof  IOException) {
+        } else if (ex instanceof IOException) {
             errorMsg += "文件读写异常\n";
         }
         errorMsg += ex.getMessage();
