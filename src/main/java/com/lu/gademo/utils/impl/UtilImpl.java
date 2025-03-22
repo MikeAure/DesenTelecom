@@ -129,7 +129,7 @@ public class UtilImpl implements Util {
         byte[] privateKeyBytes = Hex.decode(sk);
         byte[] publicKeyBytes = Hex.decode(pk);
         // 恢复私钥
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        KeyFactory keyFactory = KeyFactory.getInstance("EC", "BC");
         PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
         PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
 
@@ -160,8 +160,7 @@ public class UtilImpl implements Util {
         byte[] signatureBytes = signature.sign();
 
         // 打印签名结果的16进制表示
-        String signatureHex = new String(Hex.encode(signatureBytes));
-        return signatureHex;
+        return new String(Hex.encode(signatureBytes));
     }
 
     @Override

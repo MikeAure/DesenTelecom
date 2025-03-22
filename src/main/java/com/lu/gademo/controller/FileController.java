@@ -9,6 +9,7 @@ import com.lu.gademo.entity.ga.RecvFilesEntity.ExcelEntity;
 import com.lu.gademo.service.ExcelParamService;
 import com.lu.gademo.service.FileService;
 import com.lu.gademo.service.FileStorageService;
+import com.lu.gademo.service.RemoteCallService;
 import com.lu.gademo.service.impl.BasicDataAnalysisEventListener;
 import com.lu.gademo.service.impl.MeetingAnalysisEventListener;
 import com.lu.gademo.utils.*;
@@ -32,11 +33,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,12 +88,14 @@ public class FileController extends BaseController {
 
     private final DocxProcessorIceBlue docxProcessorIceBlue;
 
+    private final RemoteCallService remoteCallService;
+
 //    private MeetingAnalysisEventListener meetingAnalysisEventListener;
 
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
                           ExcelParamService excelParamService, FileStorageService fileStorageService,
-                          LogCollectUtil logCollectUtil, Util util, DocxProcessorIceBlue docxProcessorIceBlue) {
+                          LogCollectUtil logCollectUtil, Util util, DocxProcessorIceBlue docxProcessorIceBlue, RemoteCallService remoteCallService) {
         this.algorithmsFactory = algorithmsFactory;
         this.officeFileDesen = officeFileDesen;
         this.fileService = fileService;
@@ -104,6 +103,7 @@ public class FileController extends BaseController {
         this.fileStorageService = fileStorageService;
         this.util = util;
         this.docxProcessorIceBlue = docxProcessorIceBlue;
+        this.remoteCallService = remoteCallService;
         this.readyState = true;
         this.sendBackFileName = "";
         this.sendBackFlag = false;
@@ -398,26 +398,16 @@ public class FileController extends BaseController {
             if (fileType.equals("docx")) {
                 docxProcessorIceBlue.processDocx(fileStorageDetails.getRawFilePathString(), fileStorageDetails.getDesenFilePathString());
             }
-            if (Files.exists(fileStorageDetails.getDesenFilePath()) && Files.exists(fileStorageDetails.getRawFilePath())) {
-// 配置 RestTemplate 支持 multipart
-                RestTemplate restTemplate = new RestTemplate();
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            if (Files.exists(fileStorageDetails.getDesenFilePath()) &&
+                    Files.exists(fileStorageDetails.getRawFilePath())) {
+                remoteCallService.sendMultipartData(
+                        fileStorageDetails.getRawFilePath(),
+                        fileStorageDetails.getDesenFilePath(),
+                        fileType
+                );
+                // 调用异步发送JSON结构数据
+                remoteCallService.sendJsonMessage(fileStorageDetails.getDesenFilePath());
 
-                // 构建 multipart 请求体
-                MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-                parts.add("ofile", new FileSystemResource(fileStorageDetails.getRawFilePath().toFile()));
-                parts.add("pfile", new FileSystemResource(fileStorageDetails.getDesenFilePath().toFile()));
-                parts.add("fileType", fileType);
-                HttpEntity<MultiValueMap<String, Object>> files = new HttpEntity<>(parts, headers);
-
-                // 发送请求到 /ofd 端点
-                String url = "http://192.168.1.47:8470/Evaluation/ofd"; // 根据实际部署调整 URL
-                try {
-                    ResponseEntity<Resource> response = restTemplate.postForEntity(url, files, Resource.class);
-                } catch (RestClientException e) {
-                    log.error(e.getMessage());
-                }
             }
             return ResponseEntity.ok(new Result<>(200, "ok", null));
         } catch (Exception e) {

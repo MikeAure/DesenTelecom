@@ -36,7 +36,8 @@ public class MultiDocumentTest {
         );
 
 
-        MvcResult result = mockMvc.perform(multipart("/File/multiDocument")
+        MvcResult result = mockMvc.perform(
+                multipart("/File/multiDocument")
                         .file(file1)
                         .param("fileType", "docx"))
                 .andExpect(status().isOk())
