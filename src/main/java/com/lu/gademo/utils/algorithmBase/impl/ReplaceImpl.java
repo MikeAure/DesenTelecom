@@ -1,9 +1,9 @@
-package com.lu.gademo.utils.impl;
+package com.lu.gademo.utils.algorithmBase.impl;
 
 import com.lu.gademo.utils.CommandExecutor;
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.DpUtil;
-import com.lu.gademo.utils.Replace;
+import com.lu.gademo.utils.algorithmBase.Replace;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

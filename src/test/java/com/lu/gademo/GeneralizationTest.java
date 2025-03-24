@@ -2,8 +2,7 @@ package com.lu.gademo;
 
 import com.lu.gademo.utils.DSObject;
 import com.lu.gademo.utils.DpUtil;
-import com.lu.gademo.utils.Generalization;
-import com.lu.gademo.utils.impl.DpUtilImpl;
+import com.lu.gademo.utils.algorithmBase.Generalization;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

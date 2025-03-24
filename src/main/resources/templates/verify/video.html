@@ -992,12 +992,12 @@
                         <div class="m-t" id="videoAesEncrypt">
                             <div class="ibox">
                                 <div class="ibox-title">
-                                    <h5>视频加密</h5>
+                                    <h5>视频脱敏</h5>
                                 </div>
                                 <div class="ibox-content">
 
                                     <div class="form-group">
-                                        <label class="col-lg-2 control-label">请输入加密密钥</label>
+                                        <label class="col-lg-2 control-label">请输入脱敏口令</label>
 
                                         <div class="col-lg-10">
                                             <input type="text" class="form-control" id="encryptKey"/>
@@ -1010,10 +1010,10 @@
                                             <input type="file" accept=".mp4" id="selectRawVideo"
                                                    style="display: none;">
                                             <label for="selectRawVideo" class="btn-primary upload-btn">
-                                                选择待加密视频文件
+                                                选择待脱敏视频文件
                                             </label>
                                             <button type="button" id="encryptVideo"
-                                                    class="btn btn-sm btn-primary">加密视频
+                                                    class="btn btn-sm btn-primary">脱敏视频
                                             </button>
 
                                         </p>
@@ -1039,12 +1039,12 @@
 
                             <div class="ibox ">
                                 <div class="ibox-title">
-                                    <h5>视频解密</h5>
+                                    <h5>视频还原</h5>
                                 </div>
                                 <div class="ibox-content">
 
                                     <div class="form-group m-b">
-                                        <label class="col-lg-2 control-label">请输入解密密钥</label>
+                                        <label class="col-lg-2 control-label">请输入恢复口令</label>
 
                                         <div class="col-lg-10">
                                             <input type="text" class="form-control" id="decryptKey"/>
@@ -1056,10 +1056,10 @@
                                             <input type="file" accept=".mp4" id="selectEncryptedVideo"
                                                    style="display: none;">
                                             <label for="selectEncryptedVideo" class="btn-primary upload-btn">
-                                                选择待解密视频文件
+                                                选择脱敏后视频文件
                                             </label>
                                             <button type="button" id="decryptVideo"
-                                                    class="btn btn-sm btn-primary">解密视频
+                                                    class="btn btn-sm btn-primary">还原视频
                                             </button>
 
                                         </p>

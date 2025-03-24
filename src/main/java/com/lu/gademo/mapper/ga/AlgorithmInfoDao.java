@@ -10,7 +10,7 @@ import com.lu.gademo.handler.ParamsTypeHandler;
 import com.lu.gademo.model.ModalTypes;
 import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.model.AlgorithmType;
-import com.lu.gademo.utils.BaseDesenAlgorithm;
+import com.lu.gademo.utils.algorithmBase.BaseDesenAlgorithm;
 import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Lazy;
 

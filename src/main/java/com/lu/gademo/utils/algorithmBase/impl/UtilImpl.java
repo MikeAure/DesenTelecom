@@ -1,4 +1,4 @@
-package com.lu.gademo.utils.impl;
+package com.lu.gademo.utils.algorithmBase.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -8,7 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bouncycastle.crypto.digests.SM3Digest;
+import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.bouncycastle.jce.spec.ECPrivateKeySpec;
+import org.bouncycastle.jce.spec.ECPublicKeySpec;
+import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Hex;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -19,16 +24,14 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +40,10 @@ import java.util.*;
 @Slf4j
 @Component
 public class UtilImpl implements Util {
+//    static {
+//        Security.addProvider(new BouncyCastleProvider());
+//    }
+
     @Override
     public String getIP() {
         try {
@@ -116,52 +123,171 @@ public class UtilImpl implements Util {
     }
 
     @Override
-    public String getSM2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException {
-        // 添加Bouncy Castle作为安全提供程序
-        Security.addProvider(new BouncyCastleProvider());
-        // 私钥字符串
-        String sk = "30818d020100301306072a8648ce3d020106082a8648ce3d03010404733071020101041e227e11283308222c5c6ede135b" +
-                "8fa41c8655037ffa2cfc7dd45b23514b6da00a06082a8648ce3d030104a140033e00046d12ce22dcde68a79a833033a4532dee2" +
-                "c7fd2442b3d5434cb61c41b707b186de567ad4ca81fbbf575ca0f39f065b6dc724bf2ac47d0446e79e06cde";
-        // 公钥字符串
-        String pk = "3055301306072a8648ce3d020106082a8648ce3d030104033e00046d12ce22dcde68a79a833033a4532dee2c7fd2442b3d5434cb61c41b707b186de567ad4ca81fbbf575ca0f39f065b6dc724bf2ac47d0446e79e06cde";
-        // 转字节数组
+    public String getSM2Sign(byte[] input) throws Exception {
+        // 将私钥转为字节数组，并构造 ECPrivateKeySpec
+        // 添加 BouncyCastle 提供者（建议只在程序启动时注册一次）
+//        Security.addProvider(new BouncyCastleProvider());
+
+        String sk = "0dfd7a0a2d7e0af318d3db9359d3a7f2a51bd9a16eecf7129077ddee1b718bfe";
+        String pk = "041eb66d59235ddd2ba489c8f66ed11b1865488b249bfb183f91cbf2cf1ff4d5dccd6f57ec9f958c479c9efc2475329ccf6963d02e07dcedbee62e3322a52f63af";
+
         byte[] privateKeyBytes = Hex.decode(sk);
-        byte[] publicKeyBytes = Hex.decode(pk);
-        // 恢复私钥
+        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec("sm2p256v1");
+        BigInteger privateKeyInt = new BigInteger(1, privateKeyBytes);
+        ECPrivateKeySpec privateKeySpec = new ECPrivateKeySpec(privateKeyInt, ecSpec);
+
         KeyFactory keyFactory = KeyFactory.getInstance("EC", "BC");
-        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
         PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
 
-        // 恢复公钥
-        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+        byte[] publicKeyBytes = Hex.decode(pk);
+        ECPoint ecPoint = ecSpec.getCurve().decodePoint(publicKeyBytes);
+        ECPublicKeySpec publicKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
         PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
 
-        // 生成密钥对
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-       /* PrivateKey privateKey = keyPair.getPrivate();
-        PublicKey publicKey = keyPair.getPublic();*/
+        byte[] z = calculateZ(publicKey);
 
-        // 打印私钥的16进制表示
-        String privateKeyHex = new String(Hex.encode(privateKey.getEncoded()));
-//        System.out.println("Private Key (Hex): " + privateKeyHex);
+        SM3Digest sm3 = new SM3Digest();
+        sm3.update(z, 0, z.length);
+        sm3.update(input, 0, input.length);
+        byte[] hash = new byte[32];
+        sm3.doFinal(hash, 0);
 
-        // 打印公钥的16进制表示
-        String publicKeyHex = new String(Hex.encode(publicKey.getEncoded()));
-//        System.out.println("Public Key (Hex): " + publicKeyHex);
-
-        // 初始化SM3withSM2签名对象
         Signature signature = Signature.getInstance("SM3withSM2", "BC");
         signature.initSign(privateKey);
-        // 更新签名对象的数据
         signature.update(input);
-        // 签名
-        byte[] signatureBytes = signature.sign();
 
-        // 打印签名结果的16进制表示
-        return new String(Hex.encode(signatureBytes));
+        return Hex.toHexString(signature.sign());
     }
+
+    private byte[] calculateZ(PublicKey publicKey) throws Exception {
+        byte[] userId = "1234567812345678".getBytes();
+        SM3Digest sm3 = new SM3Digest();
+        sm3.update(userId, 0, userId.length);
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        sm3.update(publicKeyEncoded, 0, publicKeyEncoded.length);
+        byte[] z = new byte[32];
+        sm3.doFinal(z, 0);
+        return z;
+    }
+
+//    @Override
+//    public String getSM2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException, CryptoException {
+//        // 添加Bouncy Castle作为安全提供程序
+//        Security.addProvider(new BouncyCastleProvider());
+//        // 私钥字符串
+//        String sk = "30818d020100301306072a8648ce3d020106082a8648ce3d03010404733071020101041e227e11283308222c5c6ede135b" +
+//                "8fa41c8655037ffa2cfc7dd45b23514b6da00a06082a8648ce3d030104a140033e00046d12ce22dcde68a79a833033a4532dee2" +
+//                "c7fd2442b3d5434cb61c41b707b186de567ad4ca81fbbf575ca0f39f065b6dc724bf2ac47d0446e79e06cde";
+//        // 公钥字符串
+//        String pk = "3055301306072a8648ce3d020106082a8648ce3d030104033e00046d12ce22dcde68a79a833033a4532dee2c7fd2442b3d5434cb61c41b707b186de567ad4ca81fbbf575ca0f39f065b6dc724bf2ac47d0446e79e06cde";
+//        // 转字节数组
+//
+////        byte[] encPub = Base64.getDecoder().decode("MFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAESic24soUECzuSh2aYH0e+hQYh+/I01NmfjOnm5mwyUEYQvNCPTzn3BlNyufgMV+DWLUKV+2h0+PVel9jYTfG8Q==");
+////        byte[] encPriv = Base64.getDecoder().decode("MIGTAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBHkwdwIBAQQg0dYU+I6IdiSe8bvWlsHuWfsjSn3XFZqOGWO3K1814O6gCgYIKoEcz1UBgi2hRANCAARKJzbiyhQQLO5KHZpgfR76FBiH78jTU2Z+M6ebmbDJQRhC80I9POfcGU3K5+AxX4NYtQpX7aHT49V6X2NhN8bx");
+//
+//        byte[] privateKeyBytes = Hex.decode(sk);
+//        byte[] publicKeyBytes = Hex.decode(pk);
+//        // 恢复私钥
+//        KeyFactory keyFactory = KeyFactory.getInstance("EC", "BC");
+//        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+//        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+//
+//        // 恢复公钥
+//        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+//        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+//        return sign4Der(privateKey, input);
+//
+////        // 生成密钥对
+////        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
+////        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+////       /* PrivateKey privateKey = keyPair.getPrivate();
+////        PublicKey publicKey = keyPair.getPublic();*/
+////
+////        // 打印私钥的16进制表示
+////        String privateKeyHex = new String(Hex.encode(privateKey.getEncoded()));
+//////        System.out.println("Private Key (Hex): " + privateKeyHex);
+////
+////        // 打印公钥的16进制表示
+////        String publicKeyHex = new String(Hex.encode(publicKey.getEncoded()));
+//////        System.out.println("Public Key (Hex): " + publicKeyHex);
+////
+////        // 初始化SM3withSM2签名对象
+////        Signature signature = Signature.getInstance("SM3withSM2", "BC");
+////        signature.initSign(privateKey);
+////        // 更新签名对象的数据
+////        signature.update(input);
+////        // 签名
+////        byte[] signatureBytes = signature.sign();
+////
+////        // 打印签名结果的16进制表示
+////        return new String(Hex.encode(signatureBytes));
+//    }
+
+//    public byte[] decodeDERSM2Sign(ECDomainParameters domainParams, byte[] derSign) {
+//        ASN1Sequence as = DERSequence.getInstance(derSign);
+//        byte[] rBytes = ((ASN1Integer) as.getObjectAt(0)).getValue().toByteArray();
+//        byte[] sBytes = ((ASN1Integer) as.getObjectAt(1)).getValue().toByteArray();
+//        //由于大数的补0规则，所以可能会出现33个字节的情况，要修正回32个字节
+//        rBytes = fixToCurveLengthBytes(domainParams, rBytes);
+//        sBytes = fixToCurveLengthBytes(domainParams, sBytes);
+//        byte[] rawSign = new byte[rBytes.length + sBytes.length];
+//        System.arraycopy(rBytes, 0, rawSign, 0, rBytes.length);
+//        System.arraycopy(sBytes, 0, rawSign, rBytes.length, sBytes.length);
+//        return rawSign;
+//    }
+//    private int getCurveLength(ECDomainParameters domainParams) {
+//        return (domainParams.getCurve().getFieldSize() + 7) / 8;
+//    }
+//    private byte[] fixToCurveLengthBytes(ECDomainParameters domainParams, byte[] src) {
+//        int curveLen = getCurveLength(domainParams);
+//        if (src.length == curveLen) {
+//            return src;
+//        }
+//        byte[] result = new byte[curveLen];
+//        if (src.length > curveLen) {
+//            System.arraycopy(src, src.length - result.length, result, 0, result.length);
+//        } else {
+//            System.arraycopy(src, 0, result, result.length - src.length, src.length);
+//        }
+//        return result;
+//    }
+
+    //签名
+//    private String sign4Der(PrivateKey privateKey, byte[] message) throws CryptoException, CryptoException {
+//        //待签名内容转为字节数组
+//        BCECPrivateKey bcecPrivateKey = (BCECPrivateKey) privateKey;
+//        ECParameterSpec ecParameterSpec = bcecPrivateKey.getParameters();
+//        ECDomainParameters domainParameters = new ECDomainParameters(ecParameterSpec.getCurve(),
+//                ecParameterSpec.getG(), ecParameterSpec.getN());
+//        ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(bcecPrivateKey.getD(),
+//                domainParameters);
+//        //获取一条SM2曲线参数
+////        X9ECParameters sm2ECParameters = GMNamedCurves.getByName("sm2p256v1");
+////        //构造domain参数
+////        ECDomainParameters domainParameters = new ECDomainParameters(sm2ECParameters.getCurve(),
+////                sm2ECParameters.getG(), sm2ECParameters.getN());
+//
+////        BigInteger privateKeyD = new BigInteger(privateKey, 16);
+////        ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(privateKeyD, domainParameters);
+//
+//        //创建签名实例
+//        SM2Signer sm2Signer = new SM2Signer(new SM3Digest());
+//
+//        //初始化签名实例,带上ID,国密的要求,ID默认值:1234567812345678
+//        try {
+//            sm2Signer.init(true, new ParametersWithID(new ParametersWithRandom(privateKeyParameters,
+//                    SecureRandom.getInstance("SHA1PRNG")), Strings.toByteArray("1234567812345678")));
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        }
+//        sm2Signer.update(message, 0, message.length);
+//        byte[] signBytes = sm2Signer.generateSignature();
+////        return Hex.toHexString(decodeDERSM2Sign(domainParameters, signBytes));
+//        String result = Hex.toHexString(decodeDERSM2Sign(domainParameters, signBytes));
+//        System.out.println(result);
+//        return result;
+//    }
+
 
     @Override
     public boolean isLinux() {
@@ -705,7 +831,7 @@ public class UtilImpl implements Util {
                 long lineNum = (Long) feature.getAttribute("line");
                 String typeCode = (String) feature.getAttribute("type_code");
 //                System.out.println(lineNum  + " " + poiString + " " + typeCode);
-                result.add(lineNum  + " " + poiString + " " + typeCode);
+                result.add(lineNum + " " + poiString + " " + typeCode);
                 Geometry geometry = (Geometry) feature.getDefaultGeometry();
                 if (geometry != null) {
 

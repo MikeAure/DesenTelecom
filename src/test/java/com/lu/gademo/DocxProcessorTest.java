@@ -1,6 +1,6 @@
 package com.lu.gademo;
 
-import com.lu.gademo.utils.DocxProcessorIceBlue;
+import com.lu.gademo.utils.MultiDocumentProcessor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +11,7 @@ import java.io.IOException;
 public class DocxProcessorTest {
 
     @Autowired
-    private DocxProcessorIceBlue docxProcessor;
+    private MultiDocumentProcessor docxProcessor;
 
     @Test
     void testDesen() {

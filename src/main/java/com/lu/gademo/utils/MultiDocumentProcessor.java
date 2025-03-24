@@ -1,9 +1,8 @@
 package com.lu.gademo.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.lu.gademo.dto.SendToClass4Dto;
 import com.lu.gademo.dto.officeComment.CategoryAndGrade;
 import com.lu.gademo.dto.officeComment.DesensitizationOperation;
 import com.lu.gademo.dto.officeComment.InformationRecognition;
@@ -16,26 +15,33 @@ import com.spire.doc.documents.CommentMark;
 import com.spire.doc.documents.Paragraph;
 import com.spire.doc.fields.Comment;
 import com.spire.doc.fields.TextRange;
+import com.spire.pdf.PdfDocument;
+import com.spire.pdf.PdfPageBase;
+import com.spire.pdf.annotations.PdfAnnotation;
+import com.spire.pdf.annotations.PdfAnnotationCollection;
+import com.spire.pdf.annotations.PdfTextMarkupAnnotationWidget;
+import com.spire.pdf.texts.PdfTextExtractOptions;
+import com.spire.pdf.texts.PdfTextExtractor;
+import com.spire.pdf.widget.PdfPageCollection;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Data
-public class DocxProcessorIceBlue {
+public class MultiDocumentProcessor {
     private final ObjectMapper MAPPER;
     private final DateTimeFormatter DATE_FORMATTER;
     private final AlgorithmMappingDaoService algorithmMappingDaoService;
     private final AlgorithmsFactory algorithmsFactory;
 
-    public DocxProcessorIceBlue(AlgorithmsFactory algorithmsFactory, AlgorithmMappingDaoService algorithmMappingDaoService) {
+    public MultiDocumentProcessor(AlgorithmsFactory algorithmsFactory, AlgorithmMappingDaoService algorithmMappingDaoService) {
         this.algorithmsFactory = algorithmsFactory;
         this.algorithmMappingDaoService = algorithmMappingDaoService;
         this.MAPPER = new ObjectMapper();
@@ -170,13 +176,15 @@ public class DocxProcessorIceBlue {
         return sb.toString();
     }
 
-    public void processDocx(String inputFilePath, String outputFilePath) throws IOException {
+    public SendToClass4Dto processDocx(String inputFilePath, String outputFilePath) throws IOException {
         Document doc = new Document();
         doc.loadFromFile(inputFilePath);
 
         if (doc.getComments().getCount() == 0) {
             throw new IOException("No comments found in the document");
         }
+        List<Integer> desenLevels = new ArrayList<>();
+        List<Integer> categoryGrades = new ArrayList<>();
         for (int i = 0; i < doc.getComments().getCount(); i++) {
             Comment comment = doc.getComments().get(i);
             int commentParagraphsNum = comment.getBody().getParagraphs().getCount();
@@ -190,10 +198,14 @@ public class DocxProcessorIceBlue {
 
             AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
             int desenLevel = calculateDesenLevel(categoryAndGrade);
+
             System.out.println("desenLevel: " + desenLevel);
             if (desenLevel <= 0) {
                 appendNoneDesensitiveOperation(comment, wordComment);
                 continue;
+            } else {
+                desenLevels.add(desenLevel);
+                categoryGrades.add(categoryAndGrade.getAttributeGrade().getCurrentGrade());
             }
             // 脱敏，修改对应的文字
             modifyCommentedContent(comment, algorithmInfo, desenLevel);
@@ -203,6 +215,14 @@ public class DocxProcessorIceBlue {
 
         doc.saveToFile(outputFilePath);
         doc.dispose();
+        SendToClass4Dto result = new SendToClass4Dto();
+        SendToClass4Dto.Class4Data class4Data = new SendToClass4Dto.Class4Data();
+        class4Data.setMinDesenLevel(Collections.min(desenLevels));
+        class4Data.setMaxCategoryLevel(Collections.max(categoryGrades));
+        result.setData(class4Data);
+
+        return result;
+
     }
 
     public void modifyCommentedContent(Comment comment, AlgorithmInfo algorithmInfo, int desenLevel) {
@@ -220,4 +240,36 @@ public class DocxProcessorIceBlue {
         refillTextRanges(targetString, textRanges);
     }
 
+
+    public List<Map<String, String>> readDataFromPDF(Path path) throws IOException {
+        List<Map<String, String>> pdfMapList = new LinkedList<>();
+        PdfDocument pdfDocument = new PdfDocument();
+        pdfDocument.loadFromFile(path.toString());
+        PdfPageCollection pdfPageCollection = pdfDocument.getPages();
+        for (Object objPage : pdfPageCollection) {
+            PdfPageBase pdfPageBase = (PdfPageBase) objPage;
+            PdfAnnotationCollection pdfAnnotationCollection = pdfPageBase.getAnnotationsWidget();
+            Map<String, String> pdfMap = new LinkedHashMap<>();
+            for (Object objAnnotation : pdfAnnotationCollection) {
+                PdfAnnotation pdfAnnotation = (PdfAnnotation) objAnnotation;
+                if (pdfAnnotation instanceof PdfTextMarkupAnnotationWidget) {
+                    PdfTextMarkupAnnotationWidget pdfTextMarkupAnnotation = (PdfTextMarkupAnnotationWidget) objAnnotation;
+//                    String text = pdfTextMarkupAnnotation.getText();
+//                    System.out.println(text);
+                    Rectangle2D rectangle2D = pdfTextMarkupAnnotation.getBounds();
+                    PdfTextExtractor textExtractor = new PdfTextExtractor(pdfPageBase);
+                    PdfTextExtractOptions extractOptions = new PdfTextExtractOptions();
+//                    String text = pdfPageBase.extractText(rectangle2D);
+                    extractOptions.setExtractArea(rectangle2D);
+                    String text = textExtractor.extract(extractOptions);
+
+                    String markedText = pdfTextMarkupAnnotation.getText();
+                    pdfMap.put(text, markedText);
+
+                }
+            }
+            pdfMapList.add(pdfMap);
+        }
+        return pdfMapList;
+    }
 }

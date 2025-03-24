@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.entity.ClassificationResult;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.service.ExcelParamService;
-import com.lu.gademo.utils.impl.UtilImpl;
+import com.lu.gademo.utils.algorithmBase.impl.UtilImpl;
 import org.deidentifier.arx.*;
 import org.deidentifier.arx.criteria.KAnonymity;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package com.lu.gademo.handler;
 
 import com.lu.gademo.model.AlgorithmType;
-import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.algorithmBase.*;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;

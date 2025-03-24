@@ -333,7 +333,11 @@
             <artifactId>spire.doc.free</artifactId>
             <version>5.3.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>e-iceblue</groupId>
+            <artifactId>spire.pdf.free</artifactId>
+            <version>9.13.0</version>
+        </dependency>
     </dependencies>
 
     <build>

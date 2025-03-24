@@ -1,6 +1,6 @@
 package com.lu.gademo.utils;
 
-import com.lu.gademo.utils.impl.UtilImpl;
+import com.lu.gademo.utils.algorithmBase.impl.UtilImpl;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;

@@ -1,12 +1,10 @@
-package com.lu.gademo.utils.impl;
+package com.lu.gademo.utils.algorithmBase.impl;
 
 import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.algorithmBase.Anonymity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

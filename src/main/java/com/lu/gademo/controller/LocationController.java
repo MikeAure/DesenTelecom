@@ -1,6 +1,8 @@
 package com.lu.gademo.controller;
 
 import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.algorithmBase.Generalization;
+import com.lu.gademo.utils.algorithmBase.Anonymity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

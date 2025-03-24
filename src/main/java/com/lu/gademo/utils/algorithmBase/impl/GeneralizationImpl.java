@@ -1,6 +1,7 @@
-package com.lu.gademo.utils.impl;
+package com.lu.gademo.utils.algorithmBase.impl;
 
 import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.algorithmBase.Generalization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

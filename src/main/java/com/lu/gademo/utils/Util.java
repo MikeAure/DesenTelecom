@@ -3,6 +3,7 @@ package com.lu.gademo.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.bouncycastle.crypto.CryptoException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +35,7 @@ public interface Util {
     void createDB(Sheet sheet, List<Integer> dataType, String tableName) throws IOException, SQLException;
 
     // SM2签名
-    String getSM2Sign(byte[] input) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException;
+    String getSM2Sign(byte[] input) throws Exception;
 
     // 系统类型
     boolean isLinux();

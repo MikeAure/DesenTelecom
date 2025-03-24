@@ -57,6 +57,7 @@ mybatis:
     configuration:
         log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
         map-underscore-to-camel-case: true
+    mapper-locations: class*:/mapper/*.xml
 
 pagehelper:
     reasonable: true
@@ -75,10 +76,13 @@ logging:
             hibernate.SQL: WARN
 #        com.lu.gademo.mapper: DEBUG
 
+desenToolSet:
+    address: 192.168.10.31
+    port: 8352
 effectEva:
 #    address: 192.168.37.192
-    address: 127.0.0.1
-    port: 10005
+    address: 192.168.10.31
+    port: 8470
     waitingTime: 10
 evidence:
 #    localAddress: 172.28.72.214
@@ -87,6 +91,9 @@ evidence:
 #    remoteAddress: 172.28.72.214
     remoteAddress: 127.0.0.1
     remotePort: 50005
+    httpAddress: 192.168.10.71
+    httpPort: 50003
+
 ruleCheck:
 #    address: 172.28.72.224
     address:  192.168.112.192
@@ -95,6 +102,10 @@ splitReconstruct:
 #    address: 172.28.72.225
     address: 127.0.0.1
     port: 40011
+
+categoryAndGrade:
+    address: 192.168.10.25
+    port: 7890
 
 evidenceSystem:
     evidenceReceipt:
@@ -113,12 +124,16 @@ evidenceSystem:
         mainCommand: '0x0003'
         msgVersion: '0x3110'
         subCommand: '0x0031'
+        dataType: 0
+        maxHops: 5
+        status: 14
 
 systemId:
     desenToolsetSystemId: '0x31000000'
     evaluationSystemId: '0x32000000'
     evidenceSystemId: '0x10000000'
     ruleCheckSystemId: '0x33000000'
+    categoryAndGradeSystemId: '0x22000000'
 
 logSenderManager:
     ifSendToEvaFirst: false
@@ -154,3 +169,9 @@ course2:
     username: root
     password: GDS&123softswitch
     port: 9090
+
+sendUrl:
+    evaluation: http://192.168.252.192:8470/Evaluation/ofd
+    localEvidence: http://192.168.10.71:50003/evidence/circulation_log
+    delete: http://192.168.10.40:9990/receive_circulation_log
+    delegeLevels: http://192.168.10.40:9990/receive_data_desen_info

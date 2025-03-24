@@ -2,6 +2,10 @@ package com.lu.gademo;
 
 import com.lu.gademo.utils.AlgorithmInfo;
 import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.algorithmBase.Dp;
+import com.lu.gademo.utils.algorithmBase.Generalization;
+import com.lu.gademo.utils.algorithmBase.Anonymity;
+import com.lu.gademo.utils.algorithmBase.Replace;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

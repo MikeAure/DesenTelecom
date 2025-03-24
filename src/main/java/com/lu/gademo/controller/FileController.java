@@ -1,6 +1,9 @@
 package com.lu.gademo.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.lu.gademo.dto.FileInfoDto;
+import com.lu.gademo.dto.OFDMessage;
+import com.lu.gademo.dto.SendToClass4Dto;
 import com.lu.gademo.entity.BasicData;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
@@ -16,6 +19,7 @@ import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;
 import com.sun.istack.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -28,6 +32,7 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -86,16 +91,27 @@ public class FileController extends BaseController {
 
     private final Util util;
 
-    private final DocxProcessorIceBlue docxProcessorIceBlue;
+    private final MultiDocumentProcessor docxProcessorIceBlue;
 
     private final RemoteCallService remoteCallService;
+
+    private final String evaluationUrl;
+    private final String deleteUrl;
+    private final String evidenceUrl;
+    private final String deleteLevelUrl;
+
+    private final OFDMessageFactory ofdMessageFactory;
 
 //    private MeetingAnalysisEventListener meetingAnalysisEventListener;
 
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
                           ExcelParamService excelParamService, FileStorageService fileStorageService,
-                          LogCollectUtil logCollectUtil, Util util, DocxProcessorIceBlue docxProcessorIceBlue, RemoteCallService remoteCallService) {
+                          LogCollectUtil logCollectUtil, Util util, MultiDocumentProcessor docxProcessorIceBlue, RemoteCallService remoteCallService,
+                          @Value("${sendUrl.evaluation}") String evaluationUrl,
+                          @Value("${sendUrl.localEvidence}") String evidenceUrl,
+                          @Value("${sendUrl.delete}") String deleteUrl,
+                          @Value("${sendUrl.delegeLevels}")String deleteLevelUrl, OFDMessageFactory ofdMessageFactory) {
         this.algorithmsFactory = algorithmsFactory;
         this.officeFileDesen = officeFileDesen;
         this.fileService = fileService;
@@ -104,6 +120,11 @@ public class FileController extends BaseController {
         this.util = util;
         this.docxProcessorIceBlue = docxProcessorIceBlue;
         this.remoteCallService = remoteCallService;
+        this.evaluationUrl = evaluationUrl;
+        this.deleteUrl = deleteUrl;
+        this.evidenceUrl = evidenceUrl;
+        this.deleteLevelUrl = deleteLevelUrl;
+        this.ofdMessageFactory = ofdMessageFactory;
         this.readyState = true;
         this.sendBackFileName = "";
         this.sendBackFlag = false;
@@ -183,7 +204,7 @@ public class FileController extends BaseController {
      * @param file TXT文件
      * @return SHP文件
      */
-    @PostMapping("/parseToShp")
+    @PostMapping("parseToShp")
     public ResponseEntity<Map<String, String>> parseToShp(@RequestParam("file") MultipartFile file) {
         try {
             // 上传目录
@@ -392,21 +413,44 @@ public class FileController extends BaseController {
     @ResponseBody
     @PostMapping(value = "multiDocument", produces = "application/json;charset=UTF-8")
     public ResponseEntity<Result<?>> dealOfdAndOthers(@RequestParam("file") MultipartFile file,
-                                                      @RequestParam("fileType") String fileType) {
+                                                      @RequestPart("fileInfo") FileInfoDto fileType)
+    throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException {
+        SendToClass4Dto sendToClass4 = new SendToClass4Dto();
         try {
             FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
-            if (fileType.equals("docx")) {
-                docxProcessorIceBlue.processDocx(fileStorageDetails.getRawFilePathString(), fileStorageDetails.getDesenFilePathString());
+            if (fileType.getFileType().equals("docx")) {
+                sendToClass4 = docxProcessorIceBlue
+                        .processDocx(fileStorageDetails.getRawFilePathString(),
+                        fileStorageDetails.getDesenFilePathString());
             }
+
             if (Files.exists(fileStorageDetails.getDesenFilePath()) &&
                     Files.exists(fileStorageDetails.getRawFilePath())) {
+                byte[] rawFileBytes = Files.readAllBytes(fileStorageDetails.getRawFilePath());
+                byte[] desenFileBytes = Files.readAllBytes(fileStorageDetails.getDesenFilePath());
+                String parentFileId = util.getSM3Hash(rawFileBytes);
+                String selfFileId = util.getSM3Hash(desenFileBytes);
+
+                String evidenceID = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, util.getTime().getBytes()));
+                OFDMessage ofdMessage = ofdMessageFactory.createOfdMessage(
+                        evidenceID, fileType.getGlobalID(),
+                        fileStorageDetails.getRawFilePathString(), parentFileId,
+                        fileStorageDetails.getDesenFilePathString(), selfFileId,
+                        fileStorageDetails.getDesenFilePathString(), selfFileId,
+                        UUID.randomUUID().toString());
+
                 remoteCallService.sendMultipartData(
                         fileStorageDetails.getRawFilePath(),
                         fileStorageDetails.getDesenFilePath(),
-                        fileType
+                        fileType, evaluationUrl
+
                 );
+                System.out.println(ofdMessage);
                 // 调用异步发送JSON结构数据
-                remoteCallService.sendJsonMessage(fileStorageDetails.getDesenFilePath());
+                remoteCallService.sendCirculationLog(ofdMessage, deleteUrl);
+                remoteCallService.sendCirculationLog(ofdMessage, evidenceUrl);
+                sendToClass4.getData().setGlobalID(fileType.getGlobalID());
+                remoteCallService.sendLevels(sendToClass4, deleteLevelUrl);
 
             }
             return ResponseEntity.ok(new Result<>(200, "ok", null));

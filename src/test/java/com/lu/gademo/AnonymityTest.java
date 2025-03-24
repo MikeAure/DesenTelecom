@@ -1,8 +1,7 @@
 package com.lu.gademo;
 
 import com.lu.gademo.utils.DSObject;
-import com.lu.gademo.utils.Anonymity;
-import com.lu.gademo.utils.impl.AnonymityImpl;
+import com.lu.gademo.utils.algorithmBase.Anonymity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

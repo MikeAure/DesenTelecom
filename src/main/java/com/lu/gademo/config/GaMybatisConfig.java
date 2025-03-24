@@ -1,7 +1,7 @@
 package com.lu.gademo.config;
 
 import com.lu.gademo.handler.ExecutorTypeHandler;
-import com.lu.gademo.utils.BaseDesenAlgorithm;
+import com.lu.gademo.utils.algorithmBase.BaseDesenAlgorithm;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.SqlSessionFactoryBean;

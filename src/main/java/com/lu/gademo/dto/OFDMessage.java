@@ -2,24 +2,27 @@ package com.lu.gademo.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.format.DateTimeFormatter;
 
 @Setter
 @Getter
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class OFDMessage {
     @Getter(onMethod_={@JsonIgnore})
     private final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     // Getters and Setters
-    private final int systemID = 0x31000000;
+    private long systemID = 0x31000000;
     private String systemIP;
-    private final int mainCMD =0x0008;
-    private final int subCMD = 0x0031;
+    private int mainCMD =0x0008;
+    private int subCMD = 0x0031;
     private String evidenceID;
-    private final int msgVersion = 0x3110;
+    private int msgVersion = 0x3110;
     private String submittime = DATE_FORMATTER.format(java.time.LocalDateTime.now());
     private Data data;
     private String dataHash;
@@ -28,7 +31,12 @@ public class OFDMessage {
 
     @Getter
     @Setter
+    @Builder
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Data {
+        @JsonProperty("globalID")
         private String globalID;
         @JsonProperty("DataType")
         private int DataType;

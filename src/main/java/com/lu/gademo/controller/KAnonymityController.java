@@ -1,7 +1,7 @@
 package com.lu.gademo.controller;
 
 import com.lu.gademo.utils.AlgorithmsFactory;
-import com.lu.gademo.utils.Anonymity;
+import com.lu.gademo.utils.algorithmBase.Anonymity;
 import com.lu.gademo.utils.DSObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

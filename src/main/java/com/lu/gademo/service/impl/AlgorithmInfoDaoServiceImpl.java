@@ -7,6 +7,7 @@ import com.lu.gademo.mapper.ga.AlgorithmInfoDao;
 import com.lu.gademo.model.AlgorithmType;
 import com.lu.gademo.service.AlgorithmInfoDaoService;
 import com.lu.gademo.utils.*;
+import com.lu.gademo.utils.algorithmBase.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

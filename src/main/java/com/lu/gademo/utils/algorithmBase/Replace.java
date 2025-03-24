@@ -1,4 +1,4 @@
-package com.lu.gademo.utils;
+package com.lu.gademo.utils.algorithmBase;
 
 public interface Replace extends BaseDesenAlgorithm {
 

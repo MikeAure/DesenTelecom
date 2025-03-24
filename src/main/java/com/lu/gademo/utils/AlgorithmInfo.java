@@ -2,6 +2,7 @@ package com.lu.gademo.utils;
 
 import com.lu.gademo.model.AlgorithmType;
 import com.lu.gademo.model.ModalTypes;
+import com.lu.gademo.utils.algorithmBase.*;
 import lombok.*;
 import org.apache.commons.collections4.CollectionUtils;
 
