@@ -20,39 +20,62 @@ import com.spire.pdf.PdfPageBase;
 import com.spire.pdf.annotations.PdfAnnotation;
 import com.spire.pdf.annotations.PdfAnnotationCollection;
 import com.spire.pdf.annotations.PdfTextMarkupAnnotationWidget;
-import com.spire.pdf.texts.PdfTextExtractOptions;
-import com.spire.pdf.texts.PdfTextExtractor;
+import com.spire.pdf.texts.*;
 import com.spire.pdf.widget.PdfPageCollection;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Component
 @Data
 public class MultiDocumentProcessor {
+
     private final ObjectMapper MAPPER;
     private final DateTimeFormatter DATE_FORMATTER;
     private final AlgorithmMappingDaoService algorithmMappingDaoService;
     private final AlgorithmsFactory algorithmsFactory;
+    private final PdfTextExtractOptions extractOptions;
+
 
     public MultiDocumentProcessor(AlgorithmsFactory algorithmsFactory, AlgorithmMappingDaoService algorithmMappingDaoService) {
         this.algorithmsFactory = algorithmsFactory;
         this.algorithmMappingDaoService = algorithmMappingDaoService;
         this.MAPPER = new ObjectMapper();
         this.DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        this.extractOptions = new PdfTextExtractOptions();
     }
 
-    private DSObject desenData(String content, AlgorithmInfo algorithmInfo, int privacyLevel) {
+    private <T> DSObject desenData(T content, AlgorithmInfo algorithmInfo, int privacyLevel) throws TypeNotPresentException {
         // 构建脱敏算法输入数据
-        DSObject rawData = new DSObject(Collections.singletonList(content));
-        // 使用编号脱敏算法
+        DSObject rawData = null;
+        if (content instanceof String) {
+            rawData = new DSObject(Collections.singletonList(content));
+            // 使用编号脱敏算法
+
+        } else if (content instanceof Cell) {
+            rawData = new DSObject(Collections.singletonList(((Cell) content).getStringCellValue()));
+
+        } else if (content == null) {
+            throw new TypeNotPresentException("Content type not supported", null);
+        }
         return algorithmInfo.execute(rawData, privacyLevel);
+
     }
 
     private String extractCommentContent(Comment comment) {
@@ -176,6 +199,19 @@ public class MultiDocumentProcessor {
         return sb.toString();
     }
 
+    private DesenInfoAggregate getDesenInfoAggregate(String commentContent) throws JsonProcessingException {
+        // 对读取到的批注进行序列化
+        WordComment wordComment = MAPPER.readValue(commentContent, WordComment.class);
+        // 获取信息识别内容
+        InformationRecognition informationRecognition = wordComment.getInformationRecognition();
+        // 获取分类分级结果
+        CategoryAndGrade categoryAndGrade = wordComment.getCategoryAndGrade();
+
+        AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
+        int desenLevel = calculateDesenLevel(categoryAndGrade);
+        return new DesenInfoAggregate(desenLevel, algorithmInfo);
+    }
+
     public SendToClass4Dto processDocx(String inputFilePath, String outputFilePath) throws IOException {
         Document doc = new Document();
         doc.loadFromFile(inputFilePath);
@@ -188,13 +224,15 @@ public class MultiDocumentProcessor {
         for (int i = 0; i < doc.getComments().getCount(); i++) {
             Comment comment = doc.getComments().get(i);
             int commentParagraphsNum = comment.getBody().getParagraphs().getCount();
-            String commentContent = extractCommentContent(comment);
+            String commentContent = extractCommentContent(comment).trim();
+            System.out.println(commentContent);
             // 对读取到的批注进行序列化
             WordComment wordComment = MAPPER.readValue(commentContent, WordComment.class);
             // 获取信息识别内容
             InformationRecognition informationRecognition = wordComment.getInformationRecognition();
             // 获取分类分级结果
             CategoryAndGrade categoryAndGrade = wordComment.getCategoryAndGrade();
+            System.out.println(categoryAndGrade);
 
             AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
             int desenLevel = calculateDesenLevel(categoryAndGrade);
@@ -225,7 +263,53 @@ public class MultiDocumentProcessor {
 
     }
 
-    public void modifyCommentedContent(Comment comment, AlgorithmInfo algorithmInfo, int desenLevel) {
+    private SendToClass4Dto processXlsx(Path rawFilePath, Path desenFilePath) throws Exception {
+        try (
+                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
+                XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
+                OutputStream outputStream = Files.newOutputStream(desenFilePath)
+        ) {
+
+            Sheet sheet = wb.getSheetAt(0);
+
+            // 使用正则表达式匹配中文
+            String patternString = "([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)-([\\u4e00-\\u9fa5]+)";
+            Pattern pattern = Pattern.compile(patternString);
+            // 存储全部Comments
+            Map<CellAddress, org.apache.poi.ss.usermodel.Comment> comments = (Map<CellAddress, org.apache.poi.ss.usermodel.Comment>) sheet.getCellComments();
+            // 逐一遍历comments
+            for (Map.Entry<CellAddress, ? extends org.apache.poi.ss.usermodel.Comment> e : comments.entrySet()) {
+                CellAddress loc = e.getKey();
+                org.apache.poi.ss.usermodel.Comment comment = e.getValue();
+                String commentContent = comment.getString().getString();
+                // 对读取到的批注进行序列化
+                WordComment wordComment = MAPPER.readValue(commentContent, WordComment.class);
+                // 获取信息识别内容
+                InformationRecognition informationRecognition = wordComment.getInformationRecognition();
+                // 获取分类分级结果
+                CategoryAndGrade categoryAndGrade = wordComment.getCategoryAndGrade();
+
+                AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
+                int desenLevel = calculateDesenLevel(categoryAndGrade);
+
+                Cell cell = sheet.getRow(loc.getRow()).getCell(loc.getColumn());
+
+                // 根据Comment修改算法
+                DSObject result = desenData(cell.getStringCellValue(), algorithmInfo, desenLevel);
+                String desenResult = result.getList().get(0).toString();
+                if (desenResult.equals(cell.getStringCellValue())) {
+                    continue;
+                }
+                cell.setCellValue(result.getList().get(0).toString());
+            }
+
+            // 写入excel
+            wb.write(outputStream);
+        }
+        return new SendToClass4Dto();
+    }
+
+    public void modifyCommentedContent(Comment comment, AlgorithmInfo algorithmInfo, int desenLevel) throws TypeNotPresentException {
 
         // 获取属于当前批注的所有TextRange
         List<TextRange> textRanges = getCommentedTextRanges(comment);
@@ -258,18 +342,27 @@ public class MultiDocumentProcessor {
 //                    System.out.println(text);
                     Rectangle2D rectangle2D = pdfTextMarkupAnnotation.getBounds();
                     PdfTextExtractor textExtractor = new PdfTextExtractor(pdfPageBase);
-                    PdfTextExtractOptions extractOptions = new PdfTextExtractOptions();
 //                    String text = pdfPageBase.extractText(rectangle2D);
                     extractOptions.setExtractArea(rectangle2D);
                     String text = textExtractor.extract(extractOptions);
 
                     String markedText = pdfTextMarkupAnnotation.getText();
+                    pdfTextMarkupAnnotation.setText(text);
                     pdfMap.put(text, markedText);
 
                 }
             }
             pdfMapList.add(pdfMap);
         }
+        pdfDocument.saveToFile(path.toString());
         return pdfMapList;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DesenInfoAggregate {
+        private int desenLevel;
+        private AlgorithmInfo algorithmMapping;
     }
 }

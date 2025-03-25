@@ -852,7 +852,7 @@ public class FileServiceImpl implements FileService {
      * 处理docx文件
      *
      * @param fileStorageDetails 文件详细信息
-     * @param params             占位符
+     * @param params             判断是否为0
      * @param algName            占位符
      * @return 构造的部分日志信息
      * @throws IOException
@@ -3054,7 +3054,8 @@ public class FileServiceImpl implements FileService {
             headers.setContentDispositionFormData("attachment", desenFileName); // 设置文件名
             responseEntityCompletableFuture.complete(ResponseEntity.ok()
                     .headers(headers)
-                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")).body(desenFileBytes));
+                    .contentType(
+                            MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")).body(desenFileBytes));
         }
 
         return responseEntityCompletableFuture.get(10, TimeUnit.MINUTES);

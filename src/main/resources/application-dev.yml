@@ -80,27 +80,27 @@ desenToolSet:
     address: 192.168.10.31
     port: 8352
 effectEva:
-#    address: 192.168.37.192
+    #    address: 192.168.37.192
     address: 192.168.10.31
     port: 8470
     waitingTime: 10
 evidence:
-#    localAddress: 172.28.72.214
-    localAddress: 127.0.0.1
+    #    localAddress: 172.28.72.214
+    localAddress: 192.168.10.71
     localPort: 50004
-#    remoteAddress: 172.28.72.214
-    remoteAddress: 127.0.0.1
+    #    remoteAddress: 172.28.72.214
+    remoteAddress: 192.168.10.71
     remotePort: 50005
     httpAddress: 192.168.10.71
     httpPort: 50003
 
 ruleCheck:
-#    address: 172.28.72.224
-    address:  192.168.112.192
+    #    address: 172.28.72.224
+    address: 192.168.10.34
     port: 30002
 splitReconstruct:
-#    address: 172.28.72.225
-    address: 127.0.0.1
+    #    address: 172.28.72.225
+    address: 192.168.10.33
     port: 40011
 
 categoryAndGrade:
@@ -124,6 +124,9 @@ evidenceSystem:
         mainCommand: '0x0003'
         msgVersion: '0x3110'
         subCommand: '0x0031'
+        httpMainCommand: '0x0008'
+        httpSubCommand: "0x0071"
+        httpMsgVersion: "0x7010"
         dataType: 0
         maxHops: 5
         status: 14

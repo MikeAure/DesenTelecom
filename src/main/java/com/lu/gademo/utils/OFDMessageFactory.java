@@ -41,9 +41,9 @@ public class OFDMessageFactory {
     public OFDMessageFactory(
             @Value("${systemId.desenToolsetSystemId}") String selfSystemId,
             @Value("${desenToolSet.address}") String selfSystemIp,
-            @Value("${evidenceSystem.submitEvidence.mainCommand}") int mainCmd,
-            @Value("${evidenceSystem.submitEvidence.subCommand}") int subCmd,
-            @Value("${evidenceSystem.submitEvidence.msgVersion}") int msgVersion,
+            @Value("${evidenceSystem.submitEvidence.httpMainCommand}") int mainCmd,
+            @Value("${evidenceSystem.submitEvidence.httpSubCommand}") int subCmd,
+            @Value("${evidenceSystem.submitEvidence.httpMsgVersion}") int msgVersion,
             @Value("${evidenceSystem.submitEvidence.dataType}") int dataType,
             @Value("${evidenceSystem.submitEvidence.status}") int status,
             @Value("${evidenceSystem.submitEvidence.maxHops}") int maxHops,

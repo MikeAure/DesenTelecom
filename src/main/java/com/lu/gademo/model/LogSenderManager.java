@@ -1,5 +1,6 @@
 package com.lu.gademo.model;
 
+import cn.hutool.core.io.resource.FileResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.dao.ga.effectEva.*;
 import com.lu.gademo.dao.ga.evidence.*;
@@ -416,8 +417,9 @@ public class LogSenderManager {
      * @param rawFileBytes
      * @param desenFileBytes
      */
-    public void submitToFourSystems(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal, SendEvaReq sendEvaReq,
-                                    SendRuleReq sendRuleReq, SendSplitDesenData sendSplitDesenData, byte[] rawFileBytes, byte[] desenFileBytes) {
+    public void submitToFourSystems(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal,
+                                    SendEvaReq sendEvaReq, SendRuleReq sendRuleReq,
+                                    SendSplitDesenData sendSplitDesenData, byte[] rawFileBytes, byte[] desenFileBytes) {
 
         ExecutorService executorService = Executors.newFixedThreadPool(4);
         executorService.submit(() -> {
@@ -481,4 +483,11 @@ public class LogSenderManager {
                 rawFileBytes, desenFileBytes);
 
     }
+
+//    public void submitToTwoSystems(LogCollectResult logCollectResult, FileResource rawFileBytes, byte[] desenFileBytes) {
+//        submitToFourSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
+//                logCollectResult.getSendEvaReq(), logCollectResult.getSendRuleReq(), logCollectResult.getSendSplitDesenData(),
+//                rawFileBytes, desenFileBytes);
+//
+//    }
 }

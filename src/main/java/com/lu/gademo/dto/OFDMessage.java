@@ -17,12 +17,12 @@ public class OFDMessage {
     private final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     // Getters and Setters
-    private long systemID = 0x31000000;
+    private long systemID;
     private String systemIP;
-    private int mainCMD =0x0008;
-    private int subCMD = 0x0031;
+    private int mainCMD;
+    private int subCMD;
     private String evidenceID;
-    private int msgVersion = 0x3110;
+    private int msgVersion;
     private String submittime = DATE_FORMATTER.format(java.time.LocalDateTime.now());
     private Data data;
     private String dataHash;

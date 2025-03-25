@@ -416,6 +416,7 @@ public class FileController extends BaseController {
                                                       @RequestPart("fileInfo") FileInfoDto fileType)
     throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException {
         SendToClass4Dto sendToClass4 = new SendToClass4Dto();
+        log.info("GlobalID: {}", fileType.getGlobalID());
         try {
             FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
             if (fileType.getFileType().equals("docx")) {
@@ -451,9 +452,9 @@ public class FileController extends BaseController {
                 remoteCallService.sendCirculationLog(ofdMessage, evidenceUrl);
                 sendToClass4.getData().setGlobalID(fileType.getGlobalID());
                 remoteCallService.sendLevels(sendToClass4, deleteLevelUrl);
-
+                return ResponseEntity.ok(new Result<>(200, "ok", null));
             }
-            return ResponseEntity.ok(new Result<>(200, "ok", null));
+            return ResponseEntity.ok(new Result<>(500, "error", null));
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(500).body(new Result<>(500, e.getMessage(), null));

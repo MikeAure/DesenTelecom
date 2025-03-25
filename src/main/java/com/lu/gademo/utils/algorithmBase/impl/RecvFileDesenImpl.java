@@ -98,7 +98,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         return Files.readAllBytes(desenFilePath);
     }
 
-    private void processXlsx(Path rawFilePath, Path desenFilePath) throws Exception {
+    public void processXlsx(Path rawFilePath, Path desenFilePath) throws Exception {
         try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
                 XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
@@ -115,10 +115,11 @@ public class RecvFileDesenImpl implements RecvFileDesen {
             // 逐一遍历comments
             for (Map.Entry<CellAddress, ? extends Comment> e : comments.entrySet()) {
                 CellAddress loc = e.getKey();
+                System.out.println(e.getValue().getString().getString());
                 Cell cell = sheet.getRow(loc.getRow()).getCell(loc.getColumn());
-                int privacyLevel = getPrivacyLevel(e, pattern);
+//                int privacyLevel = getPrivacyLevel(e, pattern);
                 // 根据Comment修改算法
-                DSObject result = desenData(cell, replacement, 3, privacyLevel);
+                DSObject result = desenData(cell, replacement, 15, 2);
                 String desenResult = result.getList().get(0).toString();
                 if (desenResult.equals(cell.getStringCellValue())) {
                     continue;
@@ -469,6 +470,7 @@ public class RecvFileDesenImpl implements RecvFileDesen {
         Comment comment = e.getValue();
         // 使用正则表达式匹配中文字符串
         String commentContent = comment.getString().getString();
+
         Matcher matcher = pattern.matcher(commentContent);
         String attribute;
         // 设置privacy_level
