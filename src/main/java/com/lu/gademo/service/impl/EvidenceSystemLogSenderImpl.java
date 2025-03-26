@@ -96,7 +96,12 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         reqData.put("objectSize", reqEvidenceSave.getObjectSize());
         // objectMode: 处置对象的模态
         reqData.put("objectMode", reqEvidenceSave.getObjectMode());
-        reqEvidenceSave.setDatasign(util.getSM3Hash(reqData.toString().getBytes()));
+        try {
+            reqEvidenceSave.setDatasign(util.getSM2Sign(reqData.toString().getBytes()));
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
+
         ObjectNode reqEvidence = objectMapper.createObjectNode();
         // systemID: 系统ID
         reqEvidence.put("systemID", reqEvidenceSave.getSystemID());
@@ -115,6 +120,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         reqEvidence.put("reqtime", reqEvidenceSave.getReqtime());
         reqEvidence.set("data", reqData);
         // dataSign: 对data字段的签名
+
         reqEvidence.put("datasign", reqEvidenceSave.getDatasign());
         log.info("发送给中心存证系统的请求: {}", reqEvidence.toPrettyString());
 
@@ -190,9 +196,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         ObjectNode pathTree = objectMapper.createObjectNode();
         ObjectNode parent = objectMapper.createObjectNode();
 
-        submitEvidenceLocal.setParentSystemId(submitEvidenceLocal.getSystemID());
         submitEvidenceLocal.setStatus("数据已脱敏");
-        submitEvidenceLocal.setChildSystemId(evidenceSystemId);
 
         parent.put("systemID", submitEvidenceLocal.getParentSystemId());
         parent.put("globalID", submitEvidenceLocal.getGlobalID());
@@ -258,28 +262,21 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
         localEvidenceData.put("desenPerformEndTime", submitEvidenceLocal.getDesenPerformEndTime());
         // desenLevel: 脱敏级别
         localEvidenceData.put("desenLevel", submitEvidenceLocal.getDesenLevel());
-
         localEvidenceData.put("fileDataType", submitEvidenceLocal.getFileDataType());
-
         log.info("发送给本地存证系统的请求: {}", localEvidenceData.toPrettyString());
         // 整个json
         ObjectNode localEvidenceJson = objectMapper.createObjectNode();
         localEvidenceJson.put("systemID", submitEvidenceLocal.getSystemID());
         localEvidenceJson.put("systemIP", submitEvidenceLocal.getSystemIP());
-//            localEvidenceJson.put("mainCMD", submitEvidenceLocal.getMainCMD());
         localEvidenceJson.put("mainCMD", 0x0003);
-        //localEvidenceJson.put("subCMD", submitEvidenceLocal.getSubCMD());
         localEvidenceJson.put("subCMD", 0x0031);
         localEvidenceJson.put("evidenceID", submitEvidenceLocal.getEvidenceID());
         submitEvidenceLocal.setSubmittime(util.getTime());
         localEvidenceJson.put("submittime", submitEvidenceLocal.getSubmittime());
         localEvidenceJson.put("msgVersion", 0x3110);
-        //localEvidenceJson.put("submittime", util.getTime());
-        //localEvidenceJson.set("data", localEvidenceData);
         localEvidenceJson.set("data", localEvidenceData);
         // dataHash: 对数据域部分进行hash
         localEvidenceJson.put("dataHash", util.getSM3Hash(localEvidenceData.toString().getBytes()));
-        //localEvidenceJson.put("datasign", evidenceResponse.getDataSign());
         // datasign: 中心存证对随机防伪内容的签名
         localEvidenceJson.put("datasign", evidenceResponse.getDataSign());
         // 密文字段（随机标识），确保存证上报前做过请求应答

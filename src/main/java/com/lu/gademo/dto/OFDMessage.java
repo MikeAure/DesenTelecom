@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OFDMessage {
+    // 上报流转时间，时间精确到秒
     @Getter(onMethod_={@JsonIgnore})
     private final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

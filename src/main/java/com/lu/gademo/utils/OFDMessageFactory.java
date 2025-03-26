@@ -1,6 +1,7 @@
 package com.lu.gademo.utils;
 
 import com.lu.gademo.dto.OFDMessage;
+import lombok.Getter;
 import org.bouncycastle.crypto.CryptoException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
+@Getter
 public class OFDMessageFactory {
     private final String systemId;
     private final int mainCmd;
@@ -95,14 +97,13 @@ public class OFDMessageFactory {
                 .mainCMD(mainCmd)
                 .subCMD(subCmd)
                 .msgVersion(msgVersion)
-                .submittime(DATE_FORMATTER.format(submitTime))
                 .data(data)
                 .build();
     }
 
     public OFDMessage createOfdMessage(String evidenceId, String globalId, String parentDataPath, String parentDataId,
                                        String selfDataPath, String selfDataId, String childDataPath, String childDataId,
-                                       String randomIdentification) throws Exception {
+                                       String submitTime, String randomIdentification) throws Exception {
         OFDMessage result = createOfdMessage();
         OFDMessage.Data dataInResult = result.getData();
         dataInResult.setGlobalID(globalId);
@@ -120,6 +121,7 @@ public class OFDMessageFactory {
         result.setDataHash(dataHash);
         result.setDatasign(dataSign);
         result.setRandomidentification(randomIdentification);
+        result.setSubmittime(submitTime);
 
         return result;
 

@@ -1,6 +1,5 @@
 package com.lu.gademo.model;
 
-import cn.hutool.core.io.resource.FileResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.dao.ga.effectEva.*;
 import com.lu.gademo.dao.ga.evidence.*;
@@ -350,6 +349,23 @@ public class LogSenderManager {
     }
 
     /**
+     *
+     * @param logInfo 日志信息集合
+     * @param rawFileHash 原始文件hash
+     * @param desenFileHash 脱敏后文件hash
+     * @param dataFieldSig 对于data字段的签名
+     * @return
+     */
+    public LogCollectResult buildLogCollectResultsForDocuments(LogInfo logInfo, String rawFileHash,
+                                                               String desenFileHash, String dataFieldSig) {
+        return buildLogCollectResultsForDocuments(logInfo.getGlobalID(), logInfo.getEvidenceID(), logInfo.getDesenCom(), logInfo.getObjectMode(),
+                logInfo.getInfoBuilders(), logInfo.getRawFileName(), logInfo.getRawFileSize(),
+                logInfo.getStartTime(), logInfo.getEndTime(), rawFileHash, desenFileHash, dataFieldSig);
+    }
+
+
+
+    /**
      * 构造发送给四个系统的日志信息
      *
      * @param globalID
@@ -405,6 +421,35 @@ public class LogSenderManager {
         return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, sendEvaReq, sendRuleReq, sendSplitDesenData);
     }
 
+    public LogCollectResult buildLogCollectResultsForDocuments(String globalID, String evidenceID, Boolean desenCom, String objectMode,
+                                                   DesenInfoStringBuilders infoBuilders,
+                                                   String rawFileName, long rawFileSize,
+                                                   String startTime, String endTime, String rawFileHash, String desenFileHash, String rawFileSig) {
+//        String desenFileHash = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, desenFileName.getBytes(StandardCharsets.UTF_8)));
+//        String rawFileHash = util.getSM3Hash(ArrayUtils.addAll(rawFileBytes, rawFileName.getBytes(StandardCharsets.UTF_8)));
+//        String rawFileSig = "";
+//        try {
+//            rawFileSig = util.getSM2Sign(rawFileBytes);
+//        } catch (Exception e) {
+//            rawFileSig = rawFileHash;
+//            log.error(e.getMessage());
+//        }
+        ReqEvidenceSave reqEvidenceSave = logCollectUtil.buildReqEvidenceSave(rawFileSize, objectMode, evidenceID);
+
+        SubmitEvidenceLocal submitEvidenceLocal = logCollectUtil.buildSubmitEvidenceLocal(evidenceID, infoBuilders.desenAlg, rawFileName,
+                rawFileHash, rawFileSize, desenFileHash, globalID, infoBuilders.desenInfoPreIden.toString(),
+                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType, rawFileSig);
+
+        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileHash, desenFileHash,
+                infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
+                infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
+                infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
+
+        log.info("Build logCollectResults successfully");
+        return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, null, sendRuleReq, null);
+    }
+
 
     /**
      * 接收已构建好的四个日志和原始文件、脱敏后文件字节数组，将日志和文件信息发送给四个系统
@@ -433,6 +478,19 @@ public class LogSenderManager {
         });
         executorService.submit(() -> {
             splitSystemLogSender.send2Split(sendSplitDesenData, desenFileBytes, splitMockSendFile);
+        });
+        executorService.shutdown();
+    }
+
+    public void submitToTwoSystems(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal,
+                                   SendRuleReq sendRuleReq) {
+
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        executorService.submit(() -> {
+            evidenceSystemLogSender.send2Evidence(reqEvidenceSave, submitEvidenceLocal);
+        });
+        executorService.submit(() -> {
+            ruleCheckSystemLogSender.send2RuleCheck(sendRuleReq);
         });
         executorService.shutdown();
     }
@@ -484,10 +542,10 @@ public class LogSenderManager {
 
     }
 
-//    public void submitToTwoSystems(LogCollectResult logCollectResult, FileResource rawFileBytes, byte[] desenFileBytes) {
-//        submitToFourSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
-//                logCollectResult.getSendEvaReq(), logCollectResult.getSendRuleReq(), logCollectResult.getSendSplitDesenData(),
-//                rawFileBytes, desenFileBytes);
-//
-//    }
+    public void submitToTwoSystems(LogCollectResult logCollectResult) {
+        submitToTwoSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
+                logCollectResult.getSendRuleReq());
+    }
+
+
 }

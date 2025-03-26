@@ -59,7 +59,7 @@ public class WordCommentDtoTest {
     @Test
     void testDesensitizationOperationToJson() throws JsonProcessingException {
         DesensitizationOperation desensitizationOperation = new DesensitizationOperation(
-                new DesensitizationOperation.AlgorithmChosen("xx", "xx", "xx", "1919-08-10 11:45"));
+                new DesensitizationOperation.AlgorithmChosen("xx", "xx", "xx", "233", 1, "1919-08-10 11:45"));
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(desensitizationOperation);
         System.out.println(json);
     }
@@ -92,7 +92,7 @@ public class WordCommentDtoTest {
                         new CategoryAndGrade.AttributeCategory("移动通信信息类", "通话信息类别", "2021-08-01 11:45"),
                         new CategoryAndGrade.AttributeGrade(10, 2, "2021-08-01 11:45")),
                 new DesensitizationOperation(
-                        new DesensitizationOperation.AlgorithmChosen("xx", "xx", "xx", "1919-08-10 11:45")),
+                        new DesensitizationOperation.AlgorithmChosen("xx", "xx", "xx","233", 1,  "1919-08-10 11:45")),
                 new DesensitizationEvaluation(
                         new DesensitizationEvaluation.EvaluationResult("xx", "xx", "1919-08-10 11:45")));
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(wordComment);

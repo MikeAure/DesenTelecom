@@ -24,51 +24,74 @@ import java.util.Map;
 @Slf4j
 @Component
 public class LogCollectUtil {
-    private Util util;
+    private final Util util;
 
-    private Integer systemID;
+    private final Integer systemID;
 
-    private Integer evidenceRequestMainCommand;
+    private final Integer evidenceRequestMainCommand;
 
-    private Integer evidenceRequestSubCommand;
+    private final Integer evidenceRequestSubCommand;
 
-    private Integer evidenceRequestMsgVersion;
+    private final Integer evidenceRequestMsgVersion;
 
-    private Integer evidenceSubmitMainCommand;
+    private final Integer evidenceSubmitMainCommand;
 
-    private Integer evidenceSubmitSubCommand;
+    private final Integer evidenceSubmitSubCommand;
 
-    private Integer evidenceSubmitMsgVersion;
+    private final Integer evidenceSubmitMsgVersion;
 
-    private String desenPerformer;
+    private final String desenPerformer;
+
+    private final String systemIP;
+
+    private final int parentSystemId;
+    private final String parentSystemIp;
+    private final int childSystemId;
+    private final String childSystemIp;
 
     @Autowired
     public LogCollectUtil(
-            Util util, @Value("${systemId.desenToolsetSystemId}") int systemID,
+            Util util, @Value("${systemId.desenToolsetSystemId}") int systemId,
             @Value("${evidenceSystem.evidenceRequest.mainCommand}") Integer evidenceRequestMainCommand,
             @Value("${evidenceSystem.evidenceRequest.subCommand}") Integer evidenceRequestSubCommand,
             @Value("${evidenceSystem.evidenceRequest.msgVersion}") Integer evidenceRequestMsgVersion,
             @Value("${evidenceSystem.submitEvidence.mainCommand}") Integer evidenceSubmitMainCommand,
             @Value("${evidenceSystem.submitEvidence.subCommand}") Integer evidenceSubmitSubCommand,
-            @Value("${evidenceSystem.submitEvidence.msgVersion}") Integer evidenceSubmitMsgVersion) {
+            @Value("${evidenceSystem.submitEvidence.msgVersion}") Integer evidenceSubmitMsgVersion,
+            @Value("${desenToolSet.address}") String systemIp,
+            @Value("${systemId.categoryAndGradeSystemId}") int parentSystemId,
+            @Value("${categoryAndGrade.address}") String parentSystemIp,
+            @Value("${systemId.evaluationSystemId}") int childSystemId,
+            @Value("${effectEva.address}") String childSystemIp) {
 
         this.util = util;
-        this.systemID = systemID;
+        this.systemID = systemId;
         this.evidenceRequestMainCommand = evidenceRequestMainCommand;
         this.evidenceRequestSubCommand = evidenceRequestSubCommand;
         this.evidenceRequestMsgVersion = evidenceRequestMsgVersion;
         this.evidenceSubmitMainCommand = evidenceSubmitMainCommand;
         this.evidenceSubmitSubCommand = evidenceSubmitSubCommand;
         this.evidenceSubmitMsgVersion = evidenceSubmitMsgVersion;
+        this.parentSystemId = parentSystemId;
+        this.parentSystemIp = parentSystemIp;
+        this.childSystemId = childSystemId;
+        this.childSystemIp = childSystemIp;
         this.desenPerformer = "脱敏工具集";
+        this.systemIP = systemIp;
 
     }
 
-    // 构造存证请求
+    /**
+     * 构造中心存证请求
+     * @param rawFileSize 原始文件大小
+     * @param objectMode 原始文件模态
+     * @param evidenceID 存证ID
+     * @return 部分构造的中心存证请求
+     */
     public ReqEvidenceSave buildReqEvidenceSave(Long rawFileSize, String objectMode, String evidenceID) {
         ReqEvidenceSave reqEvidenceSave = new ReqEvidenceSave();
         reqEvidenceSave.setSystemID(systemID);
-        reqEvidenceSave.setSystemIP(util.getIP());
+        reqEvidenceSave.setSystemIP(systemIP);
         reqEvidenceSave.setMainCMD(evidenceRequestMainCommand);
         reqEvidenceSave.setSubCMD(evidenceRequestSubCommand);
         reqEvidenceSave.setMsgVersion(evidenceRequestMsgVersion);
@@ -89,11 +112,14 @@ public class LogCollectUtil {
         SubmitEvidenceLocal submitEvidenceLocal = new SubmitEvidenceLocal();
 
         submitEvidenceLocal.setSystemID(systemID);
-        submitEvidenceLocal.setSystemIP(util.getIP());
+        submitEvidenceLocal.setSystemIP(systemIP);
         submitEvidenceLocal.setMainCMD(evidenceSubmitMainCommand);
         submitEvidenceLocal.setSubCMD(evidenceSubmitSubCommand);
         submitEvidenceLocal.setEvidenceID(evidenceID);
         submitEvidenceLocal.setMsgVersion(evidenceSubmitMsgVersion);
+
+        submitEvidenceLocal.setParentSystemId(parentSystemId);
+        submitEvidenceLocal.setChildSystemId(childSystemId);
 
         String fileTitle = "脱敏工具集脱敏" + rawFileName + "文件存证记录";
         String fileAbstract = "脱敏工具集采用算法" + desenAlg + "脱敏" + rawFileName + "文件存证记录";

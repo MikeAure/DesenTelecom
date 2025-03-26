@@ -20,6 +20,7 @@ public class OFDMessageFactoryTest {
                 "D:\\test\\test.ofd", "24242424",
                 "D:\\test\\test.ofd", "24242424",
                 "D:\\test\\test.ofd", "24242424",
+                "2001-01-01 01:01:01",
                 "32342342342"));
     }
 }

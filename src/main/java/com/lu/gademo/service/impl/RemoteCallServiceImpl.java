@@ -2,7 +2,7 @@ package com.lu.gademo.service.impl;
 
 import com.lu.gademo.dto.FileInfoDto;
 import com.lu.gademo.dto.OFDMessage;
-import com.lu.gademo.dto.SendToClass4Dto;
+import com.lu.gademo.dto.SendToCourse4Dto;
 import com.lu.gademo.service.RemoteCallService;
 import com.lu.gademo.utils.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -91,13 +91,13 @@ public class RemoteCallServiceImpl implements RemoteCallService {
 
     @Override
     @Async("restTemplateExecutor")
-    public CompletableFuture<String> sendLevels(SendToClass4Dto sendToClass4Dto, String url) {
+    public CompletableFuture<String> sendLevels(SendToCourse4Dto sendToCourse4Dto, String url) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             // 可打印完整消息用以调试
-            HttpEntity<SendToClass4Dto> requestEntity = new HttpEntity<>(sendToClass4Dto, headers);
+            HttpEntity<SendToCourse4Dto> requestEntity = new HttpEntity<>(sendToCourse4Dto, headers);
             ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
             log.info("JSON请求响应状态: {}, 响应体: {}", response.getStatusCode(), response.getBody());
             return CompletableFuture.completedFuture(response.getBody());

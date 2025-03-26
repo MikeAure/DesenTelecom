@@ -93,7 +93,7 @@ public class DocxCommentUpdater {
 //            updateClassification(rootNode, keywordDict.get(attributeKey));
             // 添加脱敏操作
             DesensitizationOperation desensitizationOperation = new DesensitizationOperation(
-                    new DesensitizationOperation.AlgorithmChosen("xx", "xx", "xx", LocalDateTime.now().format(DATE_FORMATTER)));
+                    new DesensitizationOperation.AlgorithmChosen("xx", "xx", "xx","xx", 2, LocalDateTime.now().format(DATE_FORMATTER)));
             addDesensitization(rootNode, desensitizationOperation);
 
             String updatedJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);

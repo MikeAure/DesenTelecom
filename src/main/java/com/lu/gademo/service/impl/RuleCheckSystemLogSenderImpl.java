@@ -74,6 +74,13 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
     public void send2RuleCheck(SendRuleReq sendRuleReq) {
         // 合规检查请求信息存储到数据库
         sendRuleReqDao.save(sendRuleReq);
+        ObjectNode data = objectMapper.createObjectNode();
+        data.put("DataType", 0x3140);
+        ObjectNode content = objectMapper.valueToTree(sendRuleReq);
+        data.set("content", content);
+        ObjectNode dataJson = objectMapper.createObjectNode();
+        dataJson.set("data", data);
+        log.info("合规检测请求：{}", dataJson.toPrettyString());
 //            System.out.println(dataJson.toPrettyString());
         try (
                 // 连接服务器
@@ -84,13 +91,7 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
                 InputStream inputStream = socket.getInputStream();
                 DataInputStream dataInputStream = new DataInputStream(inputStream);
         ) {
-            ObjectNode data = objectMapper.createObjectNode();
-            data.put("DataType", 0x3140);
-            ObjectNode content = (ObjectNode) objectMapper.readTree(objectMapper.writeValueAsString(sendRuleReq));
-            data.set("content", content);
-            ObjectNode dataJson = objectMapper.createObjectNode();
-            dataJson.set("data", data);
-            log.info("合规检测请求：{}", dataJson.toPrettyString());
+
             // 构造数据域
             TcpPacket tcpPacket = new TcpPacket(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataJson));
             byte[] tcp = tcpPacket.buildPacket();

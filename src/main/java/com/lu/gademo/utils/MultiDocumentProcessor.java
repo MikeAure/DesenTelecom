@@ -2,11 +2,11 @@ package com.lu.gademo.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lu.gademo.dto.SendToClass4Dto;
-import com.lu.gademo.dto.officeComment.CategoryAndGrade;
-import com.lu.gademo.dto.officeComment.DesensitizationOperation;
-import com.lu.gademo.dto.officeComment.InformationRecognition;
-import com.lu.gademo.dto.officeComment.WordComment;
+import com.lu.gademo.annotation.SendLog;
+import com.lu.gademo.dto.FileInfoDto;
+import com.lu.gademo.dto.SendToCourse4Dto;
+import com.lu.gademo.dto.officeComment.*;
+import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.ga.AlgorithmMapping;
 import com.lu.gademo.service.AlgorithmMappingDaoService;
 import com.spire.doc.Document;
@@ -25,6 +25,7 @@ import com.spire.pdf.widget.PdfPageCollection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.pdfbox.util.filetypedetector.FileType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellAddress;
@@ -109,11 +110,21 @@ public class MultiDocumentProcessor {
         return algorithmsFactory.getAlgorithmInfoFromId(algorithmMapping.getAlgorithmId());
     }
 
-    private void appendDesensitiveOperation(Comment comment, AlgorithmInfo algorithmInfo, int desenLevel, WordComment wordComment) throws JsonProcessingException {
+    /**
+     * 填充脱敏操作日志
+     * @param comment
+     * @param algorithmInfo
+     * @param desenLevel
+     * @param wordComment
+     * @return
+     * @throws JsonProcessingException
+     */
+    private DesensitizationOperation appendDesensitiveOperation(Comment comment, AlgorithmInfo algorithmInfo, int desenLevel, WordComment wordComment) throws JsonProcessingException {
         DesensitizationOperation desensitizationOperation = new DesensitizationOperation(
                 new DesensitizationOperation.AlgorithmChosen(algorithmInfo.getType().getName(),
                         algorithmInfo.getName(), String.valueOf(desenLevel),
-                        LocalDateTime.now().format(DATE_FORMATTER)));
+                        LocalDateTime.now().format(DATE_FORMATTER), algorithmInfo.getId(),
+                        algorithmInfo.getParams().get(desenLevel - 1).toString()));
         wordComment.setDesensitizationOperation(desensitizationOperation);
 
         ParagraphCollection paragraphCollection = comment.getBody().getParagraphs();
@@ -122,13 +133,23 @@ public class MultiDocumentProcessor {
         }
         paragraphCollection.get(0).setText(MAPPER.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(wordComment));
+
+        return desensitizationOperation;
     }
 
-    private void appendNoneDesensitiveOperation(Comment comment, WordComment wordComment) throws JsonProcessingException {
+    /**
+     * 对分级结果小于等于0的批注进行脱敏
+     * @param comment
+     * @param wordComment
+     * @return
+     * @throws JsonProcessingException
+     */
+    private DesensitizationOperation appendNoneDesensitiveOperation(Comment comment, WordComment wordComment) throws JsonProcessingException {
         DesensitizationOperation desensitizationOperation = new DesensitizationOperation(
                 new DesensitizationOperation.AlgorithmChosen(
                         "无", "无", "0",
-                        LocalDateTime.now().format(DATE_FORMATTER)));
+                        LocalDateTime.now().format(DATE_FORMATTER),
+                        0, "无"));
         wordComment.setDesensitizationOperation(desensitizationOperation);
 
         ParagraphCollection paragraphCollection = comment.getBody().getParagraphs();
@@ -137,6 +158,8 @@ public class MultiDocumentProcessor {
         }
         paragraphCollection.get(0).setText(MAPPER.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(wordComment));
+
+        return desensitizationOperation;
     }
 
     private void refillTextRanges(String targetString, List<TextRange> textRanges) {
@@ -212,8 +235,11 @@ public class MultiDocumentProcessor {
         return new DesenInfoAggregate(desenLevel, algorithmInfo);
     }
 
-    public SendToClass4Dto processDocx(String inputFilePath, String outputFilePath) throws IOException {
+    @SendLog
+    public ProcessDocxResult processDocx(FileStorageDetails fileStorageDetails, FileInfoDto fileInfoDto) throws IOException {
         Document doc = new Document();
+        String inputFilePath = fileStorageDetails.getRawFilePathString();
+        String outputFilePath = fileStorageDetails.getDesenFilePathString();
         doc.loadFromFile(inputFilePath);
 
         if (doc.getComments().getCount() == 0) {
@@ -221,9 +247,12 @@ public class MultiDocumentProcessor {
         }
         List<Integer> desenLevels = new ArrayList<>();
         List<Integer> categoryGrades = new ArrayList<>();
+        List<InformationRecognition> recognitions = new ArrayList<>();
+        List<CategoryAndGrade> categoryAndGrades = new ArrayList<>();
+        List<DesensitizationOperation> operations = new ArrayList<>();
+        List<WordComment> wordComments = new ArrayList<>();
         for (int i = 0; i < doc.getComments().getCount(); i++) {
             Comment comment = doc.getComments().get(i);
-            int commentParagraphsNum = comment.getBody().getParagraphs().getCount();
             String commentContent = extractCommentContent(comment).trim();
             System.out.println(commentContent);
             // 对读取到的批注进行序列化
@@ -232,6 +261,8 @@ public class MultiDocumentProcessor {
             InformationRecognition informationRecognition = wordComment.getInformationRecognition();
             // 获取分类分级结果
             CategoryAndGrade categoryAndGrade = wordComment.getCategoryAndGrade();
+            categoryAndGrades.add(categoryAndGrade);
+            recognitions.add(informationRecognition);
             System.out.println(categoryAndGrade);
 
             AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
@@ -239,31 +270,32 @@ public class MultiDocumentProcessor {
 
             System.out.println("desenLevel: " + desenLevel);
             if (desenLevel <= 0) {
-                appendNoneDesensitiveOperation(comment, wordComment);
-                continue;
+                wordComment.setDesensitizationOperation(appendNoneDesensitiveOperation(comment, wordComment));
+//                continue;
             } else {
                 desenLevels.add(desenLevel);
                 categoryGrades.add(categoryAndGrade.getAttributeGrade().getCurrentGrade());
+                // 脱敏，修改对应的文字
+                modifyCommentedContent(comment, algorithmInfo, desenLevel);
+                // 向注释中添加脱敏操作日志
+                wordComment.setDesensitizationOperation(appendDesensitiveOperation(comment, algorithmInfo, desenLevel, wordComment));
             }
-            // 脱敏，修改对应的文字
-            modifyCommentedContent(comment, algorithmInfo, desenLevel);
-            // 向注释中添加脱敏操作日志
-            appendDesensitiveOperation(comment, algorithmInfo, desenLevel, wordComment);
+            wordComments.add(wordComment);
         }
 
         doc.saveToFile(outputFilePath);
         doc.dispose();
-        SendToClass4Dto result = new SendToClass4Dto();
-        SendToClass4Dto.Class4Data class4Data = new SendToClass4Dto.Class4Data();
+        SendToCourse4Dto sendToCourse4Dto = new SendToCourse4Dto();
+        SendToCourse4Dto.Class4Data class4Data = new SendToCourse4Dto.Class4Data();
         class4Data.setMinDesenLevel(Collections.min(desenLevels));
         class4Data.setMaxCategoryLevel(Collections.max(categoryGrades));
-        result.setData(class4Data);
-
-        return result;
+        class4Data.setGlobalID(fileInfoDto.getGlobalID());
+        sendToCourse4Dto.setData(class4Data);
+        return new ProcessDocxResult(sendToCourse4Dto, wordComments);
 
     }
 
-    private SendToClass4Dto processXlsx(Path rawFilePath, Path desenFilePath) throws Exception {
+    private SendToCourse4Dto processXlsx(Path rawFilePath, Path desenFilePath) throws Exception {
         try (
                 InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
                 XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
@@ -306,7 +338,7 @@ public class MultiDocumentProcessor {
             // 写入excel
             wb.write(outputStream);
         }
-        return new SendToClass4Dto();
+        return new SendToCourse4Dto();
     }
 
     public void modifyCommentedContent(Comment comment, AlgorithmInfo algorithmInfo, int desenLevel) throws TypeNotPresentException {
@@ -345,7 +377,8 @@ public class MultiDocumentProcessor {
 //                    String text = pdfPageBase.extractText(rectangle2D);
                     extractOptions.setExtractArea(rectangle2D);
                     String text = textExtractor.extract(extractOptions);
-
+//                    page.getCanvas().drawRectangle(PdfBrushes.getWhite(), rec);
+//                    page.getCanvas().drawString(NewText, font, brush, position);
                     String markedText = pdfTextMarkupAnnotation.getText();
                     pdfTextMarkupAnnotation.setText(text);
                     pdfMap.put(text, markedText);

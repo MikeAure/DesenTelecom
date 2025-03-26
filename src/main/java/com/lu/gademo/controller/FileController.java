@@ -3,7 +3,8 @@ package com.lu.gademo.controller;
 import com.alibaba.excel.EasyExcel;
 import com.lu.gademo.dto.FileInfoDto;
 import com.lu.gademo.dto.OFDMessage;
-import com.lu.gademo.dto.SendToClass4Dto;
+import com.lu.gademo.dto.SendToCourse4Dto;
+import com.lu.gademo.dto.officeComment.ProcessDocxResult;
 import com.lu.gademo.entity.BasicData;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
@@ -107,7 +108,8 @@ public class FileController extends BaseController {
     @Autowired
     public FileController(AlgorithmsFactory algorithmsFactory, RecvFileDesen officeFileDesen, FileService fileService,
                           ExcelParamService excelParamService, FileStorageService fileStorageService,
-                          LogCollectUtil logCollectUtil, Util util, MultiDocumentProcessor docxProcessorIceBlue, RemoteCallService remoteCallService,
+                          LogCollectUtil logCollectUtil, Util util, MultiDocumentProcessor docxProcessorIceBlue,
+                          RemoteCallService remoteCallService,
                           @Value("${sendUrl.evaluation}") String evaluationUrl,
                           @Value("${sendUrl.localEvidence}") String evidenceUrl,
                           @Value("${sendUrl.delete}") String deleteUrl,
@@ -415,46 +417,16 @@ public class FileController extends BaseController {
     public ResponseEntity<Result<?>> dealOfdAndOthers(@RequestParam("file") MultipartFile file,
                                                       @RequestPart("fileInfo") FileInfoDto fileType)
     throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException {
-        SendToClass4Dto sendToClass4 = new SendToClass4Dto();
+        ProcessDocxResult processResult = new ProcessDocxResult();
         log.info("GlobalID: {}", fileType.getGlobalID());
         try {
             FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
             if (fileType.getFileType().equals("docx")) {
-                sendToClass4 = docxProcessorIceBlue
-                        .processDocx(fileStorageDetails.getRawFilePathString(),
-                        fileStorageDetails.getDesenFilePathString());
-            }
-
-            if (Files.exists(fileStorageDetails.getDesenFilePath()) &&
-                    Files.exists(fileStorageDetails.getRawFilePath())) {
-                byte[] rawFileBytes = Files.readAllBytes(fileStorageDetails.getRawFilePath());
-                byte[] desenFileBytes = Files.readAllBytes(fileStorageDetails.getDesenFilePath());
-                String parentFileId = util.getSM3Hash(rawFileBytes);
-                String selfFileId = util.getSM3Hash(desenFileBytes);
-
-                String evidenceID = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, util.getTime().getBytes()));
-                OFDMessage ofdMessage = ofdMessageFactory.createOfdMessage(
-                        evidenceID, fileType.getGlobalID(),
-                        fileStorageDetails.getRawFilePathString(), parentFileId,
-                        fileStorageDetails.getDesenFilePathString(), selfFileId,
-                        fileStorageDetails.getDesenFilePathString(), selfFileId,
-                        UUID.randomUUID().toString());
-
-                remoteCallService.sendMultipartData(
-                        fileStorageDetails.getRawFilePath(),
-                        fileStorageDetails.getDesenFilePath(),
-                        fileType, evaluationUrl
-
-                );
-                System.out.println(ofdMessage);
-                // 调用异步发送JSON结构数据
-                remoteCallService.sendCirculationLog(ofdMessage, deleteUrl);
-                remoteCallService.sendCirculationLog(ofdMessage, evidenceUrl);
-                sendToClass4.getData().setGlobalID(fileType.getGlobalID());
-                remoteCallService.sendLevels(sendToClass4, deleteLevelUrl);
+                processResult = docxProcessorIceBlue
+                        .processDocx(fileStorageDetails, fileType);
                 return ResponseEntity.ok(new Result<>(200, "ok", null));
             }
-            return ResponseEntity.ok(new Result<>(500, "error", null));
+            return ResponseEntity.status(500).body(new Result<>(500, "error", null));
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(500).body(new Result<>(500, e.getMessage(), null));

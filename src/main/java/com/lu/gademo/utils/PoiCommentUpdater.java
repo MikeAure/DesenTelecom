@@ -75,7 +75,7 @@ public class PoiCommentUpdater {
             if (isNotValidJson(jsonContent)) continue;
 
             JsonNode rootNode = mapper.readTree(jsonContent);
-            addDesensitizationOperation(rootNode);
+//            addDesensitizationOperation(rootNode);
 
             updateCommentContent(comment, mapper.writerWithDefaultPrettyPrinter()
                     .writeValueAsString(rootNode));
@@ -98,16 +98,16 @@ public class PoiCommentUpdater {
                 .set("脱敏操作", new ObjectMapper().valueToTree(operation));
     }
 
-    private static void addDesensitizationOperation(JsonNode rootNode) {
-        DesensitizationOperation operation = new DesensitizationOperation(
-                new DesensitizationOperation.AlgorithmChosen(
-                        "xx", "xx", "xx",
-                        LocalDateTime.now().format(DATE_FORMATTER)
-                )
-        );
-        ((com.fasterxml.jackson.databind.node.ObjectNode) rootNode)
-                .set("脱敏操作", new ObjectMapper().valueToTree(operation));
-    }
+//    private static void addDesensitizationOperation(JsonNode rootNode) {
+//        DesensitizationOperation operation = new DesensitizationOperation(
+//                new DesensitizationOperation.AlgorithmChosen(
+//                        "xx", "xx", "xx",
+//                        LocalDateTime.now().format(DATE_FORMATTER)
+//                )
+//        );
+//        ((com.fasterxml.jackson.databind.node.ObjectNode) rootNode)
+//                .set("脱敏操作", new ObjectMapper().valueToTree(operation));
+//    }
 
     private static void updateCommentContent(XWPFComment comment, String newContent) {
         // 清空原有内容
@@ -151,7 +151,7 @@ public class PoiCommentUpdater {
             System.out.println("Comment " + i + ": " + extractCommentContent(comments.get(i)));
             commentMapping.put(comments.get(i), new DesensitizationOperation(
                     new DesensitizationOperation.AlgorithmChosen("test", "test",
-                            String.valueOf(i + 1), LocalDateTime.now().format(DATE_FORMATTER))));
+                            "2", "2", 2, LocalDateTime.now().format(DATE_FORMATTER))));
         }
         modifyCommentsClass(doc, "D:\\Programming\\DesenTelecom\\comment_output.docx", commentMapping);
         System.out.println("文档处理完成");
