@@ -1,10 +1,9 @@
-package com.lu.gademo;
+package com.lu.gademo.controllerTests;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -20,6 +19,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+/**
+ * 对新增的/File/multiDocument进行测试，用于处理docx xlsx pdf文件
+ */
 public class MultiDocumentTest {
     @Autowired
     MockMvc mockMvc;

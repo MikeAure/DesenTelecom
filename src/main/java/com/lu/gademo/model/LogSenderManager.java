@@ -358,8 +358,10 @@ public class LogSenderManager {
      */
     public LogCollectResult buildLogCollectResultsForDocuments(LogInfo logInfo, String rawFileHash,
                                                                String desenFileHash, String dataFieldSig) {
-        return buildLogCollectResultsForDocuments(logInfo.getGlobalID(), logInfo.getEvidenceID(), logInfo.getDesenCom(), logInfo.getObjectMode(),
-                logInfo.getInfoBuilders(), logInfo.getRawFileName(), logInfo.getRawFileSize(),
+        return buildLogCollectResultsForDocuments(logInfo.getGlobalID(), logInfo.getEvidenceID(), logInfo.getDesenCom(),
+                logInfo.getObjectMode(), logInfo.getInfoBuilders(),
+                logInfo.getRawFileName(), logInfo.getRawFileSize(), logInfo.getRawFileSuffix(),
+                logInfo.getDesenFileName(), logInfo.getDesenFileSize(),
                 logInfo.getStartTime(), logInfo.getEndTime(), rawFileHash, desenFileHash, dataFieldSig);
     }
 
@@ -423,7 +425,8 @@ public class LogSenderManager {
 
     public LogCollectResult buildLogCollectResultsForDocuments(String globalID, String evidenceID, Boolean desenCom, String objectMode,
                                                    DesenInfoStringBuilders infoBuilders,
-                                                   String rawFileName, long rawFileSize,
+                                                   String rawFileName, long rawFileSize, String rawFileSuffix,
+                                                   String desenFileName, long desenFileSize,
                                                    String startTime, String endTime, String rawFileHash, String desenFileHash, String rawFileSig) {
 //        String desenFileHash = util.getSM3Hash(ArrayUtils.addAll(desenFileBytes, desenFileName.getBytes(StandardCharsets.UTF_8)));
 //        String rawFileHash = util.getSM3Hash(ArrayUtils.addAll(rawFileBytes, rawFileName.getBytes(StandardCharsets.UTF_8)));
@@ -446,8 +449,13 @@ public class LogSenderManager {
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
 
+        SendEvaReq sendEvaReq = logCollectUtil.buildSendEvaReq(globalID, evidenceID, rawFileName, rawFileHash, rawFileSize,
+                desenFileName, desenFileHash, desenFileSize, infoBuilders.desenInfoPreIden, infoBuilders.desenInfoAfterIden,
+                infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
+                infoBuilders.desenAlg, infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel,
+                objectMode, rawFileSuffix, desenCom);
         log.info("Build logCollectResults successfully");
-        return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, null, sendRuleReq, null);
+        return new LogCollectResult(reqEvidenceSave, submitEvidenceLocal, sendEvaReq, sendRuleReq, null);
     }
 
 
@@ -482,8 +490,8 @@ public class LogSenderManager {
         executorService.shutdown();
     }
 
-    public void submitToTwoSystems(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal,
-                                   SendRuleReq sendRuleReq) {
+    public void submitToThreeSystems(ReqEvidenceSave reqEvidenceSave, SubmitEvidenceLocal submitEvidenceLocal,
+                                     SendRuleReq sendRuleReq, SendEvaReq sendEvaReq) {
 
         ExecutorService executorService = Executors.newFixedThreadPool(4);
         executorService.submit(() -> {
@@ -492,6 +500,9 @@ public class LogSenderManager {
         executorService.submit(() -> {
             ruleCheckSystemLogSender.send2RuleCheck(sendRuleReq);
         });
+//        executorService.submit(() -> {
+//            evaluationSystemLogSender.send2EffectEva(sendEvaReq, new byte[0], new byte[0], false);
+//        });
         executorService.shutdown();
     }
 
@@ -531,9 +542,9 @@ public class LogSenderManager {
     /**
      * 使用已构建好的日志集合，直接将日志发送给四个系统
      *
-     * @param logCollectResult
-     * @param rawFileBytes
-     * @param desenFileBytes
+     * @param logCollectResult 日志集合
+     * @param rawFileBytes 原始文件字节内容
+     * @param desenFileBytes 脱敏后文件字节内容
      */
     public void submitToFourSystems(LogCollectResult logCollectResult, byte[] rawFileBytes, byte[] desenFileBytes) {
         submitToFourSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
@@ -542,9 +553,13 @@ public class LogSenderManager {
 
     }
 
-    public void submitToTwoSystems(LogCollectResult logCollectResult) {
-        submitToTwoSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
-                logCollectResult.getSendRuleReq());
+    /**
+     * 用于Http接口，实现向除拆分存储系统之外的三个系统发送日志
+     * @param logCollectResult 日志集合
+     */
+    public void submitToThreeSystems(LogCollectResult logCollectResult) {
+        submitToThreeSystems(logCollectResult.getReqEvidenceSave(), logCollectResult.getSubmitEvidenceLocal(),
+                logCollectResult.getSendRuleReq(), logCollectResult.getSendEvaReq());
     }
 
 

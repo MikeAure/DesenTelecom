@@ -73,43 +73,7 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             // 本地保存请求
             sendEvaReqDao.save(sendEvaReq);
 
-            ObjectNode content = objectMapper.valueToTree(sendEvaReq);
-            String evaRequestDesenIntention = content.get("desenIntention").asText();
-            String evaRequestDesenRequirements = content.get("desenRequirements").asText();
-
-            ArrayNode evaRequestDesenIntentionArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenIntention, objectMapper);
-            ArrayNode evaRequestDesenRequirementsArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenRequirements, objectMapper);
-
-            content.remove("desenIntention");
-            content.remove("desenRequirements");
-
-            content.set("desenIntention", evaRequestDesenIntentionArrayNode);
-            content.set("desenRequirements", evaRequestDesenRequirementsArrayNode);
-            // 构造数据域
-            ObjectNode data = objectMapper.createObjectNode();
-            // 增加Pathtree
-            ObjectNode pathTree = objectMapper.createObjectNode();
-            ObjectNode parent = objectMapper.createObjectNode();
-
-            parent.put("systemID", sendEvaReq.getSystemID());
-            parent.put("globalID", sendEvaReq.getGlobalID());
-            ObjectNode self = objectMapper.createObjectNode();
-            self.put("systemID", sendEvaReq.getSystemID());
-            self.put("globalID", sendEvaReq.getGlobalID());
-            self.put("evidenceID", sendEvaReq.getEvidenceID());
-            ObjectNode child = objectMapper.createObjectNode();
-            child.put("systemID", evaluationSystemId);
-            child.put("globalID", sendEvaReq.getGlobalID());
-            //self.put("status", "数据已脱敏");
-            pathTree.set("parent", parent);
-            pathTree.set("self", self);
-            pathTree.set("child", child);
-
-            data.put("DataType", 0x3130);
-            data.set("content", content);
-            data.set("pathtree", pathTree);
-            ObjectNode dataJson = objectMapper.createObjectNode();
-            dataJson.set("data", data);
+            ObjectNode dataJson = createSendEvaReqObjectNode(sendEvaReq);
 
             log.info("脱敏效果评测系统请求: {}", dataJson.toPrettyString());
             TcpPacket tcpPacket = new TcpPacket(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataJson));
@@ -249,6 +213,45 @@ public class EvaluationSystemLogSenderImpl implements EvaluationSystemLogSender 
             log.error(e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public ObjectNode createSendEvaReqObjectNode(SendEvaReq sendEvaReq) {
+        ObjectNode content = objectMapper.valueToTree(sendEvaReq);
+        String evaRequestDesenIntention = content.get("desenIntention").asText();
+        String evaRequestDesenRequirements = content.get("desenRequirements").asText();
+
+        ArrayNode evaRequestDesenIntentionArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenIntention, objectMapper);
+        ArrayNode evaRequestDesenRequirementsArrayNode = util.trimCommaAndReturnArrayNode(evaRequestDesenRequirements, objectMapper);
+
+        content.set("desenIntention", evaRequestDesenIntentionArrayNode);
+        content.set("desenRequirements", evaRequestDesenRequirementsArrayNode);
+        // 构造数据域
+        ObjectNode data = objectMapper.createObjectNode();
+        // 增加Pathtree
+        ObjectNode pathTree = objectMapper.createObjectNode();
+        ObjectNode parent = objectMapper.createObjectNode();
+
+        parent.put("systemID", sendEvaReq.getSystemID());
+        parent.put("globalID", sendEvaReq.getGlobalID());
+        ObjectNode self = objectMapper.createObjectNode();
+        self.put("systemID", sendEvaReq.getSystemID());
+        self.put("globalID", sendEvaReq.getGlobalID());
+        self.put("evidenceID", sendEvaReq.getEvidenceID());
+        ObjectNode child = objectMapper.createObjectNode();
+        child.put("systemID", sendEvaReq.getParentSystemId());
+        child.put("globalID", sendEvaReq.getChildSystemId());
+        //self.put("status", "数据已脱敏");
+        pathTree.set("parent", parent);
+        pathTree.set("self", self);
+        pathTree.set("child", child);
+
+        data.put("DataType", 0x3130);
+        data.set("content", content);
+        data.set("pathtree", pathTree);
+        ObjectNode dataJson = objectMapper.createObjectNode();
+        dataJson.set("data", data);
+        return dataJson;
     }
 
     @Override

@@ -121,8 +121,9 @@ public class DpUtilImpl implements DpUtil {
 
     /**
      * 用于日期分组置换中的k匿名实现
+     *
      * @param array 待分组的数据
-     * @param k 分组大小
+     * @param k     分组大小
      * @return 分组后的List
      */
     public List<Double> kNumNew(List<Double> array, int k) {
@@ -197,7 +198,7 @@ public class DpUtilImpl implements DpUtil {
         //这种情况未执行脱敏
         if (code1.size() == 1) {
             if (Objects.equals(reData.get(0), "-9999")) {
-                reData.replaceAll(x->null);
+                reData.replaceAll(x -> null);
             }
             return reData;
         } else {
@@ -589,29 +590,35 @@ public class DpUtilImpl implements DpUtil {
                 resultList.add(null);
             } else {
                 StringBuilder str = new StringBuilder(reDatum.substring(0, 1));
-                if (privacyLevel == 1) {
-                    if (reDatum.length() == 2) {
-                        str.append("*");
-                    } else {
-                        for (int j = 0; j < reDatum.length() - 2; j++) {
+                if (reDatum.length() == 1) {
+                    str.delete(0, str.length());
+                    str.append("*");
+                    resultList.add(str.toString());
+                } else {
+                    if (privacyLevel == 1) {
+                        if (reDatum.length() == 2) {
+                            str.append("*");
+                        } else {
+                            for (int j = 0; j < reDatum.length() - 2; j++) {
+                                str.append("*");
+                            }
+                            str.append(reDatum.substring(reDatum.length() - 1));
+                        }
+                        resultList.add(str.toString());
+                    }
+                    if (privacyLevel == 2) {
+                        for (int j = 0; j < reDatum.length() - 1; j++) {
                             str.append("*");
                         }
-                        str.append(reDatum.substring(reDatum.length() - 1));
+                        resultList.add(str.toString());
                     }
-                    resultList.add(str.toString());
-                }
-                if (privacyLevel == 2) {
-                    for (int j = 0; j < reDatum.length() - 1; j++) {
-                        str.append("*");
+                    if (privacyLevel == 3) {
+                        str.delete(0, str.length());
+                        for (int j = 0; j < reDatum.length(); j++) {
+                            str.append("*");
+                        }
+                        resultList.add(str.toString());
                     }
-                    resultList.add(str.toString());
-                }
-                if (privacyLevel == 3) {
-                    str.delete(0, str.length());
-                    for (int j = 0; j < reDatum.length(); j++) {
-                        str.append("*");
-                    }
-                    resultList.add(str.toString());
                 }
             }
         }

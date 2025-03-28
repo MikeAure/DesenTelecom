@@ -32,60 +32,38 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
-    jpa:
-        hibernate:
-            ddl-auto: update
-        properties:
-            jadira:
-                usertype:
-                    autoRegisterUserTypes: true
-        show-sql: true
 
-    servlet:
-        multipart:
-            maxFileSize: 100MB
-            maxRequestSize: 100MB
 
-    thymeleaf:
-        cache: false
-        encoding: UTF-8
-        servlet:
-            content-type: text/html
-
-mybatis:
-    configuration:
-        log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-
-pagehelper:
-    reasonable: true
-    page-size-zero: true
-    support-methods-arguments: true
-
-server:
+desenToolSet:
+    address: 192.168.10.31
     port: 8352
-
-logging:
-    file:
-        path: ./log
-    level:
-        org:
-            hibernate: WARN
-            hibernate.SQL: WARN
-
 effectEva:
-    address: 172.28.72.223
-    port: 10005
+    #    address: 192.168.37.192
+    address: 192.168.10.30
+    port: 8470
+    waitingTime: 10
 evidence:
-    localAddress: 172.28.72.214
+    #    localAddress: 172.28.72.214
+    localAddress: 192.168.10.71
     localPort: 50004
-    remoteAddress: 172.28.72.214
+    #    remoteAddress: 172.28.72.214
+    remoteAddress: 192.168.10.71
     remotePort: 50005
+    httpAddress: 192.168.10.71
+    httpPort: 50003
+
 ruleCheck:
-    address: 172.28.72.224
+    #    address: 172.28.72.224
+    address: 192.168.10.34
     port: 30002
 splitReconstruct:
-    address: 172.28.72.225
+    #    address: 172.28.72.225
+    address: 192.168.10.33
     port: 40011
+
+categoryAndGrade:
+    address: 192.168.10.25
+    port: 7890
 
 evidenceSystem:
     evidenceReceipt:
@@ -94,8 +72,8 @@ evidenceSystem:
         subCommand: '0x0020'
     evidenceRequest:
         mainCommand: '0x0001'
-        msgVersion: '0x1000'
-        subCommand: '0x0020'
+        msgVersion: '0x3100'
+        subCommand: '0x0031'
     evidenceResponse:
         mainCommand: '0x0001'
         msgVersion: '0x1000'
@@ -104,18 +82,26 @@ evidenceSystem:
         mainCommand: '0x0003'
         msgVersion: '0x3110'
         subCommand: '0x0031'
+        httpMainCommand: '0x0008'
+        httpSubCommand: "0x0071"
+        httpMsgVersion: "0x7010"
+        dataType: 0
+        maxHops: 5
+        status: 14
 
 systemId:
     desenToolsetSystemId: '0x31000000'
     evaluationSystemId: '0x32000000'
     evidenceSystemId: '0x10000000'
     ruleCheckSystemId: '0x33000000'
+    categoryAndGradeSystemId: '0x22000000'
 
 logSenderManager:
-    ifSendToEvaFirst: true
-    ifSaveToDatabase: true
-    ifSendFile: true
+    ifSendToEvaFirst: false
+    ifSaveToDatabase: false
+    ifSendFile: false
     ifPerformenceTest: false
+    ifPlatformTest: false
 
 pythonMock:
     evaSendFile: false
@@ -144,3 +130,9 @@ course2:
     username: root
     password: GDS&123softswitch
     port: 9090
+
+sendUrl:
+    evaluation: http://192.168.10.30:8470/Evaluation/ofd
+    localEvidence: http://192.168.10.71:50003/evidence/circulation_log
+    delete: http://192.168.10.40:9990/receive_circulation_log
+    delegeLevels: http://192.168.10.40:9990/receive_data_desen_info

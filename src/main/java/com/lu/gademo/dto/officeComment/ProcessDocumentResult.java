@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ProcessDocxResult {
+public class ProcessDocumentResult {
     SendToCourse4Dto sendToCourse;
     List<WordComment> wordComments;
 //    List<CategoryAndGrade> categoryAndGrades;

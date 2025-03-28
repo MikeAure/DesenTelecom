@@ -93,20 +93,21 @@ public class SendEvaReq extends BaseEntity {
     @Basic
     @Column(name = "status")
     private String status;
+    @Column(name = "parentSystemId")
+    private Integer parentSystemId;
+    @Column(name = "childSystemId")
+    private Integer childSystemId;
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         SendEvaReq that = (SendEvaReq) o;
-        return getEvaRequestId() != null && Objects.equals(getEvaRequestId(), that.getEvaRequestId());
+        return Objects.equals(getEvaRequestId(), that.getEvaRequestId()) && Objects.equals(getSystemID(), that.getSystemID()) && Objects.equals(getEvidenceID(), that.getEvidenceID()) && Objects.equals(getGlobalID(), that.getGlobalID()) && Objects.equals(getDesenInfoPreIden(), that.getDesenInfoPreIden()) && Objects.equals(getDesenInfoAfterIden(), that.getDesenInfoAfterIden()) && Objects.equals(getDesenInfoPreId(), that.getDesenInfoPreId()) && Objects.equals(getDesenInfoPre(), that.getDesenInfoPre()) && Objects.equals(getDesenInfoAfterId(), that.getDesenInfoAfterId()) && Objects.equals(getDesenInfoAfter(), that.getDesenInfoAfter()) && Objects.equals(getDesenIntention(), that.getDesenIntention()) && Objects.equals(getDesenRequirements(), that.getDesenRequirements()) && Objects.equals(getDesenControlSet(), that.getDesenControlSet()) && Objects.equals(getDesenAlg(), that.getDesenAlg()) && Objects.equals(getDesenAlgParam(), that.getDesenAlgParam()) && Objects.equals(getDesenPerformStartTime(), that.getDesenPerformStartTime()) && Objects.equals(getDesenPerformEndTime(), that.getDesenPerformEndTime()) && Objects.equals(getDesenLevel(), that.getDesenLevel()) && Objects.equals(getDesenPerformer(), that.getDesenPerformer()) && Objects.equals(getDesenCom(), that.getDesenCom()) && Objects.equals(getRawFileSize(), that.getRawFileSize()) && Objects.equals(getDesenFileSize(), that.getDesenFileSize()) && Objects.equals(getFileType(), that.getFileType()) && Objects.equals(getFileSuffix(), that.getFileSuffix()) && Objects.equals(getStatus(), that.getStatus()) && Objects.equals(getParentSystemId(), that.getParentSystemId()) && Objects.equals(getChildSystemId(), that.getChildSystemId());
     }
 
     @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    public int hashCode() {
+        return Objects.hash(getEvaRequestId(), getSystemID(), getEvidenceID(), getGlobalID(), getDesenInfoPreIden(), getDesenInfoAfterIden(), getDesenInfoPreId(), getDesenInfoPre(), getDesenInfoAfterId(), getDesenInfoAfter(), getDesenIntention(), getDesenRequirements(), getDesenControlSet(), getDesenAlg(), getDesenAlgParam(), getDesenPerformStartTime(), getDesenPerformEndTime(), getDesenLevel(), getDesenPerformer(), getDesenCom(), getRawFileSize(), getDesenFileSize(), getFileType(), getFileSuffix(), getStatus(), getParentSystemId(), getChildSystemId());
     }
 }

@@ -1,4 +1,4 @@
-package com.lu.gademo.controllerTests;
+package com.lu.gademo.daoTests;
 
 import com.lu.gademo.service.AlgorithmMappingDaoService;
 import org.junit.jupiter.api.Test;

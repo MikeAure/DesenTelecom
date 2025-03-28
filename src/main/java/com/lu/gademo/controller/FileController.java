@@ -2,9 +2,7 @@ package com.lu.gademo.controller;
 
 import com.alibaba.excel.EasyExcel;
 import com.lu.gademo.dto.FileInfoDto;
-import com.lu.gademo.dto.OFDMessage;
-import com.lu.gademo.dto.SendToCourse4Dto;
-import com.lu.gademo.dto.officeComment.ProcessDocxResult;
+import com.lu.gademo.dto.officeComment.ProcessDocumentResult;
 import com.lu.gademo.entity.BasicData;
 import com.lu.gademo.entity.ExcelParam;
 import com.lu.gademo.entity.FileStorageDetails;
@@ -20,7 +18,6 @@ import com.lu.gademo.utils.*;
 import com.mashape.unirest.http.JsonNode;
 import com.sun.istack.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -417,7 +414,7 @@ public class FileController extends BaseController {
     public ResponseEntity<Result<?>> dealOfdAndOthers(@RequestParam("file") MultipartFile file,
                                                       @RequestPart("fileInfo") FileInfoDto fileType)
     throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException {
-        ProcessDocxResult processResult = new ProcessDocxResult();
+        ProcessDocumentResult processResult = new ProcessDocumentResult();
         log.info("GlobalID: {}", fileType.getGlobalID());
         try {
             FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
@@ -425,8 +422,11 @@ public class FileController extends BaseController {
                 processResult = docxProcessorIceBlue
                         .processDocx(fileStorageDetails, fileType);
                 return ResponseEntity.ok(new Result<>(200, "ok", null));
+            } else if (fileType.getFileType().equals("xlsx")) {
+                docxProcessorIceBlue.processXlsx(fileStorageDetails, fileType);
+                return ResponseEntity.ok(new Result<>(200, "ok", null));
             }
-            return ResponseEntity.status(500).body(new Result<>(500, "error", null));
+            return ResponseEntity.status(500).body(new Result<>(500, "wrong file format", null));
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.status(500).body(new Result<>(500, e.getMessage(), null));

@@ -33,55 +33,13 @@ spring:
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
 
-    jpa:
-        hibernate:
-            ddl-auto: update
-        properties:
-            jadira:
-                usertype:
-                    autoRegisterUserTypes: true
-        show-sql: false
-
-    servlet:
-        multipart:
-            max-file-size: 200MB
-            max-request-size: 200MB
-
-    thymeleaf:
-        cache: false
-        encoding: UTF-8
-        servlet:
-            content-type: text/html
-
-mybatis:
-    configuration:
-        log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-        map-underscore-to-camel-case: true
-    mapper-locations: class*:/mapper/*.xml
-
-pagehelper:
-    reasonable: true
-    page-size-zero: true
-    support-methods-arguments: true
-
-server:
-    port: 8352
-
-logging:
-    file:
-        path: ./log
-    level:
-        org:
-            hibernate: WARN
-            hibernate.SQL: WARN
-#        com.lu.gademo.mapper: DEBUG
 
 desenToolSet:
     address: 192.168.10.31
     port: 8352
 effectEva:
     #    address: 192.168.37.192
-    address: 192.168.10.31
+    address: 192.168.10.30
     port: 8470
     waitingTime: 10
 evidence:
@@ -114,8 +72,8 @@ evidenceSystem:
         subCommand: '0x0020'
     evidenceRequest:
         mainCommand: '0x0001'
-        msgVersion: '0x1000'
-        subCommand: '0x0020'
+        msgVersion: '0x3100'
+        subCommand: '0x0031'
     evidenceResponse:
         mainCommand: '0x0001'
         msgVersion: '0x1000'
@@ -174,7 +132,7 @@ course2:
     port: 9090
 
 sendUrl:
-    evaluation: http://192.168.252.192:8470/Evaluation/ofd
+    evaluation: http://192.168.10.30:8470/Evaluation/ofd
     localEvidence: http://192.168.10.71:50003/evidence/circulation_log
     delete: http://192.168.10.40:9990/receive_circulation_log
     delegeLevels: http://192.168.10.40:9990/receive_data_desen_info

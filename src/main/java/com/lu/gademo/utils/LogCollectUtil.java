@@ -9,14 +9,10 @@ import com.lu.gademo.entity.ga.evidence.SubmitEvidenceLocal;
 import com.lu.gademo.entity.ga.ruleCheck.SendRuleReq;
 import com.lu.gademo.entity.ga.split.SendSplitDesenData;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,6 +192,8 @@ public class LogCollectUtil {
         sendEvaReq.setDesenFileSize(desenFileSize);
         sendEvaReq.setFileType(fileType);
         sendEvaReq.setFileSuffix(rawFileSuffix);
+        sendEvaReq.setParentSystemId(parentSystemId);
+        sendEvaReq.setChildSystemId(childSystemId);
         sendEvaReq.setStatus("数据已脱敏");
         return sendEvaReq;
     }

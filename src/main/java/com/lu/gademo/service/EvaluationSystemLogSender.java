@@ -1,9 +1,9 @@
 package com.lu.gademo.service;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.entity.ga.effectEva.SendEvaReq;
 import com.lu.gademo.model.effectEva.EvaluationSystemReturnResult;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -14,5 +14,6 @@ public interface EvaluationSystemLogSender {
                                                 byte[] desenFileData, Boolean ifSendFile);
     EvaluationSystemReturnResult send2EffectEva(SendEvaReq sendEvaReq, Path rawFileData,
                                                 Path desenFileData, Boolean ifSendFile);
+    ObjectNode createSendEvaReqObjectNode(SendEvaReq sendEvaReq);
 
 }

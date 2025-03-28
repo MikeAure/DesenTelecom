@@ -78,7 +78,6 @@ public class TcpPacket {
 
         // 认证与校验
         System.arraycopy(authenticationAndValidationField, 0, packet, 18 + jsonDataBytes.length, 16);
-
         return packet;
     }
 

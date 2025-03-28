@@ -1,21 +1,23 @@
 package com.lu.gademo.aop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lu.gademo.dto.FileInfoDto;
 import com.lu.gademo.dto.OFDMessage;
 import com.lu.gademo.dto.officeComment.DesensitizationOperation;
 import com.lu.gademo.dto.officeComment.InformationRecognition;
-import com.lu.gademo.dto.officeComment.ProcessDocxResult;
+import com.lu.gademo.dto.officeComment.ProcessDocumentResult;
 import com.lu.gademo.dto.officeComment.WordComment;
 import com.lu.gademo.entity.FileStorageDetails;
 import com.lu.gademo.entity.LogCollectResult;
 import com.lu.gademo.model.DocumentTypeMapping;
 import com.lu.gademo.model.LogSenderManager;
+import com.lu.gademo.service.EvaluationSystemLogSender;
 import com.lu.gademo.service.RemoteCallService;
+import com.lu.gademo.service.impl.EvaluationSystemLogSenderImpl;
 import com.lu.gademo.utils.DesenInfoStringBuilders;
 import com.lu.gademo.utils.LogInfo;
 import com.lu.gademo.utils.OFDMessageFactory;
 import com.lu.gademo.utils.Util;
-import lombok.extern.java.Log;
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,6 +34,7 @@ import java.util.UUID;
 @Component
 public class MultiDocumentAspect {
 
+    private final EvaluationSystemLogSender evaluationSystemLogSender;
     private Util util;
     private RemoteCallService remoteCallService;
     private OFDMessageFactory ofdMessageFactory;
@@ -42,13 +45,14 @@ public class MultiDocumentAspect {
     private final String evidenceUrl;
     private final String deleteLevelUrl;
     private final LogSenderManager logSenderManager;
+    private final ObjectMapper MAPPER = new ObjectMapper();
     public MultiDocumentAspect(Util util, RemoteCallService remoteCallService,
                                OFDMessageFactory ofdMessageFactory,
                                @Value("${sendUrl.evaluation}") String evaluationUrl,
                                @Value("${sendUrl.localEvidence}") String evidenceUrl,
                                @Value("${sendUrl.delete}") String deleteUrl,
                                @Value("${sendUrl.delegeLevels}")String deleteLevelUrl,
-                               LogSenderManager logSenderManager) {
+                               LogSenderManager logSenderManager, EvaluationSystemLogSenderImpl evaluationSystemLogSenderImpl) {
         this.util = util;
         this.remoteCallService = remoteCallService;
         this.ofdMessageFactory = ofdMessageFactory;
@@ -57,6 +61,7 @@ public class MultiDocumentAspect {
         this.deleteLevelUrl = deleteLevelUrl;
         this.evidenceUrl = evidenceUrl;
         this.logSenderManager = logSenderManager;
+        this.evaluationSystemLogSender = evaluationSystemLogSenderImpl;
     }
 
     @Pointcut("execution(public * com.lu.gademo.utils.MultiDocumentProcessor.process*(..)) && @annotation(com.lu.gademo.annotation.SendLog)")
@@ -72,7 +77,10 @@ public class MultiDocumentAspect {
 //        System.out.println("GlobalID: " + args[1]);
 //        System.out.println("MultiDocumentAspect: " + joinPoint.getSignature().getName());
         String startTime = util.getTime();
-        ProcessDocxResult processResult = (ProcessDocxResult) joinPoint.proceed();
+        ProcessDocumentResult processResult = (ProcessDocumentResult) joinPoint.proceed();
+        if (processResult == null) {
+            throw new IllegalArgumentException("processResult is null");
+        }
         String endTime = util.getTime();
         fileStorageDetails.setDesenFileSize(Files.size(fileStorageDetails.getDesenFilePath()));
         if (Files.exists(fileStorageDetails.getDesenFilePath()) &&
@@ -93,11 +101,7 @@ public class MultiDocumentAspect {
                     endTime,
                     UUID.randomUUID().toString());
 
-            remoteCallService.sendMultipartData(
-                    fileStorageDetails.getRawFilePath(),
-                    fileStorageDetails.getDesenFilePath(),
-                    fileInfoDto, evaluationUrl
-            );
+
             System.out.println(ofdMessage);
             // 调用异步发送JSON结构数据
             remoteCallService.sendCirculationLog(ofdMessage, deleteUrl);
@@ -112,13 +116,22 @@ public class MultiDocumentAspect {
                     evidenceID, startTime, endTime, infoStringBuilders);
             LogCollectResult logCollectResult = logSenderManager.buildLogCollectResultsForDocuments(logInfo,
                     parentFileId, selfFileId, ofdMessage.getDatasign());
-            logSenderManager.submitToTwoSystems(logCollectResult);
+            // 设置发送给评测系统的日志
+            fileInfoDto.setEvaluationLog(
+                    evaluationSystemLogSender.createSendEvaReqObjectNode(logCollectResult.getSendEvaReq()));
+            System.out.println(MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(fileInfoDto));
+            remoteCallService.sendMultipartData(
+                    fileStorageDetails.getRawFilePath(),
+                    fileStorageDetails.getDesenFilePath(),
+                    fileInfoDto, evaluationUrl
+            );
+            logSenderManager.submitToThreeSystems(logCollectResult);
 
         }
         return processResult;
     }
 
-    private DesenInfoStringBuilders buildDesenInfoBuilders(ProcessDocxResult processDocxResult,
+    private DesenInfoStringBuilders buildDesenInfoBuilders(ProcessDocumentResult processDocxResult,
                                                            String rawFileDataHash, String desenFileDataHash,
                                                            String fileDataType) {
         DesenInfoStringBuilders desenInfoStringBuilders = new DesenInfoStringBuilders();
@@ -146,7 +159,10 @@ public class MultiDocumentAspect {
         return LogInfo.builder().fileType(objectMode).desenFileSize(fileStorageDetails.getDesenFileSize())
                 .desenFileName(fileStorageDetails.getDesenFileName()).desenCom(true).evidenceID(evidenceId)
                 .globalID(globalId).objectMode(objectMode).rawFileName(fileStorageDetails.getRawFileName())
-                .rawFileSize(fileStorageDetails.getRawFileSize()).startTime(startTime).endTime(endTime)
+                .rawFileSize(fileStorageDetails.getRawFileSize())
+                .desenFileName(fileStorageDetails.getDesenFileName())
+                .desenFileSize(fileStorageDetails.getDesenFileSize())
+                .startTime(startTime).endTime(endTime)
                 .infoBuilders(infoBuilders).rawFileSuffix(fileStorageDetails.getRawFileSuffix()).build();
 
     }
