@@ -11,7 +11,6 @@ import com.lu.gademo.entity.ga.AlgorithmMapping;
 import com.lu.gademo.model.CommonComment;
 import com.lu.gademo.model.PdfCommentAdapter;
 import com.lu.gademo.model.SpireCommentAdapter;
-import com.lu.gademo.model.XlsxPoiCommentAdapter;
 import com.lu.gademo.service.AlgorithmMappingDaoService;
 import com.lu.gademo.service.FileStorageService;
 import com.spire.doc.Document;
@@ -26,28 +25,23 @@ import com.spire.pdf.annotations.PdfAnnotationCollection;
 import com.spire.pdf.annotations.PdfTextMarkupAnnotationWidget;
 import com.spire.pdf.texts.*;
 import com.spire.pdf.widget.PdfPageCollection;
+import com.spire.xls.CellRange;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Component
 @Data
@@ -150,6 +144,31 @@ public class MultiDocumentProcessor {
                 .writeValueAsString(wordComment);
 
         comment.setComment(content);
+//        return desensitizationOperation;
+    }
+
+    private void appendDesensitiveOperation(com.spire.xls.CellRange comment, AlgorithmInfo algorithmInfo, int desenLevel, WordComment wordComment) throws JsonProcessingException {
+        DesensitizationOperation desensitizationOperation = null;
+        if (desenLevel > 0) {
+            desensitizationOperation = new DesensitizationOperation(
+                    new DesensitizationOperation.AlgorithmChosen(algorithmInfo.getType().getName(),
+                            algorithmInfo.getName(), String.valueOf(desenLevel),
+                            LocalDateTime.now().format(DATE_FORMATTER), algorithmInfo.getId(),
+                            algorithmInfo.getParams().get(desenLevel - 1).toString()));
+        } else {
+            desensitizationOperation = new DesensitizationOperation(
+                    new DesensitizationOperation.AlgorithmChosen(
+                            "无", "无", "0",
+                            LocalDateTime.now().format(DATE_FORMATTER),
+                            0, "无"));
+        }
+        wordComment.setDesensitizationOperation(desensitizationOperation);
+        String content = MAPPER.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(wordComment);
+
+//        com.spire.xls.CellRange cellRange = locatedRange.get(row, col);
+        comment.getComment().setText(content);
+//        comment.setComment(content);
 //        return desensitizationOperation;
     }
 
@@ -329,93 +348,168 @@ public class MultiDocumentProcessor {
     public ProcessDocumentResult processXlsx(FileStorageDetails fileStorageDetails, FileInfoDto fileInfoDto) throws Exception {
         Path rawFilePath = Paths.get(fileStorageDetails.getRawFilePathString());
         Path desenFilePath = Paths.get(fileStorageDetails.getDesenFilePathString());
-        try (
-                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
-                XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
-                OutputStream outputStream = Files.newOutputStream(desenFilePath)
-        ) {
-            // TODO:多个工作表
-            int sheetsTotalNum = wb.getNumberOfSheets();
-            Sheet sheet = wb.getSheetAt(0);
-            // 存储全部Comments
-            Map<CellAddress, org.apache.poi.ss.usermodel.Comment> comments = (Map<CellAddress, org.apache.poi.ss.usermodel.Comment>) sheet.getCellComments();
-            if (comments == null || comments.entrySet().isEmpty()) {
-                throw new IOException("No comments found in the document");
-            }
-            List<Integer> desenLevels = new ArrayList<>();
-            List<Integer> categoryGrades = new ArrayList<>();
-            List<WordComment> wordComments = new ArrayList<>();
-            // 逐一遍历comments
-            for (Map.Entry<CellAddress, ? extends org.apache.poi.ss.usermodel.Comment> e : comments.entrySet()) {
-                CellAddress loc = e.getKey();
-                Cell cell = sheet.getRow(loc.getRow()).getCell(loc.getColumn());
-                org.apache.poi.ss.usermodel.Comment comment = e.getValue();
-                CommonComment commonComment = new XlsxPoiCommentAdapter(comment);
-                String commentContent = comment.getString().getString();
-                // 对读取到的批注进行序列化
-                WordComment wordComment = MAPPER.readValue(commentContent, WordComment.class);
-                // 获取信息识别内容
-                InformationRecognition informationRecognition = wordComment.getInformationRecognition();
-                String markedContent = informationRecognition.getContent();
-                // 获取分类分级结果
-                CategoryAndGrade categoryAndGrade = wordComment.getCategoryAndGrade();
-                DesensitizationEvaluation desensitizationEvaluation = wordComment.getDesensitizationEvaluation();
-                DesensitizationOperation desensitizationOperation = wordComment.getDesensitizationOperation();
-                System.out.println(categoryAndGrade);
-                CellStyle style = wb.createCellStyle();
-                AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
-                int desenLevel = calculateDesenLevel(categoryAndGrade);
-                categoryGrades.add(categoryAndGrade.getAttributeGrade().getCurrentGrade());
-                // 根据Comment修改算法
-                // 如果没有脱敏评估结果
-                if (desensitizationEvaluation == null) {
-                    desenLevel = updatePrivacyLevel(desenLevel, fileInfoDto.isRandom());
-                    desenLevels.add(desenLevel);
-                    if (desenLevel > 0) {
-                        DSObject result = desenData(cell.getStringCellValue(), algorithmInfo, desenLevel);
-                        System.out.println(result.getList().get(0).toString());
-                        System.out.println(cell.getCellType());
-                        cell.setCellStyle(style);
-                        cell.setCellValue(new XSSFRichTextString(result.getList().get(0).toString()));
-//                        cell.setCellValue(result.getList().get(0).toString());
+
+        List<XLSCell> xlsCells = readDataFromXls(rawFilePath);
+        if (xlsCells == null || xlsCells.isEmpty()) {
+            throw new IOException("No comments found in the document");
+        }
+        List<Integer> desenLevels = new ArrayList<>();
+        List<Integer> categoryGrades = new ArrayList<>();
+        List<WordComment> wordComments = new ArrayList<>();
+        com.spire.xls.Workbook workbook = new com.spire.xls.Workbook();
+        workbook.loadFromFile(rawFilePath.toAbsolutePath().toString());
+        com.spire.xls.Worksheet worksheet = workbook.getWorksheets().get(0);
+        com.spire.xls.CellRange locatedRange = worksheet.getAllocatedRange();
+        for (XLSCell xlsCell : xlsCells) {
+            String commentContent = xlsCell.getMark();
+            System.out.println(xlsCell.getMark());
+            // 对读取到的批注进行序列化
+            WordComment wordComment = MAPPER.readValue(commentContent, WordComment.class);
+            // 获取信息识别内容
+            InformationRecognition informationRecognition = wordComment.getInformationRecognition();
+            String markedContent = informationRecognition.getContent();
+            // 获取分类分级结果
+            CategoryAndGrade categoryAndGrade = wordComment.getCategoryAndGrade();
+            DesensitizationEvaluation desensitizationEvaluation = wordComment.getDesensitizationEvaluation();
+            DesensitizationOperation desensitizationOperation = wordComment.getDesensitizationOperation();
+            System.out.println(categoryAndGrade);
+
+            AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
+            int desenLevel = calculateDesenLevel(categoryAndGrade);
+            categoryGrades.add(categoryAndGrade.getAttributeGrade().getCurrentGrade());
+            // 根据Comment修改算法
+            // 如果没有脱敏评估结果
+            CellRange targetCellRange = locatedRange.get(xlsCell.getRow(), xlsCell.getCol());
+            if (desensitizationEvaluation == null) {
+                desenLevel = updatePrivacyLevel(desenLevel, fileInfoDto.isRandom());
+                desenLevels.add(desenLevel);
+                if (desenLevel > 0) {
+                    DSObject result = desenData(xlsCell.getText(), algorithmInfo, desenLevel);
+                    System.out.println(result.getList().get(0).toString());
+                    targetCellRange.setText(result.getList().get(0).toString());
+                }
+                appendDesensitiveOperation(targetCellRange, algorithmInfo, desenLevel, wordComment);
+                wordComments.add(wordComment);
+            } else {
+                // 如果有脱敏评估结果且执行过脱敏
+                if (desensitizationOperation != null && desensitizationOperation.getAlgorithmChosen() != null) {
+                    DesensitizationEvaluation.EvaluationResult evaluationResult = desensitizationEvaluation.getEvaluationResult();
+                    DesensitizationOperation.AlgorithmChosen algorithmChosen = desensitizationOperation.getAlgorithmChosen();
+
+                    int magnitude = Integer.parseInt(algorithmChosen.getParameterMagnitude());
+                    // 如果评估失败
+                    if (!evaluationResult.isEvalResult()) {
+                        // 提升脱敏等级
+                        desenLevel = magnitude < 3 ? magnitude + 1 : 3;
+                        desenLevels.add(desenLevel);
+                        // 脱敏，修改对应的文字
+                        DSObject result = desenData(markedContent, algorithmInfo, desenLevel);
+                        targetCellRange.setText(result.getList().get(0).toString());
+                        // 向注释中添加脱敏操作日志
+                        appendDesensitiveOperation(targetCellRange, algorithmInfo, desenLevel, wordComment);
                     }
-                    appendDesensitiveOperation(commonComment, algorithmInfo, desenLevel, wordComment);
+                    // 如果评估成功
+                    else {
+                        desenLevels.add(magnitude);
+                        DSObject result = desenData(markedContent, algorithmInfo, magnitude);
+                        targetCellRange.setText(result.getList().get(0).toString());
+                        // 向注释中添加脱敏操作日志
+                        appendDesensitiveOperation(targetCellRange, algorithmInfo, magnitude, wordComment);
+                    }
                     wordComments.add(wordComment);
                 } else {
-                    // 如果有脱敏评估结果且执行过脱敏
-                    if (desensitizationOperation != null && desensitizationOperation.getAlgorithmChosen() != null) {
-                        DesensitizationEvaluation.EvaluationResult evaluationResult = desensitizationEvaluation.getEvaluationResult();
-                        DesensitizationOperation.AlgorithmChosen algorithmChosen = desensitizationOperation.getAlgorithmChosen();
-
-                        int magnitude = Integer.parseInt(algorithmChosen.getParameterMagnitude());
-                        // 如果评估失败
-                        if (!evaluationResult.isEvalResult()) {
-                            // 提升脱敏等级
-                            desenLevel = magnitude < 3 ? magnitude + 1 : 3;
-                            desenLevels.add(desenLevel);
-                            // 脱敏，修改对应的文字
-                            DSObject result = desenData(markedContent, algorithmInfo, desenLevel);
-                            cell.setCellValue(result.getList().get(0).toString());
-                            // 向注释中添加脱敏操作日志
-                            appendDesensitiveOperation(commonComment, algorithmInfo, desenLevel, wordComment);
-                        }
-                        // 如果评估成功
-                        else {
-                            desenLevels.add(magnitude);
-                            DSObject result = desenData(markedContent, algorithmInfo, magnitude);
-                            cell.setCellValue(result.getList().get(0).toString());
-                            // 向注释中添加脱敏操作日志
-                            appendDesensitiveOperation(commonComment, algorithmInfo, magnitude, wordComment);
-                        }
-                        wordComments.add(wordComment);
-                    } else {
-                        throw new IOException("No desensitization operation found in the comment");
-                    }
+                    throw new IOException("No desensitization operation found in the comment");
                 }
             }
-
-            // 写入excel
-            wb.write(outputStream);
+        }
+        workbook.saveToFile(desenFilePath.toAbsolutePath().toString());
+//        try (
+//                InputStream rawFileInputStream = Files.newInputStream(rawFilePath);
+//                XSSFWorkbook wb = new XSSFWorkbook(rawFileInputStream);
+//                OutputStream outputStream = Files.newOutputStream(desenFilePath)
+//        ) {
+//            // TODO:多个工作表
+//            int sheetsTotalNum = wb.getNumberOfSheets();
+//            Sheet sheet = wb.getSheetAt(0);
+//            // 存储全部Comments
+//            Map<CellAddress, org.apache.poi.ss.usermodel.Comment> comments = (Map<CellAddress, org.apache.poi.ss.usermodel.Comment>) sheet.getCellComments();
+//            if (comments == null || comments.entrySet().isEmpty()) {
+//                throw new IOException("No comments found in the document");
+//            }
+//            List<Integer> desenLevels = new ArrayList<>();
+//            List<Integer> categoryGrades = new ArrayList<>();
+//            List<WordComment> wordComments = new ArrayList<>();
+//            // 逐一遍历comments
+//            for (Map.Entry<CellAddress, ? extends org.apache.poi.ss.usermodel.Comment> e : comments.entrySet()) {
+//                CellAddress loc = e.getKey();
+//                Cell cell = sheet.getRow(loc.getRow()).getCell(loc.getColumn());
+//                org.apache.poi.ss.usermodel.Comment comment = e.getValue();
+//                CommonComment commonComment = new XlsxPoiCommentAdapter(comment);
+//                String commentContent = comment.getString().getString();
+//                // 对读取到的批注进行序列化
+//                WordComment wordComment = MAPPER.readValue(commentContent, WordComment.class);
+//                // 获取信息识别内容
+//                InformationRecognition informationRecognition = wordComment.getInformationRecognition();
+//                String markedContent = informationRecognition.getContent();
+//                // 获取分类分级结果
+//                CategoryAndGrade categoryAndGrade = wordComment.getCategoryAndGrade();
+//                DesensitizationEvaluation desensitizationEvaluation = wordComment.getDesensitizationEvaluation();
+//                DesensitizationOperation desensitizationOperation = wordComment.getDesensitizationOperation();
+//                System.out.println(categoryAndGrade);
+//                CellStyle style = wb.createCellStyle();
+//                AlgorithmInfo algorithmInfo = getAlgorithmInfo(informationRecognition);
+//                int desenLevel = calculateDesenLevel(categoryAndGrade);
+//                categoryGrades.add(categoryAndGrade.getAttributeGrade().getCurrentGrade());
+//                // 根据Comment修改算法
+//                // 如果没有脱敏评估结果
+//                if (desensitizationEvaluation == null) {
+//                    desenLevel = updatePrivacyLevel(desenLevel, fileInfoDto.isRandom());
+//                    desenLevels.add(desenLevel);
+//                    if (desenLevel > 0) {
+//                        DSObject result = desenData(cell.getStringCellValue(), algorithmInfo, desenLevel);
+//                        System.out.println(result.getList().get(0).toString());
+//                        System.out.println(cell.getCellType());
+//                        cell.setCellStyle(style);
+//                        cell.setCellValue(new XSSFRichTextString(result.getList().get(0).toString()));
+////                        cell.setCellValue(result.getList().get(0).toString());
+//                    }
+//                    appendDesensitiveOperation(commonComment, algorithmInfo, desenLevel, wordComment);
+//                    wordComments.add(wordComment);
+//                } else {
+//                    // 如果有脱敏评估结果且执行过脱敏
+//                    if (desensitizationOperation != null && desensitizationOperation.getAlgorithmChosen() != null) {
+//                        DesensitizationEvaluation.EvaluationResult evaluationResult = desensitizationEvaluation.getEvaluationResult();
+//                        DesensitizationOperation.AlgorithmChosen algorithmChosen = desensitizationOperation.getAlgorithmChosen();
+//
+//                        int magnitude = Integer.parseInt(algorithmChosen.getParameterMagnitude());
+//                        // 如果评估失败
+//                        if (!evaluationResult.isEvalResult()) {
+//                            // 提升脱敏等级
+//                            desenLevel = magnitude < 3 ? magnitude + 1 : 3;
+//                            desenLevels.add(desenLevel);
+//                            // 脱敏，修改对应的文字
+//                            DSObject result = desenData(markedContent, algorithmInfo, desenLevel);
+//                            cell.setCellValue(result.getList().get(0).toString());
+//                            // 向注释中添加脱敏操作日志
+//                            appendDesensitiveOperation(commonComment, algorithmInfo, desenLevel, wordComment);
+//                        }
+//                        // 如果评估成功
+//                        else {
+//                            desenLevels.add(magnitude);
+//                            DSObject result = desenData(markedContent, algorithmInfo, magnitude);
+//                            cell.setCellValue(result.getList().get(0).toString());
+//                            // 向注释中添加脱敏操作日志
+//                            appendDesensitiveOperation(commonComment, algorithmInfo, magnitude, wordComment);
+//                        }
+//                        wordComments.add(wordComment);
+//                    } else {
+//                        throw new IOException("No desensitization operation found in the comment");
+//                    }
+//                }
+//            }
+//
+//            // 写入excel
+//            wb.write(outputStream);
             SendToCourse4Dto sendToCourse4Dto = new SendToCourse4Dto();
             SendToCourse4Dto.Class4Data class4Data = new SendToCourse4Dto.Class4Data();
             class4Data.setMinDesenLevel(Collections.min(desenLevels));
@@ -423,9 +517,30 @@ public class MultiDocumentProcessor {
             class4Data.setGlobalID(fileInfoDto.getGlobalID());
             sendToCourse4Dto.setData(class4Data);
             return new ProcessDocumentResult(sendToCourse4Dto, wordComments);
-        }
 
     }
+
+    public List<XLSCell> readDataFromXls(Path path) throws IOException {
+        List<XLSCell> xlsCellList = new LinkedList<>();
+        com.spire.xls.Workbook workbook = new com.spire.xls.Workbook();
+        workbook.loadFromFile(path.toString());
+        com.spire.xls.Worksheet worksheet = workbook.getWorksheets().get(0);
+        com.spire.xls.CellRange locatedRange = worksheet.getAllocatedRange();
+        for (int i = 0; i < locatedRange.getRows().length; i++) {
+            for (int j = 0; j < locatedRange.getColumnCount(); j++) {
+                com.spire.xls.CellRange cellRange = locatedRange.get(i + 1, j + 1);
+                xlsCellList.add(new XLSCell(cellRange.getText(), cellRange.getComment().getText(), i + 1, j + 1));
+            }
+        }
+        return xlsCellList.stream().filter(xlsCell -> xlsCell.getMark() != null && !xlsCell.getMark().isEmpty()).collect(Collectors.toList());
+    }
+
+//    private void updateCommentInXls(com.spire.xls.Workbook workbook, Integer row, Integer col, String newCommentText) {
+//        com.spire.xls.Worksheet worksheet = workbook.getWorksheets().get(0);
+//        com.spire.xls.CellRange locatedRange = worksheet.getAllocatedRange();
+//        com.spire.xls.CellRange cellRange = locatedRange.get(row, col);
+//        cellRange.getComment().setText(newCommentText);
+//    }
 
     /**
      * 更新脱敏等级，根据参数决定是否随机产生错误
@@ -725,13 +840,13 @@ public class MultiDocumentProcessor {
 //            }
 //
 //        }
-            pdfDocument.saveToFile(desenFilePath);
-            SendToCourse4Dto sendToCourse4Dto = new SendToCourse4Dto();
-            SendToCourse4Dto.Class4Data class4Data = new SendToCourse4Dto.Class4Data();
-            class4Data.setMinDesenLevel(Collections.min(desenLevels));
-            class4Data.setMaxCategoryLevel(Collections.max(categoryGrades));
-            class4Data.setGlobalID(fileInfoDto.getGlobalID());
-            sendToCourse4Dto.setData(class4Data);
-            return new ProcessDocumentResult(sendToCourse4Dto, wordComments);
-        }
+        pdfDocument.saveToFile(desenFilePath);
+        SendToCourse4Dto sendToCourse4Dto = new SendToCourse4Dto();
+        SendToCourse4Dto.Class4Data class4Data = new SendToCourse4Dto.Class4Data();
+        class4Data.setMinDesenLevel(Collections.min(desenLevels));
+        class4Data.setMaxCategoryLevel(Collections.max(categoryGrades));
+        class4Data.setGlobalID(fileInfoDto.getGlobalID());
+        sendToCourse4Dto.setData(class4Data);
+        return new ProcessDocumentResult(sendToCourse4Dto, wordComments);
     }
+}
