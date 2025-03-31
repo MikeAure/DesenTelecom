@@ -174,7 +174,7 @@ course2:
     port: 9090
 
 sendUrl:
-    evaluation: http://192.168.10.30:8470/Evaluation/ofd
+    evaluation: http://192.168.10.31:8470/Evaluation/ofd
     localEvidence: http://192.168.10.71:50003/evidence/circulation_log
     delete: http://192.168.10.40:9990/receive_circulation_log
     delegeLevels: http://192.168.10.40:9990/receive_data_desen_info

@@ -1,5 +1,6 @@
 package com.lu.gademo.utils.algorithmBase.impl;
 
+import com.lu.gademo.utils.DateParseUtil;
 import com.lu.gademo.utils.DpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,9 +38,9 @@ public class DpUtilImpl implements DpUtil {
     String[] ipv6Parts;
     SecureRandom random;
     DecimalFormat decimalFormat;
+    DateParseUtil dateParseUtil;
 
-
-    public DpUtilImpl() {
+    public DpUtilImpl(DateParseUtil dateParseUtil) {
         this.ipv4PatternTemp = "((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})\\.((?:2(?:5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})";
         this.ipv4Pattern = Pattern.compile(ipv4PatternTemp);
         this.ipv4Parts = new String[]{"$1", "$2", "$3", "$4"};
@@ -48,7 +49,7 @@ public class DpUtilImpl implements DpUtil {
         this.ipv6Parts = new String[]{"$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8"};
         this.random = new SecureRandom();
         this.decimalFormat = new DecimalFormat("#.###");
-
+        this.dateParseUtil = dateParseUtil;
     }
 
     /**
@@ -852,7 +853,8 @@ public class DpUtilImpl implements DpUtil {
             if (data == null) {
                 reData.add(null);
             } else {
-                tempDate = fmt.get().parse(data.toString());
+
+                tempDate = dateParseUtil.parseDate(data.toString());
                 if (tempDate == null) {
 
 //                    throw new ParseException("Parse date error : " + data, 0);
@@ -936,7 +938,7 @@ public class DpUtilImpl implements DpUtil {
                 milliseconds.add(0.0);
             else {
                 //java.util.Date utilDate = dateFormat.parse(data + "");
-                java.util.Date date = dateFormat.get().parse(data.toString());
+                java.util.Date date = dateParseUtil.parseDate(data.toString());
                 if (date == null) {
                     milliseconds.add(0.0);
                 } else {

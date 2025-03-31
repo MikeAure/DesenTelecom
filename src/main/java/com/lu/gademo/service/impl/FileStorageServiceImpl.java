@@ -1,5 +1,6 @@
 package com.lu.gademo.service.impl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.entity.FileStorageDetails;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +77,98 @@ public class FileStorageServiceImpl implements com.lu.gademo.service.FileStorage
                 .rawFilePath(rawFilePath)
                 .rawFilePathString(rawFilePathString)
                 .rawFileBytes(rawFileBytes)
+                .rawFileSize(rawFileSize)
+                .desenFileName(desenFileName)
+                .desenFileSuffix(rawFileSuffix)
+                .desenFilePath(desenFilePath)
+                .desenFilePathString(desenFilePathString)
+                .build();
+    }
+
+    public String extractBetweenLastTwoUnderscores(String fileName) {
+        // Step 1: 找到最后一个下划线的位置
+        int lastUnderscoreIndex = fileName.lastIndexOf('_');
+
+        // 如果没有下划线或最后一个下划线在起始位置
+        if (lastUnderscoreIndex <= 0) return "redesen";
+        // Step 2: 在最后一个下划线之前的子串中找倒数第二个下划线
+        String subString = fileName.substring(0, lastUnderscoreIndex);
+        int secondLastUnderscoreIndex = subString.lastIndexOf('_');
+        // 如果找不到倒数第二个下划线
+        if (secondLastUnderscoreIndex == -1) {
+            return "redesen";
+//            return fileName.substring(lastUnderscoreIndex, splitIndex);
+        }
+        // Step 3: 截取目标内容
+        return fileName.substring(
+                secondLastUnderscoreIndex + 1,
+                lastUnderscoreIndex
+        );
+    }
+
+    @Override
+    public FileStorageDetails saveRawFileTruncationWithDesenInfo(MultipartFile file) throws IOException {
+        String fileTimeStamp = String.valueOf(System.currentTimeMillis());
+
+        if (file.getOriginalFilename() == null) {
+            throw new IOException("Input file name is null");
+        }
+
+        String originalFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        String fileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
+        String rawFileSuffix = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        // 去除前后"_"字符之前之后的文字
+
+        fileName = extractBetweenLastTwoUnderscores(fileName);
+        String rawFileNameTemp = fileTimeStamp + "_" + fileName;
+        String rawFileName = rawFileNameTemp + "." + rawFileSuffix;
+        log.info("RawFileName: {}", rawFileName);
+        Path rawFilePath = rawFileDirectory.resolve(rawFileNameTemp + "." + rawFileSuffix);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        byte[] rawFileBytes = file.getBytes();
+        Long rawFileSize = file.getSize();
+        log.info("rawFileSize: {}", rawFileSize);
+        // Path for the desensitized file
+        String desenFileTimeStamp = String.valueOf(System.currentTimeMillis());
+        String desenFileName = rawFileNameTemp + "_" + desenFileTimeStamp + "." + rawFileSuffix;
+        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+
+        // Save the original file
+        file.transferTo(rawFilePath);
+//        Files.write(rawFilePath, rawFileBytes);
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
+                .rawFileBytes(rawFileBytes)
+                .rawFileSize(rawFileSize)
+                .desenFileName(desenFileName)
+                .desenFileSuffix(rawFileSuffix)
+                .desenFilePath(desenFilePath)
+                .desenFilePathString(desenFilePathString)
+                .build();
+    }
+
+    @Override
+    public FileStorageDetails saveRawFileWithDesenInfoByLog(ObjectNode evaluationLog) throws IOException {
+        String rawFileName = evaluationLog.get("data").get("content").get("desenInfoPre").asText();
+        String fileName = rawFileName.substring(0, rawFileName.lastIndexOf("."));
+        String rawFileSuffix = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
+        String desenFileName = fileName + "_" + System.currentTimeMillis() + "." + rawFileSuffix;
+        Path desenFilePath = desenFileDirectory.resolve(desenFileName);
+        Path rawFilePath = rawFileDirectory.resolve(rawFileName);
+        Long rawFileSize = Files.size(rawFilePath);
+        String rawFilePathString = rawFilePath.toAbsolutePath().toString();
+        String desenFilePathString = desenFilePath.toAbsolutePath().toString();
+
+        return FileStorageDetails.builder()
+                .rawFileName(rawFileName)
+                .rawFileSuffix(rawFileSuffix)
+                .rawFilePath(rawFilePath)
+                .rawFilePathString(rawFilePathString)
                 .rawFileSize(rawFileSize)
                 .desenFileName(desenFileName)
                 .desenFileSuffix(rawFileSuffix)

@@ -74,7 +74,7 @@ public class EvidenceSystemLogSenderImpl implements EvidenceSystemLogSender {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @EventListener
-    @Async
+    @Async("eventAsyncExecutor")
     @Override
     public void evidenceHandleThreeSystemEvent(ThreeSystemsEvent threeSystemsEvent) {
         ReqEvidenceSave reqEvidenceSave = threeSystemsEvent.getReqEvidenceSave();

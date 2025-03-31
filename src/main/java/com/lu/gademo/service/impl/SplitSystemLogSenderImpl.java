@@ -41,7 +41,7 @@ public class SplitSystemLogSenderImpl implements SplitSystemLogSender {
     Util util;
     ObjectMapper objectMapper = new ObjectMapper();
 
-    @EventListener
+
     @Async
     @Override
     public void splitHandleThreeSystemEvent(ThreeSystemsEvent logManagerEvent) {

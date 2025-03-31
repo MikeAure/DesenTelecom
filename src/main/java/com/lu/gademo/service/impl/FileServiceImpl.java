@@ -316,7 +316,6 @@ public class FileServiceImpl implements FileService {
         long startTimePoint = System.nanoTime();
 
         //  逐列处理
-        DataFormatter dataFormatter = new DataFormatter();
         for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
             // 取列名
             String colName = fieldRow.getCell(columnIndex).toString();
@@ -1865,9 +1864,8 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws IOException, ExecutionException, InterruptedException, TimeoutException {
-        HttpHeaders errorHttpHeaders = new HttpHeaders();
-        errorHttpHeaders.add(HttpHeaders.CONTENT_TYPE, "text/plain");
+    public ResponseEntity<byte[]> dealImage(FileStorageDetails fileStorageDetails, String params, String algName) throws
+            IOException, ExecutionException, InterruptedException, TimeoutException {
         // 处理图片
         LogInfo logInfo = processImage(fileStorageDetails, params, algName);
         LogCollectResult logCollectResult = logSenderManager.buildLogCollectResults(logInfo);

@@ -59,7 +59,7 @@ public class RuleCheckSystemLogSenderImpl implements RuleCheckSystemLogSender {
     private RecRuleTimeDao recRuleTimeDao;
 
     @EventListener
-    @Async
+    @Async("eventAsyncExecutor")
     @Override
     public void ruleCheckHandleThreeSystemEvent(ThreeSystemsEvent threeSystemsEvent) {
         // 三个系统的请求

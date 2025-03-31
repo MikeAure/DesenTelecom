@@ -1,5 +1,6 @@
 package com.lu.gademo.service;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.entity.FileStorageDetails;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,6 +10,10 @@ import java.util.List;
 
 public interface FileStorageService {
     FileStorageDetails saveRawFileWithDesenInfo(MultipartFile file) throws IOException;
+
+    FileStorageDetails saveRawFileTruncationWithDesenInfo(MultipartFile file) throws IOException;
+
+    FileStorageDetails saveRawFileWithDesenInfoByLog(ObjectNode evaluationLog) throws IOException;
 
     FileStorageDetails saveRawFileWithDesenInfoForBigFile(MultipartFile file) throws IOException;
 

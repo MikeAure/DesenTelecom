@@ -444,7 +444,7 @@ public class LogSenderManager {
                 infoBuilders.desenIntention, infoBuilders.desenRequirements, infoBuilders.desenControlSet,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType, rawFileSig);
 
-        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, rawFileHash, desenFileHash,
+        SendRuleReq sendRuleReq = logCollectUtil.buildSendRuleReq(evidenceID, globalID, desenFileHash,
                 infoBuilders.desenInfoAfterIden, infoBuilders.desenIntention,
                 infoBuilders.desenRequirements, infoBuilders.desenControlSet, infoBuilders.desenAlg,
                 infoBuilders.desenAlgParam, startTime, endTime, infoBuilders.desenLevel, desenCom, infoBuilders.fileDataType);
@@ -484,9 +484,9 @@ public class LogSenderManager {
         executorService.submit(() -> {
             ruleCheckSystemLogSender.send2RuleCheck(sendRuleReq);
         });
-        executorService.submit(() -> {
-            splitSystemLogSender.send2Split(sendSplitDesenData, desenFileBytes, splitMockSendFile);
-        });
+//        executorService.submit(() -> {
+//            splitSystemLogSender.send2Split(sendSplitDesenData, desenFileBytes, splitMockSendFile);
+//        });
         executorService.shutdown();
     }
 

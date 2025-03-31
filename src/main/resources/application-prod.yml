@@ -32,7 +32,48 @@ spring:
             password: BRysj0725HhRhL##
             username: root
             driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            jadira:
+                usertype:
+                    autoRegisterUserTypes: true
+        show-sql: false
+        open-in-view: false
 
+    servlet:
+        multipart:
+            max-file-size: 200MB
+            max-request-size: 200MB
+
+thymeleaf:
+    cache: false
+    encoding: UTF-8
+    servlet:
+        content-type: text/html
+
+mybatis:
+    configuration:
+        log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+        map-underscore-to-camel-case: true
+    mapper-locations: class*:/mapper/*.xml
+
+pagehelper:
+    reasonable: true
+    page-size-zero: true
+    support-methods-arguments: true
+
+server:
+    port: 8352
+
+logging:
+    file:
+        path: ./log
+    level:
+        org:
+            hibernate: WARN
+            hibernate.SQL: WARN
 
 desenToolSet:
     address: 192.168.10.31

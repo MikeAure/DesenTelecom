@@ -1,18 +1,26 @@
 package com.lu.gademo.dto.officeComment;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-
-public class InformationRecognition {
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class InformationRecognition extends BaseDateFormatter {
+    @JsonProperty("内容类型")
     private String contentType;
+    @JsonProperty("内容")
     private String content;
+    @JsonProperty("属性名称")
     private String attributeName;
-    private String informationRecognitionTime;
+    @JsonProperty("信息识别时间")
+    private LocalDateTime informationRecognitionTime;
 
     @JsonCreator
     public InformationRecognition(
@@ -23,11 +31,9 @@ public class InformationRecognition {
         this.contentType = contentType;
         this.content = content;
         this.attributeName = attributeName;
-        this.informationRecognitionTime = informationRecognitionTime;
+        this.informationRecognitionTime = LocalDateTime.parse(informationRecognitionTime, sdf);
     }
 
-    public InformationRecognition() {
-    }
 
     @JsonGetter("内容类型")
     public String getContentType() {
@@ -61,12 +67,12 @@ public class InformationRecognition {
 
     @JsonGetter("信息识别时间")
     public String getInformationRecognitionTime() {
-        return informationRecognitionTime;
+        return sdf.format(informationRecognitionTime);
     }
 
     @JsonSetter("信息识别时间")
     public void setInformationRecognitionTime(String informationRecognitionTime) {
-        this.informationRecognitionTime = informationRecognitionTime;
+        this.informationRecognitionTime = LocalDateTime.parse(informationRecognitionTime, sdf);
     }
 
     @Override

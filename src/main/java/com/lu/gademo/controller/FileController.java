@@ -1,6 +1,7 @@
 package com.lu.gademo.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lu.gademo.dto.FileInfoDto;
 import com.lu.gademo.dto.officeComment.ProcessDocumentResult;
 import com.lu.gademo.entity.BasicData;
@@ -413,18 +414,34 @@ public class FileController extends BaseController {
     @PostMapping(value = "multiDocument", produces = "application/json;charset=UTF-8")
     public ResponseEntity<Result<?>> dealOfdAndOthers(@RequestParam("file") MultipartFile file,
                                                       @RequestPart("fileInfo") FileInfoDto fileType)
-    throws IOException, ParseException, ExecutionException, InterruptedException, TimeoutException {
-        ProcessDocumentResult processResult = new ProcessDocumentResult();
-        log.info("GlobalID: {}", fileType.getGlobalID());
+   {
+//        ProcessDocumentResult processResult = new ProcessDocumentResult();
+       log.info("GlobalID: {}", fileType.getGlobalID());
+       FileStorageDetails fileStorageDetails = new FileStorageDetails();
         try {
-            FileStorageDetails fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
-            if (fileType.getFileType().equals("docx")) {
-                processResult = docxProcessorIceBlue
-                        .processDocx(fileStorageDetails, fileType);
-                return ResponseEntity.ok(new Result<>(200, "ok", null));
-            } else if (fileType.getFileType().equals("xlsx")) {
-                docxProcessorIceBlue.processXlsx(fileStorageDetails, fileType);
-                return ResponseEntity.ok(new Result<>(200, "ok", null));
+            boolean redesen = fileType.isRedesen();
+            if (redesen) {
+                log.info("Redesen Process");
+//                ObjectNode evaluationLog = fileType.getEvaluationLog();
+                fileStorageDetails = fileStorageService.saveRawFileTruncationWithDesenInfo(file);
+//                log.info("rawFileInfo: {}", fileStorageDetails);
+//                fileStorageDetails = fileStorageService.saveRawFileTruncationWithDesenInfo(file);
+            } else {
+                log.info("Normal Process");
+                fileStorageDetails = fileStorageService.saveRawFileWithDesenInfo(file);
+            }
+
+            switch (fileType.getFileType()) {
+                case "docx":
+                    docxProcessorIceBlue
+                            .processDocx(fileStorageDetails, fileType);
+                    return ResponseEntity.ok(new Result<>(200, "ok", null));
+                case "xlsx":
+                    docxProcessorIceBlue.processXlsx(fileStorageDetails, fileType);
+                    return ResponseEntity.ok(new Result<>(200, "ok", null));
+                case "pdf":
+                    docxProcessorIceBlue.processPdf(fileStorageDetails, fileType);
+                    return ResponseEntity.ok(new Result<>(200, "ok", null));
             }
             return ResponseEntity.status(500).body(new Result<>(500, "wrong file format", null));
         } catch (Exception e) {

@@ -5,47 +5,15 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DesensitizationOperation {
+    @JsonProperty("算法选择")
     private AlgorithmChosen algorithmChosen;
-
-    @JsonCreator
-    public DesensitizationOperation(
-            @JsonProperty("算法选择") AlgorithmChosen algorithmChosen) {
-        this.algorithmChosen = algorithmChosen;
-    }
-
-    @JsonGetter("算法选择")
-    public AlgorithmChosen getAlgorithmChosen() {
-        return algorithmChosen;
-    }
-
-    @JsonSetter("算法选择")
-    public void setAlgorithmChosen(AlgorithmChosen algorithmChosen) {
-        this.algorithmChosen = algorithmChosen;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DesensitizationOperation that = (DesensitizationOperation) o;
-        return Objects.equals(getAlgorithmChosen(), that.getAlgorithmChosen());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getAlgorithmChosen());
-    }
-
-    @Override
-    public String toString() {
-        return "DesensitizationOperation{" +
-                "algorithmChosen=" + algorithmChosen +
-                '}';
-    }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Getter
@@ -60,24 +28,26 @@ public class DesensitizationOperation {
         @JsonProperty("参数强度")
         private String parameterMagnitude = "";
         @JsonProperty("脱敏操作时间")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         private LocalDateTime desensitizationOperationTime = LocalDateTime.now();
         @JsonIgnore
         private int desenAlgNum;
         @JsonIgnore
         private String desenAlgParam;
-        
+
+        @JsonCreator
         public AlgorithmChosen(
-                String algorithmCategory,
-                String algorithmName,
-                String parameterMagnitude,
-                String desensitizationOperationTime){
+                @JsonProperty("算法类别") String algorithmCategory,
+                @JsonProperty("算法名称") String algorithmName,
+                @JsonProperty("参数强度") String parameterMagnitude,
+                @JsonProperty("脱敏操作时间") String desensitizationOperationTime) {
             this.algorithmCategory = algorithmCategory;
             this.algorithmName = algorithmName;
             this.parameterMagnitude = parameterMagnitude;
             this.desensitizationOperationTime = LocalDateTime.parse(desensitizationOperationTime, sdf);
-            this.desenAlgNum = 0;
-            this.desenAlgParam = "0";
+
         }
+
 
         public AlgorithmChosen(
                 String algorithmCategory,
@@ -85,7 +55,7 @@ public class DesensitizationOperation {
                 String parameterMagnitude,
                 String desensitizationOperationTime,
                 int desenAlgNum,
-                String desenAlgParam){
+                String desenAlgParam) {
             this.algorithmCategory = algorithmCategory;
             this.algorithmName = algorithmName;
             this.parameterMagnitude = parameterMagnitude;
@@ -110,11 +80,29 @@ public class DesensitizationOperation {
 
         }
 
+        public AlgorithmChosen(
+                String algorithmCategory,
+                String algorithmName,
+                String parameterMagnitude,
+                LocalDateTime desensitizationOperationTime
+        ) {
+            this.algorithmCategory = algorithmCategory;
+            this.algorithmName = algorithmName;
+            this.parameterMagnitude = parameterMagnitude;
+            this.desensitizationOperationTime = desensitizationOperationTime;
+            this.desenAlgNum = 1;
+            this.desenAlgParam = "1";
+
+        }
+
         @JsonProperty("脱敏操作时间")
-        public String getTimeString() {
+        public String getDesensitizationOperationTime() {
             return sdf.format(desensitizationOperationTime);
         }
 
-
+        @JsonProperty("脱敏操作时间")
+        public void setDesensitizationOperationTime(String desensitizationOperationTime) {
+            this.desensitizationOperationTime = LocalDateTime.parse(desensitizationOperationTime, sdf);
+        }
     }
 }

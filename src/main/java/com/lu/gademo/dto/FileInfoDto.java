@@ -17,10 +17,14 @@ public class FileInfoDto {
     @JsonProperty("globalID")
     String globalID;
     ObjectNode evaluationLog;
+    boolean random;
+    boolean redesen;
 
     public FileInfoDto(String fileType, String globalID) {
         this.fileType = fileType;
         this.globalID = globalID;
         this.evaluationLog = null;
+        this.random = false;
+        this.redesen = false;
     }
 }

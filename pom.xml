@@ -339,6 +339,12 @@
             <artifactId>spire.pdf.free</artifactId>
             <version>9.13.0</version>
         </dependency>
+        <dependency>
+            <groupId>e-iceblue</groupId>
+            <artifactId>spire.office.free</artifactId>
+            <version>5.4.0</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
 
     <build>
