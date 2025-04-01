@@ -338,11 +338,11 @@
                 let encryptKey = document.getElementById("encryptKey").value;
                 let selectRawVideo = nonDistortionSelectedRawVideo.files[0];
                 if (!selectRawVideo) {
-                    alert("未选择待加密文件");
+                    alert("未选择待脱敏文件");
                     return;
                 }
                 if (!encryptKey) {
-                    alert("未指定加密密钥");
+                    alert("未指定脱敏口令");
                     return;
                 }
                 let formData = new FormData();
@@ -964,7 +964,7 @@
                                 </label>
                                 <div class="col-lg-3">
                                     <select class="form-control" id="nodistortionAlg">
-                                        <option value="videoAesEncrypt" selected>AES视频加密</option>
+                                        <option value="videoAesEncrypt" selected>非失真视频混淆脱敏</option>
                                     </select>
                                 </div>
                             </div>

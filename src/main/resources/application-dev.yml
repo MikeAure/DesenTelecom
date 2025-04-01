@@ -81,26 +81,26 @@ desenToolSet:
     port: 8352
 effectEva:
     #    address: 192.168.37.192
-    address: 192.168.10.30
-    port: 8470
+    address: 127.0.0.1
+    port: 10005
     waitingTime: 10
 evidence:
     #    localAddress: 172.28.72.214
-    localAddress: 192.168.10.71
+    localAddress: 127.0.0.1
     localPort: 50004
     #    remoteAddress: 172.28.72.214
-    remoteAddress: 192.168.10.71
+    remoteAddress: 127.0.0.1
     remotePort: 50005
-    httpAddress: 192.168.10.71
+    httpAddress: 127.0.0.1
     httpPort: 50003
 
 ruleCheck:
     #    address: 172.28.72.224
-    address: 192.168.10.34
+    address: 127.0.0.1
     port: 30002
 splitReconstruct:
     #    address: 172.28.72.225
-    address: 192.168.10.33
+    address: 127.0.0.1
     port: 40011
 
 categoryAndGrade:
